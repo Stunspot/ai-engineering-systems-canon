@@ -1,4 +1,4 @@
-[← Back to Canon Map](../canon-map.md)# **AI-ENG-M — Agentic Orchestration \- Autonomy Boundaries, Loop Budgets & Termination**
+# **AI-ENG-M — Agentic Orchestration \- Autonomy Boundaries, Loop Budgets & Termination**
 
 The transition of artificial intelligence from static generative engines to active organizational actors represents a major paradigm shift in software systems engineering.1 Traditional model serving operates on a request-response pattern characterized by isolated, stateless computations where the surrounding application logic maintains absolute control over execution paths.2 Conversely, agentic systems autonomously synthesize their execution paths at runtime, choosing tools, updating operational state, and modifying plans based on continuous environmental observations.2 This shift transfers system risk from single-call correctness to end-to-end behavioral predictability across temporal, resource-constrained, and non-stationary environments.2  
 Agentic orchestration is the bounded control discipline that governs this dynamic behavior.6 Autonomy is not an abstract behavior or a design-free capability; it is a strictly regulated architectural lease of decision rights granted to a model under precise runtime constraints.2 An agent loop can only operate safely within production systems when its execution boundary is explicitly mapped, its resource consumption is metered, and its termination and escalation parameters are deterministically enforced.2  
@@ -570,3 +570,5 @@ An agentic workflow must terminate and escalate based on explicit, programmatic 
 25. BAGEN: Are LLM Agents Budget-Aware? \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2606.00198v1](https://arxiv.org/html/2606.00198v1)
 
 ---
+
+[← Back to Canon Map](../canon-map.md)
