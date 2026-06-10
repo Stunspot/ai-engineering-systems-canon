@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: "The AI Engineering Systems Canon"
+message: "If you use this knowledge base, please cite it as below."
+type: dataset
+authors:
+  - family-names: Walker
+    given-names: Sam
+    alias: stunspot
+    affiliation: Collaborative Dynamics
+abstract: "A 12-volume doctrinal knowledge base for high-dimensional AI system architecture."
+keywords:
+  - AI engineering
+  - LLM systems
+  - RAG
+  - model steering
+  - agentic systems
+  - AI evaluation
+  - AI governance
+license: CC-BY-NC-SA-4.0
+repository-code: "https://github.com/Stunspot/ai-engineering-systems-canon"
+url: "https://github.com/Stunspot/ai-engineering-systems-canon"
+date-released: "2026-06-XX"
