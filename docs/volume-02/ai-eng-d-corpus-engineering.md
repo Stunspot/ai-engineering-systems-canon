@@ -127,7 +127,7 @@ A robust, enterprise-grade metadata payload must be bound to every Corpus Object
 
 The fields below define the technical metadata schema of the standard Corpus Object:
 
-JSON  
+```JSON  
 {  
   "$schema": "http://json-schema.org/draft-07/schema#",  
   "title": "CorpusObjectSchema",  
@@ -242,6 +242,7 @@ JSON
   },  
   "required": ["identity", "origin", "provenance", "lifecycle", "security", "compliance", "epistemic"]  
 }
+```
 
 ## **Knowledge Supply Chain Pipeline**
 
@@ -513,7 +514,7 @@ The following Python implementation patterns demonstrate how to enforce permissi
 
 At ingestion time, every vector chunk is tagged with its tenant, allowed security groups, and classifications.8 The search engine enforces RBAC prior to approximate nearest neighbor (ANN) matching.8
 
-Python  
+```Python  
 from dataclasses import dataclass  
 from typing import List, Dict, Any, Optional
 
@@ -554,12 +555,13 @@ class SecureRetrievalEngine:
             limit=top_k  
         )  
         return results
+```
 
 #### **2. Attribute-Based Access Control (ABAC) Filtering**
 
 For fine-grained, dynamic rules (e.g., checking user geography, department match, and clearance level simultaneously), the system utilizes an ABAC filter.8
 
-Python  
+```Python  
 @dataclass  
 class UserContext:  
     identity_id: str  
@@ -589,12 +591,13 @@ class ABACEnforcer:
                 {"field": "classification", "in": allowed_clearances}  
             ]  
         }
+```
 
 #### **3. Row-Level Security (RLS) for Database-Backed Memory and Agents**
 
 For agents executing structured SQL queries via Text2SQL, PostgreSQL Row-Level Security must be enforced on the connection session to prevent query injection from leaking cross-tenant data.8
 
-SQL  
+```SQL  
 -- Enable RLS on the core agent memory table  
 ALTER TABLE agent_memory_store ENABLE ROW LEVEL SECURITY;
 
@@ -603,10 +606,11 @@ CREATE POLICY tenant_isolation_policy
 ON agent_memory_store  
 FOR ALL  
 USING (tenant_id = NULLIF(current_setting('app.current_tenant', true), ''));
+```
 
 The database adapter execution pattern maps the authenticated user principal to this session variable prior to query processing 8:
 
-Python  
+```Python  
 from sqlalchemy import text  
 from sqlalchemy.orm import Session
 
@@ -628,6 +632,7 @@ def execute_agent_query(db_session: Session, user: UserContext, generated_sql: s
     except Exception as e:  
         db_session.rollback()  
         raise SecurityException(f"SQL execution failed or blocked by policy engine: {str(e)}")
+```
 
 ## **Versioning, Retention, Redaction, and Archival Policy Map**
 

@@ -11,15 +11,15 @@ To establish a structurally durable nomenclature for the model adaptation lifecy
 
 | Term | Formal Representation / Mechanism | Operational Definition | System Impact |
 | :---- | :---- | :---- | :---- |
-| **Model Adaptation** | f\_theta \-\> f\_(theta \+ delta\_theta) | The disciplined modification, specialization, alignment, or compression of model behavior through optimization algorithms that alter parameter states or output logit distributions to satisfy a stable task envelope.7 | Shuts down runtime variance, reduces prompt overhead, and locks in domain formatting.5 |
-| **Supervised Fine-Tuning (SFT)** | L\_SFT(theta) \= \-sum log P\_theta(y\_t | x, y\_\<t) | Updating all model weights by computing gradients over a labeled corpus of prompt-response pairs using a cross-entropy loss function.10 |
+| **Model Adaptation** | f_theta -> f_(theta + delta_theta) | The disciplined modification, specialization, alignment, or compression of model behavior through optimization algorithms that alter parameter states or output logit distributions to satisfy a stable task envelope.7 | Shuts down runtime variance, reduces prompt overhead, and locks in domain formatting.5 |
+| **Supervised Fine-Tuning (SFT)** | L_SFT(theta) = -sum log P_theta(y_t | x, y_<t) | Updating all model weights by computing gradients over a labeled corpus of prompt-response pairs using a cross-entropy loss function.10 |
 | **Instruction Tuning** | Formatted as explicit instruction-response structures | A specialized form of SFT where the training data is structured as instructions and multi-turn dialogues, shifting the model from next-token completion to conversational task-following behavior.4 | Restructures attention allocation; makes the model highly receptive to zero-shot task framing. |
-| **Low-Rank Adaptation (LoRA)** | W \= W\_0 \+ (alpha / r) \* B \* A | A parameter-efficient fine-tuning technique that freezes pre-trained weights W\_0 in R^(d x k) and injects trainable low-rank matrices A in R^(r x k) and B in R^(d x r) where r \<\< min(d, k).1 | Decreases GPU training memory footprint by up to 3x; allows dynamic, zero-latency adapter swapping at inference.1 |
+| **Low-Rank Adaptation (LoRA)** | W = W_0 + (alpha / r) * B * A | A parameter-efficient fine-tuning technique that freezes pre-trained weights W_0 in R^(d x k) and injects trainable low-rank matrices A in R^(r x k) and B in R^(d x r) where r << min(d, k).1 | Decreases GPU training memory footprint by up to 3x; allows dynamic, zero-latency adapter swapping at inference.1 |
 | **Quantized Low-Rank Adaptation (QLoRA)** | Quantization of base weights to NF4 with double quantization | An adaptation of LoRA where the base model is quantized to a specialized low-bit representation (typically 4-bit NormalFloat) while the adapter matrices remain in high precision.16 | Lowers VRAM requirements of fine-tuning by up to 4x, enabling training of large models on commodity hardware with minimal precision loss.17 |
-| **Adapter** | Modular parameter deltas delta\_W \= B \* A | A modular, lightweight set of trainable parameters that can be dynamically loaded, swapped, or merged into a frozen base model at runtime to alter its behavior.8 | Decouples base capability from specialized domain execution, simplifying multi-tenant serving.8 |
-| **Adapter Merge** | W\_merged \= W\_0 \+ delta\_W | The physical consolidation of adapter weights directly into the base model weights, eliminating runtime inference latency.6 | Removes memory lookup overhead, but permanently fuses behavior and destroys adapter modularity.6 |
+| **Adapter** | Modular parameter deltas delta_W = B * A | A modular, lightweight set of trainable parameters that can be dynamically loaded, swapped, or merged into a frozen base model at runtime to alter its behavior.8 | Decouples base capability from specialized domain execution, simplifying multi-tenant serving.8 |
+| **Adapter Merge** | W_merged = W_0 + delta_W | The physical consolidation of adapter weights directly into the base model weights, eliminating runtime inference latency.6 | Removes memory lookup overhead, but permanently fuses behavior and destroys adapter modularity.6 |
 | **Preference Tuning** | Policy optimization based on a relative preference signal | Programmatic alignment of model outputs with comparative utility signals, optimizing the policy to favor preferred completions over dispreferred ones.20 | Controls brand safety, shapes conversational tone, and mitigates toxic or adversarial completions.2 |
-| **Reinforcement Learning from Human Feedback (RLHF)** | Actor-Critic optimization against a learned reward r\_phi(x, y) | An online alignment framework that trains a scalar reward model on human preferences and optimizes the policy using reinforcement learning (e.g., PPO) with a KL penalty.2 | High capability for long-tail alignment, but presents high training instability and massive infrastructure overhead.2 |
+| **Reinforcement Learning from Human Feedback (RLHF)** | Actor-Critic optimization against a learned reward r_phi(x, y) | An online alignment framework that trains a scalar reward model on human preferences and optimizes the policy using reinforcement learning (e.g., PPO) with a KL penalty.2 | High capability for long-tail alignment, but presents high training instability and massive infrastructure overhead.2 |
 | **Direct Preference Optimization (DPO)** | Sigmoid-wrapped log-ratio objective | An offline alignment method that parameterizes the reward function directly through the policy's log-probabilities, bypassing explicit reward modeling.2 | Simplifies preference optimization to a supervised loss; prone to over-fitting and logit saturation.22 |
 | **Identity Preference Optimization (IPO)** | Margin-regularized quadratic preference loss | An offline preference optimization variant that adds a quadratic regularization term to the DPO loss.22 | Prevents premature logit saturation and reduces model overfitting to noisy preference labels without early stopping.20 |
 | **Kahneman-Tversky Optimization (KTO)** | Prospect-theory utility maximization | An alignment loss that optimizes a policy using independent binary desirability labels (good vs. bad) rather than paired preferences, modeling human loss aversion asymmetrically.2 | Operates on abundant, unpaired telemetry data (thumbs-up / thumbs-down); handles extreme dataset imbalances exceptionally well.2 |
@@ -49,10 +49,10 @@ A disciplined engineering organization does not default to model training. Befor
 | 8 | **Tools** | Action-level | Decoupled | Days | API definitions | Moderate | Multi-step invocation | High | High (agent framework) | Low |
 | 9 | **Routing** | Semantic Redirection | Decoupled | Days | Classification heuristics | Low | Millisecond routing check | High | Moderate | Low |
 | 10 | **Model Selection** | Capability-level | High | Days | Evaluation sets | Moderate | Variable (swap-dependent) | High | High (router node) | Low |
-| 11 | **Supervised Fine-Tuning** | Deep Parameter | Irreversible | Weeks | 10^3 \- 10^5 pairs | High | Zero | Low | High (Discrete artifact) | High |
-| 12 | **LoRA / QLoRA** | Weight-level | High (unloadable) | Days to Weeks | 10^2 \- 10^4 pairs | Moderate | Near-zero (with Punica/SGMV) | Moderate | High (Multi-adapter server) | Moderate |
-| 13 | **Preference Tuning** | Logit Alignment | Irreversible | Weeks to Months | 10^3 \- 10^4 pairwise tags | High | Zero | Low | High | Extremely High |
-| 14 | **Distillation** | Architectural | Irreversible | Months | 10^5 \- 10^6 teacher outputs | Extremely High (initially) | Massive Reduction (5-30x savings) | Low | High (New student artifact) | High |
+| 11 | **Supervised Fine-Tuning** | Deep Parameter | Irreversible | Weeks | 10^3 - 10^5 pairs | High | Zero | Low | High (Discrete artifact) | High |
+| 12 | **LoRA / QLoRA** | Weight-level | High (unloadable) | Days to Weeks | 10^2 - 10^4 pairs | Moderate | Near-zero (with Punica/SGMV) | Moderate | High (Multi-adapter server) | Moderate |
+| 13 | **Preference Tuning** | Logit Alignment | Irreversible | Weeks to Months | 10^3 - 10^4 pairwise tags | High | Zero | Low | High | Extremely High |
+| 14 | **Distillation** | Architectural | Irreversible | Months | 10^5 - 10^6 teacher outputs | Extremely High (initially) | Massive Reduction (5-30x savings) | Low | High (New student artifact) | High |
 | 15 | **No Adaptation** | None | N/A | N/A | None | Zero | None | N/A | Zero | None |
 
 ## **Behavior Gap Diagnostic**
@@ -77,48 +77,48 @@ When adaptation is diagnosed as the required intervention, the choice of method 
 
 | Method | Ideal Use Case | Required Data | Training Complexity | Infrastructure Burden | Behavioral Depth | Failure Risk | Evaluation Requirements |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Supervised Fine-Tuning** | Mastering domain-specific styles, specialized classifications, or highly repetitive output structural patterns.5 | 10^3 \- 10^5 highly curated prompt-response pairs with perfect formatting.5 | Moderate (standard cross-entropy optimization).10 | High (requires full parameter gradient tracking and optimizer memory).7 | Deep structural behavior shift; alters core attention weight profiles. | High (susceptible to catastrophic forgetting and style overfit).13 | Comprehensive held-out task evals, general reasoning tests, and safety checks.4 |
-| **Instruction Tuning** | Aligning raw base models to conversational dialog patterns and multi-turn instruction following.4 | 10^4 \- 10^5 diverse instruction-response sequences across multiple tasks.7 | Moderate to High (requires careful masking of instruction tokens). | High (requires multi-node distributed training for parameter scale). | Moderate to High (restructures conversational attention bounds). | Moderate (risks collapsing zero-shot out-of-domain performance).4 | Dialogue adherence, constraint checking, and general benchmark tracking.4 |
-| **LoRA** | Specialized task adaptation under strict hardware, VRAM, or multi-tenant serving constraints.1 | 10^2 \- 10^4 target task examples; highly efficient in low-data regimes.7 | Low to Moderate (hyperparameter tuning of r and alpha is highly sensitive).7 | Low (base weights frozen; only low-rank matrices are optimized).1 | Moderate (constrained to the low-rank update subspace).7 | Low to Moderate (acts as a strong regularizer, minimizing forgetting).7 | Held-out target evaluations, prompt template dependency validation.18 |
-| **QLoRA** | Specialized training of highly parameterized models on constrained, commodity single-GPU hardware.16 | 10^2 \- 10^4 target task examples; maps identically to LoRA data footprints. | Moderate (requires fused quantization-dequantization pipelines).16 | Extremely Low (quantizes base model to 4-bit NF4 with double quantization).16 | Moderate (identical behavioral footprint to standard LoRA updates). | Low to Moderate (minor precision losses during on-the-fly dequantization).16 | Identical to LoRA; requires runtime latency tracking.16 |
-| **Preference Tuning** | Brand alignment, tone shaping, safety guardrail enforcement, and conversational quality tuning.20 | 10^3 \- 10^4 pairwise chosen/rejected records or pointwise utility labels.2 | Extremely High (susceptible to gradient explosion, policy collapse).12 | Moderate to High (requires reference model tracking and policy rollouts).2 | Superficial logit alignment; modifies probability boundaries.2 | High (over-optimization, reward hacking, loss of reasoning).11 | Held-out preference evaluations, adversarial safety red-teaming.4 |
-| **Domain Adaptation** | Infusing specialized language styles, acronyms, or deep reasoning patterns into pre-training.4 | 10^8 \- 10^10 raw, domain-specific text tokens (Continued Pre-Training).7 | High (requires custom learning rate schedules and packing algorithms). | Massive (requires high-throughput multi-GPU pre-training clusters). | Deep representation shift; reshapes the core latent semantic space. | Extremely High (erodes general world knowledge and reasoning).7 | Standard pre-training benchmarks, general reasoning, domain-specific cloze tests.14 |
+| **Supervised Fine-Tuning** | Mastering domain-specific styles, specialized classifications, or highly repetitive output structural patterns.5 | 10^3 - 10^5 highly curated prompt-response pairs with perfect formatting.5 | Moderate (standard cross-entropy optimization).10 | High (requires full parameter gradient tracking and optimizer memory).7 | Deep structural behavior shift; alters core attention weight profiles. | High (susceptible to catastrophic forgetting and style overfit).13 | Comprehensive held-out task evals, general reasoning tests, and safety checks.4 |
+| **Instruction Tuning** | Aligning raw base models to conversational dialog patterns and multi-turn instruction following.4 | 10^4 - 10^5 diverse instruction-response sequences across multiple tasks.7 | Moderate to High (requires careful masking of instruction tokens). | High (requires multi-node distributed training for parameter scale). | Moderate to High (restructures conversational attention bounds). | Moderate (risks collapsing zero-shot out-of-domain performance).4 | Dialogue adherence, constraint checking, and general benchmark tracking.4 |
+| **LoRA** | Specialized task adaptation under strict hardware, VRAM, or multi-tenant serving constraints.1 | 10^2 - 10^4 target task examples; highly efficient in low-data regimes.7 | Low to Moderate (hyperparameter tuning of r and alpha is highly sensitive).7 | Low (base weights frozen; only low-rank matrices are optimized).1 | Moderate (constrained to the low-rank update subspace).7 | Low to Moderate (acts as a strong regularizer, minimizing forgetting).7 | Held-out target evaluations, prompt template dependency validation.18 |
+| **QLoRA** | Specialized training of highly parameterized models on constrained, commodity single-GPU hardware.16 | 10^2 - 10^4 target task examples; maps identically to LoRA data footprints. | Moderate (requires fused quantization-dequantization pipelines).16 | Extremely Low (quantizes base model to 4-bit NF4 with double quantization).16 | Moderate (identical behavioral footprint to standard LoRA updates). | Low to Moderate (minor precision losses during on-the-fly dequantization).16 | Identical to LoRA; requires runtime latency tracking.16 |
+| **Preference Tuning** | Brand alignment, tone shaping, safety guardrail enforcement, and conversational quality tuning.20 | 10^3 - 10^4 pairwise chosen/rejected records or pointwise utility labels.2 | Extremely High (susceptible to gradient explosion, policy collapse).12 | Moderate to High (requires reference model tracking and policy rollouts).2 | Superficial logit alignment; modifies probability boundaries.2 | High (over-optimization, reward hacking, loss of reasoning).11 | Held-out preference evaluations, adversarial safety red-teaming.4 |
+| **Domain Adaptation** | Infusing specialized language styles, acronyms, or deep reasoning patterns into pre-training.4 | 10^8 - 10^10 raw, domain-specific text tokens (Continued Pre-Training).7 | High (requires custom learning rate schedules and packing algorithms). | Massive (requires high-throughput multi-GPU pre-training clusters). | Deep representation shift; reshapes the core latent semantic space. | Extremely High (erodes general world knowledge and reasoning).7 | Standard pre-training benchmarks, general reasoning, domain-specific cloze tests.14 |
 | **Synthetic Data Gen.** | Expanding training coverage for low-frequency edge cases or bootstrapping data-scarce domains.5 | Highly capable teacher seed prompts; template-driven simulation models.5 | Low to Moderate (computational complexity is concentrated at inference). | Low (requires inference execution infrastructure for the teacher model). | N/A (this is a data curation and synthesis method). | High (risks introducing teacher errors and synthetic monoculture).5 | Diversity metrics, hallucination audits, compiler/sandbox verification.5 |
-| **Distillation** | Compressing expensive frontier model capabilities into compact, low-latency deployment artifacts.5 | 10^5 \- 10^6 high-fidelity teacher completions, soft logits, or reasoning traces.9 | High (requires joint student-teacher validation and logit-matching code). | High (requires hosting both student and teacher during data generation).32 | Deep architectural compression; alters parameter efficiency.9 | High (student parameter limits may trigger a capacity gap collapse).32 | Massive regression suites, comparative student-teacher performance tracking.5 |
+| **Distillation** | Compressing expensive frontier model capabilities into compact, low-latency deployment artifacts.5 | 10^5 - 10^6 high-fidelity teacher completions, soft logits, or reasoning traces.9 | High (requires joint student-teacher validation and logit-matching code). | High (requires hosting both student and teacher during data generation).32 | Deep architectural compression; alters parameter efficiency.9 | High (student parameter limits may trigger a capacity gap collapse).32 | Massive regression suites, comparative student-teacher performance tracking.5 |
 
 ### **SFT vs. Parameter-Efficient Adaptation (LoRA)**
 
-Full parameter fine-tuning (FFT) updates all parameters of the network by calculating gradients over a target dataset D \= {(x\_i, y\_i)} using the standard auto-regressive cross-entropy loss:  
-L\_SFT(theta) \= \-sum\_(i=1 to |D|) sum\_(t=1 to |y\_i|) log P\_theta(y\_i,t | x\_i, y\_i,\<t)  
+Full parameter fine-tuning (FFT) updates all parameters of the network by calculating gradients over a target dataset D = {(x_i, y_i)} using the standard auto-regressive cross-entropy loss:  
+L_SFT(theta) = -sum_(i=1 to |D|) sum_(t=1 to |y_i|) log P_theta(y_i,t | x_i, y_i,<t)  
 SFT is highly effective for establishing target styles, domain formatting, and structured task patterns. However, full parameter fine-tuning requires keeping optimizer states (e.g., AdamW's first and second moments) in GPU memory, which consumes roughly six times the memory of the model weights alone.12  
-To bypass this memory wall, Low-Rank Adaptation (LoRA) freezes the pre-trained weight matrix W\_0 in R^(d\_out x d\_in) and represents the weight update delta\_W through a low-rank decomposition 1:  
-W\_adapted \= W\_0 \+ delta\_W \= W\_0 \+ (alpha / r) \* B \* A  
-where B in R^(d\_out x r) and A in R^(r x d\_in) are trainable parameters, r \<\< min(d\_in, d\_out) is the rank hyperparameter, and alpha is a constant scaling factor that stabilizes training when adjusting r.1 The matrix A is typically initialized from a random Gaussian distribution N(0, sigma^2), and B is initialized to zero, ensuring that delta\_W \= 0 at the onset of training, which preserves the model's pre-trained behavior.1  
+To bypass this memory wall, Low-Rank Adaptation (LoRA) freezes the pre-trained weight matrix W_0 in R^(d_out x d_in) and represents the weight update delta_W through a low-rank decomposition 1:  
+W_adapted = W_0 + delta_W = W_0 + (alpha / r) * B * A  
+where B in R^(d_out x r) and A in R^(r x d_in) are trainable parameters, r << min(d_in, d_out) is the rank hyperparameter, and alpha is a constant scaling factor that stabilizes training when adjusting r.1 The matrix A is typically initialized from a random Gaussian distribution N(0, sigma^2), and B is initialized to zero, ensuring that delta_W = 0 at the onset of training, which preserves the model's pre-trained behavior.1  
 To optimize memory efficiency further, Quantized Low-Rank Adaptation (QLoRA) introduces three core architectural innovations 16:
 
-1. **NormalFloat 4 (NF4)**: An information-theoretically optimal 4-bit quantization scheme engineered specifically for normally distributed parameters.34 The 16 quantization bins are determined by finding the equiprobable quantiles of the standard normal distribution N(0, 1\) 34: q\_i \= 1/2 \* \[ Q\_x(i / 17\) \+ Q\_x((i \+ 1\) / 17\) \], for i in {0,..., 15} where Q\_x(...) is the quantile function of N(0, 1), and the codebook is rescaled to exactly represent zero.34  
+1. **NormalFloat 4 (NF4)**: An information-theoretically optimal 4-bit quantization scheme engineered specifically for normally distributed parameters.34 The 16 quantization bins are determined by finding the equiprobable quantiles of the standard normal distribution N(0, 1) 34: q_i = 1/2 * [ Q_x(i / 17) + Q_x((i + 1) / 17) ], for i in {0,..., 15} where Q_x(...) is the quantile function of N(0, 1), and the codebook is rescaled to exactly represent zero.34  
 2. **Double Quantization (DQ)**: The process of quantizing the quantization constants (scales) themselves. QLoRA quantizes 32-bit floating-point scales per block of 64 weights into 8-bit floats with a block size of 256, reducing the memory footprint from 32 bits per block to roughly 8.12 bits per block.16  
 3. **Paged Optimizers**: The dynamic offloading of optimizer states to CPU memory during memory spikes, preventing out-of-memory errors on high-batch training steps.
 
 Empirical research establishes a critical performance-regularization trade-off between full fine-tuning (FFT) and LoRA.
 
 * **Learning Capacity**: Full fine-tuning learns perturbations with an intrinsic rank that is 10x to 100x greater than standard LoRA configurations (r in {8, 16, 32}).7 Consequently, for complex continued pre-training (CPT) on highly technical domains like mathematics or computer programming, LoRA significantly underperforms full fine-tuning because the low-rank constraint restricts the model's ability to absorb novel linguistic structures and complex representation shifts.7  
-* **Instruction Following**: In standard instruction fine-tuning (IFT) regimes (e.g., 10^5 samples), the performance gap between LoRA and FFT can be largely closed by scaling the rank r to higher dimensions (e.g., r \>= 64, alpha \= 128\) and targeting all linear projections in the transformer architecture—including attention projections (W\_q, W\_k, W\_v, W\_o) and feedforward block projections (W\_gate, W\_up, W\_down).1  
-* **Generalization and Forgetting**: LoRA acts as a powerful regularizer. Because the base model weights W\_0 remain frozen, LoRA prevents the model's pre-trained representation coordinates from collapsing.7 LoRA significantly mitigates catastrophic forgetting of out-of-domain knowledge compared to full fine-tuning and maintains a higher degree of generation diversity, preventing the token distribution from collapsing into a narrow subset of solutions.7  
-* **Hyperparameter Sensitivity**: LoRA is highly sensitive to training hyperparameters. The critical parameters are, in order of decreasing sensitivity: Learning Rate \-\> Target Modules \-\> Rank (r) and Alpha (alpha).7
+* **Instruction Following**: In standard instruction fine-tuning (IFT) regimes (e.g., 10^5 samples), the performance gap between LoRA and FFT can be largely closed by scaling the rank r to higher dimensions (e.g., r >= 64, alpha = 128) and targeting all linear projections in the transformer architecture—including attention projections (W_q, W_k, W_v, W_o) and feedforward block projections (W_gate, W_up, W_down).1  
+* **Generalization and Forgetting**: LoRA acts as a powerful regularizer. Because the base model weights W_0 remain frozen, LoRA prevents the model's pre-trained representation coordinates from collapsing.7 LoRA significantly mitigates catastrophic forgetting of out-of-domain knowledge compared to full fine-tuning and maintains a higher degree of generation diversity, preventing the token distribution from collapsing into a narrow subset of solutions.7  
+* **Hyperparameter Sensitivity**: LoRA is highly sensitive to training hyperparameters. The critical parameters are, in order of decreasing sensitivity: Learning Rate -> Target Modules -> Rank (r) and Alpha (alpha).7
 
 ## **Preference Tuning Architectures**
 
 Preference tuning shifts the optimization target from imitating a target corpus to maximizing a comparative utility metric. Rather than asking "what token is most likely to follow?", preference optimization asks "which candidate completion is structurally, semantically, or safety-wise preferred?".20 This phase is critical for alignment, style control, toxicity reduction, and complex multi-turn conversational patterns.11  
-Standard preference tuning assumes a dataset of prompt-response pairs D \= {(x, y\_w, y\_l)}, where y\_w represents the preferred (chosen) response and y\_l represents the dispreferred (rejected) response.2 Traditionally, this was executed via Reinforcement Learning from Human Feedback (RLHF), which requires:
+Standard preference tuning assumes a dataset of prompt-response pairs D = {(x, y_w, y_l)}, where y_w represents the preferred (chosen) response and y_l represents the dispreferred (rejected) response.2 Traditionally, this was executed via Reinforcement Learning from Human Feedback (RLHF), which requires:
 
-1. Training a binary classification Reward Model r\_phi(x, y) on pairwise preferences using the Bradley-Terry objective 2: L\_R(r\_phi) \= \-E\_(x, y\_w, y\_l) \~ D \[ log sigma( r\_phi(x, y\_w) \- r\_phi(x, y\_l) ) \]  
-2. Optimizing the active policy pi\_theta(y | x) against the frozen reward model r\_phi using Actor-Critic PPO, while applying a Kullback-Leibler (KL) divergence penalty against a frozen reference policy pi\_ref to prevent policy collapse 2: Objective(theta) \= E\_(x \~ D, y \~ pi\_theta) \[ r\_phi(x, y) \] \- beta \* DKL( pi\_theta(y | x) |
+1. Training a binary classification Reward Model r_phi(x, y) on pairwise preferences using the Bradley-Terry objective 2: L_R(r_phi) = -E_(x, y_w, y_l) ~ D [ log sigma( r_phi(x, y_w) - r_phi(x, y_l) ) ]  
+2. Optimizing the active policy pi_theta(y | x) against the frozen reward model r_phi using Actor-Critic PPO, while applying a Kullback-Leibler (KL) divergence penalty against a frozen reference policy pi_ref to prevent policy collapse 2: Objective(theta) = E_(x ~ D, y ~ pi_theta) [ r_phi(x, y) ] - beta * DKL( pi_theta(y | x) |
 
-| pi\_ref(y | x) )  
-PPO requires maintaining four distinct models in memory (Actor pi\_theta, Critic, Reward r\_phi, Reference pi\_ref), leading to high training instability, complex hyperparameter tuning, and massive GPU infrastructure requirements.2  
+| pi_ref(y | x) )  
+PPO requires maintaining four distinct models in memory (Actor pi_theta, Critic, Reward r_phi, Reference pi_ref), leading to high training instability, complex hyperparameter tuning, and massive GPU infrastructure requirements.2  
 To eliminate this complexity, Direct Preference Optimization (DPO) mathematically reparameterizes the Bradley-Terry reward function directly in terms of the policy's log-probabilities, bypassing the reward model and reinforcement learning loop entirely.2 The DPO loss is defined as 2:  
-L\_DPO(pi\_theta; pi\_ref) \= \-E\_(x, y\_w, y\_l) \~ D \[ log sigma( beta \* log(pi\_theta(y\_w | x) / pi\_ref(y\_w | x)) \- beta \* log(pi\_theta(y\_l | x) / pi\_ref(y\_l | x)) ) \]  
+L_DPO(pi_theta; pi_ref) = -E_(x, y_w, y_l) ~ D [ log sigma( beta * log(pi_theta(y_w | x) / pi_ref(y_w | x)) - beta * log(pi_theta(y_l | x) / pi_ref(y_l | x)) ) ]  
 where beta controls the strength of the implicit KL penalty.2  
 While computationally elegant, DPO exhibits distinct empirical vulnerabilities:
 
@@ -130,17 +130,17 @@ To address DPO's limitations, alternative frameworks have emerged:
 ### **Identity Preference Optimization (IPO)**
 
 IPO introduces a quadratic regularization term directly over the implicit reward margin to prevent the policy from saturating and over-optimizing to noisy preference labels.22 The loss is formulated as 22:  
-L\_IPO(pi\_theta; pi\_ref) \= E\_(x, y\_w, y\_l) \~ D \[ ( beta \* log(pi\_theta(y\_w | x) / pi\_ref(y\_w | x)) \- beta \* log(pi\_theta(y\_l | x) / pi\_ref(y\_l | x)) \- 1 / (2 \* beta) )^2 \]  
-By replacing the log-sigmoid objective with a squared error deviation from a target margin c \= 1 / (2 \* beta), IPO prevents logit saturation, regularizes the policy throughout training, and enables convergence without the need for early stopping.20
+L_IPO(pi_theta; pi_ref) = E_(x, y_w, y_l) ~ D [ ( beta * log(pi_theta(y_w | x) / pi_ref(y_w | x)) - beta * log(pi_theta(y_l | x) / pi_ref(y_l | x)) - 1 / (2 * beta) )^2 ]  
+By replacing the log-sigmoid objective with a squared error deviation from a target margin c = 1 / (2 * beta), IPO prevents logit saturation, regularizes the policy throughout training, and enables convergence without the need for early stopping.20
 
 ### **Kahneman-Tversky Optimization (KTO)**
 
-KTO bypasses the requirement for paired preference data.20 Based on the asymmetrical value function of Kahneman & Tversky's prospect theory, KTO posits that humans perceive utility relative to a reference point and are significantly more averse to losses (dispreferred outcomes) than they are pleased by equivalent gains (preferred outcomes).2 KTO operates on independent binary annotations: whether a completion is desirable (y \~ desirable) or undesirable (y \~ undesirable) for a given prompt.2  
+KTO bypasses the requirement for paired preference data.20 Based on the asymmetrical value function of Kahneman & Tversky's prospect theory, KTO posits that humans perceive utility relative to a reference point and are significantly more averse to losses (dispreferred outcomes) than they are pleased by equivalent gains (preferred outcomes).2 KTO operates on independent binary annotations: whether a completion is desirable (y ~ desirable) or undesirable (y ~ undesirable) for a given prompt.2  
 The KTO loss function is formulated as 2:  
-L\_KTO(pi\_theta; pi\_ref) \= E\_(x, y \~ D) \[ w(y) \* ( 1 \- sigma( tau(x, y; beta) ) ) \]  
-where tau(x, y; beta) \= beta \* log(pi\_theta(y | x) / pi\_ref(y | x)) \- z(x; beta) represents the margin-adjusted implicit reward, z(x; beta) is a dynamic reference point tracking the expected reward of the current policy, and w(y) is the asymmetrical weighting factor 2:  
-w(y) \= lambda\_D if y is desirable, or lambda\_U if y is undesirable  
-To model human loss aversion, the penalty weight for undesirable outcomes is set higher than the reward weight for desirable outcomes (typically lambda\_D \= 1.0 and lambda\_U \= 1.33).37 KTO matches or exceeds DPO performance on task capabilities, excels in handling highly imbalanced datasets, and collects data directly from user telemetry (e.g., thumbs-up / thumbs-down logs).2
+L_KTO(pi_theta; pi_ref) = E_(x, y ~ D) [ w(y) * ( 1 - sigma( tau(x, y; beta) ) ) ]  
+where tau(x, y; beta) = beta * log(pi_theta(y | x) / pi_ref(y | x)) - z(x; beta) represents the margin-adjusted implicit reward, z(x; beta) is a dynamic reference point tracking the expected reward of the current policy, and w(y) is the asymmetrical weighting factor 2:  
+w(y) = lambda_D if y is desirable, or lambda_U if y is undesirable  
+To model human loss aversion, the penalty weight for undesirable outcomes is set higher than the reward weight for desirable outcomes (typically lambda_D = 1.0 and lambda_U = 1.33).37 KTO matches or exceeds DPO performance on task capabilities, excels in handling highly imbalanced datasets, and collects data directly from user telemetry (e.g., thumbs-up / thumbs-down logs).2
 
 ## **Training Dataset Design Framework**
 
@@ -156,10 +156,10 @@ A model adaptation run is only as robust as the corpus that defines it. Treating
 
 To ensure training data label consistency prior to optimization, the annotation pipeline must enforce mathematical calibration steps:
 
-* **Cohen's Kappa (kappa)**: Used to evaluate the degree of agreement between exactly two fixed raters assigning categorical labels 38: kappa \= (P\_0 \- P\_e) / (1 \- P\_e) where P\_0 represents the observed proportion of agreement between the raters, and P\_e is the expected proportion of agreement due to random chance based on marginal frequencies.38  
-* **Fleiss' Kappa (kappa)**: A generalization of Cohen's Kappa used when three or more fixed raters (m \>= 3\) assign categorical labels to a set of items, allowing for random rater sampling per item 38: kappa \= (bar\_P \- bar\_P\_e) / (1 \- bar\_P\_e) where bar\_P represents the mean of the rater agreement proportions calculated subject-by-subject, and bar\_P\_e represents the expected agreement if all raters made completely random assignments.39
+* **Cohen's Kappa (kappa)**: Used to evaluate the degree of agreement between exactly two fixed raters assigning categorical labels 38: kappa = (P_0 - P_e) / (1 - P_e) where P_0 represents the observed proportion of agreement between the raters, and P_e is the expected proportion of agreement due to random chance based on marginal frequencies.38  
+* **Fleiss' Kappa (kappa)**: A generalization of Cohen's Kappa used when three or more fixed raters (m >= 3) assign categorical labels to a set of items, allowing for random rater sampling per item 38: kappa = (bar_P - bar_P_e) / (1 - bar_P_e) where bar_P represents the mean of the rater agreement proportions calculated subject-by-subject, and bar_P_e represents the expected agreement if all raters made completely random assignments.39
 
-A strict engineering protocol dictates that training data collection must be halted and annotation rubrics recalibrated if the inter-rater agreement score falls below kappa \= 0.70.38
+A strict engineering protocol dictates that training data collection must be halted and annotation rubrics recalibrated if the inter-rater agreement score falls below kappa = 0.70.38
 
 ## **Synthetic Data Governance Model**
 
@@ -167,7 +167,7 @@ When organic training data is sparse, synthetic data generation is a valid strat
 
 | Governance Layer | Operational Protocol | Filtering & Verification Controls | Diversity & Entropic Controls | Bias & Noise Mitigations | Disclosure & Provenance Rules |
 | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Generation (Teacher Selection)** | Select frontier models (e.g., Llama 3.3 70B, Qwen3 235B).5 Use temperature perturbation (T \>= 1.0).5 | Filter out standard teacher prefix phrases (e.g., "Certainly," "As an AI language model").23 | Implement nucleated sampling (p \= 0.95) to prevent structural token collapse and repetitive phrasing. | De-duplicate completions via MinHash LSH; enforce minimum semantic distance thresholds.5 | Append metadata tags documenting the generating model name, API version, and temperature config.18 |
+| **Generation (Teacher Selection)** | Select frontier models (e.g., Llama 3.3 70B, Qwen3 235B).5 Use temperature perturbation (T >= 1.0).5 | Filter out standard teacher prefix phrases (e.g., "Certainly," "As an AI language model").23 | Implement nucleated sampling (p = 0.95) to prevent structural token collapse and repetitive phrasing. | De-duplicate completions via MinHash LSH; enforce minimum semantic distance thresholds.5 | Append metadata tags documenting the generating model name, API version, and temperature config.18 |
 | **Verification (Compiler/Sandbox)** | Route generated code, SQL, or structured data directly through isolated, ephemeral sandboxed compilers.5 | Reject any completions that fail compilation, runtime execution, unit tests, or static analysis.5 | Track execution path branch coverage; enforce diverse algorithm structures in coding tasks. | Automatically strip compile-time warnings, debug logs, and path traces from the final dataset. | Log exact sandbox execution logs, test harness versions, and compiler configuration states. |
 | **Evaluation (LLM-as-a-Judge)** | Pass synthetic generations to a separate, frozen judge model running multi-dimensional rubrics.5 | Reject completions scoring below 4.0/5.0 on logical consistency, relevance, and formatting accuracy. | Prompt judges to explicitly penalize stylistic verbosity and repetitive, formulaic transitions. | Run dual-judge voting; flag and adjudicate instances where judges exhibit high rating divergence. | Store the judge model's full evaluation rationale and scoring breakdown alongside the training item. |
 
@@ -183,16 +183,16 @@ Both adapter parameters and KV cache sequences are broken down into fixed-size p
 ### **Punica and the SGMV Kernel**
 
 When a batch of requests arrives at a multi-adapter server, each request may target a different adapter with a unique rank r and sequence length T.43 Executing these computations using standard Basic Linear Algebra Subprograms (BLAS) libraries would require padding the activation tensors to match the maximum rank and sequence length in the batch, causing severe computational waste and low GPU tensor core utilization.6  
-Punica resolves this by introducing the **Segmented Gather Matrix-Vector Multiplication (SGMV)** kernel.45 For a batch of heterogeneous decoding requests, the server executes the computationally heavy base model forward pass X \* W\_0 in a single batched General Matrix Multiply (GEMM) operation.6 Then, the custom SGMV CUDA kernel executes the low-rank adapter computations on-the-fly 6:  
-Y \= X \* W\_0 \+ SGMV(X, A, B, s)  
+Punica resolves this by introducing the **Segmented Gather Matrix-Vector Multiplication (SGMV)** kernel.45 For a batch of heterogeneous decoding requests, the server executes the computationally heavy base model forward pass X * W_0 in a single batched General Matrix Multiply (GEMM) operation.6 Then, the custom SGMV CUDA kernel executes the low-rank adapter computations on-the-fly 6:  
+Y = X * W_0 + SGMV(X, A, B, s)  
 where s is a segment vector defining which rows of the batched activation tensor X map to which target adapter parameters.45  
-SGMV gathers non-contiguous adapter weights directly from the unified memory pool, performs the segmented low-rank projection X \* B and the subsequent expansion X \* B \* A, and accumulates the residual delta directly into the output tensor Y.43 This eliminates padding overhead and enables highly concurrent, heterogeneous multi-adapter decoding batches with millisecond-level execution penalties.45
+SGMV gathers non-contiguous adapter weights directly from the unified memory pool, performs the segmented low-rank projection X * B and the subsequent expansion X * B * A, and accumulates the residual delta directly into the output tensor Y.43 This eliminates padding overhead and enables highly concurrent, heterogeneous multi-adapter decoding batches with millisecond-level execution penalties.45
 
 vLLM Multi-Adapter Serving Engine Parameters:  
-  \--enable-lora : Activates the scheduler's LoRAManager node.  
-  \--max-loras : Restricts the active concurrent adapter slot count in GPU HBM.  
-  \--max-lora-rank : Allocates pre-formatted memory buffers sized to this rank limit.  
-  \--max-cpu-loras : Manages the intermediate LRU cache tier in system DRAM.
+  --enable-lora : Activates the scheduler's LoRAManager node.  
+  --max-loras : Restricts the active concurrent adapter slot count in GPU HBM.  
+  --max-lora-rank : Allocates pre-formatted memory buffers sized to this rank limit.  
+  --max-cpu-loras : Manages the intermediate LRU cache tier in system DRAM.
 
 ### **Adapter Management Model**
 
@@ -202,10 +202,10 @@ To prevent deployment errors, adapter artifacts must be registered alongside pre
 | :---- | :---- | :---- | :---- |
 | **Adapter ID** | Unique string identifier: {Base-Model-Name}-{Task-Namespace}-v{Version}.8 | Structural regex checking in registry database. | Reject load requests containing duplicated namespaces. |
 | **Base Model Mapping** | Absolute identifier hash of the base checkpoint (e.g., sha256 value).18 | Verifies exact parameter match of the host model during serving engine load. | Halt server initialization if the base checkpoint hash diverges by a single bit.18 |
-| **Tokenizer Version** | Identifier mapping the exact vocabulary config used in training.18 | Schema verification of tokenizer\_config.json properties.18 | Throw exceptions if special tokens (e.g., task separators) are missing from host tokenizer. |
+| **Tokenizer Version** | Identifier mapping the exact vocabulary config used in training.18 | Schema verification of tokenizer_config.json properties.18 | Throw exceptions if special tokens (e.g., task separators) are missing from host tokenizer. |
 | **Training Objective** | Explicit objective tag.7 | Metadata inspection of the registered adapter card.18 | Reject serving combinations that attempt to stack incompatible objectives on-the-fly. |
-| **Hyperparameters** | Full logging of Rank (r), Alpha (alpha), Dropout, and Target Modules.7 | Automatic schema parse of adapter\_config.json at startup.18 | Throw runtime serving errors if the host pre-allocated buffer size is smaller than the target rank.8 |
-| **Tenant Scope** | Explicit classification tag restricting tenant ownership (e.g., SaaS\_Tenant\_A).8 | Multi-tenant dynamic authorization check at the request routing layer.8 | Route-level exception if a request attempts to execute an adapter outside authorized scope.8 |
+| **Hyperparameters** | Full logging of Rank (r), Alpha (alpha), Dropout, and Target Modules.7 | Automatic schema parse of adapter_config.json at startup.18 | Throw runtime serving errors if the host pre-allocated buffer size is smaller than the target rank.8 |
+| **Tenant Scope** | Explicit classification tag restricting tenant ownership (e.g., SaaS_Tenant_A).8 | Multi-tenant dynamic authorization check at the request routing layer.8 | Route-level exception if a request attempts to execute an adapter outside authorized scope.8 |
 | **Merge Policy** | Rule structure parameters. | Configuration property check during deployment compilation.19 | If static merge, invoke TIES-Merging and output consolidated checkpoint.49 |
 | **Stacking Policy** | Rule structure parameters. | Informs the serving engine whether the adapter can co-exist with other active layers.8 | Reject inference request if multiple incompatible adapters are routed to a single token segment.48 |
 | **Rollback Path** | Fallback adapter ID or native frozen base model routing instruction. | Health checking monitoring nodes in the serving loop.8 | Automatically route traffic back to target state if p95 latency or error rates spike.8 |
@@ -226,14 +226,14 @@ Every adaptation run must generate a structured, immutable Adaptation Card (or A
 * **Failure Class**: True Adaptation Gap.7  
 * **Root-Cause Diagnosis**: The baseline model exhibits a 14.2% failure rate when parsing complex nested COBOL records into standardized JSON structures, driven by context bloat and stylistic inconsistencies under few-shot prompting.  
 * **Lighter Steering Alternatives Rejected**:  
-  1. *Prompt Engineering*: Rejected due to high token overhead (\>1,800 tokens per prompt), which increased TTFT by 320 ms and degraded system margins by $0.12 per transaction.5  
+  1. *Prompt Engineering*: Rejected due to high token overhead (>1,800 tokens per prompt), which increased TTFT by 320 ms and degraded system margins by $0.12 per transaction.5  
   2. *Structured Outputs (Inference-time constraint)*: Constrained sampling was retained as an active layer but was insufficient on its own because the base model lacked semantic understanding of COBOL structures, leading to a high rate of logically incorrect field mapping.17
 
 ### **Dataset Lineage & Calibration**
 
 * **Sourcing Coordinates**: dataset-saas-cobol-parser-v2.3 (Sourced via anonymized production transaction logs).18  
 * **Quality Metrics**: 42,500 paired sequences, de-duplicated using MinHash LSH at threshold 0.85.5  
-* **Inter-Rater Consensus**: Double-blind expert review achieved an overall Fleiss' Kappa score of kappa \= 0.84 across 5 concurrent raters.38  
+* **Inter-Rater Consensus**: Double-blind expert review achieved an overall Fleiss' Kappa score of kappa = 0.84 across 5 concurrent raters.38  
 * **PII & Secrets Verification**: Passed through Microsoft Presidio redaction engine with 100% zero-leak check.4
 
 ### **Training Configuration**
@@ -241,26 +241,26 @@ Every adaptation run must generate a structured, immutable Adaptation Card (or A
 * **Optimization Framework**: Axolotl v0.4.1 running PyTorch 2.3.1 with CUDA 12.1.  
 * **Hyperparameter Settings**:  
   * *Adapter Method*: LoRA.7  
-  * *Rank (r)*: 16 | *Alpha (alpha)*: 32\.14  
-  * *Learning Rate*: 2 \* 10^(-4) with Cosine Decay.7  
-  * *Target Modules*: q\_proj, v\_proj, k\_proj, o\_proj, gate\_proj, up\_proj, down\_proj.1  
-  * *Batch Size*: 128 (Gradient Accumulation Steps: 4\) | *Epochs*: 3\.26
+  * *Rank (r)*: 16 | *Alpha (alpha)*: 32.14  
+  * *Learning Rate*: 2 * 10^(-4) with Cosine Decay.7  
+  * *Target Modules*: q_proj, v_proj, k_proj, o_proj, gate_proj, up_proj, down_proj.1  
+  * *Batch Size*: 128 (Gradient Accumulation Steps: 4) | *Epochs*: 3.26
 
 ### **Validation Results & Regression Safety**
 
 * **Target Task Success Rate**: Improved parsing accuracy from 85.8% (baseline) to 98.4% on the held-out validation set.  
 * **General Capability Impact**:  
-  * *MMLU Score Delta*: \-0.4% (baseline: 66.2% | post-adaptation: 65.8%).4  
-  * *HumanEval Delta*: \+0.2% (demonstrates general code syntax preservation).31  
+  * *MMLU Score Delta*: -0.4% (baseline: 66.2% | post-adaptation: 65.8%).4  
+  * *HumanEval Delta*: +0.2% (demonstrates general code syntax preservation).31  
 * **Format Adherence Rate**: 100% valid JSON syntax over 10,000 simulated test cases.17  
 * **Jailbreak Refusal Preservation**: 100% safety preservation when evaluated against the internal Red-Teaming Jailbreak Suite.4
 
 ### **Serving & Deployment Constraints**
 
 * **Serving Engine**: vLLM v0.4.2.8  
-* **HBM Allocation Profile**: Pre-allocate dynamic LoRA buffers to \--max-lora-rank 16\.8  
+* **HBM Allocation Profile**: Pre-allocate dynamic LoRA buffers to --max-lora-rank 16.8  
 * **Co-Existence Restrictions**: May stack alongside system-wide safety guardrail adapters, but cannot stack alongside other custom customer-facing parser adapters.  
-* **P95 Latency SLA Limit**: 85 ms TTFT at concurrency 32\.  
+* **P95 Latency SLA Limit**: 85 ms TTFT at concurrency 32.  
 * **Rollback & Reconsideration Triggers**:  
   1. *Rollback Trigger*: Prompt-level p95 latency exceeds 120 ms or runtime syntax exception rate exceeds 0.1% over a 100-request sliding window.8  
   2. *Reconsideration Condition*: If the underlying COBOL-to-JSON database schema expands to support generic mainframe record updates, retrain the adapter or migrate the behavior logic back to dynamic context-space compilation.
@@ -271,9 +271,9 @@ Model distillation is an architectural and economic intervention designed to tra
 
 ### **Distillation Scaling Laws**
 
-The performance of a distilled student model is governed by rigorous scaling laws parameterized by the student size (N\_S), distillation token volume (D\_S), and the teacher's capability represented by its cross-entropy loss (L\_T).51 Research by Busbridge et al. (2025) models the student's cross-entropy loss (L\_S) through a broken power law 33:  
-L\_S(N\_S, D\_S, L\_T) \= \+ phi(L\_T, N\_S)  
-The term phi(L\_T, N\_S) models the **Capacity Gap**.32 Under standard scaling, a stronger teacher (lower L\_T) yields a stronger student (lower L\_S).51 However, if the teacher's capacity is excessively high relative to the student's parameter limit N\_S, a representation mismatch occurs.32 The student model lacks the representational hypothesis space required to model the highly complex, multi-modal logit distributions of the teacher, resulting in optimization instability and an actual degradation of student performance (forming a U-shaped capacity gap curve).32  
+The performance of a distilled student model is governed by rigorous scaling laws parameterized by the student size (N_S), distillation token volume (D_S), and the teacher's capability represented by its cross-entropy loss (L_T).51 Research by Busbridge et al. (2025) models the student's cross-entropy loss (L_S) through a broken power law 33:  
+L_S(N_S, D_S, L_T) = + phi(L_T, N_S)  
+The term phi(L_T, N_S) models the **Capacity Gap**.32 Under standard scaling, a stronger teacher (lower L_T) yields a stronger student (lower L_S).51 However, if the teacher's capacity is excessively high relative to the student's parameter limit N_S, a representation mismatch occurs.32 The student model lacks the representational hypothesis space required to model the highly complex, multi-modal logit distributions of the teacher, resulting in optimization instability and an actual degradation of student performance (forming a U-shaped capacity gap curve).32  
 Furthermore:
 
 * Given infinite compute or token budgets, **direct supervised learning from ground truth always matches or outperforms distillation**.51  
@@ -283,12 +283,12 @@ Furthermore:
 ### **Distillation Economics Cost Function**
 
 To justify distillation, the system architect must evaluate the total lifecycle cost function of the student model relative to the teacher baseline.  
-C\_total(V) \= C\_generation \+ C\_training \+ C\_evaluation \+ C\_infrastructure \+ V \* T \* P\_student  
-C\_teacher\_baseline(V) \= V \* T \* P\_teacher  
-where V represents the total projected inference request volume, T is the average token footprint per request, P\_student is the inference price per token of the student, and P\_teacher is the inference price per token of the teacher.5
+C_total(V) = C_generation + C_training + C_evaluation + C_infrastructure + V * T * P_student  
+C_teacher_baseline(V) = V * T * P_teacher  
+where V represents the total projected inference request volume, T is the average token footprint per request, P_student is the inference price per token of the student, and P_teacher is the inference price per token of the teacher.5
 
 Distillation Break-Even Volumetric Equation:  
-  V\_break\_even \= (C\_generation \+ C\_training \+ C\_evaluation \+ C\_infrastructure) / (T \* (P\_teacher \- P\_student)) 
+  V_break_even = (C_generation + C_training + C_evaluation + C_infrastructure) / (T * (P_teacher - P_student)) 
 
 ### **Volumetric Scenario Comparison**
 
@@ -308,6 +308,7 @@ Distillation Break-Even Volumetric Equation:
 
 Every model adaptation pipeline must pass through a multi-stage validation suite prior to staging or production deployment to protect against negative transfer, capability regression, and safety decay.
 
+```
                    ┌────────────────────────────────────────┐  
                    │    Adaptive Model Candidate Check      │  
                    └───────────────────┬────────────────────┘  
@@ -316,9 +317,9 @@ Every model adaptation pipeline must pass through a multi-stage validation suite
             ▼                                                     ▼  
 ┌───────────────────────┐                               ┌───────────────────────┐  
 │ Target Behavior Evals │                               │ Alignment Evals       │  
-│ \- Exact Match Accuracy│                               │ \- Refusal Accuracy    │  
-│ \- Syntax & Schema Adh.│                               │ \- Jailbreak Resistance│  
-│ \- Tool-Call Success   │                               │ \- Privacy Leak Check  │  
+│ - Exact Match Accuracy│                               │ - Refusal Accuracy    │  
+│ - Syntax & Schema Adh.│                               │ - Jailbreak Resistance│  
+│ - Tool-Call Success   │                               │ - Privacy Leak Check  │  
 └───────────┬───────────┘                               └───────────┬───────────┘  
             │                                                       │  
             └──────────────────────────┬────────────────────────────┘  
@@ -326,18 +327,19 @@ Every model adaptation pipeline must pass through a multi-stage validation suite
                                        ▼  
                         ┌─────────────────────────────┐  
                         │      Regression Evals       │  
-                        │ \- MMLU / GSM8K Track        │  
-                        │ \- Perplexity Drift Tracking │  
-                        │ \- Negative Transfer Check   │  
+                        │ - MMLU / GSM8K Track        │  
+                        │ - Perplexity Drift Tracking │  
+                        │ - Negative Transfer Check   │  
                         └──────────────┬──────────────┘  
                                        │  Pass Threshold (Max 2% Decay)  
                                        ▼  
                         ┌─────────────────────────────┐  
                         │      Shadow Deployment      │  
-                        │ \- Live Mirror Traffic Run   │  
-                        │ \- Latency SLA Assessment    │  
-                        │ \- Error Budget Tracking     │  
+                        │ - Live Mirror Traffic Run   │  
+                        │ - Latency SLA Assessment    │  
+                        │ - Error Budget Tracking     │  
                         └─────────────────────────────┘
+```
 
 1. **Baseline Calibration Sweep**: Prior to fine-tuning, run the base model through prompt-engineered, context-grounded, and validation scenarios to establish a performance baseline.  
 2. **Held-Out Target Task Evaluation**: Assess the candidate on a partitioned, unseen test dataset of target tasks.5 The task success rate must equal or exceed the baseline model.5  
@@ -347,7 +349,7 @@ Every model adaptation pipeline must pass through a multi-stage validation suite
 6. **Adversarial and Jailbreak Red-Teaming**: Execute automated adversarial prompt sweeps, injection attacks, and safety tests.4 The candidate must not display unsafe capability shifts or bypass established safety boundaries.4  
 7. **Privacy Leakage and Redaction Audit**: Run semantic probing to extract potentially memorized private schemas or training data PII. The model must refuse to reveal secure training boundaries.4  
 8. **Shadow Deployment Verification**: Route production traffic concurrently to both the baseline model and the adapted model.4 Log output divergence, latency deltas, and token throughput limits without exposing users to adapter errors.  
-9. **Canary Rollout and Automated Rollback**: Roll out the adapter to 1% of live traffic, scaling progressively to 10%, 50%, and 100%. Automatically trigger rollback to the base model if the p95 latency exceeds the SLA by \>15 ms or if exception rates spike.8
+9. **Canary Rollout and Automated Rollback**: Roll out the adapter to 1% of live traffic, scaling progressively to 10%, 50%, and 100%. Automatically trigger rollback to the base model if the p95 latency exceeds the SLA by >15 ms or if exception rates spike.8
 
 ## **Adaptation Failure Mode Map**
 
@@ -355,12 +357,12 @@ Weight optimization carries severe operational and systemic risks that can compr
 
 Supervised Fine-Tuning (SFT) Weight Shifts  
   │  
-  ├─► Over-optimization of surface tokens  ──►  
-  │                                               (Model repeats boilerplate length/format)   
-  ├─► Overwriting deep parameter coordinates ──► \[Catastrophic Forgetting\]  
-  │                                               (General reasoning/MMLU collapses)   
-  └─► Over-sensitization of safety data     ──►  
-                                                  (Benign queries trigger false refusals) 
+  ├─► Over-optimization of surface tokens  ──►  (Model repeats boilerplate length/format)
+  │                                                  
+  ├─► Overwriting deep parameter coordinates ──► [Catastrophic Forgetting]  (General reasoning/MMLU collapses)
+  │                                                  
+  └─► Over-sensitization of safety data     ──►  (Benign queries trigger false refusals)
+                                                   
 
 ### **Style Overfit**
 
@@ -470,19 +472,19 @@ An adapted model in production requires systematic runtime monitoring. The dashb
 
 | Monitoring Metric | Tracking Mechanism | Target Threshold | Alert Trigger | Remediation Protocol |
 | :---- | :---- | :---- | :---- | :---- |
-| **Task Success Rate** | Automated validation of the execution boundary (e.g., successful API parsing).5 | \>= 95.0% | Drops below 90.0% over a 100-request window. | Route traffic back to the frozen baseline model; audit training dataset coverage. |
-| **Delta Over Baseline** | Sliding scale evaluation comparing target adapter accuracy to the base model. | Positive gain (\>= 5.0%) | Drops below baseline model performance. | The adapter is causing negative transfer; check for prompt syntax mismatch. |
+| **Task Success Rate** | Automated validation of the execution boundary (e.g., successful API parsing).5 | >= 95.0% | Drops below 90.0% over a 100-request window. | Route traffic back to the frozen baseline model; audit training dataset coverage. |
+| **Delta Over Baseline** | Sliding scale evaluation comparing target adapter accuracy to the base model. | Positive gain (>= 5.0%) | Drops below baseline model performance. | The adapter is causing negative transfer; check for prompt syntax mismatch. |
 | **Cost Per Successful Outcome** | Calculation: Total serving cost / Successful transaction count. | Match or beat system margin targets. | Spikes above baseline cost due to excessive output length or retries. | Adjust generation max token bounds; check if model is stuck in generation loops. |
-| **First-Attempt Validity** | Programmatic schema parsing of the raw model output.18 | \>= 98.0% | Drops below 95.0% over a sliding window. | Enforce structured output generation at the serving engine layer.17 |
+| **First-Attempt Validity** | Programmatic schema parsing of the raw model output.18 | >= 98.0% | Drops below 95.0% over a sliding window. | Enforce structured output generation at the serving engine layer.17 |
 | **Schema Adherence** | Assert syntax validity (e.g., JSON validation against Pydantic schema).18 | 100.0% | Any syntax failure in production. | Enable constrained decoding at the serving engine level.17 |
-| **Tool-Call Success** | Execution success rate of generated tool arguments.5 | \>= 98.0% | Drops below 95.0%. | Audit schema templates; run fine-grained targeted tool-use validation sweeps. |
-| **Grounding Score** | Semantic entailment score of outputs against retrieved context documents. | \>= 0.90 | Drops below 0.80 over a sliding window. | The model is hallucinating; lower generation temperature or inject negative examples into SFT. |
+| **Tool-Call Success** | Execution success rate of generated tool arguments.5 | >= 98.0% | Drops below 95.0%. | Audit schema templates; run fine-grained targeted tool-use validation sweeps. |
+| **Grounding Score** | Semantic entailment score of outputs against retrieved context documents. | >= 0.90 | Drops below 0.80 over a sliding window. | The model is hallucinating; lower generation temperature or inject negative examples into SFT. |
 | **Citation Support** | Assert that output statements are accurately mapped to retrieval source coordinates. | 100.0% | Any output statement lacking verified document source pointers. | Reject generation output; check if the model has drifted from formatting conventions. |
-| **Human Override Rate** | Ratio of outputs manually overridden or rejected by operators. | \<= 2.0% | Overrides spike above 5.0% in any operational shift. | Trigger active retraining loop; re-evaluate annotation guidelines for the task. |
-| **User Correction Rate** | Tracking user prompt edits indicating satisfaction failures. | \<= 10.0% | Correction edits spike above 15.0%. | Audit model completions; re-evaluate prompt templates and context formatting. |
+| **Human Override Rate** | Ratio of outputs manually overridden or rejected by operators. | <= 2.0% | Overrides spike above 5.0% in any operational shift. | Trigger active retraining loop; re-evaluate annotation guidelines for the task. |
+| **User Correction Rate** | Tracking user prompt edits indicating satisfaction failures. | <= 10.0% | Correction edits spike above 15.0%. | Audit model completions; re-evaluate prompt templates and context formatting. |
 | **Refusal Accuracy** | Ratio of correct refusals to total refusal events.4 | 100.0% | Any false refusal of a benign, safe prompt. | Adjust refusal examples in the training dataset; retrain using KTO loss.2 |
 | **Safety Incidents** | Monitoring for policy violations, toxic generation, or jailbreaks.4 | **0 Incidents** | Any confirmed jailbreak or policy bypass in production. | Immediately roll back to frozen safety baseline; escalate to red-team audit.8 |
-| **Regression Rate** | Accuracy degradation on held-out general benchmarks post-adaptation.7 | \<= 2.0% | General task performance decays by \>2.0% post-deployment. | The adapter is causing catastrophic forgetting 13; retrain with general rehearsal sets.4 |
+| **Regression Rate** | Accuracy degradation on held-out general benchmarks post-adaptation.7 | <= 2.0% | General task performance decays by >2.0% post-deployment. | The adapter is causing catastrophic forgetting 13; retrain with general rehearsal sets.4 |
 | **Adapter Incident Rate** | Serving engine exceptions specific to adapter swapping.8 | **0 Incidents** | Swapping exceptions or swap-induced latency spikes over SLA bounds.8 | Audit vLLM memory configurations; verify base-adapter tokenizer configuration.18 |
 | **Drift Signals** | Tracking semantic distance deltas between live prompts and the training set. | Within 1.5x of dev set | Prompt perplexity drifts significantly over a 24-hour period. | Operational input drift has occurred; users are prompting the model outside its task envelope. |
 
@@ -496,7 +498,7 @@ The model adaptation lifecycle interacts directly with surrounding architectural
 | **AI-ENG-G (Model Selection)** | Base capability profile, failure tolerance profile, Model Decision Records.14 | AI-ENG-H initiates adaptation when AI-ENG-G selection profiles are insufficient for task limits. | AI-ENG-H must respect AI-ENG-G decision records; upgrading base models is prioritized over training. |
 | **AI-ENG-C (System Economics)** | Distillation Economics Model, latency delta metrics, margin targets.5 | AI-ENG-H maps distillation scaling laws and costs directly to the system-margin parameters in AI-ENG-C. | Distillation is rejected under AI-ENG-C if projected inference volume fails to clear the break-even point.5 |
 | **AI-ENG-D/F (Data Governance)** | Raw source documents, licensing status, provenance metadata.18 | AI-ENG-H ingests curated records from AI-ENG-D/F to construct the SFT/alignment corpora. | All training inputs must pass AI-ENG-D/F provenance and licensing checks before parameter training starts.18 |
-| **AI-ENG-J/K/L (Model Serving)** | Punica SGMV kernels, S-LoRA configs, HBM partition schemas.8 | AI-ENG-H adapters are dynamically served and swapped using the serving architecture in AI-ENG-J/K/L.8 | Serving configurations must align with the \--max-lora-rank and memory limits specified in AI-ENG-H.8 |
+| **AI-ENG-J/K/L (Model Serving)** | Punica SGMV kernels, S-LoRA configs, HBM partition schemas.8 | AI-ENG-H adapters are dynamically served and swapped using the serving architecture in AI-ENG-J/K/L.8 | Serving configurations must align with the --max-lora-rank and memory limits specified in AI-ENG-H.8 |
 | **AI-ENG-M/N/O (Agent Systems)** | Tool-calling schemas, structured response conventions, routing tables.47 | AI-ENG-H fine-tunes parameters to format correct arguments for AI-ENG-M/N/O tool executors.47 | Adapted agents must pass strict sandboxed compiler validation to prevent runtime parameter parsing failures. |
 | **AI-ENG-S (Production Pathologies)** | Style drift patterns, catastrophic forgetting data, hallucinatory logs.4 | AI-ENG-H ingests edge-case failure logs from AI-ENG-S to run targeted alignment and contrastive training. | Failures detected in AI-ENG-S must be diagnosed before selecting adaptation; do not train on noisy logs. |
 | **AI-ENG-Z (Telemetry & Logs)** | Perplexity metrics, prompt drift logs, request latency arrays.8 | AI-ENG-Z feeds continuous runtime metrics back to the AI-ENG-H evaluation plan. | Alert indicators in AI-ENG-Z automatically trigger rollback pathways to safe baseline states.8 |
@@ -515,60 +517,60 @@ The model adaptation lifecycle interacts directly with surrounding architectural
 
 #### **Works cited**
 
-1. LoRA: Low-Rank Adaptation of Large Language Models \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2106.09685v2](https://arxiv.org/html/2106.09685v2)  
-2. KTO: Model Alignment as Prospect Theoretic Optimization \- arXiv, accessed June 8, 2026, [https://arxiv.org/pdf/2402.01306](https://arxiv.org/pdf/2402.01306)  
-3. How are you handling catastrophic forgetting in multi-domain LLM fine-tuning pipelines?, accessed June 8, 2026, [https://www.reddit.com/r/mlops/comments/1rnhoa6/how\_are\_you\_handling\_catastrophic\_forgetting\_in/](https://www.reddit.com/r/mlops/comments/1rnhoa6/how_are_you_handling_catastrophic_forgetting_in/)  
+1. LoRA: Low-Rank Adaptation of Large Language Models - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2106.09685v2](https://arxiv.org/html/2106.09685v2)  
+2. KTO: Model Alignment as Prospect Theoretic Optimization - arXiv, accessed June 8, 2026, [https://arxiv.org/pdf/2402.01306](https://arxiv.org/pdf/2402.01306)  
+3. How are you handling catastrophic forgetting in multi-domain LLM fine-tuning pipelines?, accessed June 8, 2026, [https://www.reddit.com/r/mlops/comments/1rnhoa6/how_are_you_handling_catastrophic_forgetting_in/](https://www.reddit.com/r/mlops/comments/1rnhoa6/how_are_you_handling_catastrophic_forgetting_in/)  
 4. Avoiding Amnesia: Some Practical Guides to Mitigate Catastrophic Forgetting in LLMs Post-training | by Baicen Xiao | Medium, accessed June 8, 2026, [https://medium.com/@baicenxiao/avoiding-amnesia-some-practical-guides-to-mitigate-catastrophic-forgetting-in-llms-post-training-6a23e4f064cb](https://medium.com/@baicenxiao/avoiding-amnesia-some-practical-guides-to-mitigate-catastrophic-forgetting-in-llms-post-training-6a23e4f064cb)  
-5. Teacher-Student Distillation: How It Works and When to Use It \- distil labs, accessed June 8, 2026, [https://www.distillabs.ai/learn/teacher-student-distillation/](https://www.distillabs.ai/learn/teacher-student-distillation/)  
-6. Serving Thousands of Concurrent LoRA Adapters | by Mukul Ranjan \- Medium, accessed June 8, 2026, [https://medium.com/@mukulranjan/serving-thousands-of-concurrent-lora-adapters-6b407e8df516](https://medium.com/@mukulranjan/serving-thousands-of-concurrent-lora-adapters-6b407e8df516)  
-7. LoRA Learns Less and Forgets Less \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2405.09673v2](https://arxiv.org/html/2405.09673v2)  
-8. LoRA Multi-Adapter Serving: Fine-Tune Once, Serve 100 Customers on One GPU \- Spheron, accessed June 8, 2026, [https://www.spheron.network/blog/lora-multi-adapter-serving-gpu-cloud/](https://www.spheron.network/blog/lora-multi-adapter-serving-gpu-cloud/)  
+5. Teacher-Student Distillation: How It Works and When to Use It - distil labs, accessed June 8, 2026, [https://www.distillabs.ai/learn/teacher-student-distillation/](https://www.distillabs.ai/learn/teacher-student-distillation/)  
+6. Serving Thousands of Concurrent LoRA Adapters | by Mukul Ranjan - Medium, accessed June 8, 2026, [https://medium.com/@mukulranjan/serving-thousands-of-concurrent-lora-adapters-6b407e8df516](https://medium.com/@mukulranjan/serving-thousands-of-concurrent-lora-adapters-6b407e8df516)  
+7. LoRA Learns Less and Forgets Less - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2405.09673v2](https://arxiv.org/html/2405.09673v2)  
+8. LoRA Multi-Adapter Serving: Fine-Tune Once, Serve 100 Customers on One GPU - Spheron, accessed June 8, 2026, [https://www.spheron.network/blog/lora-multi-adapter-serving-gpu-cloud/](https://www.spheron.network/blog/lora-multi-adapter-serving-gpu-cloud/)  
 9. Model Distillation and Knowledge Transfer in AI 2026 | Zylos Research, accessed June 8, 2026, [https://zylos.ai/research/2026-02-08-model-distillation](https://zylos.ai/research/2026-02-08-model-distillation)  
-10. 𝛼-LoRA: Effective Fine-Tuning via Base Model Rescaling \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2510.21345v1](https://arxiv.org/html/2510.21345v1)  
-11. All Knowledge You Need about DPO and its Variants \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2404.14723v2](https://arxiv.org/html/2404.14723v2)  
+10. 𝛼-LoRA: Effective Fine-Tuning via Base Model Rescaling - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2510.21345v1](https://arxiv.org/html/2510.21345v1)  
+11. All Knowledge You Need about DPO and its Variants - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2404.14723v2](https://arxiv.org/html/2404.14723v2)  
 12. DPO vs PPO: Which RLHF Algorithm to Use for Production LLM Alignment (2026 Decision Guide) | Spheron Blog, accessed June 8, 2026, [https://www.spheron.network/blog/dpo-vs-ppo-rlhf-algorithm-production-llm-alignment/](https://www.spheron.network/blog/dpo-vs-ppo-rlhf-algorithm-production-llm-alignment/)  
-13. What is Catastrophic Forgetting? \- IBM, accessed June 8, 2026, [https://www.ibm.com/think/topics/catastrophic-forgetting](https://www.ibm.com/think/topics/catastrophic-forgetting)  
-14. How Much is Too Much? Exploring LoRA Rank Trade-offs for Retaining Knowledge and Domain Robustness \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2512.15634v1](https://arxiv.org/html/2512.15634v1)  
-15. LoRA Adapters: Efficient Fine-Tuning \- Emergent Mind, accessed June 8, 2026, [https://www.emergentmind.com/topics/low-rank-adaptation-lora-adapters](https://www.emergentmind.com/topics/low-rank-adaptation-lora-adapters)  
+13. What is Catastrophic Forgetting? - IBM, accessed June 8, 2026, [https://www.ibm.com/think/topics/catastrophic-forgetting](https://www.ibm.com/think/topics/catastrophic-forgetting)  
+14. How Much is Too Much? Exploring LoRA Rank Trade-offs for Retaining Knowledge and Domain Robustness - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2512.15634v1](https://arxiv.org/html/2512.15634v1)  
+15. LoRA Adapters: Efficient Fine-Tuning - Emergent Mind, accessed June 8, 2026, [https://www.emergentmind.com/topics/low-rank-adaptation-lora-adapters](https://www.emergentmind.com/topics/low-rank-adaptation-lora-adapters)  
 16. Crafty Patchwork: Parameter-Efficient Fine-Tuning | Vectors & Verbs, accessed June 8, 2026, [https://vectorsandverbs.com/posts/parameter-efficient-fine-tuning/](https://vectorsandverbs.com/posts/parameter-efficient-fine-tuning/)  
-17. Quantization in Large Language Models(LLMs) \- Intelligent Machines, accessed June 8, 2026, [https://www.intelligentmachines.blog/post/quantization-in-large-language-models-llms](https://www.intelligentmachines.blog/post/quantization-in-large-language-models-llms)  
-18. Deploy multi-LoRA adapters on LLMs \- Anyscale Docs, accessed June 8, 2026, [https://docs.anyscale.com/llm/serving/multi-lora](https://docs.anyscale.com/llm/serving/multi-lora)  
-19. Saliency-Aware Model Merging \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2606.00511v1](https://arxiv.org/html/2606.00511v1)  
-20. Preference Tuning LLMs with Direct Preference Optimization Methods \- Hugging Face, accessed June 8, 2026, [https://huggingface.co/blog/pref-tuning](https://huggingface.co/blog/pref-tuning)  
-21. A-IPO: Adaptive Intent-driven Preference Optimization \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2510.10077v1](https://arxiv.org/html/2510.10077v1)  
-22. Identity Preference Optimization (IPO) \- Emergent Mind, accessed June 8, 2026, [https://www.emergentmind.com/topics/identity-preference-optimization-ipo](https://www.emergentmind.com/topics/identity-preference-optimization-ipo)  
-23. Reward Modeling and DPO: Learning What "Good" Means \- Suvash Sedhain, accessed June 8, 2026, [https://mesuvash.github.io/blog/2026/reward-modeling/](https://mesuvash.github.io/blog/2026/reward-modeling/)  
+17. Quantization in Large Language Models(LLMs) - Intelligent Machines, accessed June 8, 2026, [https://www.intelligentmachines.blog/post/quantization-in-large-language-models-llms](https://www.intelligentmachines.blog/post/quantization-in-large-language-models-llms)  
+18. Deploy multi-LoRA adapters on LLMs - Anyscale Docs, accessed June 8, 2026, [https://docs.anyscale.com/llm/serving/multi-lora](https://docs.anyscale.com/llm/serving/multi-lora)  
+19. Saliency-Aware Model Merging - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2606.00511v1](https://arxiv.org/html/2606.00511v1)  
+20. Preference Tuning LLMs with Direct Preference Optimization Methods - Hugging Face, accessed June 8, 2026, [https://huggingface.co/blog/pref-tuning](https://huggingface.co/blog/pref-tuning)  
+21. A-IPO: Adaptive Intent-driven Preference Optimization - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2510.10077v1](https://arxiv.org/html/2510.10077v1)  
+22. Identity Preference Optimization (IPO) - Emergent Mind, accessed June 8, 2026, [https://www.emergentmind.com/topics/identity-preference-optimization-ipo](https://www.emergentmind.com/topics/identity-preference-optimization-ipo)  
+23. Reward Modeling and DPO: Learning What "Good" Means - Suvash Sedhain, accessed June 8, 2026, [https://mesuvash.github.io/blog/2026/reward-modeling/](https://mesuvash.github.io/blog/2026/reward-modeling/)  
 24. Vinija's Notes • LLM Alignment, accessed June 8, 2026, [https://vinija.ai/concepts/llm-alignment/](https://vinija.ai/concepts/llm-alignment/)  
-25. Regarding DPO, IPO, and KTO. DPO method | by Mohammad Reza Esmaeiliyan \- Medium, accessed June 8, 2026, [https://esmln.medium.com/regarding-dpo-ipo-and-kto-02e94e6958ed](https://esmln.medium.com/regarding-dpo-ipo-and-kto-02e94e6958ed)  
+25. Regarding DPO, IPO, and KTO. DPO method | by Mohammad Reza Esmaeiliyan - Medium, accessed June 8, 2026, [https://esmln.medium.com/regarding-dpo-ipo-and-kto-02e94e6958ed](https://esmln.medium.com/regarding-dpo-ipo-and-kto-02e94e6958ed)  
 26. When Benchmarks Lie: Why Contamination Breaks LLM Evaluation, accessed June 8, 2026, [https://thegrigorian.medium.com/when-benchmarks-lie-why-contamination-breaks-llm-evaluation-1fa335706f32](https://thegrigorian.medium.com/when-benchmarks-lie-why-contamination-breaks-llm-evaluation-1fa335706f32)  
-27. From Teacher to Student: Model Distillation for Cost-Effective LLM Deployment \- Marvik.ai, accessed June 8, 2026, [https://www.marvik.ai/blog/from-teacher-to-student-model-distillation-for-cost-effective-llm-deployment](https://www.marvik.ai/blog/from-teacher-to-student-model-distillation-for-cost-effective-llm-deployment)  
-28. How to Alleviate Catastrophic Forgetting in LLMs Finetuning? Hierarchical Layer-Wise and Element-Wise Regularization \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2501.13669v2](https://arxiv.org/html/2501.13669v2)  
-29. How Contaminated Is Your Benchmark? Quantifying Dataset Leakage in Large Language Models with Kernel Divergence \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2502.00678v1](https://arxiv.org/html/2502.00678v1)  
-30. What Matters for Model Merging at Scale? \- OpenReview, accessed June 8, 2026, [https://openreview.net/forum?id=HW26XyHp3P](https://openreview.net/forum?id=HW26XyHp3P)  
-31. LoRA Learns Less and Forgets Less \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2405.09673v1](https://arxiv.org/html/2405.09673v1)  
-32. Everything You Need to Know about Knowledge Distillation \- Hugging Face, accessed June 8, 2026, [https://huggingface.co/blog/Kseniase/kd](https://huggingface.co/blog/Kseniase/kd)  
+27. From Teacher to Student: Model Distillation for Cost-Effective LLM Deployment - Marvik.ai, accessed June 8, 2026, [https://www.marvik.ai/blog/from-teacher-to-student-model-distillation-for-cost-effective-llm-deployment](https://www.marvik.ai/blog/from-teacher-to-student-model-distillation-for-cost-effective-llm-deployment)  
+28. How to Alleviate Catastrophic Forgetting in LLMs Finetuning? Hierarchical Layer-Wise and Element-Wise Regularization - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2501.13669v2](https://arxiv.org/html/2501.13669v2)  
+29. How Contaminated Is Your Benchmark? Quantifying Dataset Leakage in Large Language Models with Kernel Divergence - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2502.00678v1](https://arxiv.org/html/2502.00678v1)  
+30. What Matters for Model Merging at Scale? - OpenReview, accessed June 8, 2026, [https://openreview.net/forum?id=HW26XyHp3P](https://openreview.net/forum?id=HW26XyHp3P)  
+31. LoRA Learns Less and Forgets Less - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2405.09673v1](https://arxiv.org/html/2405.09673v1)  
+32. Everything You Need to Know about Knowledge Distillation - Hugging Face, accessed June 8, 2026, [https://huggingface.co/blog/Kseniase/kd](https://huggingface.co/blog/Kseniase/kd)  
 33. ICML Poster Distillation Scaling Laws, accessed June 8, 2026, [https://icml.cc/virtual/2025/poster/46615](https://icml.cc/virtual/2025/poster/46615)  
-34. NormalFloat-4 (NF4): 4-bit Quantization \- Emergent Mind, accessed June 8, 2026, [https://www.emergentmind.com/topics/normalfloat-4-nf4](https://www.emergentmind.com/topics/normalfloat-4-nf4)  
-35. 4-bit NormalFloat (NF4) Quantization \- Emergent Mind, accessed June 8, 2026, [https://www.emergentmind.com/topics/4-bit-normalfloat-nf4-quantization](https://www.emergentmind.com/topics/4-bit-normalfloat-nf4-quantization)  
-36. RLHF and alternatives: IPO \- Argilla, accessed June 8, 2026, [https://argilla.io/blog/mantisnlp-rlhf-part-6/](https://argilla.io/blog/mantisnlp-rlhf-part-6/)  
+34. NormalFloat-4 (NF4): 4-bit Quantization - Emergent Mind, accessed June 8, 2026, [https://www.emergentmind.com/topics/normalfloat-4-nf4](https://www.emergentmind.com/topics/normalfloat-4-nf4)  
+35. 4-bit NormalFloat (NF4) Quantization - Emergent Mind, accessed June 8, 2026, [https://www.emergentmind.com/topics/4-bit-normalfloat-nf4-quantization](https://www.emergentmind.com/topics/4-bit-normalfloat-nf4-quantization)  
+36. RLHF and alternatives: IPO - Argilla, accessed June 8, 2026, [https://argilla.io/blog/mantisnlp-rlhf-part-6/](https://argilla.io/blog/mantisnlp-rlhf-part-6/)  
 37. Kahneman-Tversky Optimization(KTO): Revolutionizing Language Model Training with Prospect Theory | by Yatin Arora | Medium, accessed June 8, 2026, [https://medium.com/@SpielmitDaten/kahneman-tversky-optimization-kto-revolutionizing-language-model-training-with-prospect-theory-99f30c50481e](https://medium.com/@SpielmitDaten/kahneman-tversky-optimization-kto-revolutionizing-language-model-training-with-prospect-theory-99f30c50481e)  
-38. A Tutorial on Sample Size Calculation for Inter-rater and Intra-rater Agreement Studies \- PMC, accessed June 8, 2026, [https://pmc.ncbi.nlm.nih.gov/articles/PMC12935580/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12935580/)  
+38. A Tutorial on Sample Size Calculation for Inter-rater and Intra-rater Agreement Studies - PMC, accessed June 8, 2026, [https://pmc.ncbi.nlm.nih.gov/articles/PMC12935580/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12935580/)  
 39. Fleiss' Kappa | Real Statistics Using Excel, accessed June 8, 2026, [https://real-statistics.com/reliability/interrater-reliability/fleiss-kappa/](https://real-statistics.com/reliability/interrater-reliability/fleiss-kappa/)  
-40. Fleiss' Kappa: Measuring Agreement Among Multiple Raters \- Numiqo, accessed June 8, 2026, [https://numiqo.com/tutorial/fleiss-kappa](https://numiqo.com/tutorial/fleiss-kappa)  
-41. Fleiss's kappa \- Wikipedia, accessed June 8, 2026, [https://en.wikipedia.org/wiki/Fleiss%27s\_kappa](https://en.wikipedia.org/wiki/Fleiss%27s_kappa)  
-42. Improving the Serving Performance of Multi-LoRA Large Language Models via Efficient LoRA and KV Cache Management \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2505.03756v1](https://arxiv.org/html/2505.03756v1)  
-43. 1 Introduction \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2311.03285v3](https://arxiv.org/html/2311.03285v3)  
-44. S-LoRA: Scalable LoRA Serving \- Emergent Mind, accessed June 8, 2026, [https://www.emergentmind.com/topics/scalable-serving-s-lora-system](https://www.emergentmind.com/topics/scalable-serving-s-lora-system)  
-45. Multi-Tenant LoRA Serving \- Punica \- arXiv, accessed June 8, 2026, [https://arxiv.org/pdf/2310.18547](https://arxiv.org/pdf/2310.18547)  
-46. \[Tracking\] Multi-LoRA Serving · Issue \#3446 · mlc-ai/mlc-llm \- GitHub, accessed June 8, 2026, [https://github.com/mlc-ai/mlc-llm/issues/3446](https://github.com/mlc-ai/mlc-llm/issues/3446)  
-47. punica\_wrapper \- vLLM Documentation, accessed June 8, 2026, [https://docs.vllm.ai/en/latest/api/vllm/lora/punica\_wrapper/](https://docs.vllm.ai/en/latest/api/vllm/lora/punica_wrapper/)  
+40. Fleiss' Kappa: Measuring Agreement Among Multiple Raters - Numiqo, accessed June 8, 2026, [https://numiqo.com/tutorial/fleiss-kappa](https://numiqo.com/tutorial/fleiss-kappa)  
+41. Fleiss's kappa - Wikipedia, accessed June 8, 2026, [https://en.wikipedia.org/wiki/Fleiss%27s_kappa](https://en.wikipedia.org/wiki/Fleiss%27s_kappa)  
+42. Improving the Serving Performance of Multi-LoRA Large Language Models via Efficient LoRA and KV Cache Management - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2505.03756v1](https://arxiv.org/html/2505.03756v1)  
+43. 1 Introduction - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2311.03285v3](https://arxiv.org/html/2311.03285v3)  
+44. S-LoRA: Scalable LoRA Serving - Emergent Mind, accessed June 8, 2026, [https://www.emergentmind.com/topics/scalable-serving-s-lora-system](https://www.emergentmind.com/topics/scalable-serving-s-lora-system)  
+45. Multi-Tenant LoRA Serving - Punica - arXiv, accessed June 8, 2026, [https://arxiv.org/pdf/2310.18547](https://arxiv.org/pdf/2310.18547)  
+46. [Tracking] Multi-LoRA Serving · Issue #3446 · mlc-ai/mlc-llm - GitHub, accessed June 8, 2026, [https://github.com/mlc-ai/mlc-llm/issues/3446](https://github.com/mlc-ai/mlc-llm/issues/3446)  
+47. punica_wrapper - vLLM Documentation, accessed June 8, 2026, [https://docs.vllm.ai/en/latest/api/vllm/lora/punica_wrapper/](https://docs.vllm.ai/en/latest/api/vllm/lora/punica_wrapper/)  
 48. Clarification: Does vLLM support concurrent decoding with multiple LoRA adapters in online inference?, accessed June 8, 2026, [https://discuss.vllm.ai/t/clarification-does-vllm-support-concurrent-decoding-with-multiple-lora-adapters-in-online-inference/1482](https://discuss.vllm.ai/t/clarification-does-vllm-support-concurrent-decoding-with-multiple-lora-adapters-in-online-inference/1482)  
-49. TIES-Merging: Robust Model Integration \- Emergent Mind, accessed June 8, 2026, [https://www.emergentmind.com/topics/ties-merging](https://www.emergentmind.com/topics/ties-merging)  
-50. MergeME: Model Merging Techniques for Homogeneous and Heterogeneous MoEs \- Amazon Science, accessed June 8, 2026, [https://assets.amazon.science/a2/38/e9dbfd2c4a36a651e0cbf20c20aa/mergeme-model-merging-techniques-for-homogeneous-and-heterogeneous-moes.pdf](https://assets.amazon.science/a2/38/e9dbfd2c4a36a651e0cbf20c20aa/mergeme-model-merging-techniques-for-homogeneous-and-heterogeneous-moes.pdf)  
-51. Distillation Scaling Laws \- arXiv, accessed June 8, 2026, [https://arxiv.org/html/2502.08606v2](https://arxiv.org/html/2502.08606v2)  
-52. Distillation Scaling Laws \- GitHub, accessed June 8, 2026, [https://raw.githubusercontent.com/mlresearch/v267/main/assets/busbridge25a/busbridge25a.pdf](https://raw.githubusercontent.com/mlresearch/v267/main/assets/busbridge25a/busbridge25a.pdf)  
-53. \[Literature Review\] Distillation Scaling Laws \- Moonlight, accessed June 8, 2026, [https://www.themoonlight.io/en/review/distillation-scaling-laws](https://www.themoonlight.io/en/review/distillation-scaling-laws)  
-54. How Contaminated Is Your Benchmark? Measuring Dataset Leakage in Large Language Models with Kernel Divergence \- ICML 2026, accessed June 8, 2026, [https://icml.cc/virtual/2025/poster/43619](https://icml.cc/virtual/2025/poster/43619)
+49. TIES-Merging: Robust Model Integration - Emergent Mind, accessed June 8, 2026, [https://www.emergentmind.com/topics/ties-merging](https://www.emergentmind.com/topics/ties-merging)  
+50. MergeME: Model Merging Techniques for Homogeneous and Heterogeneous MoEs - Amazon Science, accessed June 8, 2026, [https://assets.amazon.science/a2/38/e9dbfd2c4a36a651e0cbf20c20aa/mergeme-model-merging-techniques-for-homogeneous-and-heterogeneous-moes.pdf](https://assets.amazon.science/a2/38/e9dbfd2c4a36a651e0cbf20c20aa/mergeme-model-merging-techniques-for-homogeneous-and-heterogeneous-moes.pdf)  
+51. Distillation Scaling Laws - arXiv, accessed June 8, 2026, [https://arxiv.org/html/2502.08606v2](https://arxiv.org/html/2502.08606v2)  
+52. Distillation Scaling Laws - GitHub, accessed June 8, 2026, [https://raw.githubusercontent.com/mlresearch/v267/main/assets/busbridge25a/busbridge25a.pdf](https://raw.githubusercontent.com/mlresearch/v267/main/assets/busbridge25a/busbridge25a.pdf)  
+53. [Literature Review] Distillation Scaling Laws - Moonlight, accessed June 8, 2026, [https://www.themoonlight.io/en/review/distillation-scaling-laws](https://www.themoonlight.io/en/review/distillation-scaling-laws)  
+54. How Contaminated Is Your Benchmark? Measuring Dataset Leakage in Large Language Models with Kernel Divergence - ICML 2026, accessed June 8, 2026, [https://icml.cc/virtual/2025/poster/43619](https://icml.cc/virtual/2025/poster/43619)
 
 ---
 

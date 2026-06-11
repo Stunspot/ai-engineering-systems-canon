@@ -47,7 +47,7 @@ A production-grade AI system cannot operate on a flat representation of memory.4
 
 To execute the Tenure Principle, every piece of information entering the context window must be wrapped in a strict, metadata-rich context object.4 The following schema represents the logical model for a Context Object, designed to make state queryable, filterable, and auditable 18:
 
-JSON  
+```JSON  
 {  
   "$schema": "https://json-schema.org/draft/2020-12/schema",  
   "title": "ContextObject",  
@@ -118,6 +118,7 @@ JSON
     }  
   }  
 }
+```
 
 ### **Designing the "Why It Matters" Field**
 
@@ -359,7 +360,7 @@ To maintain a mathematically precise and audit-ready representation of historica
 
 To preserve complete auditability and prevent silent data loss, records in a bitemporal database are immutable.24 Updates are executed by closing the transaction window of the active record and writing a new version 23:
 
-SQL  
+```SQL  
 -- Step 1: Invalidate the existing, older period by setting its tx_end to current_time  
 UPDATE context_store   
 SET tx_end = '2026-06-06T12:15:00Z'   
@@ -368,6 +369,7 @@ WHERE canonical_entity_id = 'usr-9921-aef4' AND tx_end IS NULL;
 -- Step 2: Insert the new period representing the current valid state of the data  
 INSERT INTO context_store (object_id, canonical_entity_id, content, valid_from, valid_until, tx_start, tx_end)  
 VALUES ('uuid-4412', 'usr-9921-aef4', 'User is now based in Chicago office.', '2026-06-06T12:00:00Z', NULL, '2026-06-06T12:15:00Z', NULL);
+```
 
 This model enables the compiler to resolve complex historical transitions, such as retroactive changes or future-dated policies.37 For example, if a user's pricing tier is updated on April 1st but backdated to be valid from February 15th, a bitemporal database can accurately recreate exactly what the system believed on March 1st versus what is true in the real world for that same date.24
 
@@ -382,9 +384,9 @@ Relation Types (7 Primary Chronological Relationships, 6 Inverses):
                         
 4. A Starts B        [ A ]  
                       
-5. A During B          [ A ]  
+5. A During B        [ A ]  
                       
-6. A Finishes B          [ A ]  
+6. A Finishes B      [ A ]  
                       
 7. A Equals B        [  A  ]  
                     
@@ -555,7 +557,7 @@ The state layer must be evaluated against standard multi-session benchmarks (LoC
 
 To guarantee complete auditable traceability, every inference call must be wrapped in a structured metadata logging context. Observability platforms (such as Opik) must log the complete compile-time trace 17:
 
-JSON  
+```JSON  
 {  
   "trace_id": "tr-7712-bcde",  
   "active_task": "generate_production_module",  
@@ -568,6 +570,7 @@ JSON
   "validation_status": "CLEAN",  
   "downstream_retries_triggered": 0  
 }
+```
 
 This structural logging ensures that when an agent generates an incorrect or hallucinated response, developers can instantly isolate whether the failure was caused by a retrieval error (Context Recall failure), a compilation error (Context Precision failure), or an entity mapping error (NER failure).17
 

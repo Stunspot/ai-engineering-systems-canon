@@ -504,7 +504,7 @@ A production-grade AI system cannot operate on a flat representation of memory.4
 
 To execute the Tenure Principle, every piece of information entering the context window must be wrapped in a strict, metadata-rich context object.4 The following schema represents the logical model for a Context Object, designed to make state queryable, filterable, and auditable 18:
 
-JSON  
+```JSON  
 {  
   "$schema": "https://json-schema.org/draft/2020-12/schema",  
   "title": "ContextObject",  
@@ -575,6 +575,7 @@ JSON
     }  
   }  
 }
+```
 
 ### **Designing the "Why It Matters" Field**
 
@@ -1012,7 +1013,7 @@ The state layer must be evaluated against standard multi-session benchmarks (LoC
 
 To guarantee complete auditable traceability, every inference call must be wrapped in a structured metadata logging context. Observability platforms (such as Opik) must log the complete compile-time trace 17:
 
-JSON  
+```JSON  
 {  
   "trace_id": "tr-7712-bcde",  
   "active_task": "generate_production_module",  
@@ -1025,6 +1026,7 @@ JSON
   "validation_status": "CLEAN",  
   "downstream_retries_triggered": 0  
 }
+```
 
 This structural logging ensures that when an agent generates an incorrect or hallucinated response, developers can instantly isolate whether the failure was caused by a retrieval error (Context Recall failure), a compilation error (Context Precision failure), or an entity mapping error (NER failure).17
 

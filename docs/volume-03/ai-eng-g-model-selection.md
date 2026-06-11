@@ -46,7 +46,7 @@ Before identifying candidate models, architects must define the task properties 
 | **Reasoning Depth** | Single-step, multi-step math, programmatic refactoring, adversarial planning.2 | Determines the allocation of inference-time compute (high-effort vs. low-effort).2 |
 | **Context Length Needs** | Under 4K tokens, 32K window, 128K document set, 1M+ active token session.8 | Impacts VRAM reservation and continuous batching parameters.5 |
 | **Tool Use Complexity** | Static function arguments, dynamic database querying, browser-use tool sequencing.3 | Requires specific alignment for tool state tracking and error recovery.9 |
-| **Latency SLA** | Time-To-First-Token (TTFT) \< 150ms; total execution \< 1.0s.5 | Excludes large parameter options or slow inference-time compute tiers.22 |
+| **Latency SLA** | Time-To-First-Token (TTFT) < 150ms; total execution < 1.0s.5 | Excludes large parameter options or slow inference-time compute tiers.22 |
 | **Throughput Target** | Peak requests/sec, concurrent users, background batch load.5 | Dictates hardware configuration (GPU counts) and serving framework optimizations.5 |
 | **Cost Ceiling** | Maximum allowable budget per successful transaction ($/million tokens).5 | Constrains the model portfolio to optimized open-weight or economy API tiers.6 |
 | **Privacy Constraints** | Zero-retention cloud hosting, private cloud VPC, on-premise hardware.2 | Limits selection to specific cloud partners or hostable open-weight parameters.22 |
@@ -108,11 +108,11 @@ A model's context window cannot be evaluated solely on its maximum advertised to
 
 Architects must mathematically determine when to stuff entire document sets into high-context windows (e.g., Gemini 3 Pro's 10M token window) 25 versus when to build RAG pipelines.  
 The cost-benefit analysis of context stuffing is governed by the relation:  
-Cost\_stuffing \= (C\_corpus / 1000\) \* P\_input  
-where C\_corpus is the total corpus token size, and P\_input is the price per 1,000 input tokens.8 For a corpus of 400,000 tokens evaluated on a premium model costing $0.005 per 1,000 input tokens, the input cost is $2.00 per query.8  
+Cost_stuffing = (C_corpus / 1000 * P_input  
+where C_corpus is the total corpus token size, and P_input is the price per 1,000 input tokens.8 For a corpus of 400,000 tokens evaluated on a premium model costing $0.005 per 1,000 input tokens, the input cost is $2.00 per query.8  
 The cost of a managed RAG query is formulated as:  
-Cost\_RAG \= C\_embed \+ C\_search \+ C\_generation  
-where C\_generation is defined by the top-k retrieved chunks.8 If a RAG pipeline retrieves 5 chunks of 512 tokens each (2,560 tokens), the input generation cost drops to approximately $0.000413, making RAG significantly more cost-effective as query volume increases.8  
+Cost_RAG = C_embed + C_search + C_generation  
+where C_generation is defined by the top-k retrieved chunks.8 If a RAG pipeline retrieves 5 chunks of 512 tokens each (2,560 tokens), the input generation cost drops to approximately $0.000413, making RAG significantly more cost-effective as query volume increases.8  
 RAG pipelines are economically justified when the cost of corpus indexing and vector searching amortizes below the per-query expense of context stuffing. However, when tasks require synthesizing holistic relationships across an entire document set (e.g., legal contract consistency audits), high-context models with stable instruction-hierarchy preservation are technically required regardless of input cost.1
 
 ### **Structured-Output and Tool-Use Architecture**
@@ -143,7 +143,7 @@ The choice of deployment topology is a trade-off between control, infrastructure
 
 | Metric | Managed API | Hosted Open Model | Self-Hosted Instance | Local Workstation/Edge | Hybrid Portfolio |
 | :---- | :---- | :---- | :---- | :---- | :---- |
-| **P50 Latency** | Low (0.73s \- 1.9s).25 | Low (0.5s \- 1.2s). | Ultra-low (optimized vLLM scheduler).5 | Variable (5x \- 30x slower if CPU offloaded).7 | Variable (governed by orchestrator overhead).14 |
+| **P50 Latency** | Low (0.73s - 1.9s).25 | Low (0.5s - 1.2s). | Ultra-low (optimized vLLM scheduler).5 | Variable (5x - 30x slower if CPU offloaded).7 | Variable (governed by orchestrator overhead).14 |
 | **Throughput Scaling** | Infinite (managed by provider rate limits). | High (auto-scaling node clusters). | Constrained by local GPU resource availability.6 | Single-concurrency bound (VRAM limited).7 | Dynamic (routes simple tasks to elastic tiers).14 |
 | **Data Privacy** | Subject to provider data-use policies.2 | High (runs inside private cloud VPC). | Absolute (fully air-gapped deployments). | Absolute (local storage and computation).7 | Variable (requires strict regional routing rules). |
 | **Hardware Burden** | Zero (fully outsourced). | Low (provisioned as SaaS container). | Very High (requires bare-metal GPU clusters).6 | Workstation hardware setup cost ($8.5k GPU cost).7 | High (requires managing API keys and GPU nodes). |
@@ -158,22 +158,22 @@ Running open-weight or self-hosted models (e.g., Llama 3.3 70B, DeepSeek V4) 22 
 #### **VRAM Allocation Formula**
 
 The total physical VRAM required to serve a model at inference is formulated as:  
-V\_total approx (P \* B\_param) \* 1.18 \+ V\_kv  
-where P is the parameter count in billions, B\_param is the precision footprint in bytes per parameter (2 for FP16, 1 for FP8, 0.5 for INT4), 1.18 represents an 18% safety margin for activations and framework overhead, and V\_kv is the memory allocated to the KV cache pool.6
+V_total approx (P * B_param) * 1.18 + V_kv  
+where P is the parameter count in billions, B_param is the precision footprint in bytes per parameter (2 for FP16, 1 for FP8, 0.5 for INT4), 1.18 represents an 18% safety margin for activations and framework overhead, and V_kv is the memory allocated to the KV cache pool.6
 
 #### **Mixture-of-Experts (MoE) VRAM Trap**
 
 In MoE architectures, the active parameter count (which dictates inference speed) is significantly smaller than the total parameter count.6 However, **all parameters must be loaded into VRAM** to execute inference.6 For example, DeepSeek R1 has 671B total parameters and activates 37B per token.7 At INT4 quantization (0.5 bytes/parameter), the weights alone require:  
-V\_weights \= (671 \* 0.5) \* 1.18 approx 395.89 GB of VRAM  
+V_weights = (671 * 0.5) * 1.18 approx 395.89 GB of VRAM  
 This requirement pushes MoE models out of workstation reach and requires multi-GPU datacenter clusters, despite their fast active token generation.7
 
 #### **KV Cache VRAM Overhead**
 
 The memory footprint of the KV cache increases linearly with context length and batch size:  
-V\_kv approx 2 \* N\_layers \* N\_heads \* D\_head \* L\_context \* N\_batch \* B\_element  
-For Llama 3.3 70B (80 layers, 8 KV heads, 128 head dimension) running at BF16 (B\_element \= 2):  
-V\_kv\_per\_1k \= 2 \* 80 \* 8 \* 128 \* 1024 \* 1 \* 2 \= 335,544,320 Bytes approx 320 MB per concurrent 1K context  
-At 128K context with 8 concurrent requests, the KV cache footprint exceeds 320 GB, often dwarfing the base model weight footprint.6 Architects using vLLM configure this via \--gpu-memory-utilization (typically 0.90 to 0.95 on bare-metal instances) and adjust \--max-model-len to prevent memory fragmentation and ensure scheduling stability.5
+V_kv approx 2 * N_layers * N_heads * D_head * L_context * N_batch * B_element  
+For Llama 3.3 70B (80 layers, 8 KV heads, 128 head dimension) running at BF16 (B_element = 2):  
+V_kv_per_1k = 2 * 80 * 8 * 128 * 1024 * 1 * 2 = 335,544,320 Bytes approx 320 MB per concurrent 1K context  
+At 128K context with 8 concurrent requests, the KV cache footprint exceeds 320 GB, often dwarfing the base model weight footprint.6 Architects using vLLM configure this via --gpu-memory-utilization (typically 0.90 to 0.95 on bare-metal instances) and adjust --max-model-len to prevent memory fragmentation and ensure scheduling stability.5
 
 ### **Legal Compliance and License Constraints**
 
@@ -231,24 +231,26 @@ Highly optimized production systems rarely rely on a single model. Instead, they
 
 This architecture maps tasks across a distributed portfolio, routing queries dynamically based on difficulty, risk, and structural needs.
 
+```
                                   Incoming Request  
                                          |  
                                          v  
-                  \---------------------\\ (Bypasses cheap model if complex)   
+                  ---------------------\ (Bypasses cheap model if complex)   
                          |                                                       |  
-                         \+---\> (Qwen 3.5 9B)        |  
+                         +---> (Qwen 3.5 9B)        |  
                          |        | (Success)                                    |  
                          |        v                                              |  
                          |                                |  
                          |        | (Schema Failure)                             |  
                          |        v                                              v  
-                         \+---------------------------------------------\> (Claude Opus 4.7)   
+                         +---------------------------------------------> (Claude Opus 4.7)   
                                                                                  |  
                                                                                  v  
                                                                        
                                                                                  | (Semantic Failure)  
                                                                                  v  
                                                                      
+```
 
 ### **Cascade Optimization and Routing Economics**
 
@@ -256,12 +258,12 @@ System economics in 2026 are defined by the total cost per successful outcome ra
 
 #### **Cascade Routing Math**
 
-A model cascade routes an incoming query first to a cheap, low-capacity model (L), evaluates the model's confidence s\_L, and escalates to a premium model (H) only if s\_L falls below a threshold tau.14  
+A model cascade routes an incoming query first to a cheap, low-capacity model (L), evaluates the model's confidence s_L, and escalates to a premium model (H) only if s_L falls below a threshold tau.14  
 The expected cost of a two-model cascade is formulated as:  
-E\[C\] \= C\_L \+ P(s\_L \< tau) \* C\_H  
-where C\_L is the cost of the cheap model, C\_H is the cost of the premium model, and P(s\_L \< tau) is the probability of escalation.14  
+E[C] = C_L + P(s_L < tau) * C_H  
+where C_L is the cost of the cheap model, C_H is the cost of the premium model, and P(s_L < tau) is the probability of escalation.14  
 The expected system quality is:  
-E\[Q\] \= P(s\_L \>= tau) \* Q\_L(s\_L \>= tau) \+ P(s\_L \< tau) \* Q\_H(s\_L \< tau)  
+E[Q] = P(s_L >= tau) * Q_L(s_L >= tau) + P(s_L < tau) * Q_H(s_L < tau)  
 Model cascades are limited primarily by **structural cost**: the system must pay the cheap model's prefill and generation costs before making any escalation decision.14 If the escalation rate is high, the total cost can exceed the price of routing directly to the premium model.14
 
 #### **Pre-Generation Diagnostic Routing**
@@ -275,9 +277,9 @@ Speculative decoding is a latency optimization that accelerates inference withou
 * **How it works:** A small draft model (e.g., Llama 3.2 1B) 30 rapidly proposes k candidate tokens, which are verified in parallel by the target model (e.g., Llama 3.3 70B) in a single forward pass.6  
 * **Drafter Training (LK Losses):** Rather than traditional KL divergence training (which covers multiple modes and degrades draft accuracy), modern draft models are trained using Total Variation (TV) minimization or LK losses.32 This approach directly maximizes the token acceptance rate alpha 32, where:
 
-alpha \= 1 \- TV(p, q)
+alpha = 1 - TV(p, q)
 
-* **The Concurrency Trap:** Speculative decoding is highly effective when the server is memory-bandwidth-bound (typically batch size \< 4 to 8), reducing latency by up to 3x.24 However, as concurrent batch size scales to 16 or 32, the GPU becomes compute-bound.26 The verification overhead of evaluating candidate tokens then consumes the latency savings, resulting in a 5% to 10% performance regression in high-traffic production environments.26
+* **The Concurrency Trap:** Speculative decoding is highly effective when the server is memory-bandwidth-bound (typically batch size < 4 to 8), reducing latency by up to 3x.24 However, as concurrent batch size scales to 16 or 32, the GPU becomes compute-bound.26 The verification overhead of evaluating candidate tokens then consumes the latency savings, resulting in a 5% to 10% performance regression in high-traffic production environments.26
 
 ### **Routing Economics Framework**
 
@@ -301,11 +303,11 @@ Architects must build a comprehensive, automated evaluation harness that runs ca
 
 | Harness Component | Test Type | Target Metric | Production Target |
 | :---- | :---- | :---- | :---- |
-| **Golden Sets** 13 | Regression Testing | Absolute Accuracy | Match baseline within \+/- 0.5%. |
+| **Golden Sets** 13 | Regression Testing | Absolute Accuracy | Match baseline within +/- 0.5%. |
 | **Adversarial Set** 2 | Robustness check | Refusal/Jailbreak Rate | Zero safety failures. |
-| **Needle-in-a-Haystack** 8 | Retrieval Validation | Context Recall | \>99% recall across the active window.8 |
+| **Needle-in-a-Haystack** 8 | Retrieval Validation | Context Recall | >99% recall across the active window.8 |
 | **Schema Test** 13 | Constraint check | Syntactic Validity | 100% validation compliance.11 |
-| **Tool Simulation** 10 | Multi-agent execution | Trace Integrity | First-attempt success \>90%.10 |
+| **Tool Simulation** 10 | Multi-agent execution | Trace Integrity | First-attempt success >90%.10 |
 | **Multilingual Sweep** 17 | Dialect evaluation | Translation Quality | BLEU score maintenance.17 |
 | **Shadow Telemetry** 2 | Parallel processing | Traffic Distribution | Match offline latency predictions.26 |
 
@@ -327,20 +329,20 @@ In agentic benchmarks, the scaffold or harness (the code allowing the model to r
 
 Applying Random Matrix Theory (RMT) to the evaluation landscape shows that public benchmarks are highly redundant.12 For example, the 43 sub-tasks of the Open LLM Leaderboard compress down to an Effective Dimensionality (ED) of just 4.5, meaning the benchmark measures only a few distinct axes of capability.12  
 Furthermore, benchmarks can exhibit conditional negative correlations:  
-rho(MATH x MuSR) \= \-0.635  
-rho(GPQA x MATH) \= \-0.340  
+rho(MATH x MuSR) = -0.635  
+rho(GPQA x MATH) = -0.340  
 This indicates that models optimized to maximize scores on one specific capability (like mathematical deduction) can show regressions in other areas (such as multi-step spatial reasoning), proving that there is no single "best" model for all workloads.1
 
 ### **Benchmark Performance Guide**
 
 | Benchmark | Target Capability | Saturated Ceiling | Production Gap | Harness Dependency |
 | :---- | :---- | :---- | :---- | :---- |
-| **MMLU / MMLU-Pro** 16 | General knowledge | Saturated (\>90%).16 | Low correlation to narrow domains.1 | Low; straightforward multi-choice. |
-| **GPQA Diamond** 16 | Scientific deduction | High (\>94%).2 | Fails to measure layout comprehension.3 | Low; multiple-choice extraction. |
-| **HLE (Human Exam)** 16 | Advanced deduction | Low (\<55%).16 | Early stages; limited domain coverage.16 | Low; short-answer parsing.2 |
-| **SWE-bench Verified** 2 | Repository coding | Saturated (\>85%). | High risk of task-ID contamination.2 | High; agent scaffolding swings score.2 |
-| **SWE-bench Pro** 2 | Multi-file development | Active (\<65%).2 | Best simulation of software engineering.2 | Extreme; harness controls context.2 |
-| **Terminal-Bench 2.0** 2 | CLI command control | Active (\<70%).2 | Excellent command execution proxy.2 | High; requires active terminal host.2 |
+| **MMLU / MMLU-Pro** 16 | General knowledge | Saturated (>90%).16 | Low correlation to narrow domains.1 | Low; straightforward multi-choice. |
+| **GPQA Diamond** 16 | Scientific deduction | High (>94%).2 | Fails to measure layout comprehension.3 | Low; multiple-choice extraction. |
+| **HLE (Human Exam)** 16 | Advanced deduction | Low (<55%).16 | Early stages; limited domain coverage.16 | Low; short-answer parsing.2 |
+| **SWE-bench Verified** 2 | Repository coding | Saturated (>85%). | High risk of task-ID contamination.2 | High; agent scaffolding swings score.2 |
+| **SWE-bench Pro** 2 | Multi-file development | Active (<65%).2 | Best simulation of software engineering.2 | Extreme; harness controls context.2 |
+| **Terminal-Bench 2.0** 2 | CLI command control | Active (<70%).2 | Excellent command execution proxy.2 | High; requires active terminal host.2 |
 
 ## **Doctrinal Artifacts and Architecture Standards**
 
@@ -352,58 +354,58 @@ Architects must complete this standardized record for every production model tra
 
 # **Model Decision Record (MDR):**
 
-## **1\. Context and Problem Statement**
+## **1. Context and Problem Statement**
 
 * Describe the specific task graph node and its cognitive requirements.  
 * Detail the system constraints (latency SLAs, cost targets, privacy requirements).
 
-## **2\. Selected Model and Configuration**
+## **2. Selected Model and Configuration**
 
 * Selected Model Identifier:  
 * Deployment Topology:  
 * Core Parameters:  
-  * \--gpu-memory-utilization: \[e.g., 0.90\]  
-  * \--max-model-len: \[e.g., 32768\]  
-  * \--enable-chunked-prefill: \[e.g., true\]
+  * --gpu-memory-utilization: [e.g., 0.90]  
+  * --max-model-len: [e.g., 32768]  
+  * --enable-chunked-prefill: [e.g., true]
 
-## **3\. Evaluation Evidence**
+## **3. Evaluation Evidence**
 
-* Golden Set Accuracy Score: \[e.g., 84.2%\]  
-* Structured-Output Validity Rate: \[e.g., 100% via XGrammar\]  
-* Target Latency P95: \[e.g., 820ms\]  
+* Golden Set Accuracy Score: [e.g., 84.2%]  
+* Structured-Output Validity Rate: [e.g., 100% via XGrammar]  
+* Target Latency P95: [e.g., 820ms]  
 * Benchmark References:
 
-## **4\. Rejected Alternatives and Rationale**
+## **4. Rejected Alternatives and Rationale**
 
 * Alternative A:  
   * Rejection Reason: Exceeded cost boundaries and violated regional data residency rules.  
 * Alternative B:  
   * Rejection Reason: Insufficient instruction following on nested schemas.
 
-## **5\. Failure Tolerance and Risk Mitigation**
+## **5. Failure Tolerance and Risk Mitigation**
 
 * Anticipated Failure: Malformed JSON output.  
   * Mitigation: Engine-level PDA constrained decoding mask.  
 * Anticipated Failure: Silent extraction omission.  
   * Mitigation: Secondary evaluation schema parsing with fail-closed human escalation.
 
-## **6\. Execution Economics**
+## **6. Execution Economics**
 
-* Estimated Prefill Cost (per 1M queries): \[e.g., $1.20\]  
-* Estimated Generation Cost (per 1M queries): \[e.g., $2.40\]  
-* Estimated Total Cost Per Successful Outcome: \[e.g., $0.0036\]
+* Estimated Prefill Cost (per 1M queries): [e.g., $1.20]  
+* Estimated Generation Cost (per 1M queries): [e.g., $2.40]  
+* Estimated Total Cost Per Successful Outcome: [e.g., $0.0036]
 
-## **7\. Lifecycle and Rollout Plan**
+## **7. Lifecycle and Rollout Plan**
 
 * Rollout Strategy: Shadow route 1% of live traffic for 72 hours, scaling to 10% canary.  
-* Rollback Trigger: Error rate \> 0.5%, P95 latency \> 1.2s, or security injection detection.  
+* Rollback Trigger: Error rate > 0.5%, P95 latency > 1.2s, or security injection detection.  
 * Reconsideration Conditions: Release of decontaminated open-weight models in the same size class.
 
 ### **Selection Failure Modes and Anti-Patterns**
 
 * **Leaderboard Shopping:** Selecting a model based solely on headline scores on saturated, contaminated benchmarks (e.g., MMLU), ignoring task-specific performance and deployment constraints.1  
 * **The Single Model Monolith:** Forcing one general-purpose model to execute every node in a complex task graph, leading to high latencies and excessive costs.1  
-* **The Speculative Concurrency Trap:** Enabling speculative decoding in high-throughput production environments (batch size \> 16\) without verifying if the GPU has transitioned to a compute-bound state, resulting in performance regressions.26  
+* **The Speculative Concurrency Trap:** Enabling speculative decoding in high-throughput production environments (batch size > 16 without verifying if the GPU has transitioned to a compute-bound state, resulting in performance regressions.26  
 * **Unverified Long-Context StuffING:** Assuming a model's long-context window maintains high retrieval accuracy near the middle of the window without running needle-in-a-haystack or citation tests.1  
 * **FSM Cold-Start Latency:** Deploying Outlines-style FSM schemas in latency-sensitive APIs without pre-compiling and caching the target schema, causing latency spikes.11  
 * **Unintentional Tokenizer Drift:** Swapping models without verifying if the new tokenizer maps the same input text to a larger number of tokens, which can increase nominal token costs by 10% to 35% under the same pricing tier.2
@@ -425,38 +427,40 @@ To maintain system margins and detect performance drift, production systems must
 
 Model selection does not exist in isolation. It serves as the bridge between model training, adaptation, serving, and system orchestration.
 
-                                    \+--------------------------------------------------------------+  
+```
+                                    +--------------------------------------------------------------+  
                                     | AI-ENG-G: Model Selection (This Report)                      |  
                                     | Establishes capability, deployment, and risk fit.            |  
-                                    \+------------------------------+-------------------------------+  
+                                    +------------------------------+-------------------------------+  
                                                                    |  
-                                            \+----------------------+----------------------+  
+                                            +----------------------+----------------------+  
                                             |                                             |  
                                             v                                             v  
-                                    \+------------------------------+             \+------------------------------+  
+                                    +------------------------------+             +------------------------------+  
                                     | AI-ENG-H: Model Adaptation   |             | AI-ENG-I: Lifecycle Control  |  
                                     | Triggered when model choice  |             | Manages registries, canaries,|  
                                     | is insufficient; uses LoRA,  |             | rollouts, and regression     |  
                                     | fine-tuning, or distillation |             | tracking.                    |  
-                                    | to align capabilities.       |             \+------------------------------+  
-                                    \+------------------------------+  
+                                    | to align capabilities.       |             +------------------------------+  
+                                    +------------------------------+  
                                             |  
                                             v  
-                                    \+------------------------------+  
+                                    +------------------------------+  
                                     | AI-ENG-J/K/L: Runtime Serving|  
                                     | Executes the physical serving|  
                                     | configuration, optimizing    |  
                                     | PagedAttention and VRAM.     |  
-                                    \+------------------------------+  
+                                    +------------------------------+  
                                             |  
-                                            \+----------------------+----------------------+  
+                                            +----------------------+----------------------+  
                                             |                      |                      |  
                                             v                      v                      v  
-                                    \+--------------+        \+--------------+        \+--------------+  
+                                    +--------------+        +--------------+        +--------------+  
                                     | AI-ENG-M:    |        | AI-ENG-N:    |        | AI-ENG-W:    |  
                                     | Agentic      |        | Tool         |        | Fallback     |  
                                     | Orchestration|        | Contracts    |        | Chains       |  
-                                    \+--------------+        \+--------------+        \+--------------+
+                                    +--------------+        +--------------+        +--------------+
+```
 
 | Downstream Canon Report | Ownership Intersection | Technical Input | Functional Dependency |
 | :---- | :---- | :---- | :---- |
@@ -482,35 +486,35 @@ This report establishes five core, durable principles for model selection:
 
 1. Model Ranking vs Model Selection: Why LLM Leaderboards Don't Pick the Right Model for Production | Trismik Blog, accessed June 7, 2026, [https://blog.trismik.com/model-ranking-vs-model-selection/](https://blog.trismik.com/model-ranking-vs-model-selection/)  
 2. LLM Benchmark Methodology 2026: Reading Leaderboards, accessed June 7, 2026, [https://www.digitalapplied.com/blog/llm-benchmark-methodology-2026-contamination-leaderboard-guide](https://www.digitalapplied.com/blog/llm-benchmark-methodology-2026-contamination-leaderboard-guide)  
-3. AI model benchmarks 2026: GPT, Claude, Gemini compared \- Logic, accessed June 7, 2026, [https://logic.inc/resources/ai-model-benchmarks-guide](https://logic.inc/resources/ai-model-benchmarks-guide)  
+3. AI model benchmarks 2026: GPT, Claude, Gemini compared - Logic, accessed June 7, 2026, [https://logic.inc/resources/ai-model-benchmarks-guide](https://logic.inc/resources/ai-model-benchmarks-guide)  
 4. The Open-Source AI Revolution: How DeepSeek, OpenClaw, and Open-Weight Models Are Reshaping AI in 2026 | AI Magicx Blog, accessed June 7, 2026, [https://www.aimagicx.com/blog/open-source-ai-revolution-deepseek-openclaw-2026](https://www.aimagicx.com/blog/open-source-ai-revolution-deepseek-openclaw-2026)  
 5. LLM Serving Optimization: Continuous Batching, PagedAttention, and Chunked Prefill on H100 (2026) | Spheron Blog, accessed June 7, 2026, [https://www.spheron.network/blog/llm-serving-optimization-continuous-batching-paged-attention/](https://www.spheron.network/blog/llm-serving-optimization-continuous-batching-paged-attention/)  
-6. GPU Requirements 2026: Llama 4 \= 1× H100 ($2.50/hr), DeepSeek V3.2 \= 8× H200 ($36/hr), Qwen 3.5 27B \= 1× H100 | Spheron Blog, accessed June 7, 2026, [https://www.spheron.network/blog/gpu-requirements-cheat-sheet-2026/](https://www.spheron.network/blog/gpu-requirements-cheat-sheet-2026/)  
-7. Local or Cloud AI? The Real Math Nobody's Doing \- Byrnu, accessed June 7, 2026, [https://byrnu.com/en/blog/local-vs-cloud-ai](https://byrnu.com/en/blog/local-vs-cloud-ai)  
-8. Home \- RTrentin's world, accessed June 7, 2026, [https://rtrentinsworld.com/home/](https://rtrentinsworld.com/home/)  
-9. JSON Schema (AI) \- Guild.ai, accessed June 7, 2026, [https://www.guild.ai/glossary/json-schema-ai](https://www.guild.ai/glossary/json-schema-ai)  
+6. GPU Requirements 2026: Llama 4 = 1× H100 ($2.50/hr), DeepSeek V3.2 = 8× H200 ($36/hr), Qwen 3.5 27B = 1× H100 | Spheron Blog, accessed June 7, 2026, [https://www.spheron.network/blog/gpu-requirements-cheat-sheet-2026/](https://www.spheron.network/blog/gpu-requirements-cheat-sheet-2026/)  
+7. Local or Cloud AI? The Real Math Nobody's Doing - Byrnu, accessed June 7, 2026, [https://byrnu.com/en/blog/local-vs-cloud-ai](https://byrnu.com/en/blog/local-vs-cloud-ai)  
+8. Home - RTrentin's world, accessed June 7, 2026, [https://rtrentinsworld.com/home/](https://rtrentinsworld.com/home/)  
+9. JSON Schema (AI) - Guild.ai, accessed June 7, 2026, [https://www.guild.ai/glossary/json-schema-ai](https://www.guild.ai/glossary/json-schema-ai)  
 10. ATLAS-RTC: Closing the Loop on LLM Agent Output with Token-Level Runtime Control, accessed June 7, 2026, [https://arxiv.org/html/2603.27905v2](https://arxiv.org/html/2603.27905v2)  
 11. Beyond JSON Mode: Getting Reliable Structured Outputs from LLMs ..., accessed June 7, 2026, [https://tianpan.co/blog/2025-10-29-structured-outputs-llm-production](https://tianpan.co/blog/2025-10-29-structured-outputs-llm-production)  
-12. BenchScope: How Many Independent Signals Does Your Benchmark Provide? \- arXiv, accessed June 7, 2026, [https://arxiv.org/html/2603.29357v1](https://arxiv.org/html/2603.29357v1)  
-13. Structured outputs guide: JSON Schema, OpenAI, Claude, Gemini \- Logic, accessed June 7, 2026, [https://logic.inc/resources/structured-outputs-guide](https://logic.inc/resources/structured-outputs-guide)  
-14. Is Escalation Worth It? A Decision-Theoretic Characterization of LLM Cascades \- arXiv, accessed June 7, 2026, [https://arxiv.org/html/2605.06350v1](https://arxiv.org/html/2605.06350v1)  
-15. Dynamic Model Routing and Cascading for Efficient LLM Inference: A Survey \- arXiv, accessed June 7, 2026, [https://arxiv.org/html/2603.04445v2](https://arxiv.org/html/2603.04445v2)  
-16. LLM Benchmarks 2026: Which Model for Which Job \- DataVLab, accessed June 7, 2026, [https://datavlab.ai/post/llm-benchmarks-2026-which-model-for-which-job](https://datavlab.ai/post/llm-benchmarks-2026-which-model-for-which-job)  
-17. meta-llama/Llama-3.3-70B-Instruct \- Hugging Face, accessed June 7, 2026, [https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct)  
-18. meta-llama/llama-models: Utilities intended for use with Llama models. \- GitHub, accessed June 7, 2026, [https://github.com/meta-llama/llama-models](https://github.com/meta-llama/llama-models)  
-19. Llama (language model) \- Wikipedia, accessed June 7, 2026, [https://en.wikipedia.org/wiki/Llama\_(language\_model)](https://en.wikipedia.org/wiki/Llama_\(language_model\))  
-20. (PDF) AgenticAKM : Enroute to Agentic Architecture Knowledge Management \- ResearchGate, accessed June 7, 2026, [https://www.researchgate.net/publication/400459554\_AgenticAKM\_Enroute\_to\_Agentic\_Architecture\_Knowledge\_Management](https://www.researchgate.net/publication/400459554_AgenticAKM_Enroute_to_Agentic_Architecture_Knowledge_Management)  
-21. Can LLMs Generate Architectural Design Decisions? \- An Exploratory Empirical study, accessed June 7, 2026, [https://arxiv.org/html/2403.01709v1](https://arxiv.org/html/2403.01709v1)  
-22. Which Open-Source LLM Models Are Currently the Best? \- GMI Cloud, accessed June 7, 2026, [https://www.gmicloud.ai/en/blog/which-open-source-llm-models-are-currently](https://www.gmicloud.ai/en/blog/which-open-source-llm-models-are-currently)  
+12. BenchScope: How Many Independent Signals Does Your Benchmark Provide? - arXiv, accessed June 7, 2026, [https://arxiv.org/html/2603.29357v1](https://arxiv.org/html/2603.29357v1)  
+13. Structured outputs guide: JSON Schema, OpenAI, Claude, Gemini - Logic, accessed June 7, 2026, [https://logic.inc/resources/structured-outputs-guide](https://logic.inc/resources/structured-outputs-guide)  
+14. Is Escalation Worth It? A Decision-Theoretic Characterization of LLM Cascades - arXiv, accessed June 7, 2026, [https://arxiv.org/html/2605.06350v1](https://arxiv.org/html/2605.06350v1)  
+15. Dynamic Model Routing and Cascading for Efficient LLM Inference: A Survey - arXiv, accessed June 7, 2026, [https://arxiv.org/html/2603.04445v2](https://arxiv.org/html/2603.04445v2)  
+16. LLM Benchmarks 2026: Which Model for Which Job - DataVLab, accessed June 7, 2026, [https://datavlab.ai/post/llm-benchmarks-2026-which-model-for-which-job](https://datavlab.ai/post/llm-benchmarks-2026-which-model-for-which-job)  
+17. meta-llama/Llama-3.3-70B-Instruct - Hugging Face, accessed June 7, 2026, [https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct)  
+18. meta-llama/llama-models: Utilities intended for use with Llama models. - GitHub, accessed June 7, 2026, [https://github.com/meta-llama/llama-models](https://github.com/meta-llama/llama-models)  
+19. Llama (language model) - Wikipedia, accessed June 7, 2026, [https://en.wikipedia.org/wiki/Llama_(language_model)](https://en.wikipedia.org/wiki/Llama_(language_model)  
+20. (PDF) AgenticAKM : Enroute to Agentic Architecture Knowledge Management - ResearchGate, accessed June 7, 2026, [https://www.researchgate.net/publication/400459554_AgenticAKM_Enroute_to_Agentic_Architecture_Knowledge_Management](https://www.researchgate.net/publication/400459554_AgenticAKM_Enroute_to_Agentic_Architecture_Knowledge_Management)  
+21. Can LLMs Generate Architectural Design Decisions? - An Exploratory Empirical study, accessed June 7, 2026, [https://arxiv.org/html/2403.01709v1](https://arxiv.org/html/2403.01709v1)  
+22. Which Open-Source LLM Models Are Currently the Best? - GMI Cloud, accessed June 7, 2026, [https://www.gmicloud.ai/en/blog/which-open-source-llm-models-are-currently](https://www.gmicloud.ai/en/blog/which-open-source-llm-models-are-currently)  
 23. What Is DeepSeek V4? Open-Weight AI at Frontier-Level Performance | MindStudio, accessed June 7, 2026, [https://www.mindstudio.ai/blog/what-is-deepseek-v4](https://www.mindstudio.ai/blog/what-is-deepseek-v4)  
 24. Accelerating decode-heavy LLM inference with speculative decoding on AWS Trainium and vLLM | Artificial Intelligence, accessed June 7, 2026, [https://aws.amazon.com/blogs/machine-learning/accelerating-decode-heavy-llm-inference-with-speculative-decoding-on-aws-trainium-and-vllm/](https://aws.amazon.com/blogs/machine-learning/accelerating-decode-heavy-llm-inference-with-speculative-decoding-on-aws-trainium-and-vllm/)  
-25. LLM Leaderboard 2026 — Compare Top AI Models \- Vellum, accessed June 7, 2026, [https://www.vellum.ai/llm-leaderboard](https://www.vellum.ai/llm-leaderboard)  
-26. Speculative Decoding in Production: Free Tokens and Hidden Traps \- TianPan.co, accessed June 7, 2026, [https://tianpan.co/blog/2026-04-17-speculative-decoding-production-hidden-traps](https://tianpan.co/blog/2026-04-17-speculative-decoding-production-hidden-traps)  
+25. LLM Leaderboard 2026 — Compare Top AI Models - Vellum, accessed June 7, 2026, [https://www.vellum.ai/llm-leaderboard](https://www.vellum.ai/llm-leaderboard)  
+26. Speculative Decoding in Production: Free Tokens and Hidden Traps - TianPan.co, accessed June 7, 2026, [https://tianpan.co/blog/2026-04-17-speculative-decoding-production-hidden-traps](https://tianpan.co/blog/2026-04-17-speculative-decoding-production-hidden-traps)  
 27. DeepSeek's Low Inference Cost Explained: MoE & Strategy | IntuitionLabs, accessed June 7, 2026, [https://intuitionlabs.ai/articles/deepseek-inference-cost-explained](https://intuitionlabs.ai/articles/deepseek-inference-cost-explained)  
-28. Daily Papers \- Hugging Face, accessed June 7, 2026, [https://huggingface.co/papers?q=selective%20routing%20mechanism](https://huggingface.co/papers?q=selective+routing+mechanism)  
+28. Daily Papers - Hugging Face, accessed June 7, 2026, [https://huggingface.co/papers?q=selective%20routing%20mechanism](https://huggingface.co/papers?q=selective+routing+mechanism)  
 29. Speculative decoding: How it works, when it helps & where it fits in your inference stack, accessed June 7, 2026, [https://redis.io/blog/speculative-decoding-llm/](https://redis.io/blog/speculative-decoding-llm/)  
-30. PARD: Accelerating LLM Inference with Low‑Cost PARallel Draft Model Adaptation \- arXiv, accessed June 7, 2026, [https://arxiv.org/html/2504.18583v4](https://arxiv.org/html/2504.18583v4)  
-31. An Interpretable Latency Model for Speculative Decoding in LLM Serving \- arXiv, accessed June 7, 2026, [https://arxiv.org/html/2605.15051v1](https://arxiv.org/html/2605.15051v1)  
+30. PARD: Accelerating LLM Inference with Low‑Cost PARallel Draft Model Adaptation - arXiv, accessed June 7, 2026, [https://arxiv.org/html/2504.18583v4](https://arxiv.org/html/2504.18583v4)  
+31. An Interpretable Latency Model for Speculative Decoding in LLM Serving - arXiv, accessed June 7, 2026, [https://arxiv.org/html/2605.15051v1](https://arxiv.org/html/2605.15051v1)  
 32. LK losses: Training speculative decoding draft models to directly maximize acceptance rate, accessed June 7, 2026, [https://nebius.com/blog/posts/lk-losses](https://nebius.com/blog/posts/lk-losses)
 
 ---

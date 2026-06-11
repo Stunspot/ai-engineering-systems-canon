@@ -43,7 +43,7 @@ The retrieval pipeline must handle queries through a deterministic sequence of p
                   +-----------------------------------------+  
                   |        1. QUERY INTERPRETATION          |  
                   |  - Intent Classification                |  
-                  |  - Entity Resolution & Alias Expansion   |  
+                  |  - Entity Resolution & Alias Expansion  |  
                   |  - Query Decomposition (Subquestions)   |  
                   +-----------------------------------------+  
                                        |  
@@ -331,25 +331,25 @@ To secure data and maintain relevance, the retrieval pipeline enforces three tie
                                      |  
                                      v  
 +--------------------------------------------------------------------------+  
-|  Tier 1: SECURITY GATE (Pre-Retrieval Filter)                             |  
+|  Tier 1: SECURITY GATE (Pre-Retrieval Filter)                            |  
 |  - Enforces: `tenant_id == "TENANT-A"`                                   |  
-|  - Enforces: `user_groups INTERSECT document_acl_groups`                  |  
-|  - Blocks unauthorized vector matches before scoring or logging   |  
+|  - Enforces: `user_groups INTERSECT document_acl_groups`                 |  
+|  - Blocks unauthorized vector matches before scoring or logging          |  
 +--------------------------------------------------------------------------+  
                                      |  
                                      v  
 +--------------------------------------------------------------------------+  
 |  Tier 2: FRESHNESS & VERSION GATE (Retrieval-Time Gate)                  |  
 |  - Enforces: `document_status == "active"`                               |  
-|  - Diverts queries targeting superseded files to replacement versions |  
-|  - Matches dates against the user's temporal parameters           |  
+|  - Diverts queries targeting superseded files to replacement versions    |  
+|  - Matches dates against the user's temporal parameters                  |  
 +--------------------------------------------------------------------------+  
                                      |  
                                      v  
 +--------------------------------------------------------------------------+  
 |  Tier 3: COMPLIANCE & SCOPE GATE (Dynamic Filter)                        |  
 |  - Enforces: `jurisdiction == "EU"`, `product_version == "V3"`           |  
-|  - Redaction Propagation: Scrubs sensitive variables and PII        |  
+|  - Redaction Propagation: Scrubs sensitive variables and PII             |  
 +--------------------------------------------------------------------------+  
                                      |  
                                      v  
@@ -401,7 +401,7 @@ Once evidence has been selected, it must be compiled into the model's context wi
 
 To ensure a standardized contract between retrieval engines and the context compiler, every retrieved item is structured as a self-contained Evidence Packet:
 
-JSON  
+```JSON  
 {  
   "$schema": "https://json-schema.org/draft/2020-12/schema",  
   "title": "EvidencePacket",  
@@ -495,6 +495,7 @@ JSON
     "retrieval_rationale"  
   ]  
 }
+```
 
 ### **Semantic Injection Pattern Library**
 
@@ -505,30 +506,32 @@ The context compiler translates approved Evidence Packets into structured prompt
 * **Use Case**: Compliance audits, quote-supported Q&A, and exact terminology lookups.30  
 * **Format**: Encloses exact verbatim text in XML tags, exposing source coordinates.8
 
-XML  
+```XML  
 <evidence-packet id="EP-9921" source="SEC-POL-V4" version="4.1">  
   <citation-coordinates uri="s3://policies/sec-pol-v4.pdf" page="12" />  
   <verbatim-text>  
     API credentials must be rotated every ninety (90) calendar days.  
   </verbatim-text>  
 </evidence-packet>
+```
 
 #### **Extracted Claim Packets**
 
 * **Use Case**: Factual synthesis and multi-hop reasoning over broad corpora.14  
 * **Format**: Represents atomic facts stripped of styling, minimizing token size.14
 
-XML  
+```XML  
 <evidence-packet id="EP-PROP-02" source="FactoidWiki">  
   <atomic-fact>The Leaning Tower of Pisa leans at an angle of 3.97 degrees.</atomic-fact>  
 </evidence-packet>
+```
 
 #### **Parent-Section Packets**
 
 * **Use Case**: Context-dependent queries where terms require surrounding qualifiers.27  
 * **Format**: Includes the retrieved chunk surrounded by its parent document section.27
 
-XML  
+```XML  
 <evidence-packet id="EP-PC-41" source="EMPLOYEE-HANDBOOK">  
   <section path="Benefits/Leave">  
     All full-time employees accumulate 1.5 days of monthly leave.  
@@ -538,13 +541,14 @@ XML
     Paternity leave eligibility follows identical timelines.  
   </section>  
 </evidence-packet>
+```
 
 #### **Table Packets**
 
 * **Use Case**: Spreadsheet lookups and structured financial analysis.3  
 * **Format**: Renders data as Markdown tables, keeping row headers and column headers intact.28
 
-XML  
+```XML  
 <evidence-packet id="EP-TAB-09" source="Q3-FINANCIALS">  
   <table-data name="Revenue Summary" coordinates="Table 2, Rows 3-5">  
     | Region | Q3 Revenue | YoY Growth |  
@@ -553,13 +557,14 @@ XML
     | APAC | $18.9M | +18% |  
   </table-data>  
 </evidence-packet>
+```
 
 #### **Code Packets**
 
 * **Use Case**: Software engineering assistants and technical reference lookup.  
 * **Format**: Isolates code syntax, preserving imports, signatures, and file references.
 
-XML  
+```XML  
 <code-evidence id="EP-CODE-102" repository="api-gateway" file="auth/rotator.py" lines="45-52">  
   <code-snippet language="python">  
     def rotate_api_key(user_id: str) -> bool:  
@@ -567,13 +572,14 @@ XML
         return key_store.update_rotation_timestamp(user_id)  
   </code-snippet>  
 </code-evidence>
+```
 
 #### **Source Comparison Packets**
 
 * **Use Case**: Dynamic document updates and policy audits.2  
 * **Format**: Displays matching text from different source files or systems.2
 
-XML  
+```XML  
 <comparison-group parameter="API Key Rotation Interval">  
   <source id="SRC-A" system="SharePoint-Draft" last-modified="2025-06-12">  
     API keys must be rotated every 180 days.  
@@ -582,13 +588,14 @@ XML
     API keys must be rotated every 90 days.  
   </source>  
 </comparison-group>
+```
 
 #### **Conflict Packets**
 
 * **Use Case**: Audit reviews where retrieved sources contain contradictory claims.2  
 * **Format**: Groups conflicting claims, exposing authority and freshness metadata.2
 
-XML  
+```XML  
 <conflict-group parameter="Standard Leave Accumulation Rate">  
   <candidate id="EP-01" source="HR-PORTAL" status="ACTIVE" authority="0.95">  
     Employees accumulate 1.5 days of leave per month.  
@@ -597,28 +604,31 @@ XML
     Employees accumulate 2.0 days of leave per month.  
   </candidate>  
 </conflict-group>
+```
 
 #### **Citation Bundles**
 
 * **Use Case**: Academic or scientific research requiring verified citations.18  
 * **Format**: Maps factual claims directly to their corresponding source IDs.18
 
-XML  
+```XML  
 <citation-bundle>  
   <claim id="CLM-01">Exposure X increases safety risk Y.</claim>  
   <supporting-evidence packet-ref="EP-A" span="strong correlation between X and Y" />  
 </citation-bundle>
+```
 
 #### **Task-Specific Evidence Briefs**
 
 * **Use Case**: Executive summaries and quick business audits.1  
 * **Format**: Compiles high-density, annotated facts, grouping related points.1
 
-XML  
+```XML  
 <evidence-brief topic="Acme Security SLA">  
   - Acme requires 99.9% uptime for API services.  
   - Incident response times must not exceed 15 minutes.  
 </evidence-brief>
+```
 
 ### **Preserving Instruction Hierarchy and Token Economics**
 
