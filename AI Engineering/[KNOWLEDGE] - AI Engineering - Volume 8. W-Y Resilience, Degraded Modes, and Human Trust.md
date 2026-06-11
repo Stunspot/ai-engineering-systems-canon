@@ -1,3 +1,12 @@
+# [KNOWLEDGE] - AI Engineering - Volume 8. W-Y Resilience, Degraded Modes, and Human Trust
+
+[Volume 8. W-Y Resilience, Degraded Modes, and Human Trust]
+  - [AI-ENG-W - UX Resilience - Model Routing, Fallback Chains & Degraded-Mode Grace](#ai-eng-w---ux-resilience---model-routing-fallback-chains--degraded-mode-grace)
+  - []()  
+  - []()
+  
+---
+
 # AI-ENG-W - UX Resilience - Model Routing, Fallback Chains & Degraded-Mode Grace
 
 ## **Doctrinal Foundations of UX Resilience**
@@ -421,5 +430,3 @@ To implement a robust, production-grade UX Resilience architecture, organization
 46. Best AI Gateway to Route Codex CLI to Any Model \- Maxim AI, accessed June 11, 2026, [https://www.getmaxim.ai/articles/best-ai-gateway-to-route-codex-cli-to-any-model/](https://www.getmaxim.ai/articles/best-ai-gateway-to-route-codex-cli-to-any-model/)
 
 ---
-
-[← Back to Canon Map](../canon-map.md)

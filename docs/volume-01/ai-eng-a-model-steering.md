@@ -5,7 +5,7 @@
 The deployment of large language models into enterprise software architectures requires a departure from traditional deterministic programming paradigms.1 In standard software systems, execution is governed by concrete execution paths, predictable memory registers, and strict type constraints. In contrast, large language models operate as probabilistic semantic engines whose native interface is unstructured natural language.1 Consequently, application developers cannot treat models as stateless computing functions; instead, they must implement a multi-layered discipline of behavioral guidance.1  
 This discipline is defined as **model steering**: the systematic control of probabilistic model outputs through a coordinated suite of semantic, contextual, architectural, runtime, evaluative, and parameter-adaptation control surfaces.1 Within this framework, prompt engineering is no longer positioned as the complete field of study, but rather as a highly localized, linguistic control surface nested inside a much larger systems engineering architecture.1  
 To organize and validate any engineering intervention within this paradigm, the system architect must operate under a single, central governing question:  
-Steering Intervention \= min\_{Cost, Latency, Complexity} f(Delta Behavior, Reversibility, Maintainability)  
+Steering Intervention = min_{Cost, Latency, Complexity} f(Delta Behavior, Reversibility, Maintainability)  
 This governing question acts as the structural filter for the entire system design. Every behavioral deviation, syntax failure, or security vulnerability must be routed to the lightest, most maintainable, and most easily reversed layer of the architecture capable of robustly solving the problem.4  
 This report provides the foundational doctrinal knowledge base for Volume 1: The Informational/Epistemic Layer, establishing the vocabulary, concepts, and decision boundaries required to build resilient, production-grade AI systems.2
 
@@ -18,7 +18,7 @@ To establish a precise and durable vocabulary across subsequent volumes of the c
 | **Model Steering** | The programmatic and semantic manipulation of token probability distributions to yield aligned, predictable, and secure model outputs.1 | System Architecture |
 | **Semantic Steering** | The design of natural language contexts, structural tags, and performance examples to prime specific regions of the model's token distribution.6 | Token Space |
 | **Harness Engineering** | The deterministic application envelope that coordinates prompt rendering, message structures, API constraints, and validation loops.4 | Application Runtime |
-| **Instruction Hierarchy** | The prioritized classification of instruction payloads based on trust boundaries to resolve conflicts (e.g., Platform \> Developer \> User \> Tool).8 | Post-Training Weights |
+| **Instruction Hierarchy** | The prioritized classification of instruction payloads based on trust boundaries to resolve conflicts (e.g., Platform > Developer > User > Tool).8 | Post-Training Weights |
 | **Constrained Decoding** | The runtime filtering of logit distributions at the sampling level to guarantee syntactical adherence to context-free grammars or schemas.10 | Inference Engine |
 | **Self-Routing** | The dynamic classification of incoming queries to route tasks between low-cost retrieval-augmented pathways and deep context windows.12 | Orchestration Layer |
 | **Temporal Knowledge Graph** | A database architecture that maps entity relations alongside temporal validity windows to maintain conversational state across sessions.2 | Memory Substrate |
@@ -44,55 +44,57 @@ The prompt's structural choreography, rhythm, delimiters, and examples determine
 * **Genre Continuation:** Structuring the prompt as the natural preface to the desired response, forcing the model’s autoregressive decoder to generate the exact style required.6  
 * **Lexical Priors:** Choosing highly specific, unambiguous domain terminology to trigger exact parametric sub-networks, avoiding generalized vocabulary that leads to conversational drift.4
 
-For example, when using frontier models like Claude 4.8 or Claude Opus 4.5, formatting defaults can be overridden by embedding aesthetic rules in explicit \<frontend\_aesthetics\> XML blocks.6 This mechanism steers the model away from generic, overused styles—often referred to as "AI slop"—by setting explicit constraints on margins, typography, and palette hex codes.6
+For example, when using frontier models like Claude 4.8 or Claude Opus 4.5, formatting defaults can be overridden by embedding aesthetic rules in explicit <frontend_aesthetics> XML blocks.6 This mechanism steers the model away from generic, overused styles—often referred to as "AI slop"—by setting explicit constraints on margins, typography, and palette hex codes.6
 
 ## **Harness Engineering and the Message Assembly Layer**
 
 To transition from experimental prompting to production-grade AI systems, developers must establish a clear separation of concerns between the prompt and the harness.4 The **prompt** represents the linguistic payload delivered to the model.15 The **harness** is the surrounding deterministic application envelope that orchestrates state, handles input sanitation, manages execution constraints, and monitors the model's interaction with the external environment.4
 
-\+-----------------------------------------------------------------------------------+  
+```
+*-----------------------------------------------------------------------------------+  
 |                                PRODUCTION HARNESS                                 |  
 |                                                                                   |  
-|  \+---------------------+   \+---------------------+   \+-------------------------+  |  
-|  |   State Assembly    |   | Context Retrieval   |   |   Memory Selection      |  |  |  
-|  | (User/Org Metadata) |   |    (Vector/RAG)     |   | (Dynamic Fact Eviction) |  |  |  
-|  \+---------------------+   \+---------------------+   \+-------------------------+  |  
+|  *---------------------+   *---------------------+   *-------------------------+  |  
+|  |   State Assembly    |   | Context Retrieval   |   |   Memory Selection      |  |  
+|  | (User/Org Metadata) |   |    (Vector/RAG)     |   | (Dynamic Fact Eviction) |  |    
+|  *---------------------+   *---------------------+   *-------------------------+  |  
 |             │                         │                           │               |  
 |             └─────────────────────────┼───────────────────────────┘               |  
 |                                       ▼                                           |  
-|  \+-----------------------------------------------------------------------------+  |  
+|  *-----------------------------------------------------------------------------+  |  
 |  | Message Generation & Input Isolation                                        |  |  
-|  | \- System Instruction Role Injection (Platform vs. Developer Roles)           |  |  
-|  | \- Structural Delimiter Isolation (System vs. User vs. Tool Payloads)        |  |  
-|  | \- Untrusted Data Wrapping (XML/Data Separators)                             |  |  
-|  \+-----------------------------------------------------------------------------+  |  
+|  | - System Instruction Role Injection (Platform vs. Developer Roles)          |  |  
+|  | - Structural Delimiter Isolation (System vs. User vs. Tool Payloads)        |  |  
+|  | - Untrusted Data Wrapping (XML/Data Separators)                             |  |  
+|  *-----------------------------------------------------------------------------+  |  
 |                                       │                                           |  
 |                                       ▼                                           |  
-|  \+-----------------------------------------------------------------------------+  |  
+|  *-----------------------------------------------------------------------------+  |  
 |  | Inference Runtime & Sampling Constraints                                    |  |  
-|  | \- Token Budgets & Effort Calibration (max, xhigh, high, medium, low)        |  |  
-|  | \- Logit Masking & Constrained Decoding (XGrammar / Guidance)                |  |  
-|  \+-----------------------------------------------------------------------------+  |  
+|  | - Token Budgets & Effort Calibration (max, xhigh, high, medium, low)        |  |  
+|  | - Logit Masking & Constrained Decoding (XGrammar / Guidance)                |  |  
+|  *-----------------------------------------------------------------------------+  |  
 |                                       │                                           |  
 |                                       ▼                                           |  
-|  \+-----------------------------------------------------------------------------+  |  
+|  *-----------------------------------------------------------------------------+  |  
 |  | Post-Inference Validation                                                   |  |  
-|  | \- Structured Parser Check & Regex Type Matching                             |  |  
-|  | \- Evaluator Judge Call & Retry Routing Policy                               |  |  
-|  \+-----------------------------------------------------------------------------+  |  
+|  | - Structured Parser Check & Regex Type Matching                             |  |  
+|  | - Evaluator Judge Call & Retry Routing Policy                               |  |  
+|  *-----------------------------------------------------------------------------+  |  
 |                                       │                                           |  
 |             ┌─────────────────────────┴───────────────────────────┐               |  
 |             ▼                                                     ▼               |  
-|  \+---------------------+                                 \+---------------------+  |  
+|  *---------------------+                                 *---------------------+  |  
 |  |     SUCCESS PATH    |                                 |    FALLBACK PATH    |  |  
 |  |  (State Sync/Save)  |                                 | (Graceful Refusal)  |  |  
-|  \+---------------------+                                 \+---------------------+  |  
-\+-----------------------------------------------------------------------------------+
+|  *---------------------+                                 *---------------------+  |  
+*-----------------------------------------------------------------------------------+
+```
 
 A production-grade harness manages several critical functions:
 
 * **Message Generation and Input Isolation:** Programmatically assembling system, developer, user, and tool roles while wrapping untrusted content inside isolated structural tags.4 This ensures that user data or tool outputs cannot masquerade as high-privilege instructions.4  
-* **Role and Delimiter Injection:** Appending developer-defined authority tags to the beginning of context packets, and injecting clear role separators (e.g., \<user\_input\> or \<retrieved\_evidence\>) dynamically during construction.4  
+* **Role and Delimiter Injection:** Appending developer-defined authority tags to the beginning of context packets, and injecting clear role separators (e.g., <user_input> or <retrieved_evidence>) dynamically during construction.4  
 * **Context Construction and Caching Optimization:** Curating the input context block to maximize cache hit rates.18 For instance, placing highly static system instructions and template rules at the top of the context window allows API providers to leverage KV caching discounts, while dynamic inputs are appended at the end.6  
 * **Inference Execution and Sampling Constraints:** Programmatically passing hyperparameters like temperature, top-p, token budgets, and effort configurations (e.g., setting Anthropic's effort parameter to xhigh or high to calibrate reasoning depth).6  
 * **Post-Action Checks and Retry Routing:** Checking the returned payload against expected types, schemas, or semantic rules.11 If a validator fails, the harness catches the error, formats the violation, appends it as a correction prompt, and triggers an automated retry loop.4  
@@ -105,36 +107,38 @@ A production-grade harness manages several critical functions:
 As large language models transition into autonomous, agentic roles, they must consume instructions from multiple heterogeneous sources: developer guidelines, direct user queries, external web page contexts, and dynamic tool schemas.19 When these instructions conflict—such as an untrusted webpage directing the model to ignore previous commands and delete a customer database—the model must possess an explicit priority resolution framework.19  
 The modern industry paradigm relies on a clearly structured authority scale 8:
 
-\+-------------------------------------------------------------------+  
+```
+*-------------------------------------------------------------------+  
 |               AUTHORITY LAYER HIGHER-PRIORITY SCALE               |  
 |                                                                   |  
-| \[LEVEL 0\] PLATFORM RULES (Safety boundaries set by provider)     |  
-| \[LEVEL 1\] DEVELOPER RULES (Session house style & schemas)        |  
-| \[LEVEL 2\] USER QUERIES (Direct human turn-level requests)         |  
-| \[LEVEL 3\] DATA & TOOLS (Web scrape, API payloads, text files)     |  
-\+-------------------------------------------------------------------+
+| [LEVEL 0] PLATFORM RULES (Safety boundaries set by provider)      |  
+| [LEVEL 1] DEVELOPER RULES (Session house style & schemas)         |  
+| [LEVEL 2] USER QUERIES (Direct human turn-level requests)         |  
+| [LEVEL 3] DATA & TOOLS (Web scrape, API payloads, text files)     |  
+*-------------------------------------------------------------------+
+```
 
 API providers like OpenAI enforce these boundaries at the API level.8 In their reasoning model lines (such as o1, o3, and gpt-5), the old system role has been deprecated in favor of the developer role.8 Under this architecture, the platform role sits at the absolute peak of authority, enforcing safety boundaries that cannot be overridden by anyone.8 The developer role acts as the second-highest authority level, defining the persistent task context, house styles, and operational rules for the session.8 The user role occupies the third-highest tier, while tool outputs, assistant messages, and uploaded files carry zero inherent authority and are treated as untrusted data.8  
 However, real-world multi-user collaborative environments demand a more granular authority structure.19 Under the Many-Tier Instruction Hierarchy (ManyIH) framework, instructions are decoupled from simple role labels.19 Instead, privilege levels are dynamically specified as ordinal or scalar values at inference time, allowing up to 12 levels of distinct authority 19:  
-P(Instruction\_i) in the range  
+P(Instruction_i) in the range  
 Empirical tests on ManyIH-Bench show that even frontier models (such as GPT-5.4 and Claude Opus 4.6) are highly fragile when managing scaled instruction conflicts, achieving under 40% accuracy, and showing extreme sensitivity to how privilege information is formatted in the prompt.19  
 To address these vulnerabilities structurally, systems can integrate **Instructional Segment Embedding (ISE)**.22 Derived from BERT’s classic segment architecture, ISE appends learnable segment embeddings directly to token representations within the network’s self-attention layers 22:  
-h\_i \= Attention(W\_Q \* (e\_i \+ s\_i), W\_K \* (e\_j \+ s\_j), W\_V \* (e\_j \+ s\_j))  
-where e\_i represents the combined token and position embedding, and s\_i is a learned segment embedding corresponding to its authority class (e.g., system, user, data, or output).22 This architectural separation prevents lower-priority tokens from overriding high-priority instructions, leading to up to an 18.68% increase in robustness against adversarial prompt injections.22  
+h_i = Attention(W_Q * (e_i * s_i), W_K * (e_j * s_j), W_V * (e_j * s_j))  
+where e_i represents the combined token and position embedding, and s_i is a learned segment embedding corresponding to its authority class (e.g., system, user, data, or output).22 This architectural separation prevents lower-priority tokens from overriding high-priority instructions, leading to up to an 18.68% increase in robustness against adversarial prompt injections.22  
 At the post-training level, systems can deploy **SecAlign (Secure Alignment)**.13 Rather than relying on simple prompt reminders, SecAlign uses Direct Preference Optimization (DPO) to align model weights against adversarial instructions.13 It first constructs a specialized preference dataset containing prompt-injected inputs paired with a secure output (which follows the developer instruction) and an insecure output (which complies with the injected instruction).13 By preference-optimizing the model on this dataset, SecAlign reduces the attack success rate of sophisticated prompt injections to nearly 0% without degrading the model's core utility.13
 
 ### **Structured Output, Syntax Compliance, and Constrained Decoding**
 
 When language models must deliver structured outputs (such as JSON payloads) to interface with downstream databases or APIs, prompt-only instructions (e.g., "respond only with valid JSON") are fundamentally insufficient.11 Under standard prompt-only execution, OpenAI benchmarks show that gpt-4o's syntax adherence scores below 40% on complex JSON schemas.11  
 To guarantee 100% syntactical compliance, developers must deploy **constrained decoding** (also called structured sampling or guided generation).10 This technique integrates a deterministic constraint engine directly between the model's raw logit computation and the token selection step.10 Before any token is sampled, the constraint engine analyzes the token sequence generated so far and applies a binary token mask to filter the model's vocabulary 11:  
-z\_tilde\_t \= z\_t \+ log(m\_t)  
-where z\_t is the model's raw logit vector at step t, and m\_t (where m\_t is in {0, 1}^V) is the validation mask.11 This ensures that any token carrying a non-zero probability after masking is mathematically guaranteed to keep the output sequence on a structurally valid path defined by a context-free grammar or JSON schema.10  
+z_tilde_t = z_t * log(m_t)  
+where z_t is the model's raw logit vector at step t, and m_t (where m_t is in {0, 1}^V) is the validation mask.11 This ensures that any token carrying a non-zero probability after masking is mathematically guaranteed to keep the output sequence on a structurally valid path defined by a context-free grammar or JSON schema.10  
 Several specialized constrained decoding engines exist, displaying highly varied performance profiles:
 
 | Framework | Core Mechanism | Strengths | Limits | Ideal Use Case |
 | :---- | :---- | :---- | :---- | :---- |
-| **XGrammar** 3 | Pushdown Automaton (PDA) batch decoding. 3 | Precomputes context-independent token validity; reduces mask time to \<40 microseconds. Default backend for vLLM and SGLang. 11 | Does not support highly complex non-context-free structures. | High-throughput production deployments and dynamic per-request schemas.11 |
-| **Guidance** 10 | Prefix trie traversal with regex derivatives. 10 | Average mask calculation \<50 microseconds; fast-forwards deterministic tokens to bypass sampling entirely. 10 | Deeply integrated into Microsoft/llguidance Rust backend dependencies. 10 | Real-time interactive generation demanding extremely low latency.11 |
+| **XGrammar** 3 | Pushdown Automaton (PDA) batch decoding. 3 | Precomputes context-independent token validity; reduces mask time to <40 microseconds. Default backend for vLLM and SGLang. 11 | Does not support highly complex non-context-free structures. | High-throughput production deployments and dynamic per-request schemas.11 |
+| **Guidance** 10 | Prefix trie traversal with regex derivatives. 10 | Average mask calculation <50 microseconds; fast-forwards deterministic tokens to bypass sampling entirely. 10 | Deeply integrated into Microsoft/llguidance Rust backend dependencies. 10 | Real-time interactive generation demanding extremely low latency.11 |
 | **Outlines** 3 | Finite-State Machine (FSM) tracking at token level. 3 | Clean Python API; supports Pydantic models, regex, and EBNF grammars. 11 | Slow compilation overhead (3 to 12 second cold-start times on new schemas).11 | Applications with a small, static set of output schemas where compilation is a one-time cost.11 |
 | **llama.cpp** 10 | GGML Backus-Naur Form (GBNF) tracking. 10 | Fully local execution; integrated directly with edge-device compile targets. 10 | Limited schema parsing speeds on resource-constrained embedded systems. | Embedded local deployments and offline edge device environments.11 |
 
@@ -148,21 +152,23 @@ Despite these benefits, constrained decoding introduces critical cognitive trade
 
 The choice between Retrieval-Augmented Generation (RAG) and ultra-long context windows represents a critical tension in context architecture.12
 
-\+-----------------------------------------------------------------------------------------+  
+```
+*-----------------------------------------------------------------------------------------+  
 |                         CONTEXT PATHWAY COMPARISON MATRIX                               |  
 |                                                                                         |  
 |  RAG Path (Order-Preserving Selective Context):                                         |  
-|  \[Query\] ──► ──► \[Metadata Filter\] ──► \[In-Context Prompt\] ──► \[LLM\] |  
-|  \* Latency: \~1.0 Second                                                     |  
-|  \* Cost: \~$0.00008 per query                                                |  
-|  \* Accuracy: Excellent local chunk recall; sidesteps middle-context degradation    |  
+|  [Query] ──► ──► [Metadata Filter] ──► [In-Context Prompt] ──► [LLM]                    |  
+|  * Latency: ~1.0 Second                                                                 |  
+|  * Cost: ~$0.00008 per query                                                            |  
+|  * Accuracy: Excellent local chunk recall; sidesteps middle-context degradation         |  
 |                                                                                         |  
 |  Long-Context Path (Full-Document Attention):                                           |  
-|  \[Query\] ──────────────────────────► ───────────► \[LLM\] |  
-|  \* Latency: 20 to 60+ Seconds                                              |  
-|  \* Cost: \~$2.00 per query                                                  |  
-|  \* Accuracy: Captures global relationships; suffers from primacy/recency bias      |  
-\+-----------------------------------------------------------------------------------------+
+|  [Query] ──────────────────────────► ───────────► [LLM]                                 |  
+|  * Latency: 20 to 60+ Seconds                                                           |  
+|  * Cost: ~$2.00 per query                                                               |  
+|  * Accuracy: Captures global relationships; suffers from primacy/recency bias           |  
+*-----------------------------------------------------------------------------------------+
+```
 
 While marketing claims celebrate context capacities of up to 2 million tokens, realistic production workloads reveal a distinct **usable context ceiling**.12 In multi-fact retrieval scenarios, average model recall drops to approximately 60% (a 40% miss rate), particularly when context blocks are semantically noisy or require multi-hop reasoning.12  
 Furthermore, attention mechanisms suffer from the **"Lost-in-the-Middle" effect**, where model recall is highly position-dependent.12 Attention distributions follow a U-shaped curve: models attend robustly to information placed at the absolute beginning of the prompt (primacy bias) or the absolute end (recency bias), but show a performance drop of over 20 percentage points when the targeted facts reside in the middle of long contexts.12  
@@ -180,9 +186,9 @@ Because language models are stateless by design, maintaining personalization and
 * **Procedural Memory:** The model’s library of learned workflows, repeatable tool-use schemas, and specific execution habits.2
 
 To maintain state integrity, platforms like MemMachine combine short-term episodic streams with long-term profile memories.32 By indexing episodes at the sentence level and using the model only for high-level abstraction rather than constant raw text extraction, MemMachine reduces memory-related token overhead by up to 80%.32  
-When managing memory at scale, systems like Mem0 support scoping dimensions such as user\_id (individual user history), run\_id (session-specific threads), agent\_id (subagent contexts), and org\_id (shared corporate policies).31 To prevent stale, outdated, or low-relevance facts from polluting the active context window, memory systems must implement explicit decay and eviction mechanics 2:  
-Memory Weight(t) \= Base Similarity Score \* e^(-lambda \* (t \- t\_last))  
-where lambda represents the temporal decay rate, and (t \- t\_last) is the duration since the memory was last retrieved.31 Underperforming or stale memory chunks are systematically evicted, keeping the most relevant context at the top of the retrieval stack.2
+When managing memory at scale, systems like Mem0 support scoping dimensions such as user_id (individual user history), run_id (session-specific threads), agent_id (subagent contexts), and org_id (shared corporate policies).31 To prevent stale, outdated, or low-relevance facts from polluting the active context window, memory systems must implement explicit decay and eviction mechanics 2:  
+Memory Weight(t) = Base Similarity Score * e^(-lambda * (t - t_last))  
+where lambda represents the temporal decay rate, and (t - t_last) is the duration since the memory was last retrieved.31 Underperforming or stale memory chunks are systematically evicted, keeping the most relevant context at the top of the retrieval stack.2
 
 ## **The Intervention Ladder and Adaptation Choice Framework**
 
@@ -192,16 +198,16 @@ When correcting behavioral errors or enforcing constraints in a production syste
 
         
           ▲  
-          │   10\. Model Distillation   
-          │    9\. Preference Tuning (DPO / SecAlign)   
-          │    8\. Parameter Adaptation (LoRA / SFT) \[5, 33\]  
-          │    7\. Model-Level Self-Routing   
-          │    6\. Constrained Decoding (XGrammar / Guidance)   
-          │    5\. Tool Contracts & State Validation Loops   
-          │    4\. Context Architecture, Memory, & RAG Pipes   
-          │    3\. Harness-Level Role/Delimiter Assembly   
-          │    2\. Few-Shot Example & Output Frame Tuning   
-          │    1\. Semantic & Instruction-Level Editing   
+          │   10. Model Distillation   
+          │    9. Preference Tuning (DPO / SecAlign)   
+          │    8. Parameter Adaptation (LoRA / SFT) [5, 33]  
+          │    7. Model-Level Self-Routing   
+          │    6. Constrained Decoding (XGrammar / Guidance)   
+          │    5. Tool Contracts & State Validation Loops   
+          │    4. Context Architecture, Memory, & RAG Pipes   
+          │    3. Harness-Level Role/Delimiter Assembly   
+          │    2. Few-Shot Example & Output Frame Tuning   
+          │    1. Semantic & Instruction-Level Editing   
           │  
       
 
@@ -215,7 +221,7 @@ The architectural trade-offs of each steering technique must be calculated syste
 | **Few-Shot Examples** 6 | Moderate | Explaining nuanced formatting or domain styles.6 | Minutes | Low (3-5 verified examples).6 | Low | Minor token overhead | Linear with token count.6 | Direct | Low |
 | **System Rules** 8 | High (Behavioral) | Setting persistent policies, safety guardrails.18 | Minutes | None | Low | Minor token overhead | Near-Zero | Direct | Low |
 | **Structured Output** 11 | Strict (Syntactic) | Database ingestion, API call generation.11 | Seconds | Schema definitions | Medium | None | Negative (Faster per-token).11 | High | Medium (Hallucination risk).11 |
-| **RAG Pipes** 34 | Dynamic Factual | Ingesting volatile documents, search queries.35 | Hours | Document chunk validation.34 | High | Storage & Vector Database costs.35 | Retrieval step (\~1s delay).12 | Complete trace | Low |
+| **RAG Pipes** 34 | Dynamic Factual | Ingesting volatile documents, search queries.35 | Hours | Document chunk validation.34 | High | Storage & Vector Database costs.35 | Retrieval step (~1s delay).12 | Complete trace | Low |
 | **Long Context** 12 | Holistic Synthesis | Codebase audits, multi-hop document analysis.12 | Minutes | None | Medium | High (quadratic token cost).12 | Quadratic scaling latency.12 | Poor (Opaque attention) | Low |
 | **Dynamic Memory** 31 | Historical | Multi-session personalization, chat continuity.2 | Seconds | Dynamic entity schemas | High | DB write & storage costs.2 | Minimal DB lookup | Complete trace | Low |
 | **Tool Use** 36 | Interactive | Dynamic actions, executing external calculations.17 | Minutes | Schema design | High | Minor token overhead | Execution dependent | High | Low |
@@ -252,24 +258,45 @@ System design in model steering is defined by trade-offs where competing archite
 
 When a production system fails, identifying which layer of the steering architecture owns the diagnostic signature is critical to applying the smallest effective corrective action.
 
-\+-----------------------------------------------------------------------------------------+  
-|                              FAILURE CASCADE FLOW CHART                                 |  
-|                                                                                         |  
-|  ────────────────────────────────────────────────────────┐  |  
-|          │                                                                           │  |  
-|          └──► DO NOT edit prompt semantics.                                          │  |  
-|          └──► FIX via Constrained Decoding (XGrammar) or Schema Validation.      │  |  
-|                                                                                      │  |  
-|  \[Factual Hallucinations / Outdated Answers\] ────────────────────────────────────────┼  |  
-|          │                                                                           │  |  
-|          └──► DO NOT run parameter fine-tuning.                                      │  |  
-|          └──► FIX via Context Retrieval (RAG) or Metadata Filters.           │  |  
-|                                                                                      │  |  
-|  \[Adversarial Prompt Injection / Jailbreaks Passed\] ─────────────────────────────────┘  |  
-|          │                                                                              |  
-|          └──► DO NOT rely on prompt safety warnings.                                    |  
-|          └──► FIX via Preference Optimization (SecAlign) or ISE.\[13, 22\]                |  
-\+-----------------------------------------------------------------------------------------+
+```
++-----------------------------------------------------------------------------------------+
+|                              FAILURE CASCADE FLOW CHART                                 |
+|                                                                                         |
+|  Production failure appears. Diagnose the failure signature before changing the model.  |
+|                                                                                         |
+|                         +-----------------------------+                                 |
+|                         |   OBSERVED FAILURE MODE     |                                 |
+|                         +--------------+--------------+                                 |
+|                                        |                                                |
+|          +-----------------------------+-----------------------------+                  |
+|          |                             |                             |                  |
+|          v                             v                             v                  |
+|  +-------------------+       +-------------------+       +---------------------------+  |
+|  | STRUCTURE FAILURE |       | KNOWLEDGE FAILURE |       | AUTHORITY / SAFETY FAILURE|  |
+|  |                   |       |                   |       |                           |  |
+|  | Invalid JSON,     |       | Hallucinations,   |       | Prompt injection,         |  |
+|  | schema mismatch,  |       | stale facts,      |       | jailbreaks, tool/data     |  |
+|  | parser rejection  |       | missing evidence  |       | instructions overriding   |  |
+|  |                   |       |                   |       | trusted instructions      |  |
+|  +---------+---------+       +---------+---------+       +-------------+-------------+  |
+|            |                           |                               |                |
+|            v                           v                               v                |
+|  DO NOT edit prompt          DO NOT fine-tune              DO NOT rely on prompt        |
+|  semantics endlessly.        parameters to memorize        safety warnings alone.       |
+|                              volatile facts.                                            |
+|            |                           |                               |                |
+|            v                           v                               v                |
+|  FIX via constrained         FIX via RAG, metadata         FIX via instruction          |
+|  decoding, strict schema     filters, context refresh,     hierarchy, privilege         |
+|  validation, nullable        document deduplication,       separation, SecAlign,        |
+|  fields, and parser          or retrieval repair.          ISE, and harness-level       |
+|  retry handling.                                           isolation.                   |
+|                                                                                         |
++-----------------------------------------------------------------------------------------+
+| Core rule: route the symptom to the lightest robust layer capable of fixing it.         |
++-----------------------------------------------------------------------------------------+
+```
+
 
 | Steering Layer | Production Failure Symptom | Likely Root Cause | Diagnostic Observability Signal | Smallest Effective Correction |
 | :---- | :---- | :---- | :---- | :---- |
@@ -288,7 +315,7 @@ When a production system fails, identifying which layer of the steering architec
 
 ### **Architectural Habits**
 
-* **XML Schema Isolation:** Programmatically separating all dynamic prompt variables, few-shot examples, retrieved document chunks, and untrusted contents using explicit XML tags (e.g., \<user\_query\> or \<context\_document index="0"\>).4 This provides clean structural boundaries and prevents context pollution.4  
+* **XML Schema Isolation:** Programmatically separating all dynamic prompt variables, few-shot examples, retrieved document chunks, and untrusted contents using explicit XML tags (e.g., <user_query> or <context_document index="0">).4 This provides clean structural boundaries and prevents context pollution.4  
 * **Logit-Level Syntax Enforcement:** Resolving all syntactical and structure-compliance challenges at the decoding layer using high-performance engines like XGrammar or Guidance, freeing up model parameter space for semantic logic.10  
 * **Grounded Evaluation Loops:** Calibrating all automated evaluation pipelines by injecting verified, human-written gold references into the judge model prompts, neutralizing self-preference and stylistic evaluation biases.41  
 * **Parallel Execution Pipelines:** Designing system prompts and harnesses to exploit parallel tool-calling capabilities (e.g., executing multiple independent document-reading calls simultaneously) to minimize time-to-first-token.6  
@@ -306,41 +333,43 @@ When a production system fails, identifying which layer of the steering architec
 
 Evaluating a multi-layered model steering system requires isolating semantic variables from harness, retrieval, and decoding layers.4 A professional evaluation architecture must be constructed across five distinct core pillars:
 
-\+-------------------------------------------------------------------------+  
+```
+*-------------------------------------------------------------------------+  
 |                  FIVE PILLARS OF SYSTEM EVALUATION                      |  
 |                                                                         |  
-|  1\. GOLDEN REFERENCE SETS ──► Ground truth human-verified baselines    |  
-|                                                            |  
-|  2\. REFERENCE GROUNDING   ──► Eliminates self-bias in LLM Judges        |  
-|                                                           |  
-|  3\. SYNTAX COMPLIANCE     ──► Verifies schema validity of outputs       |  
-|                                                            |  
-|  4\. CITATION AUDITING     ──► Enforces factual grounding via RAG        |  
-|                                                           |  
-|  5\. TELEMETRY MONITORING  ──► Tracks runtime performance metrics        |  
-|                                                            |  
-\+-------------------------------------------------------------------------+
+|  1. GOLDEN REFERENCE SETS ──► Ground truth human-verified baselines     |  
+|                                                                         |  
+|  2. REFERENCE GROUNDING   ──► Eliminates self-bias in LLM Judges        |  
+|                                                                         |  
+|  3. SYNTAX COMPLIANCE     ──► Verifies schema validity of outputs       |  
+|                                                                         |  
+|  4. CITATION AUDITING     ──► Enforces factual grounding via RAG        |  
+|                                                                         |  
+|  5. TELEMETRY MONITORING  ──► Tracks runtime performance metrics        |  
+|                                                                         |  
+*-------------------------------------------------------------------------+
+```
 
-### **1\. Golden Reference Sets**
+### **1. Golden Reference Sets**
 
 System testing must be anchored on a static, high-diversity golden evaluation dataset of at least 50 to 100 domain-specific scenarios.4 This dataset must contain expert-annotated ground-truth outputs, edge cases, and safety probes to establish baseline operational compliance.4
 
-### **2\. Reference Grounding for Evaluator Judges**
+### **2. Reference Grounding for Evaluator Judges**
 
 When deploying LLM-as-a-judge pipelines to evaluate outputs at scale, evaluations must use human-grounded reference responses.40 Research reveals that LLM judges exhibit significant biases, including self-preference (favoring generations from their own model family) and stylistic bias (rating assertive but incorrect answers 15% to 20% higher than accurate, cautious responses).40  
 Crucially, without an expert reference, a judge model's grading accuracy degrades on questions it cannot correctly answer itself.41 Providing the judge with a verified human-written reference answer resolves this discrepancy, enabling high agreement with human annotators.41 Agreement rates must be validated using chance-corrected metrics like Cohen’s Kappa (Kappa):  
-Kappa \= (p\_o \- p\_e) / (1 \- p\_e)  
-where p\_o represents observed agreement and p\_e represents expected agreement under random conditions.45
+Kappa = (p_o - p_e) / (1 - p_e)  
+where p_o represents observed agreement and p_e represents expected agreement under random conditions.45
 
-### **3\. Syntax Compliance**
+### **3. Syntax Compliance**
 
 Outputs generated via constrained decoding must be validated against downstream schemas (e.g., Pydantic or OpenAPI models).11 The evaluation harness must log schema violation rates, parsing errors, and logit compression latency.4
 
-### **4\. Citation Auditing**
+### **4. Citation Auditing**
 
 For RAG workloads, evaluations must ensure the model's generations are factually grounded in retrieved sources.12 The evaluation harness must parse citations, verify that cited substrings exist in the retrieved context documents, and run semantic overlap validations.12
 
-### **5\. Telemetry and Regression Gates**
+### **5. Telemetry and Regression Gates**
 
 In production, systems must log token usage, API latency, cache hit rates, cost per query, and user feedback signals.4 Any updates to the semantic prompts or harness assembly must pass through automated regression gates, comparing candidate performance against current production baselines before deployment.4
 
@@ -372,48 +401,48 @@ This report establishes the baseline concepts of model steering, serving as the 
 1. Difference between the roles used in the OpenAI API, accessed June 5, 2026, [https://community.openai.com/t/difference-between-the-roles-used-in-the-openai-api/1262886](https://community.openai.com/t/difference-between-the-roles-used-in-the-openai-api/1262886)  
 2. AI Memory System: Types, Architecture, and Enterprise Use Cases, accessed June 5, 2026, [https://atlan.com/know/ai-memory-system/](https://atlan.com/know/ai-memory-system/)  
 3. Structured Decoding in vLLM: a gentle introduction, accessed June 5, 2026, [https://vllm.ai/blog/2025-01-14-struct-decode-intro](https://vllm.ai/blog/2025-01-14-struct-decode-intro)  
-4. Applying Anthropic's Prompt Guide: Practical Insights for Claude \- PromptLayer Blog, accessed June 5, 2026, [https://blog.promptlayer.com/how-to-apply-anthropic-s-prompt-guide/](https://blog.promptlayer.com/how-to-apply-anthropic-s-prompt-guide/)  
+4. Applying Anthropic's Prompt Guide: Practical Insights for Claude - PromptLayer Blog, accessed June 5, 2026, [https://blog.promptlayer.com/how-to-apply-anthropic-s-prompt-guide/](https://blog.promptlayer.com/how-to-apply-anthropic-s-prompt-guide/)  
 5. RAG vs Fine-Tuning: A 2026 Decision Framework | Zartis, accessed June 5, 2026, [https://www.zartis.com/rag-vs-fine-tuning-a-2026-decision-framework/](https://www.zartis.com/rag-vs-fine-tuning-a-2026-decision-framework/)  
-6. Prompting best practices \- Claude API Docs \- Claude Console, accessed June 5, 2026, [https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)  
-7. Evaluation of Prompt Injection Defenses in Large Language Models \- arXiv, accessed June 5, 2026, [https://arxiv.org/html/2604.23887v1](https://arxiv.org/html/2604.23887v1)  
+6. Prompting best practices - Claude API Docs - Claude Console, accessed June 5, 2026, [https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)  
+7. Evaluation of Prompt Injection Defenses in Large Language Models - arXiv, accessed June 5, 2026, [https://arxiv.org/html/2604.23887v1](https://arxiv.org/html/2604.23887v1)  
 8. OpenAI Developer Role | Aurelio AI, accessed June 5, 2026, [https://www.aurelio.ai/reference/openai-developer-role](https://www.aurelio.ai/reference/openai-developer-role)  
-9. Instruction Hierarchy in LLMs \- Ylang Labs, accessed June 5, 2026, [https://ylanglabs.com/blogs/instruction-hierarchy-in-llms](https://ylanglabs.com/blogs/instruction-hierarchy-in-llms)  
-10. guidance-ai/llguidance: Super-fast Structured Outputs \- GitHub, accessed June 5, 2026, [https://github.com/guidance-ai/llguidance](https://github.com/guidance-ai/llguidance)  
+9. Instruction Hierarchy in LLMs - Ylang Labs, accessed June 5, 2026, [https://ylanglabs.com/blogs/instruction-hierarchy-in-llms](https://ylanglabs.com/blogs/instruction-hierarchy-in-llms)  
+10. guidance-ai/llguidance: Super-fast Structured Outputs - GitHub, accessed June 5, 2026, [https://github.com/guidance-ai/llguidance](https://github.com/guidance-ai/llguidance)  
 11. Grammar-Constrained Generation: The Output Reliability Technique ..., accessed June 5, 2026, [https://tianpan.co/blog/2026-04-16-grammar-constrained-generation-output-reliability](https://tianpan.co/blog/2026-04-16-grammar-constrained-generation-output-reliability)  
 12. Long-Context Models vs. RAG: When the 1M-Token Window Is the ..., accessed June 5, 2026, [https://tianpan.co/blog/2026-04-09-long-context-vs-rag-production-decision-framework](https://tianpan.co/blog/2026-04-09-long-context-vs-rag-production-decision-framework)  
-13. SecAlign: Defending Against Prompt Injection with Preference Optimization \- arXiv, accessed June 5, 2026, [https://arxiv.org/html/2410.05451v2](https://arxiv.org/html/2410.05451v2)  
-14. \[PDF\] SecAlign: Defending Against Prompt Injection with Preference Optimization, accessed June 5, 2026, [https://www.semanticscholar.org/paper/SecAlign%3A-Defending-Against-Prompt-Injection-with-Chen-Zharmagambetov/3e1d812a1ef4b02b7d60020cc8aaa596d28373da](https://www.semanticscholar.org/paper/SecAlign%3A-Defending-Against-Prompt-Injection-with-Chen-Zharmagambetov/3e1d812a1ef4b02b7d60020cc8aaa596d28373da)  
-15. Claude System Prompt Explained: What's Inside and Why It Matters \- Tactiq, accessed June 5, 2026, [https://tactiq.io/learn/claude-system-prompt](https://tactiq.io/learn/claude-system-prompt)  
-16. What goes in the system vs developer role \- API, accessed June 5, 2026, [https://community.openai.com/t/what-goes-in-the-system-vs-developer-role/1347594](https://community.openai.com/t/what-goes-in-the-system-vs-developer-role/1347594)  
+13. SecAlign: Defending Against Prompt Injection with Preference Optimization - arXiv, accessed June 5, 2026, [https://arxiv.org/html/2410.05451v2](https://arxiv.org/html/2410.05451v2)  
+14. [PDF] SecAlign: Defending Against Prompt Injection with Preference Optimization, accessed June 5, 2026, [https://www.semanticscholar.org/paper/SecAlign%3A-Defending-Against-Prompt-Injection-with-Chen-Zharmagambetov/3e1d812a1ef4b02b7d60020cc8aaa596d28373da](https://www.semanticscholar.org/paper/SecAlign%3A-Defending-Against-Prompt-Injection-with-Chen-Zharmagambetov/3e1d812a1ef4b02b7d60020cc8aaa596d28373da)  
+15. Claude System Prompt Explained: What's Inside and Why It Matters - Tactiq, accessed June 5, 2026, [https://tactiq.io/learn/claude-system-prompt](https://tactiq.io/learn/claude-system-prompt)  
+16. What goes in the system vs developer role - API, accessed June 5, 2026, [https://community.openai.com/t/what-goes-in-the-system-vs-developer-role/1347594](https://community.openai.com/t/what-goes-in-the-system-vs-developer-role/1347594)  
 17. How to Interact with APIs Using Function Calling in Gemini | Google Codelabs, accessed June 5, 2026, [https://codelabs.developers.google.com/codelabs/gemini-function-calling](https://codelabs.developers.google.com/codelabs/gemini-function-calling)  
-18. System and Developer Roles in messages and Instructions in Responses.Create? \- API, accessed June 5, 2026, [https://community.openai.com/t/system-and-developer-roles-in-messages-and-instructions-in-responses-create/1370516](https://community.openai.com/t/system-and-developer-roles-in-messages-and-instructions-in-responses-create/1370516)  
-19. Many-Tier Instruction Hierarchy in LLM Agents \- arXiv, accessed June 5, 2026, [https://arxiv.org/html/2604.09443v2](https://arxiv.org/html/2604.09443v2)  
-20. Mitigating the risk of prompt injections in browser use \- Anthropic, accessed June 5, 2026, [https://www.anthropic.com/research/prompt-injection-defenses](https://www.anthropic.com/research/prompt-injection-defenses)  
-21. Many-Tier Instruction Hierarchy in LLM Agents \- arXiv, accessed June 5, 2026, [https://arxiv.org/html/2604.09443v3](https://arxiv.org/html/2604.09443v3)  
-22. Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy \- arXiv, accessed June 5, 2026, [https://arxiv.org/html/2410.09102v1](https://arxiv.org/html/2410.09102v1)  
-23. Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy | Request PDF \- ResearchGate, accessed June 5, 2026, [https://www.researchgate.net/publication/384929764\_Instructional\_Segment\_Embedding\_Improving\_LLM\_Safety\_with\_Instruction\_Hierarchy](https://www.researchgate.net/publication/384929764_Instructional_Segment_Embedding_Improving_LLM_Safety_with_Instruction_Hierarchy)  
-24. Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy \- GitHub, accessed June 5, 2026, [https://github.com/tongwu2020/ISE](https://github.com/tongwu2020/ISE)  
-25. Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy \- arXiv, accessed June 5, 2026, [https://arxiv.org/html/2410.09102v2](https://arxiv.org/html/2410.09102v2)  
-26. SecAlign: Defending Against Prompt Injection with Preference Optimization \- Sizhe Chen, accessed June 5, 2026, [https://sizhe-chen.github.io/SecAlign-Website/](https://sizhe-chen.github.io/SecAlign-Website/)  
-27. Generating Structured Outputs from Language Models: Benchmark and Studies \- arXiv, accessed June 5, 2026, [https://arxiv.org/html/2501.10868v1](https://arxiv.org/html/2501.10868v1)  
-28. Structured Outputs \- SGLang Documentation, accessed June 5, 2026, [https://sgl-project.github.io/advanced\_features/structured\_outputs.html](https://sgl-project.github.io/advanced_features/structured_outputs.html)  
+18. System and Developer Roles in messages and Instructions in Responses.Create? - API, accessed June 5, 2026, [https://community.openai.com/t/system-and-developer-roles-in-messages-and-instructions-in-responses-create/1370516](https://community.openai.com/t/system-and-developer-roles-in-messages-and-instructions-in-responses-create/1370516)  
+19. Many-Tier Instruction Hierarchy in LLM Agents - arXiv, accessed June 5, 2026, [https://arxiv.org/html/2604.09443v2](https://arxiv.org/html/2604.09443v2)  
+20. Mitigating the risk of prompt injections in browser use - Anthropic, accessed June 5, 2026, [https://www.anthropic.com/research/prompt-injection-defenses](https://www.anthropic.com/research/prompt-injection-defenses)  
+21. Many-Tier Instruction Hierarchy in LLM Agents - arXiv, accessed June 5, 2026, [https://arxiv.org/html/2604.09443v3](https://arxiv.org/html/2604.09443v3)  
+22. Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy - arXiv, accessed June 5, 2026, [https://arxiv.org/html/2410.09102v1](https://arxiv.org/html/2410.09102v1)  
+23. Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy | Request PDF - ResearchGate, accessed June 5, 2026, [https://www.researchgate.net/publication/384929764_Instructional_Segment_Embedding_Improving_LLM_Safety_with_Instruction_Hierarchy](https://www.researchgate.net/publication/384929764_Instructional_Segment_Embedding_Improving_LLM_Safety_with_Instruction_Hierarchy)  
+24. Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy - GitHub, accessed June 5, 2026, [https://github.com/tongwu2020/ISE](https://github.com/tongwu2020/ISE)  
+25. Instructional Segment Embedding: Improving LLM Safety with Instruction Hierarchy - arXiv, accessed June 5, 2026, [https://arxiv.org/html/2410.09102v2](https://arxiv.org/html/2410.09102v2)  
+26. SecAlign: Defending Against Prompt Injection with Preference Optimization - Sizhe Chen, accessed June 5, 2026, [https://sizhe-chen.github.io/SecAlign-Website/](https://sizhe-chen.github.io/SecAlign-Website/)  
+27. Generating Structured Outputs from Language Models: Benchmark and Studies - arXiv, accessed June 5, 2026, [https://arxiv.org/html/2501.10868v1](https://arxiv.org/html/2501.10868v1)  
+28. Structured Outputs - SGLang Documentation, accessed June 5, 2026, [https://sgl-project.github.io/advanced_features/structured_outputs.html](https://sgl-project.github.io/advanced_features/structured_outputs.html)  
 29. RAG vs. long-context LLMs: A side-by-side comparison | Meilisearch, accessed June 5, 2026, [https://www.meilisearch.com/blog/rag-vs-long-context-llms](https://www.meilisearch.com/blog/rag-vs-long-context-llms)  
-30. RAG vs Large Context Window: Real Trade-offs for AI Apps \- Redis, accessed June 5, 2026, [https://redis.io/blog/rag-vs-large-context-window-ai-apps/](https://redis.io/blog/rag-vs-large-context-window-ai-apps/)  
-31. AI Memory Management for LLMs and Agents \- Mem0, accessed June 5, 2026, [https://mem0.ai/blog/ai-memory-management-for-llms-and-agents](https://mem0.ai/blog/ai-memory-management-for-llms-and-agents)  
+30. RAG vs Large Context Window: Real Trade-offs for AI Apps - Redis, accessed June 5, 2026, [https://redis.io/blog/rag-vs-large-context-window-ai-apps/](https://redis.io/blog/rag-vs-large-context-window-ai-apps/)  
+31. AI Memory Management for LLMs and Agents - Mem0, accessed June 5, 2026, [https://mem0.ai/blog/ai-memory-management-for-llms-and-agents](https://mem0.ai/blog/ai-memory-management-for-llms-and-agents)  
 32. MemMachine: A Ground-Truth-Preserving Memory System for Personalized AI Agents, accessed June 5, 2026, [https://arxiv.org/html/2604.04853v1](https://arxiv.org/html/2604.04853v1)  
-33. RAG vs Fine-tuning: Pipelines, Tradeoffs, and a Case Study on Agriculture \- arXiv, accessed June 5, 2026, [https://arxiv.org/html/2401.08406v2](https://arxiv.org/html/2401.08406v2)  
-34. RAG vs. Fine-tuning \- IBM, accessed June 5, 2026, [https://www.ibm.com/think/topics/rag-vs-fine-tuning](https://www.ibm.com/think/topics/rag-vs-fine-tuning)  
-35. Should You Use RAG or Fine-Tune Your LLM? \- Actian Corporation, accessed June 5, 2026, [https://www.actian.com/blog/databases/should-you-use-rag-or-fine-tune-your-llm/](https://www.actian.com/blog/databases/should-you-use-rag-or-fine-tune-your-llm/)  
+33. RAG vs Fine-tuning: Pipelines, Tradeoffs, and a Case Study on Agriculture - arXiv, accessed June 5, 2026, [https://arxiv.org/html/2401.08406v2](https://arxiv.org/html/2401.08406v2)  
+34. RAG vs. Fine-tuning - IBM, accessed June 5, 2026, [https://www.ibm.com/think/topics/rag-vs-fine-tuning](https://www.ibm.com/think/topics/rag-vs-fine-tuning)  
+35. Should You Use RAG or Fine-Tune Your LLM? - Actian Corporation, accessed June 5, 2026, [https://www.actian.com/blog/databases/should-you-use-rag-or-fine-tune-your-llm/](https://www.actian.com/blog/databases/should-you-use-rag-or-fine-tune-your-llm/)  
 36. Using Tools with Gemini API | Google AI for Developers, accessed June 5, 2026, [https://ai.google.dev/gemini-api/docs/tools](https://ai.google.dev/gemini-api/docs/tools)  
-37. The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions \- GitHub, accessed June 5, 2026, [https://github.com/AIResponsibly/PaperSummaries/blob/main/summaries/safety/instruction\_hierarchy\_llm.md](https://github.com/AIResponsibly/PaperSummaries/blob/main/summaries/safety/instruction_hierarchy_llm.md)  
+37. The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions - GitHub, accessed June 5, 2026, [https://github.com/AIResponsibly/PaperSummaries/blob/main/summaries/safety/instruction_hierarchy_llm.md](https://github.com/AIResponsibly/PaperSummaries/blob/main/summaries/safety/instruction_hierarchy_llm.md)  
 38. RAG vs Long-Context LLMs: A Comprehensive Comparison | by Rost Glukhov | Medium, accessed June 5, 2026, [https://medium.com/@rosgluk/rag-vs-long-context-llms-a-comprehensive-comparison-9b30594c445e](https://medium.com/@rosgluk/rag-vs-long-context-llms-a-comprehensive-comparison-9b30594c445e)  
 39. Gemini | Mendix Documentation, accessed June 5, 2026, [https://docs.mendix.com/agents/reference-guide/external-connectors/gemini/](https://docs.mendix.com/agents/reference-guide/external-connectors/gemini/)  
-40. LLM-as-a-Judge vs Human Evaluation \- Galileo AI, accessed June 5, 2026, [https://galileo.ai/blog/llm-as-a-judge-vs-human-evaluation](https://galileo.ai/blog/llm-as-a-judge-vs-human-evaluation)  
-41. No Free Labels: Limitations of LLM-as-a-Judge Without Human Grounding \- arXiv, accessed June 5, 2026, [https://arxiv.org/html/2503.05061v2](https://arxiv.org/html/2503.05061v2)  
+40. LLM-as-a-Judge vs Human Evaluation - Galileo AI, accessed June 5, 2026, [https://galileo.ai/blog/llm-as-a-judge-vs-human-evaluation](https://galileo.ai/blog/llm-as-a-judge-vs-human-evaluation)  
+41. No Free Labels: Limitations of LLM-as-a-Judge Without Human Grounding - arXiv, accessed June 5, 2026, [https://arxiv.org/html/2503.05061v2](https://arxiv.org/html/2503.05061v2)  
 42. Human Evaluation of Large Language Models: A Review and Protocol Selection Framework, accessed June 5, 2026, [https://www.mdpi.com/2673-2688/7/5/174](https://www.mdpi.com/2673-2688/7/5/174)  
-43. Repo for the research paper "SecAlign: Defending Against Prompt Injection with Preference Optimization" \- GitHub, accessed June 5, 2026, [https://github.com/facebookresearch/SecAlign](https://github.com/facebookresearch/SecAlign)  
-44. No Free Labels: Limitations of LLM-as-a-Judge Without Human Grounding \- arXiv, accessed June 5, 2026, [https://arxiv.org/html/2503.05061v1](https://arxiv.org/html/2503.05061v1)  
-45. \[Literature Review\] No Free Labels: Limitations of LLM-as-a-Judge Without Human Grounding, accessed June 5, 2026, [https://www.themoonlight.io/en/review/no-free-labels-limitations-of-llm-as-a-judge-without-human-grounding](https://www.themoonlight.io/en/review/no-free-labels-limitations-of-llm-as-a-judge-without-human-grounding)  
+43. Repo for the research paper "SecAlign: Defending Against Prompt Injection with Preference Optimization" - GitHub, accessed June 5, 2026, [https://github.com/facebookresearch/SecAlign](https://github.com/facebookresearch/SecAlign)  
+44. No Free Labels: Limitations of LLM-as-a-Judge Without Human Grounding - arXiv, accessed June 5, 2026, [https://arxiv.org/html/2503.05061v1](https://arxiv.org/html/2503.05061v1)  
+45. [Literature Review] No Free Labels: Limitations of LLM-as-a-Judge Without Human Grounding, accessed June 5, 2026, [https://www.themoonlight.io/en/review/no-free-labels-limitations-of-llm-as-a-judge-without-human-grounding](https://www.themoonlight.io/en/review/no-free-labels-limitations-of-llm-as-a-judge-without-human-grounding)  
 46. Judge's Verdict: A Comprehensive Analysis of LLM Judge Capability Through Human Agreement | OpenReview, accessed June 5, 2026, [https://openreview.net/forum?id=jVyUlri4Rw](https://openreview.net/forum?id=jVyUlri4Rw)
 
 ---

@@ -34,89 +34,91 @@ The vocabulary of enterprise information retrieval requires rigorous definition 
 
 The retrieval pipeline must handle queries through a deterministic sequence of processing stages. It is designed to interpret natural language requests, enforce compliance boundaries, execute high-recall searches, and select precise evidence. The complete architectural lifecycle of a query is detailed in the data flow diagram below:
 
-                  \+-----------------------------------------+  
+```
+                  +-----------------------------------------+  
                   |            Incoming User Query          |  
-                  \+-----------------------------------------+  
+                  +-----------------------------------------+  
                                        |  
                                        v  
-                  \+-----------------------------------------+  
-                  |        1\. QUERY INTERPRETATION          |  
-                  |  \- Intent Classification                |  
-                  |  \- Entity Resolution & Alias Expansion   |  
-                  |  \- Query Decomposition (Subquestions)   |  
-                  \+-----------------------------------------+  
+                  +-----------------------------------------+  
+                  |        1. QUERY INTERPRETATION          |  
+                  |  - Intent Classification                |  
+                  |  - Entity Resolution & Alias Expansion   |  
+                  |  - Query Decomposition (Subquestions)   |  
+                  +-----------------------------------------+  
                                        |  
                                        | (Targeted Search Queries)  
                                        v  
-                  \+-----------------------------------------+  
-                  |         2\. CANDIDATE GENERATION         |  
-                  |  \+-----------------------------------+  |  
+                  +-----------------------------------------+  
+                  |         2. CANDIDATE GENERATION         |  
+                  |  +-----------------------------------+  |  
                   |  |  Lexical Channel (BM25 Engine)    |  |  
-                  |  \+-----------------------------------+  |  
+                  |  +-----------------------------------+  |  
                   |  |  Dense Channel (Embedding Index)  |  |  
-                  |  \+-----------------------------------+  |  
+                  |  +-----------------------------------+  |  
                   |  |  Graph Channel (Knowledge Graph)  |  |  
-                  |  \+-----------------------------------+  |  
+                  |  +-----------------------------------+  |  
                   |  |  Relational Channel (SQL / APIs)  |  |  
-                  |  \+-----------------------------------+  |  
-                  \+-----------------------------------------+  
+                  |  +-----------------------------------+  |  
+                  +-----------------------------------------+  
                                        |  
                                        | (Raw Candidates)  
                                        v  
-                  \+-----------------------------------------+  
-                  |          3\. COMPLIANCE GATING           |  
-                  |  \- Access Control List (ACL) Filter     |  
-                  |  \- Tenant / Organization Boundaries     |  
-                  |  \- Redaction Verification               |  
-                  \+-----------------------------------------+  
+                  +-----------------------------------------+  
+                  |          3. COMPLIANCE GATING           |  
+                  |  - Access Control List (ACL) Filter     |  
+                  |  - Tenant / Organization Boundaries     |  
+                  |  - Redaction Verification               |  
+                  +-----------------------------------------+  
                                        |  
                                        | (Authorized Candidates)  
                                        v  
-                  \+-----------------------------------------+  
-                  |         4\. HYBRID SEARCH FUSION         |  
-                  |  \- Score Normalization & Scaling        |  
-                  |  \- Reciprocal Rank Fusion (RRF / RSF)   |  
-                  \+-----------------------------------------+  
+                  +-----------------------------------------+  
+                  |         4. HYBRID SEARCH FUSION         |  
+                  |  - Score Normalization & Scaling        |  
+                  |  - Reciprocal Rank Fusion (RRF / RSF)   |  
+                  +-----------------------------------------+  
                                        |  
                                        | (Fused Candidate List)  
                                        v  
-                  \+-----------------------------------------+  
-                  |              5\. RERANKING               |  
-                  |  \- Cross-Encoder Semantic Scoring       |  
-                  |  \- Answerability & Utility Evaluation   |  
-                  \+-----------------------------------------+  
+                  +-----------------------------------------+  
+                  |              5. RERANKING               |  
+                  |  - Cross-Encoder Semantic Scoring       |  
+                  |  - Answerability & Utility Evaluation   |  
+                  +-----------------------------------------+  
                                        |  
                                        | (Scored & Ranked Candidates)  
                                        v  
-                  \+-----------------------------------------+  
-                  |       6\. EVIDENCE GATING & SELECTION    |  
-                  |  \- Freshness and Supersession Gating    |  
-                  |  \- Source Authority Weighting           |  
-                  |  \- Diversity-Aware Context Pruning      |  
-                  \+-----------------------------------------+  
+                  +-----------------------------------------+  
+                  |       6. EVIDENCE GATING & SELECTION    |  
+                  |  - Freshness and Supersession Gating    |  
+                  |  - Source Authority Weighting           |  
+                  |  - Diversity-Aware Context Pruning      |  
+                  +-----------------------------------------+  
                                        |  
                                        | (Approved Chunks)  
                                        v  
-                  \+-----------------------------------------+  
-                  |        7\. EVIDENCE PACKAGING            |  
-                  |  \- Lineage & Provenance Attachment      |  
-                  |  \- Coordinate & Citation Map Binding    |  
-                  |  \- Creation of Standard Evidence Packet |  
-                  \+-----------------------------------------+  
+                  +-----------------------------------------+  
+                  |        7. EVIDENCE PACKAGING            |  
+                  |  - Lineage & Provenance Attachment      |  
+                  |  - Coordinate & Citation Map Binding    |  
+                  |  - Creation of Standard Evidence Packet |  
+                  +-----------------------------------------+  
                                        |  
                                        | (Evidence Packets)  
                                        v  
-                  \+-----------------------------------------+  
-                  |    8\. SEMANTIC INJECTION & ASSEMBLY     |  
-                  |  \- Structure-Preserving Rendering       |  
-                  |  \- Delimiter Injection & Isolation      |  
-                  |  \- Grounding Prompts Compile            |  
-                  \+-----------------------------------------+  
+                  +-----------------------------------------+  
+                  |    8. SEMANTIC INJECTION & ASSEMBLY     |  
+                  |  - Structure-Preserving Rendering       |  
+                  |  - Delimiter Injection & Isolation      |  
+                  |  - Grounding Prompts Compile            |  
+                  +-----------------------------------------+  
                                        |  
                                        v  
-                  \+-----------------------------------------+  
+                  +-----------------------------------------+  
                   |             Target LLM Context          |  
-                  \+-----------------------------------------+
+                  +-----------------------------------------+
+```
 
 ### **Architectural Decomposition of the Query Lifecycle**
 
@@ -139,7 +141,7 @@ The trade-offs between key chunking strategies across performance, structural in
 | **Recursive Character Splitting** 5 | Policy manuals, legal agreements, structured documentation.5 | Strong; aligns closely with paragraph and sentence structures.5 | High; preserves the local semantic cluster of structural blocks.5 | Moderate; maps cleanly to structural document blocks.5 | Good; matches context budgets through dynamic sizing.5 | Can still split tabular structures or blockquotes if sizing thresholds are misaligned. |
 | **Semantic Chunking** 28 | Narrative prose, continuous transcripts, thesis papers. | Moderate-High; groups contextually coherent sentences.5 | Brittle; highly dependent on similarity threshold tuning.5 | High for themes; low for specific spans when paragraphs are over-merged.5 | Highly volatile; yields highly variable chunk lengths.28 | Brittle thresholds generate tiny, disconnected chunks (e.g., 43 tokens), losing local context.5 |
 | **Structure-Aware Chunking** 2 | PDFs, technical manuals, regulatory filings, financial reports.2 | High; respects headers, sections, sidebars, and footnotes.2 | Excellent; retrieves complete logical structures.2 | Precision-grade; maps directly to document section coordinates.2 | Optimized; limits noise by avoiding arbitrary cross-node bleeding. | Parser failures can drop text inside deeply nested elements or complex tables. |
-| **Parent-Child Retrieval** 16 | Complex Q\&A, nested legal arguments, dense compliance manuals.27 | Maximized; small vectors capture precise semantic overlap.20 | High; provides the generator with a complete surrounding context.20 | Exceptional; matches exact child hits inside a coherent parent.27 | Costly; injects larger parent contexts into downstream windows.27 | Misaligned mapping can retrieve incorrect parent nodes or duplicate contexts.30 |
+| **Parent-Child Retrieval** 16 | Complex Q&A, nested legal arguments, dense compliance manuals.27 | Maximized; small vectors capture precise semantic overlap.20 | High; provides the generator with a complete surrounding context.20 | Exceptional; matches exact child hits inside a coherent parent.27 | Costly; injects larger parent contexts into downstream windows.27 | Misaligned mapping can retrieve incorrect parent nodes or duplicate contexts.30 |
 | **Proposition-Level Indexing** 14 | Wikipedia-style databases, factual QA, customer service lookups.14 | Exceptional for rare entities and precise fact patterns.31 | Outstanding; minimizes non-factual filler text.14 | High for facts; low for local formatting context.31 | Optimal; delivers dense, high-utility facts.14 | High indexing cost; loses structural relationships and formatting.32 |
 | **Table-Aware Indexing** 2 | Financial statements, spreadsheets, transactional tables. | High; prevents row-to-row semantic fragmentation. | Excellent; delivers intact rows mapped to columns. | High; points directly to table coordinates and footnotes. | Efficient; avoids padding table data with irrelevant filler text. | Unstructured split severs headers from rows, rendering numeric cells ungrounded.3 |
 | **Code-Aware Indexing** | Software repositories, developer tools, API documentation. | High; matches callers, class signatures, and variables. | High; preserves the operational scope of code blocks. | High; maps directly to repositories, files, and lines. | Moderate; requires complete signatures to be useful. | Simple split severs imports from execution blocks, breaking code validity. |
@@ -176,7 +178,7 @@ For example, a text stating: *"The Leaning Tower of Pisa began leaning during co
 * Proposition B: *"The Leaning Tower of Pisa currently leans at an angle of 3.97 degrees."* 14  
 * Proposition C: *"The Leaning Tower of Pisa underwent extensive restoration work that was completed in 2001."*
 
-This approach significantly improves dense retrieval. Empirical evaluations show a relative improvement in Recall@20 of up to \+10.1% for unsupervised retrievers and \+2.2% for supervised retrievers compared to traditional 100-word passage splits.14 The advantages are especially pronounced when querying rare entities or complex, multi-part fact patterns.32
+This approach significantly improves dense retrieval. Empirical evaluations show a relative improvement in Recall@20 of up to +10.1% for unsupervised retrievers and +2.2% for supervised retrievers compared to traditional 100-word passage splits.14 The advantages are especially pronounced when querying rare entities or complex, multi-part fact patterns.32
 
 ### **Failure Modes of Bad Chunking**
 
@@ -198,14 +200,14 @@ To guarantee robust coverage, the pipeline must route queries across multiple co
 
 | Retrieval Method | Strengths | Weaknesses | Ideal Workloads | Failure Modes | Latency | Cost | Citation Suitability |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Lexical Search (BM25)** 12 | Exact matches, identifiers, product codes, error strings, and rare acronyms.10 | Synonyms, vocabulary mismatches, and multi-word paraphrases.10 | Log searching, product part lookup, exact clause matching.10 | Fails to match concepts when query terms do not align with doc terms.10 | \<10ms | Very low (CPU-only index).13 | High; maps directly to exact character coordinates.10 |
-| **Dense Vector Retrieval** 12 | Semantic matching, conceptual mapping, and cross-lingual alignment.12 | Exact string mapping, numeric bounds, version flags, and rare entities.13 | Concept lookup, general FAQ searching, thematic grouping.10 | Vocabulary mismatch; misses exact codes like ERR\_401.13 | 10-50ms (GPU bound) | High (GPU storage and embedding cost).13 | Moderate; depends on chunk boundaries.28 |
+| **Lexical Search (BM25)** 12 | Exact matches, identifiers, product codes, error strings, and rare acronyms.10 | Synonyms, vocabulary mismatches, and multi-word paraphrases.10 | Log searching, product part lookup, exact clause matching.10 | Fails to match concepts when query terms do not align with doc terms.10 | <10ms | Very low (CPU-only index).13 | High; maps directly to exact character coordinates.10 |
+| **Dense Vector Retrieval** 12 | Semantic matching, conceptual mapping, and cross-lingual alignment.12 | Exact string mapping, numeric bounds, version flags, and rare entities.13 | Concept lookup, general FAQ searching, thematic grouping.10 | Vocabulary mismatch; misses exact codes like ERR_401.13 | 10-50ms (GPU bound) | High (GPU storage and embedding cost).13 | Moderate; depends on chunk boundaries.28 |
 | **Hybrid Search** 10 | Combines keyword precision with semantic depth.12 | Increased complexity; requires managing and syncing duplicate indexes.10 | Enterprise search, legacy migration databases.1 | Calibration drift; scale mismatches can skew fused rankings.13 | 15-60ms | High (requires maintaining dual pipelines).10 | High; leverages the strengths of both channels.10 |
 | **Graph Traversal** 33 | Connects disparate entities across documents to answer global, multi-hop questions.33 | High computational complexity; extremely expensive to build and update.35 | Complex relationship tracking, multi-document analysis.33 | Entity extraction failures; misses unlinked or isolated text.34 | 100-500ms | Extremely high (heavy LLM cost for indexing).35 | High; links back to multiple entity source nodes.33 |
 | **SQL/Database Lookup** 7 | Exact calculations, structured filters, ranges, and multi-column joins.7 | Brittle syntax; vulnerable to generation errors when translating NLP to SQL. | Inventory counts, date filters, transactional audits.7 | Parsing errors; syntax issues can block queries entirely. | 5-30ms | Low (standard transactional database indices). | Moderate; refers to table row coordinates. |
 | **API/Tool Lookup** 2 | Real-time state queries, live external statuses, and system updates.2 | Highly dependent on external service availability and rate limits. | Stock checks, shipment updates, user account permissions.2 | Timeout errors or upstream schema changes. | 50-1000ms | Low-Moderate (dependent on third-party pricing). | High; points directly to live systems of record. |
 | **Reranking Models** 10 | Computes deep, cross-attention relevance scores between queries and chunks.10 | High latency overhead; scales linearly with candidate list size.10 | Precision-critical legal, clinical, or financial QA.10 | Over-indexing on similarity over actual source authority.5 | 50-200ms | Moderate-High (GPU resource intensive). | High; isolates the most relevant evidence chunks.7 |
-| **Human-Curated Retrieval** | Manual mapping of high-priority queries to exact, canonical answers. | Poor scalability; requires manual maintenance and updates. | Pinpoint FAQ mappings, compliance standards, brand rules. | Stale mapping; fails to update when underlying files change. | \<5ms | Low (manual mapping store cost). | Absolute; points directly to approved documents. |
+| **Human-Curated Retrieval** | Manual mapping of high-priority queries to exact, canonical answers. | Poor scalability; requires manual maintenance and updates. | Pinpoint FAQ mappings, compliance standards, brand rules. | Stale mapping; fails to update when underlying files change. | <5ms | Low (manual mapping store cost). | Absolute; points directly to approved documents. |
 
 ### **Sober Analysis of Embeddings**
 
@@ -224,21 +226,21 @@ Three primary fusion methodologies exist to resolve this scale mismatch:
 #### **Reciprocal Rank Fusion (RRF)**
 
 RRF bypasses score calibration entirely by evaluating only the rank position of a document across each retrieval channel.10 The RRF score for a document d in D is calculated using the formula:  
-RRF\_Score(d in D) \= sum\_{m in M} (1 / (k \+ rank\_m(d))) 10  
-where M represents the set of retrieval methods (e.g., M \= {dense, lexical}), rank\_m(d) is the position of document d in the output of method m (starting at 1), and k is a constant (typically set to 60).10 The constant k dampens the influence of outlier high rankings, ensuring that documents ranked moderately well across multiple channels are prioritized over documents ranked highly in only one.10
+RRF_Score(d in D) = sum_{m in M} (1 / (k + rank_m(d))) 10  
+where M represents the set of retrieval methods (e.g., M = {dense, lexical}), rank_m(d) is the position of document d in the output of method m (starting at 1), and k is a constant (typically set to 60).10 The constant k dampens the influence of outlier high rankings, ensuring that documents ranked moderately well across multiple channels are prioritized over documents ranked highly in only one.10
 
 #### **Relative Score Fusion (RSF)**
 
-RSF normalizes the score distributions of each channel to a common 0 to 1 range before applying a weighted sum.12 The normalized score S'\_m(d) for document d under retrieval method m is defined as:  
-S'\_m(d) \= (S\_m(d) \- min(S\_m)) / (max(S\_m) \- min(S\_m)) 12  
+RSF normalizes the score distributions of each channel to a common 0 to 1 range before applying a weighted sum.12 The normalized score S'_m(d) for document d under retrieval method m is defined as:  
+S'_m(d) = (S_m(d) - min(S_m)) / (max(S_m) - min(S_m)) 12  
 The final fused score is then computed using weights assigned to each channel:  
-Fused\_Score(d) \= (w\_dense \* S'\_dense(d)) \+ (w\_lexical \* S'\_lexical(d)) 12  
+Fused_Score(d) = (w_dense * S'_dense(d)) + (w_lexical * S'_lexical(d)) 12  
 This method preserves relative score differences within a channel, but it remains vulnerable to skewing from extreme outlier scores.13
 
 #### **Bayesian BM25 Blending**
 
 Bayesian blending maps raw lexical scores into calibrated probabilities by fitting a prior distribution to historical query-corpus pairs.37 This probabilistically calibrates sparse scores, allowing them to be combined with dense cosine probabilities 37:  
-P(Relevant | d) \= (alpha \* P(Dense | d)) \+ ((1 \- alpha) \* P(Lexical\_Bayesian | d))  
+P(Relevant | d) = (alpha * P(Dense | d)) + ((1 - alpha) * P(Lexical_Bayesian | d))  
 This approach reduces scale mismatches and stabilizes hybrid fusion performance across diverse datasets without requiring manual per-domain weight tuning.37
 
 ### **Answerability versus Similarity**
@@ -255,13 +257,13 @@ The functional stages of the query planning model are detailed in the table belo
 
 | Processing Stage | System Subsystem | Input Example | Output Plan / Dynamic Query | Operational Purpose |
 | :---- | :---- | :---- | :---- | :---- |
-| **Intent Classification** | Intent Classifier 7 | *"What was our total revenue in Q3 and when is the next board audit?"* | Intent: SQL/Calculative \+ Document/Retrieval.7 | Routes queries to specialized storage engines, preventing semantic search over tabular databases.7 |
-| **Entity Resolution** | Named Entity Resolution (NER) 11 | *"Does this still apply to enterprise customers?"* 15 | resolved\_entity: "Enterprise Tier" canonical\_id: "PROD-ENT-009" 2 | Resolves vocabulary mismatches, ensuring precise filtering and search targeting.15 |
+| **Intent Classification** | Intent Classifier 7 | *"What was our total revenue in Q3 and when is the next board audit?"* | Intent: SQL/Calculative + Document/Retrieval.7 | Routes queries to specialized storage engines, preventing semantic search over tabular databases.7 |
+| **Entity Resolution** | Named Entity Resolution (NER) 11 | *"Does this still apply to enterprise customers?"* 15 | resolved_entity: "Enterprise Tier" canonical_id: "PROD-ENT-009" 2 | Resolves vocabulary mismatches, ensuring precise filtering and search targeting.15 |
 | **Alias Expansion** | Corporate Catalog Map 11 | *"Update limits for ACME invoice"* 15 | *"Update limits for ACME Corp (EIN: 12-34567)"* 15 | Enhances candidate recall across unlinked, multi-vendor files.15 |
 | **Metadata Inference** | Grammar Parsing Engine 6 | *"Show compliance rules in Germany"* | Filter: {"geography": "DE", "status": "active"} 2 | Constrains candidate generation, preventing out-of-scope document matches.2 |
 | **Temporal Constraint Extraction** | Temporal Normalizer 23 | *"What changed since last summer?"* | Filter: {"date": {"$gt": "2025-06-01"}} | Prevents the retrieval of outdated, superseded document histories.2 |
 | **Subquestion Decomposition** | Dependency Parser 5 | *"Compare our 2024 and 2025 data breach policies."* | Step 1: Search "data breach policy 2024" Step 2: Search "data breach policy 2025" 16 | Enables balanced multi-document comparisons, avoiding single-source retrieval dominance.16 |
-| **Multi-Query Generation** | Paraphraser Model 15 | *"How to reset connection"* 13 | Q1: *"ERR\_CONN\_RESET fixes"* Q2: *"socket reset timeout errors"* 13 | Bypasses individual model embedding variations to improve first-stage recall.15 |
+| **Multi-Query Generation** | Paraphraser Model 15 | *"How to reset connection"* 13 | Q1: *"ERR_CONN_RESET fixes"* Q2: *"socket reset timeout errors"* 13 | Bypasses individual model embedding variations to improve first-stage recall.15 |
 | **Hypothetical Document Expansion** | Generation Engine (HyDE) 7 | *"Where are the server keys?"* | *"Server private keys are secured within the HSM module located at..."* | Shifts retrieval from a query-to-document match to a document-to-document match, matching the target style.7 |
 | **Step-Back Prompting** | Abstraction Router | *"Why did the connection reset on server B?"* | *"What causes connection reset errors on standard Linux servers?"* | Abstracts specific user problems to find general background principles in the corpus. |
 | **Rewrite Evaluation** | Consistency Checker | Combined search variants output. | Validation: Match check against original user constraints. | Ensures generated query rewrites do not introduce semantic drift.6 |
@@ -276,7 +278,7 @@ To illustrate how query planning transforms user intent, the system executes spe
 * **Inference Steps**:  
   1. *Entity Resolution*: Maps "enterprise customers" to canonical customer tiers PROD-ENT-V3.11  
   2. *Freshness Check*: Identifies the current date range and checks if SEC-POL-API-2025 has been superseded.2  
-  3. *Metadata Filter Generation*: Creates the programmatic constraint: {"document\_id": "SEC-POL-API-2025", "tier": "enterprise", "status": "active"}.2  
+  3. *Metadata Filter Generation*: Creates the programmatic constraint: {"document_id": "SEC-POL-API-2025", "tier": "enterprise", "status": "active"}.2  
   4. *Query Plan*: Executes hybrid search over the active partition and compiles the retrieved evidence with citations.2
 
 #### **Case B: "What did we promise Acme?"**
@@ -324,42 +326,44 @@ Pre-retrieval filtering restricts the search space *before* candidate generation
 
 To secure data and maintain relevance, the retrieval pipeline enforces three tiers of metadata-driven validation gates before candidates are selected for reranking:
 
+```
             User Query & Authenticated Context (SIDs, Tenant ID)  
                                      |  
                                      v  
-\+--------------------------------------------------------------------------+  
++--------------------------------------------------------------------------+  
 |  Tier 1: SECURITY GATE (Pre-Retrieval Filter)                             |  
-|  \- Enforces: \`tenant\_id \== "TENANT-A"\`                                   |  
-|  \- Enforces: \`user\_groups INTERSECT document\_acl\_groups\`                  |  
-|  \- Blocks unauthorized vector matches before scoring or logging   |  
-\+--------------------------------------------------------------------------+  
+|  - Enforces: `tenant_id == "TENANT-A"`                                   |  
+|  - Enforces: `user_groups INTERSECT document_acl_groups`                  |  
+|  - Blocks unauthorized vector matches before scoring or logging   |  
++--------------------------------------------------------------------------+  
                                      |  
                                      v  
-\+--------------------------------------------------------------------------+  
++--------------------------------------------------------------------------+  
 |  Tier 2: FRESHNESS & VERSION GATE (Retrieval-Time Gate)                  |  
-|  \- Enforces: \`document\_status \== "active"\`                               |  
-|  \- Diverts queries targeting superseded files to replacement versions |  
-|  \- Matches dates against the user's temporal parameters           |  
-\+--------------------------------------------------------------------------+  
+|  - Enforces: `document_status == "active"`                               |  
+|  - Diverts queries targeting superseded files to replacement versions |  
+|  - Matches dates against the user's temporal parameters           |  
++--------------------------------------------------------------------------+  
                                      |  
                                      v  
-\+--------------------------------------------------------------------------+  
++--------------------------------------------------------------------------+  
 |  Tier 3: COMPLIANCE & SCOPE GATE (Dynamic Filter)                        |  
-|  \- Enforces: \`jurisdiction \== "EU"\`, \`product\_version \== "V3"\`           |  
-|  \- Redaction Propagation: Scrubs sensitive variables and PII        |  
-\+--------------------------------------------------------------------------+  
+|  - Enforces: `jurisdiction == "EU"`, `product_version == "V3"`           |  
+|  - Redaction Propagation: Scrubs sensitive variables and PII        |  
++--------------------------------------------------------------------------+  
                                      |  
                                      v  
                      Clean, Approved Candidate List
+```
 
 The system coordinates these validation gates using structured metadata constraints:
 
-* **The Security Gate**: Every document chunk indexed in the vector database must carry an allowed\_principals metadata field, inheriting the exact Access Control Lists (ACLs) of its source system (e.g., Active Directory, Okta, SharePoint, Alfresco).22 The system must resolve the user's identity into a complete list of Security Identifiers (SIDs) or group memberships at query time.23 The database then executes an intersection query to filter candidates before scoring 23:
+* **The Security Gate**: Every document chunk indexed in the vector database must carry an allowed_principals metadata field, inheriting the exact Access Control Lists (ACLs) of its source system (e.g., Active Directory, Okta, SharePoint, Alfresco).22 The system must resolve the user's identity into a complete list of Security Identifiers (SIDs) or group memberships at query time.23 The database then executes an intersection query to filter candidates before scoring 23:
 
-Query Filter implies User\_SIDs intersect Document\_ACLs is not empty 23
+Query Filter implies User_SIDs intersect Document_ACLs is not empty 23
 
-* **The Version and Freshness Gate**: Corpus objects can change rapidly.2 To prevent the retrieval of outdated information, the ingestion pipeline links superseded documents to their replacement versions using explicit directed relationships.2 The retrieval gate checks candidate document IDs against an active lookup index. If a candidate document is flagged as superseded\_by: "DOC-V2", the query-time gate dynamically updates the retrieval target to the current version, ensuring that only valid and active information is routed to the context assembly stage.2  
-* **The Compliance and Scope Gate**: To comply with geographic and organizational data boundaries, retrieval queries are restricted using explicit scope metadata.2 Chunks are filtered by attributes like jurisdiction: "EU", retention\_status: "active", or tenant\_id: "TENANT-A".2 This step isolates user data and keeps retrieval aligned with local compliance requirements.23
+* **The Version and Freshness Gate**: Corpus objects can change rapidly.2 To prevent the retrieval of outdated information, the ingestion pipeline links superseded documents to their replacement versions using explicit directed relationships.2 The retrieval gate checks candidate document IDs against an active lookup index. If a candidate document is flagged as superseded_by: "DOC-V2", the query-time gate dynamically updates the retrieval target to the current version, ensuring that only valid and active information is routed to the context assembly stage.2  
+* **The Compliance and Scope Gate**: To comply with geographic and organizational data boundaries, retrieval queries are restricted using explicit scope metadata.2 Chunks are filtered by attributes like jurisdiction: "EU", retention_status: "active", or tenant_id: "TENANT-A".2 This step isolates user data and keeps retrieval aligned with local compliance requirements.23
 
 When candidates within the retrieval pool contain conflicting factual claims, the system must handle the disagreement directly.2 Rather than flattening or ignoring the conflict, the pipeline flags the contradiction and groups the conflicting candidates into a dedicated "conflict packet".2 This packet is annotated with provenance, source authority, and version metadata, allowing downstream models or users to resolve the conflict explicitly.2
 
@@ -377,13 +381,13 @@ The comparative trade-offs between reranking methods are detailed in the table b
 | **Cross-Encoder Rerankers** 10 | Computes joint attention scores over query-chunk pairs.7 | Moderate (50-150ms overall) | Limited (typically 512-1024 tokens per chunk).7 | None; evaluates each candidate independently. | Significantly improves top-k precision by evaluating joint semantic meaning.7 |
 | **LLM Reranking** 7 | Generative models evaluate candidate utility using structured grading prompts.7 | High (200-1000ms) | Medium-Large (limited by API cost and response time).6 | Strong; can evaluate candidates as a group to identify redundant info.6 | High-precision relevance; evaluates complex fact patterns.7 |
 | **Embedding Reranking** | Re-computes cosine similarity using specialized, high-dimension models. | Low (10-30ms) | Medium (depends on the model's token limits). | None; scores each candidate independently. | Refines initial semantic matching with minimal latency overhead. |
-| **Learning-to-Rank (LTR)** | Machine learning models combine multiple features (e.g., BM25, vector, popularity). | Low (\<10ms) | Unlimited. | Moderate; features can include diversity scores. | Leverages historical click data and user feedback to optimize results. |
-| **Reciprocal Rank Fusion (RRF)** 10 | Rank position across multiple retrieval channels.10 | Very low (\<5ms) | Unlimited. | Low; prioritizes agreement across channels.10 | Combines the strengths of distinct retrieval channels without score calibration.12 |
-| **Diversity-Aware Selection** | Minimizes redundancy by evaluating candidate similarity to already selected items. | Low (\<10ms) | Unlimited. | High; actively penalizes redundant text. | Prevents context stuffing by ensuring selected chunks cover unique details.3 |
-| **Source-Authority Reranking** 2 | Adjusts candidate scores using source-system authority metadata.2 | Negligible (\<1ms) | Unlimited. | Low; prioritizes trusted source systems.2 | Prevents unofficial drafts or low-authority systems from overriding official policies.2 |
-| **Freshness-Aware Reranking** 2 | Applies a decay function to candidate scores based on document age or active flags.2 | Negligible (\<1ms) | Unlimited. | Low; prioritizes the most current updates.2 | Prioritizes current information, minimizing the retrieval of outdated historical policies.2 |
+| **Learning-to-Rank (LTR)** | Machine learning models combine multiple features (e.g., BM25, vector, popularity). | Low (<10ms) | Unlimited. | Moderate; features can include diversity scores. | Leverages historical click data and user feedback to optimize results. |
+| **Reciprocal Rank Fusion (RRF)** 10 | Rank position across multiple retrieval channels.10 | Very low (<5ms) | Unlimited. | Low; prioritizes agreement across channels.10 | Combines the strengths of distinct retrieval channels without score calibration.12 |
+| **Diversity-Aware Selection** | Minimizes redundancy by evaluating candidate similarity to already selected items. | Low (<10ms) | Unlimited. | High; actively penalizes redundant text. | Prevents context stuffing by ensuring selected chunks cover unique details.3 |
+| **Source-Authority Reranking** 2 | Adjusts candidate scores using source-system authority metadata.2 | Negligible (<1ms) | Unlimited. | Low; prioritizes trusted source systems.2 | Prevents unofficial drafts or low-authority systems from overriding official policies.2 |
+| **Freshness-Aware Reranking** 2 | Applies a decay function to candidate scores based on document age or active flags.2 | Negligible (<1ms) | Unlimited. | Low; prioritizes the most current updates.2 | Prioritizes current information, minimizing the retrieval of outdated historical policies.2 |
 | **Answerability Reranking** 7 | Evaluates whether a candidate contains the direct logical answer to the query.7 | High (100-500ms) | Medium. | Moderate; focuses on resolving specific query steps. | Maximizes generation quality by excluding similar but uninformative chunks.7 |
-| **Citation-Aware Reranking** 18 | Evaluates whether a candidate has precise, verifiable citation coordinates.18 | Low (\<5ms) | Unlimited. | Low; prioritizes structured data and clear spans.18 | Ensures all retrieved facts can be precisely cited in the final response.18 |
+| **Citation-Aware Reranking** 18 | Evaluates whether a candidate has precise, verifiable citation coordinates.18 | Low (<5ms) | Unlimited. | Low; prioritizes structured data and clear spans.18 | Ensures all retrieved facts can be precisely cited in the final response.18 |
 
 ### **Managing Evidence Diversity and Token Economy**
 
@@ -403,93 +407,93 @@ JSON
   "title": "EvidencePacket",  
   "type": "object",  
   "properties": {  
-    "evidence\_packet\_id": { "type": "string" },  
-    "corpus\_object\_id": { "type": "string" },  
-    "chunk\_id": { "type": "string" },  
+    "evidence_packet_id": { "type": "string" },  
+    "corpus_object_id": { "type": "string" },  
+    "chunk_id": { "type": "string" },  
     "content": {  
       "type": "object",  
       "properties": {  
-        "raw\_text": { "type": "string" },  
-        "structured\_data": { "type": "object" },  
-        "exact\_matching\_spans": {  
+        "raw_text": { "type": "string" },  
+        "structured_data": { "type": "object" },  
+        "exact_matching_spans": {  
           "type": "array",  
           "items": { "type": "string" }  
         }  
       },  
-      "required": \["raw\_text"\]  
+      "required": ["raw_text"]  
     },  
     "provenance": {  
       "type": "object",  
       "properties": {  
-        "source\_id": { "type": "string" },  
-        "origin\_system": { "type": "string" },  
-        "source\_authority\_score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },  
-        "ingestion\_timestamp": { "type": "string", "format": "date-time" },  
-        "lineage\_hash": { "type": "string" }  
+        "source_id": { "type": "string" },  
+        "origin_system": { "type": "string" },  
+        "source_authority_score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },  
+        "ingestion_timestamp": { "type": "string", "format": "date-time" },  
+        "lineage_hash": { "type": "string" }  
       },  
-      "required": \["source\_id", "source\_authority\_score", "ingestion\_timestamp"\]  
+      "required": ["source_id", "source_authority_score", "ingestion_timestamp"]  
     },  
     "governance": {  
       "type": "object",  
       "properties": {  
-        "tenant\_id": { "type": "string" },  
-        "permission\_status": { "type": "string", "enum": \["cleared", "restricted"\] },  
-        "allowed\_principals": {  
+        "tenant_id": { "type": "string" },  
+        "permission_status": { "type": "string", "enum": ["cleared", "restricted"] },  
+        "allowed_principals": {  
           "type": "array",  
           "items": { "type": "string" }  
         }  
       },  
-      "required": \["tenant\_id", "permission\_status"\]  
+      "required": ["tenant_id", "permission_status"]  
     },  
-    "epistemic\_metadata": {  
+    "epistemic_metadata": {  
       "type": "object",  
       "properties": {  
-        "freshness\_status": { "type": "string", "enum": \["active", "superseded", "archived"\] },  
-        "conflict\_indicators": {  
+        "freshness_status": { "type": "string", "enum": ["active", "superseded", "archived"] },  
+        "conflict_indicators": {  
           "type": "object",  
           "properties": {  
-            "has\_contradiction": { "type": "boolean" },  
-            "contradicted\_by\_ids": {  
+            "has_contradiction": { "type": "boolean" },  
+            "contradicted_by_ids": {  
               "type": "array",  
               "items": { "type": "string" }  
             }  
           },  
-          "required": \["has\_contradiction"\]  
+          "required": ["has_contradiction"]  
         }  
       },  
-      "required": \["freshness\_status", "conflict\_indicators"\]  
+      "required": ["freshness_status", "conflict_indicators"]  
     },  
-    "citation\_coordinates": {  
+    "citation_coordinates": {  
       "type": "object",  
       "properties": {  
         "uri": { "type": "string", "format": "uri" },  
-        "page\_number": { "type": "integer" },  
-        "section\_path": { "type": "string" },  
-        "table\_cell\_range": { "type": "string" },  
-        "version\_id": { "type": "string" }  
+        "page_number": { "type": "integer" },  
+        "section_path": { "type": "string" },  
+        "table_cell_range": { "type": "string" },  
+        "version_id": { "type": "string" }  
       },  
-      "required": \["uri", "version\_id"\]  
+      "required": ["uri", "version_id"]  
     },  
-    "retrieval\_rationale": {  
+    "retrieval_rationale": {  
       "type": "object",  
       "properties": {  
-        "matched\_subquery": { "type": "string" },  
-        "relevance\_rationale": { "type": "string" }  
+        "matched_subquery": { "type": "string" },  
+        "relevance_rationale": { "type": "string" }  
       },  
-      "required": \["matched\_subquery"\]  
+      "required": ["matched_subquery"]  
     }  
   },  
-  "required": \[  
-    "evidence\_packet\_id",  
-    "corpus\_object\_id",  
-    "chunk\_id",  
+  "required": [  
+    "evidence_packet_id",  
+    "corpus_object_id",  
+    "chunk_id",  
     "content",  
     "provenance",  
     "governance",  
-    "epistemic\_metadata",  
-    "citation\_coordinates",  
-    "retrieval\_rationale"  
-  \]  
+    "epistemic_metadata",  
+    "citation_coordinates",  
+    "retrieval_rationale"  
+  ]  
 }
 
 ### **Semantic Injection Pattern Library**
@@ -498,16 +502,16 @@ The context compiler translates approved Evidence Packets into structured prompt
 
 #### **Raw Span Packets**
 
-* **Use Case**: Compliance audits, quote-supported Q\&A, and exact terminology lookups.30  
+* **Use Case**: Compliance audits, quote-supported Q&A, and exact terminology lookups.30  
 * **Format**: Encloses exact verbatim text in XML tags, exposing source coordinates.8
 
 XML  
-\<evidence-packet id\="EP-9921" source\="SEC-POL-V4" version\="4.1"\>  
-  \<citation-coordinates uri\="s3://policies/sec-pol-v4.pdf" page\="12" /\>  
-  \<verbatim-text\>  
+<evidence-packet id="EP-9921" source="SEC-POL-V4" version="4.1">  
+  <citation-coordinates uri="s3://policies/sec-pol-v4.pdf" page="12" />  
+  <verbatim-text>  
     API credentials must be rotated every ninety (90) calendar days.  
-  \</verbatim-text\>  
-\</evidence-packet\>
+  </verbatim-text>  
+</evidence-packet>
 
 #### **Extracted Claim Packets**
 
@@ -515,9 +519,9 @@ XML
 * **Format**: Represents atomic facts stripped of styling, minimizing token size.14
 
 XML  
-\<evidence-packet id\="EP-PROP-02" source\="FactoidWiki"\>  
-  \<atomic-fact\>The Leaning Tower of Pisa leans at an angle of 3.97 degrees.\</atomic-fact\>  
-\</evidence-packet\>
+<evidence-packet id="EP-PROP-02" source="FactoidWiki">  
+  <atomic-fact>The Leaning Tower of Pisa leans at an angle of 3.97 degrees.</atomic-fact>  
+</evidence-packet>
 
 #### **Parent-Section Packets**
 
@@ -525,15 +529,15 @@ XML
 * **Format**: Includes the retrieved chunk surrounded by its parent document section.27
 
 XML  
-\<evidence-packet id\="EP-PC-41" source\="EMPLOYEE-HANDBOOK"\>  
-  \<section path\="Benefits/Leave"\>  
+<evidence-packet id="EP-PC-41" source="EMPLOYEE-HANDBOOK">  
+  <section path="Benefits/Leave">  
     All full-time employees accumulate 1.5 days of monthly leave.  
-    \<retrieved-chunk id\="C-12"\>  
+    <retrieved-chunk id="C-12">  
       Maternity leave eligibility begins after six months of active employment.  
-    \</retrieved-chunk\>  
+    </retrieved-chunk>  
     Paternity leave eligibility follows identical timelines.  
-  \</section\>  
-\</evidence-packet\>
+  </section>  
+</evidence-packet>
 
 #### **Table Packets**
 
@@ -541,14 +545,14 @@ XML
 * **Format**: Renders data as Markdown tables, keeping row headers and column headers intact.28
 
 XML  
-\<evidence-packet id\="EP-TAB-09" source\="Q3-FINANCIALS"\>  
-  \<table-data name\="Revenue Summary" coordinates\="Table 2, Rows 3-5"\>  
+<evidence-packet id="EP-TAB-09" source="Q3-FINANCIALS">  
+  <table-data name="Revenue Summary" coordinates="Table 2, Rows 3-5">  
     | Region | Q3 Revenue | YoY Growth |  
     | :--- | :--- | :--- |  
-    | EMEA | $14.2M | \+12% |  
-    | APAC | $18.9M | \+18% |  
-  \</table-data\>  
-\</evidence-packet\>
+    | EMEA | $14.2M | +12% |  
+    | APAC | $18.9M | +18% |  
+  </table-data>  
+</evidence-packet>
 
 #### **Code Packets**
 
@@ -556,13 +560,13 @@ XML
 * **Format**: Isolates code syntax, preserving imports, signatures, and file references.
 
 XML  
-\<code-evidence id\="EP-CODE-102" repository\="api-gateway" file\="auth/rotator.py" lines\="45-52"\>  
-  \<code-snippet language\="python"\>  
-    def rotate\_api\_key(user\_id: str) \-\> bool:  
-        \# Rotation policy enforces 90-day intervals  
-        return key\_store.update\_rotation\_timestamp(user\_id)  
-  \</code-snippet\>  
-\</code-evidence\>
+<code-evidence id="EP-CODE-102" repository="api-gateway" file="auth/rotator.py" lines="45-52">  
+  <code-snippet language="python">  
+    def rotate_api_key(user_id: str) -> bool:  
+        # Rotation policy enforces 90-day intervals  
+        return key_store.update_rotation_timestamp(user_id)  
+  </code-snippet>  
+</code-evidence>
 
 #### **Source Comparison Packets**
 
@@ -570,14 +574,14 @@ XML
 * **Format**: Displays matching text from different source files or systems.2
 
 XML  
-\<comparison-group parameter\="API Key Rotation Interval"\>  
-  \<source id\="SRC-A" system\="SharePoint-Draft" last-modified\="2025-06-12"\>  
+<comparison-group parameter="API Key Rotation Interval">  
+  <source id="SRC-A" system="SharePoint-Draft" last-modified="2025-06-12">  
     API keys must be rotated every 180 days.  
-  \</source\>  
-  \<source id\="SRC-B" system\="Compliance-Prod" last-modified\="2026-01-15"\>  
+  </source>  
+  <source id="SRC-B" system="Compliance-Prod" last-modified="2026-01-15">  
     API keys must be rotated every 90 days.  
-  \</source\>  
-\</comparison-group\>
+  </source>  
+</comparison-group>
 
 #### **Conflict Packets**
 
@@ -585,14 +589,14 @@ XML
 * **Format**: Groups conflicting claims, exposing authority and freshness metadata.2
 
 XML  
-\<conflict-group parameter\="Standard Leave Accumulation Rate"\>  
-  \<candidate id\="EP-01" source\="HR-PORTAL" status\="ACTIVE" authority\="0.95"\>  
+<conflict-group parameter="Standard Leave Accumulation Rate">  
+  <candidate id="EP-01" source="HR-PORTAL" status="ACTIVE" authority="0.95">  
     Employees accumulate 1.5 days of leave per month.  
-  \</candidate\>  
-  \<candidate id\="EP-02" source\="DRAFT-BENEFITS" status\="SUPERSEDED" authority\="0.50"\>  
+  </candidate>  
+  <candidate id="EP-02" source="DRAFT-BENEFITS" status="SUPERSEDED" authority="0.50">  
     Employees accumulate 2.0 days of leave per month.  
-  \</candidate\>  
-\</conflict-group\>
+  </candidate>  
+</conflict-group>
 
 #### **Citation Bundles**
 
@@ -600,10 +604,10 @@ XML
 * **Format**: Maps factual claims directly to their corresponding source IDs.18
 
 XML  
-\<citation-bundle\>  
-  \<claim id\="CLM-01"\>Exposure X increases safety risk Y.\</claim\>  
-  \<supporting-evidence packet-ref\="EP-A" span\="strong correlation between X and Y" /\>  
-\</citation-bundle\>
+<citation-bundle>  
+  <claim id="CLM-01">Exposure X increases safety risk Y.</claim>  
+  <supporting-evidence packet-ref="EP-A" span="strong correlation between X and Y" />  
+</citation-bundle>
 
 #### **Task-Specific Evidence Briefs**
 
@@ -611,10 +615,10 @@ XML
 * **Format**: Compiles high-density, annotated facts, grouping related points.1
 
 XML  
-\<evidence-brief topic\="Acme Security SLA"\>  
-  \- Acme requires 99.9% uptime for API services.  
-  \- Incident response times must not exceed 15 minutes.  
-\</evidence-brief\>
+<evidence-brief topic="Acme Security SLA">  
+  - Acme requires 99.9% uptime for API services.  
+  - Incident response times must not exceed 15 minutes.  
+</evidence-brief>
 
 ### **Preserving Instruction Hierarchy and Token Economics**
 
@@ -660,7 +664,7 @@ A production-grade RAG pipeline must treat failures as structured engineering pr
 
 | Failure Family | Symptom | Likely Cause | Detection Signal | Corrective Action |
 | :---- | :---- | :---- | :---- | :---- |
-| **Under-Retrieval** 3 | System fails to find the answer or states it has no information.3 | Tight thresholds or short context budgets exclude relevant chunks.3 | Low Context Recall (\<0.8) on evaluation sets.4 | Increase candidate pool (K); expand queries using multi-query generation.3 |
+| **Under-Retrieval** 3 | System fails to find the answer or states it has no information.3 | Tight thresholds or short context budgets exclude relevant chunks.3 | Low Context Recall (<0.8) on evaluation sets.4 | Increase candidate pool (K); expand queries using multi-query generation.3 |
 | **Over-Retrieval** 3 | Output contains excessive irrelevant text or adjacent noise.3 | Large candidate pools fill context windows with low-relevance chunks.3 | High latency; degraded answer correctness due to model distraction.4 | Deploy cross-encoder rerankers; apply diversity-aware pruning.3 |
 | **Vector-Only Miss** 10 | Fails to match rare terminology or exact identifiers.10 | Embedding models map rare strings to generic semantic spaces.10 | Low similarity scores for queries containing exact codes.13 | Implement hybrid search; fuse BM25 lexical matching.10 |
 | **Lexical-Only Miss** 10 | Fails to match queries using synonyms or rephrasing.10 | Lexical index requires exact word overlap, missing semantic links.10 | Zero matches returned for queries using non-indexed terms.13 | Deploy hybrid search; leverage dense embedding vectors.10 |
@@ -679,7 +683,7 @@ A production-grade RAG pipeline must treat failures as structured engineering pr
 | **Contradiction Flattening** 2 | Model synthesizes conflicting claims into a single false statement.2 | Retrieval pipeline flattens conflicting sources into a single pool.2 | Answer contains synthesized but logically impossible statements.2 | Dynamic conflict checking; compile distinct conflict packets.2 |
 | **Prompt Injection via Retrieval** 8 | Model executes malicious instructions hidden inside retrieved text.8 | Model fails to distinguish system instructions from raw text.8 | Model attempts unauthorized tool calls or outputs payload text.8 | Enforce strict XML isolation; treat retrieved text as raw evidence.8 |
 | **Generated-Summary Overtrust** | Retrieval misses details omitted in ingestion summaries. | Ingestion pipeline summarizes large documents, discarding details. | Accuracy drops for queries targeting specific numbers or edge cases.4 | Retain and index raw text chunks alongside document summaries. |
-| **Unsupported Synthesis** 4 | Model hallucinates details not supported by retrieved context.4 | Model ignores retrieved context or relies on pre-training data.4 | Low Faithfulness scores (\<0.9) on evaluation checks.4 | Implement strict grounding prompts; require models to abstain.4 |
+| **Unsupported Synthesis** 4 | Model hallucinates details not supported by retrieved context.4 | Model ignores retrieved context or relies on pre-training data.4 | Low Faithfulness scores (<0.9) on evaluation checks.4 | Implement strict grounding prompts; require models to abstain.4 |
 
 ## **Retrieval Evaluation and Observability Guidance**
 
@@ -692,29 +696,29 @@ The core mathematical foundations of retrieval quality must be measured continuo
 #### **Precision@K**
 
 Measures the proportion of retrieved chunks in the top K results that are truly relevant to the query 4:  
-Precision@K \= |Relevant Chunks intersect Top K Chunks| / K 4
+Precision@K = |Relevant Chunks intersect Top K Chunks| / K 4
 
 #### **Recall@K**
 
 Measures the proportion of all relevant chunks in the database that are successfully retrieved in the top K results 4:  
-Recall@K \= |Relevant Chunks intersect Top K Chunks| / Total Relevant Chunks in Corpus 36
+Recall@K = |Relevant Chunks intersect Top K Chunks| / Total Relevant Chunks in Corpus 36
 
 #### **Mean Reciprocal Rank (MRR)**
 
 Evaluates ranking quality by measuring how deep the first relevant chunk is positioned in the retrieved list 4:  
-MRR \= (1 / |Q|) \* sum\_{i=1}^{|Q|} (1 / rank\_i) 4  
-where |Q| is the total number of test queries, and rank\_i represents the position of the first relevant chunk for query i.4 If no relevant chunk is found, the reciprocal rank is 0\.10
+MRR = (1 / |Q|) * sum_{i=1}^{|Q|} (1 / rank_i) 4  
+where |Q| is the total number of test queries, and rank_i represents the position of the first relevant chunk for query i.4 If no relevant chunk is found, the reciprocal rank is 0.10
 
 #### **Discounted Cumulative Gain (DCG@K)**
 
 Evaluates ranking quality when chunks have varying relevance levels rather than simple binary flags 4:  
-DCG@K \= sum\_{i=1}^{K} (rel\_i / log\_2(i \+ 1)) 36  
-where rel\_i represents the graded relevance score of the chunk at position i.39 This logarithmic discount penalizes systems that place highly relevant information lower in the list.4
+DCG@K = sum_{i=1}^{K} (rel_i / log_2(i + 1)) 36  
+where rel_i represents the graded relevance score of the chunk at position i.39 This logarithmic discount penalizes systems that place highly relevant information lower in the list.4
 
 #### **Normalized Discounted Cumulative Gain (NDCG@K)**
 
 Normalizes the DCG score against an ideal ranking to enable comparison across different query sets 4:  
-NDCG@K \= DCG@K / IDCG@K 4  
+NDCG@K = DCG@K / IDCG@K 4  
 where IDCG@K is the Ideal DCG score, calculated by sorting the retrieved chunks in descending order of their relevance.39 This yields a normalized value between 0 and 1, where 1 represents perfect ranking order.39
 
 ### **Operational Observability Metrics**
@@ -773,50 +777,50 @@ Every generated response must maintain a clear, auditable trail back to its exac
 
 #### **Works cited**
 
-1. Best Enterprise RAG Platforms for 2026: A Buyer's Guide \- Onyx AI, accessed June 6, 2026, [https://onyx.app/insights/enterprise-rag-platforms-2026](https://onyx.app/insights/enterprise-rag-platforms-2026)  
-2. AI-ENG-D — Corpus Engineering \- Data Provenance, Knowledge Hygiene & Source Authority.md  
+1. Best Enterprise RAG Platforms for 2026: A Buyer's Guide - Onyx AI, accessed June 6, 2026, [https://onyx.app/insights/enterprise-rag-platforms-2026](https://onyx.app/insights/enterprise-rag-platforms-2026)  
+2. AI-ENG-D — Corpus Engineering - Data Provenance, Knowledge Hygiene & Source Authority.md  
 3. Production RAG: The Chunking, Retrieval, and Evaluation Strategies That Actually Work, accessed June 6, 2026, [https://towardsai.net/p/machine-learning/production-rag-the-chunking-retrieval-and-evaluation-strategies-that-actually-work](https://towardsai.net/p/machine-learning/production-rag-the-chunking-retrieval-and-evaluation-strategies-that-actually-work)  
-4. RAG evaluation guide: metrics, frameworks & infrastructure \- Redis, accessed June 6, 2026, [https://redis.io/blog/rag-system-evaluation/](https://redis.io/blog/rag-system-evaluation/)  
-5. We Benchmarked 7 Chunking Strategies. Most 'Best Practice' Advice Was Wrong. : r/Rag, accessed June 6, 2026, [https://www.reddit.com/r/Rag/comments/1r47duk/we\_benchmarked\_7\_chunking\_strategies\_most\_best/](https://www.reddit.com/r/Rag/comments/1r47duk/we_benchmarked_7_chunking_strategies_most_best/)  
-6. Lesson 2: Core Components of RAG \- Medium, accessed June 6, 2026, [https://medium.com/@noumannawaz/lesson-2-core-components-of-rag-94acd476729e](https://medium.com/@noumannawaz/lesson-2-core-components-of-rag-94acd476729e)  
-7. Query rewriting strategies for LLMs and search engines to improve results \- Elastic, accessed June 6, 2026, [https://www.elastic.co/search-labs/blog/query-rewriting-llm-search-improve](https://www.elastic.co/search-labs/blog/query-rewriting-llm-search-improve)  
-8. AI security: Defending against prompt injection and unsafe actions \- Red Hat, accessed June 6, 2026, [https://www.redhat.com/en/blog/ai-security-defending-against-prompt-injection-and-unsafe-actions](https://www.redhat.com/en/blog/ai-security-defending-against-prompt-injection-and-unsafe-actions)  
-9. Prompt injection attacks: What are they and how to defend against them \- WorkOS, accessed June 6, 2026, [https://workos.com/blog/prompt-injection-attacks](https://workos.com/blog/prompt-injection-attacks)  
-10. Lesson 8: Hybrid Retrieval: BM25 \+ Dense | by Nouman Nawaz | Medium, accessed June 6, 2026, [https://medium.com/@noumannawaz/lesson-8-hybrid-retrieval-bm25-dense-bac3c702318b](https://medium.com/@noumannawaz/lesson-8-hybrid-retrieval-bm25-dense-bac3c702318b)  
-11. The future of search engines: Does MCP make indexed search obsolete? \- Elastic, accessed June 6, 2026, [https://www.elastic.co/search-labs/blog/future-of-search-engines-indexed-search-mcp](https://www.elastic.co/search-labs/blog/future-of-search-engines-indexed-search-mcp)  
+4. RAG evaluation guide: metrics, frameworks & infrastructure - Redis, accessed June 6, 2026, [https://redis.io/blog/rag-system-evaluation/](https://redis.io/blog/rag-system-evaluation/)  
+5. We Benchmarked 7 Chunking Strategies. Most 'Best Practice' Advice Was Wrong. : r/Rag, accessed June 6, 2026, [https://www.reddit.com/r/Rag/comments/1r47duk/we_benchmarked_7_chunking_strategies_most_best/](https://www.reddit.com/r/Rag/comments/1r47duk/we_benchmarked_7_chunking_strategies_most_best/)  
+6. Lesson 2: Core Components of RAG - Medium, accessed June 6, 2026, [https://medium.com/@noumannawaz/lesson-2-core-components-of-rag-94acd476729e](https://medium.com/@noumannawaz/lesson-2-core-components-of-rag-94acd476729e)  
+7. Query rewriting strategies for LLMs and search engines to improve results - Elastic, accessed June 6, 2026, [https://www.elastic.co/search-labs/blog/query-rewriting-llm-search-improve](https://www.elastic.co/search-labs/blog/query-rewriting-llm-search-improve)  
+8. AI security: Defending against prompt injection and unsafe actions - Red Hat, accessed June 6, 2026, [https://www.redhat.com/en/blog/ai-security-defending-against-prompt-injection-and-unsafe-actions](https://www.redhat.com/en/blog/ai-security-defending-against-prompt-injection-and-unsafe-actions)  
+9. Prompt injection attacks: What are they and how to defend against them - WorkOS, accessed June 6, 2026, [https://workos.com/blog/prompt-injection-attacks](https://workos.com/blog/prompt-injection-attacks)  
+10. Lesson 8: Hybrid Retrieval: BM25 + Dense | by Nouman Nawaz | Medium, accessed June 6, 2026, [https://medium.com/@noumannawaz/lesson-8-hybrid-retrieval-bm25-dense-bac3c702318b](https://medium.com/@noumannawaz/lesson-8-hybrid-retrieval-bm25-dense-bac3c702318b)  
+11. The future of search engines: Does MCP make indexed search obsolete? - Elastic, accessed June 6, 2026, [https://www.elastic.co/search-labs/blog/future-of-search-engines-indexed-search-mcp](https://www.elastic.co/search-labs/blog/future-of-search-engines-indexed-search-mcp)  
 12. Hybrid Search Explained With An In-Depth Guide | MongoDB, accessed June 6, 2026, [https://www.mongodb.com/resources/products/capabilities/hybrid-search](https://www.mongodb.com/resources/products/capabilities/hybrid-search)  
-13. Hybrid Search in RAG: Dense \+ Sparse (BM25/SPLADE), Reciprocal Rank Fusion, and When to Use Which\! | by Vaibhav Dixit | GoPenAI, accessed June 6, 2026, [https://blog.gopenai.com/hybrid-search-in-rag-dense-sparse-bm25-splade-reciprocal-rank-fusion-and-when-to-use-which-fafe4fd6156e](https://blog.gopenai.com/hybrid-search-in-rag-dense-sparse-bm25-splade-reciprocal-rank-fusion-and-when-to-use-which-fafe4fd6156e)  
-14. Dense X Retrieval: What Retrieval Granularity Should We Use? \- arXiv, accessed June 6, 2026, [https://arxiv.org/html/2312.06648v2](https://arxiv.org/html/2312.06648v2)  
-15. Beyond Fuzzy Matching: A Dual-Augmentation RAG System for Robust Product Reconciliation in Accounting \- MDPI, accessed June 6, 2026, [https://www.mdpi.com/1911-8074/19/6/402](https://www.mdpi.com/1911-8074/19/6/402)  
+13. Hybrid Search in RAG: Dense + Sparse (BM25/SPLADE), Reciprocal Rank Fusion, and When to Use Which! | by Vaibhav Dixit | GoPenAI, accessed June 6, 2026, [https://blog.gopenai.com/hybrid-search-in-rag-dense-sparse-bm25-splade-reciprocal-rank-fusion-and-when-to-use-which-fafe4fd6156e](https://blog.gopenai.com/hybrid-search-in-rag-dense-sparse-bm25-splade-reciprocal-rank-fusion-and-when-to-use-which-fafe4fd6156e)  
+14. Dense X Retrieval: What Retrieval Granularity Should We Use? - arXiv, accessed June 6, 2026, [https://arxiv.org/html/2312.06648v2](https://arxiv.org/html/2312.06648v2)  
+15. Beyond Fuzzy Matching: A Dual-Augmentation RAG System for Robust Product Reconciliation in Accounting - MDPI, accessed June 6, 2026, [https://www.mdpi.com/1911-8074/19/6/402](https://www.mdpi.com/1911-8074/19/6/402)  
 16. Multi-Document RAG: RetrievalQA Breaks on 100+ Docs (2026) | AI Learning Hub, accessed June 6, 2026, [https://ailearnings.in/blog/multi-document-rag/](https://ailearnings.in/blog/multi-document-rag/)  
-17. Beyond Fuzzy Matching: A Dual-Augmentation RAG System for Robust Product Reconciliation in Accounting \- Preprints.org, accessed June 6, 2026, [https://www.preprints.org/manuscript/202605.0214](https://www.preprints.org/manuscript/202605.0214)  
-18. Relevant Is Not Warranted: Evidence-Force Calibration for Cited RAG \- arXiv, accessed June 6, 2026, [https://arxiv.org/pdf/2605.28044](https://arxiv.org/pdf/2605.28044)  
-19. Relevant Is Not Warranted: Evidence-Force Calibration for Cited RAG \- arXiv, accessed June 6, 2026, [https://arxiv.org/html/2605.28044v1](https://arxiv.org/html/2605.28044v1)  
-20. LangGraph-based production-style RAG (Parent-Child retrieval, idempotent ingestion) — feedback on recursive loop control? : r/LocalLLaMA \- Reddit, accessed June 6, 2026, [https://www.reddit.com/r/LocalLLaMA/comments/1rbdv2c/langgraphbased\_productionstyle\_rag\_parentchild/](https://www.reddit.com/r/LocalLLaMA/comments/1rbdv2c/langgraphbased_productionstyle_rag_parentchild/)  
-21. How do hybrid approaches combine full-text and vector search? \- Milvus, accessed June 6, 2026, [https://milvus.io/ai-quick-reference/how-do-hybrid-approaches-combine-fulltext-and-vector-search](https://milvus.io/ai-quick-reference/how-do-hybrid-approaches-combine-fulltext-and-vector-search)  
-22. How are teams handling permission-safe retrieval for enterprise AI agents? \- Reddit, accessed June 6, 2026, [https://www.reddit.com/r/AI\_Agents/comments/1s4e1tc/how\_are\_teams\_handling\_permissionsafe\_retrieval/](https://www.reddit.com/r/AI_Agents/comments/1s4e1tc/how_are_teams_handling_permissionsafe_retrieval/)  
-23. Building an Agentic Access-Aware RAG System with Amazon FSx for NetApp ONTAP, S3 Vectors, and S3 Access Points— Where AI Respects File Permissions \- DEV Community, accessed June 6, 2026, [https://dev.to/aws-builders/building-an-agentic-access-aware-rag-system-with-amazon-fsx-for-netapp-ontap-s3-vectors-and-s3-2b86](https://dev.to/aws-builders/building-an-agentic-access-aware-rag-system-with-amazon-fsx-for-netapp-ontap-s3-vectors-and-s3-2b86)  
-24. Building Permission-Aware Semantic Search on Alfresco with hxpr and Content Lake \- Hyland Connect, accessed June 6, 2026, [https://connect.hyland.com/t5/alfresco-blog/building-permission-aware-semantic-search-on-alfresco-with-hxpr/ba-p/498464](https://connect.hyland.com/t5/alfresco-blog/building-permission-aware-semantic-search-on-alfresco-with-hxpr/ba-p/498464)  
+17. Beyond Fuzzy Matching: A Dual-Augmentation RAG System for Robust Product Reconciliation in Accounting - Preprints.org, accessed June 6, 2026, [https://www.preprints.org/manuscript/202605.0214](https://www.preprints.org/manuscript/202605.0214)  
+18. Relevant Is Not Warranted: Evidence-Force Calibration for Cited RAG - arXiv, accessed June 6, 2026, [https://arxiv.org/pdf/2605.28044](https://arxiv.org/pdf/2605.28044)  
+19. Relevant Is Not Warranted: Evidence-Force Calibration for Cited RAG - arXiv, accessed June 6, 2026, [https://arxiv.org/html/2605.28044v1](https://arxiv.org/html/2605.28044v1)  
+20. LangGraph-based production-style RAG (Parent-Child retrieval, idempotent ingestion) — feedback on recursive loop control? : r/LocalLLaMA - Reddit, accessed June 6, 2026, [https://www.reddit.com/r/LocalLLaMA/comments/1rbdv2c/langgraphbased_productionstyle_rag_parentchild/](https://www.reddit.com/r/LocalLLaMA/comments/1rbdv2c/langgraphbased_productionstyle_rag_parentchild/)  
+21. How do hybrid approaches combine full-text and vector search? - Milvus, accessed June 6, 2026, [https://milvus.io/ai-quick-reference/how-do-hybrid-approaches-combine-fulltext-and-vector-search](https://milvus.io/ai-quick-reference/how-do-hybrid-approaches-combine-fulltext-and-vector-search)  
+22. How are teams handling permission-safe retrieval for enterprise AI agents? - Reddit, accessed June 6, 2026, [https://www.reddit.com/r/AI_Agents/comments/1s4e1tc/how_are_teams_handling_permissionsafe_retrieval/](https://www.reddit.com/r/AI_Agents/comments/1s4e1tc/how_are_teams_handling_permissionsafe_retrieval/)  
+23. Building an Agentic Access-Aware RAG System with Amazon FSx for NetApp ONTAP, S3 Vectors, and S3 Access Points— Where AI Respects File Permissions - DEV Community, accessed June 6, 2026, [https://dev.to/aws-builders/building-an-agentic-access-aware-rag-system-with-amazon-fsx-for-netapp-ontap-s3-vectors-and-s3-2b86](https://dev.to/aws-builders/building-an-agentic-access-aware-rag-system-with-amazon-fsx-for-netapp-ontap-s3-vectors-and-s3-2b86)  
+24. Building Permission-Aware Semantic Search on Alfresco with hxpr and Content Lake - Hyland Connect, accessed June 6, 2026, [https://connect.hyland.com/t5/alfresco-blog/building-permission-aware-semantic-search-on-alfresco-with-hxpr/ba-p/498464](https://connect.hyland.com/t5/alfresco-blog/building-permission-aware-semantic-search-on-alfresco-with-hxpr/ba-p/498464)  
 25. RAG security: the forgotten attack surface, accessed June 6, 2026, [https://christian-schneider.net/blog/rag-security-forgotten-attack-surface/](https://christian-schneider.net/blog/rag-security-forgotten-attack-surface/)  
-26. Comparative Evaluation of Advanced Chunking for Retrieval-Augmented Generation in Large Language Models for Clinical Decision Support \- PMC, accessed June 6, 2026, [https://pmc.ncbi.nlm.nih.gov/articles/PMC12649634/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12649634/)  
-27. Improve LLM based response through parent-child retrieval strategy (Part 1\) \- Medium, accessed June 6, 2026, [https://medium.com/@pinaki.brahma/improve-llm-based-response-through-parent-child-retrieval-strategy-part-1-cde3b1493961](https://medium.com/@pinaki.brahma/improve-llm-based-response-through-parent-child-retrieval-strategy-part-1-cde3b1493961)  
+26. Comparative Evaluation of Advanced Chunking for Retrieval-Augmented Generation in Large Language Models for Clinical Decision Support - PMC, accessed June 6, 2026, [https://pmc.ncbi.nlm.nih.gov/articles/PMC12649634/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12649634/)  
+27. Improve LLM based response through parent-child retrieval strategy (Part 1\) - Medium, accessed June 6, 2026, [https://medium.com/@pinaki.brahma/improve-llm-based-response-through-parent-child-retrieval-strategy-part-1-cde3b1493961](https://medium.com/@pinaki.brahma/improve-llm-based-response-through-parent-child-retrieval-strategy-part-1-cde3b1493961)  
 28. Semantic Chunking Methods: 5 Best Practices for Better RAG Results (March 2026), accessed June 6, 2026, [https://www.extend.ai/resources/semantic-chunking-methods-5-best-practices-rag-results](https://www.extend.ai/resources/semantic-chunking-methods-5-best-practices-rag-results)  
-29. Chunking Methods on Retrieval-Augmented Generation – Effectiveness Evaluation Against Computational Cost and Limitations \- arXiv, accessed June 6, 2026, [https://arxiv.org/html/2606.00881v1](https://arxiv.org/html/2606.00881v1)  
-30. LangGraph-based production-style RAG (Parent-Child retrieval, idempotent ingestion) — feedback on recursive loops? : r/LangChain \- Reddit, accessed June 6, 2026, [https://www.reddit.com/r/LangChain/comments/1rbd4x5/langgraphbased\_productionstyle\_rag\_parentchild/](https://www.reddit.com/r/LangChain/comments/1rbd4x5/langgraphbased_productionstyle_rag_parentchild/)  
-31. EMNLP 2024 Main Conference Dense X Retrieval: What Retrieval Granularity Should We Use? \- arXiv, accessed June 6, 2026, [https://arxiv.org/html/2312.06648v3](https://arxiv.org/html/2312.06648v3)  
-32. Dense X Retrieval: What Retrieval Granularity Should We Use? \- Weaviate, accessed June 6, 2026, [https://weaviate.io/papers/paper10](https://weaviate.io/papers/paper10)  
-33. From Local to Global: A GraphRAG Approach to Query-Focused Summarization \- arXiv, accessed June 6, 2026, [https://arxiv.org/html/2404.16130v2](https://arxiv.org/html/2404.16130v2)  
-34. Welcome \- GraphRAG, accessed June 6, 2026, [https://microsoft.github.io/graphrag/](https://microsoft.github.io/graphrag/)  
-35. Graphrag \- Tools in Data Science, accessed June 6, 2026, [https://tds.s-anand.net/2026-02/docs/week-4/graphrag/](https://tds.s-anand.net/2026-02/docs/week-4/graphrag/)  
-36. A practical guide to search relevance metrics and evaluation \- Meilisearch, accessed June 6, 2026, [https://www.meilisearch.com/blog/search-relevance-metrics](https://www.meilisearch.com/blog/search-relevance-metrics)  
-37. Bayesian BM25 blends more smoothly with vector scores (less scale mismatch than simple weighted sum) : r/Rag \- Reddit, accessed June 6, 2026, [https://www.reddit.com/r/Rag/comments/1qvttdv/bayesian\_bm25\_blends\_more\_smoothly\_with\_vector/](https://www.reddit.com/r/Rag/comments/1qvttdv/bayesian_bm25_blends_more_smoothly_with_vector/)  
-38. jyyang621/DailyArXiv: Thanks to https://github.com/zezhishao/DailyArXiv.git · GitHub \- GitHub, accessed June 6, 2026, [https://github.com/jyyang621/DailyArXiv](https://github.com/jyyang621/DailyArXiv)  
+29. Chunking Methods on Retrieval-Augmented Generation – Effectiveness Evaluation Against Computational Cost and Limitations - arXiv, accessed June 6, 2026, [https://arxiv.org/html/2606.00881v1](https://arxiv.org/html/2606.00881v1)  
+30. LangGraph-based production-style RAG (Parent-Child retrieval, idempotent ingestion) — feedback on recursive loops? : r/LangChain - Reddit, accessed June 6, 2026, [https://www.reddit.com/r/LangChain/comments/1rbd4x5/langgraphbased_productionstyle_rag_parentchild/](https://www.reddit.com/r/LangChain/comments/1rbd4x5/langgraphbased_productionstyle_rag_parentchild/)  
+31. EMNLP 2024 Main Conference Dense X Retrieval: What Retrieval Granularity Should We Use? - arXiv, accessed June 6, 2026, [https://arxiv.org/html/2312.06648v3](https://arxiv.org/html/2312.06648v3)  
+32. Dense X Retrieval: What Retrieval Granularity Should We Use? - Weaviate, accessed June 6, 2026, [https://weaviate.io/papers/paper10](https://weaviate.io/papers/paper10)  
+33. From Local to Global: A GraphRAG Approach to Query-Focused Summarization - arXiv, accessed June 6, 2026, [https://arxiv.org/html/2404.16130v2](https://arxiv.org/html/2404.16130v2)  
+34. Welcome - GraphRAG, accessed June 6, 2026, [https://microsoft.github.io/graphrag/](https://microsoft.github.io/graphrag/)  
+35. Graphrag - Tools in Data Science, accessed June 6, 2026, [https://tds.s-anand.net/2026-02/docs/week-4/graphrag/](https://tds.s-anand.net/2026-02/docs/week-4/graphrag/)  
+36. A practical guide to search relevance metrics and evaluation - Meilisearch, accessed June 6, 2026, [https://www.meilisearch.com/blog/search-relevance-metrics](https://www.meilisearch.com/blog/search-relevance-metrics)  
+37. Bayesian BM25 blends more smoothly with vector scores (less scale mismatch than simple weighted sum) : r/Rag - Reddit, accessed June 6, 2026, [https://www.reddit.com/r/Rag/comments/1qvttdv/bayesian_bm25_blends_more_smoothly_with_vector/](https://www.reddit.com/r/Rag/comments/1qvttdv/bayesian_bm25_blends_more_smoothly_with_vector/)  
+38. jyyang621/DailyArXiv: Thanks to https://github.com/zezhishao/DailyArXiv.git · GitHub - GitHub, accessed June 6, 2026, [https://github.com/jyyang621/DailyArXiv](https://github.com/jyyang621/DailyArXiv)  
 39. How to Evaluate Retrieval Quality in RAG Pipelines (Part 3): DCG@k and NDCG@k, accessed June 6, 2026, [https://towardsdatascience.com/how-to-evaluate-retrieval-quality-in-rag-pipelines-part-3-dcgk-and-ndcgk/](https://towardsdatascience.com/how-to-evaluate-retrieval-quality-in-rag-pipelines-part-3-dcgk-and-ndcgk/)  
-40. Indirect Prompt Injection in the Wild: X-Labs Finds 10 IPI Payloads \- Forcepoint, accessed June 6, 2026, [https://www.forcepoint.com/blog/x-labs/indirect-prompt-injection-payloads](https://www.forcepoint.com/blog/x-labs/indirect-prompt-injection-payloads)  
-41. Relevant Is Not Warranted: Evidence-Force Calibration for Cited RAG \- OpenReview, accessed June 6, 2026, [https://openreview.net/pdf/93542ce5e0041565b29a9f50deff803c126700e1.pdf](https://openreview.net/pdf/93542ce5e0041565b29a9f50deff803c126700e1.pdf)  
+40. Indirect Prompt Injection in the Wild: X-Labs Finds 10 IPI Payloads - Forcepoint, accessed June 6, 2026, [https://www.forcepoint.com/blog/x-labs/indirect-prompt-injection-payloads](https://www.forcepoint.com/blog/x-labs/indirect-prompt-injection-payloads)  
+41. Relevant Is Not Warranted: Evidence-Force Calibration for Cited RAG - OpenReview, accessed June 6, 2026, [https://openreview.net/pdf/93542ce5e0041565b29a9f50deff803c126700e1.pdf](https://openreview.net/pdf/93542ce5e0041565b29a9f50deff803c126700e1.pdf)  
 42. Essential LLM evaluation metrics for AI quality control: From error analysis to binary checks, accessed June 6, 2026, [https://langwatch.ai/blog/essential-llm-evaluation-metrics-for-ai-quality-control](https://langwatch.ai/blog/essential-llm-evaluation-metrics-for-ai-quality-control)  
 43. From LLM to agentic AI: prompt injection got worse, accessed June 6, 2026, [https://christian-schneider.net/blog/prompt-injection-agentic-amplification/](https://christian-schneider.net/blog/prompt-injection-agentic-amplification/)  
-44. From RAG to Agentic RAG for Faithful Islamic Question Answering \- arXiv, accessed June 6, 2026, [https://arxiv.org/pdf/2601.07528](https://arxiv.org/pdf/2601.07528)
+44. From RAG to Agentic RAG for Faithful Islamic Question Answering - arXiv, accessed June 6, 2026, [https://arxiv.org/pdf/2601.07528](https://arxiv.org/pdf/2601.07528)
 
 ---
 

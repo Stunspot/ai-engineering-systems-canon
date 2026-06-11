@@ -1,3 +1,16 @@
+\=
+\#
+\<
+\>
+\[
+\]
+\-
+\*
+\+
+\_
+\.
+\~
+
 Reformat any and all LaTeX expressions as plaintext if present.
 💠‍🌐Nova
 # 🧠 The AI Engineering Systems Canon
@@ -108,7 +121,7 @@ Covers denial-of-wallet attacks, recursive agents, context flooding, retrieval f
 
 ---
 
-## Volume 8: Resilience, Degraded Modes, and Human Trust
+## Volume 8: W-Y Resilience, Degraded Modes, and Human Trust
 *How systems fail gracefully enough that users do not feel the machinery grinding underneath them.*
 
 ### AI-ENG-W - UX Resilience: Model Routing, Fallback Chains & Degraded-Mode Grace

@@ -4,10 +4,11 @@
 
 The mature artificial intelligence enterprise does not treat its data as an unmanaged document landfill, a collection of flat PDFs, or a basic vector database filled with disconnected text chunks. Instead, the corpus is modeled as an engineered, governed knowledge substrate.1 This report defines the architectural discipline of **corpus engineering** as the end-to-end knowledge supply-chain management that transforms raw, unstructured organizational information into clean, versioned, deduplicated, permission-aware, canonical, conflict-aware, and lifecycle-governed knowledge assets.1 These assets are designed to support retrieval-augmented generation (RAG), multi-agent memory structures, verifiably accurate citations, and model-facing context compilation.4
 
+```
 Raw Organizational Data (PDFs, Wikis, SQL, APIs)  
                       │  
                       ▼  
-         \<─── Enforces: Provenance, Hygiene, ACLs  
+         <─── Enforces: Provenance, Hygiene, ACLs  
                       │  
                       ▼  
          Governed Corpus Object Store  
@@ -23,6 +24,7 @@ Raw Organizational Data (PDFs, Wikis, SQL, APIs)
                       │  
                       ▼  
          LLM Synthesizer (Context Window)
+```
 
 Corpus engineering represents a distinct architectural shift from standard data ingestion, document management, RAG preprocessing, retrieval engineering, and memory architectures. The following comparative matrix outlines these structural boundaries:
 
@@ -44,21 +46,23 @@ Corpus engineering operates as the upstream control system that prevents retriev
 
 Raw organizational information is transformed through several discrete states before it is loaded into an LLM's active context window. This architectural progression is governed by the **Epistemic Hierarchy**, which maps raw source files to structured, model-ready context objects.
 
- (e.g., policy\_v2.pdf)  
+```
+ (e.g., policy_v2.pdf)  
        │  
        ▼ (Parsing & Structure Normalization)  
  (Markdown representation)  
        │  
        ▼ (Identity & Metadata Ingestion)  
-\[Corpus Object\] (Canonical, metadata-anchored asset)  
+[Corpus Object] (Canonical, metadata-anchored asset)  
        │  
-       ├─► \[Canonical Chunk\] (Semantic segment with security tags)  
-       ├─► \[Extracted Claim\] (Atomic proposition, e.g., "Company matches 4%")  
+       ├─► [Canonical Chunk] (Semantic segment with security tags)  
+       ├─► [Extracted Claim] (Atomic proposition, e.g., "Company matches 4%")  
        ├─► (Contextual overview)  
        ├─► (Graph node mapped to Canonical ID)  
        │  
        ▼ (Retrieval, Filtering & Verification)  
-\[Context Object\] ──►
+[Context Object] ──►
+```
 
 The table below defines the structural boundaries, ingestion mechanics, and operational lifespans of each artifact within the epistemic hierarchy:
 
@@ -105,46 +109,48 @@ To establish a standard terminology across the engineering canon, the following 
 
 A robust, enterprise-grade metadata payload must be bound to every Corpus Object at ingestion. This metadata allows downstream retrieval engines, security checkers, and context compilers to filter out out-of-scope, invalid, or unauthorized materials before running search algorithms.7
 
+```
 ┌────────────────────────────────────────────────────────────────────────┐  
 │                          CORPUS OBJECT SCHEMA                          │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│ IDENTITY      : object\_id (UUID), canonical\_source\_id (UUID)           │  
-│ ORIGIN        : source\_system (Str), source\_uri (Str), jurisdiction    │  
+│ IDENTITY      : object_id (UUID), canonical_source_id (UUID)           │  
+│ ORIGIN        : source_system (Str), source_uri (Str), jurisdiction    │  
 │ PROVENANCE    : creator (Str), owner (Str), steward (Str)              │  
-│ LIFECYCLE     : version\_id (Str), valid\_from, valid\_until (Timestamps) │  
-│ STATE         : version\_state (Enum), archival\_state (Enum)            │  
-│ RELATIONSHIPS : supersedes (UUID), superseded\_by (UUID), lineage\_parent│  
-│ SECURITY      : classification (Enum), permission\_scope (JSON/ACL)     │  
-│ COMPLIANCE    : retention\_class (Enum), legal\_hold (Bool)              │  
-│ EPISTEMIC     : source\_authority (Float), conflict\_status (Enum)       │  
+│ LIFECYCLE     : version_id (Str), valid_from, valid_until (Timestamps) │  
+│ STATE         : version_state (Enum), archival_state (Enum)            │  
+│ RELATIONSHIPS : supersedes (UUID), superseded_by (UUID), lineage_parent│  
+│ SECURITY      : classification (Enum), permission_scope (JSON/ACL)     │  
+│ COMPLIANCE    : retention_class (Enum), legal_hold (Bool)              │  
+│ EPISTEMIC     : source_authority (Float), conflict_status (Enum)       │  
 └────────────────────────────────────────────────────────────────────────┘
+```
 
 The fields below define the technical metadata schema of the standard Corpus Object:
 
 JSON  
 {  
-  "$schema": "http://json-schema.org/draft-07/schema\#",  
+  "$schema": "http://json-schema.org/draft-07/schema#",  
   "title": "CorpusObjectSchema",  
   "type": "object",  
   "properties": {  
     "identity": {  
       "type": "object",  
       "properties": {  
-        "object\_id": { "type": "string", "format": "uuid" },  
-        "object\_type": { "type": "string", "enum": \["document", "chunk", "claim", "table\_row", "entity\_profile", "summary"\] },  
-        "canonical\_source\_id": { "type": "string", "format": "uuid" }  
+        "object_id": { "type": "string", "format": "uuid" },  
+        "object_type": { "type": "string", "enum": ["document", "chunk", "claim", "table_row", "entity_profile", "summary"] },  
+        "canonical_source_id": { "type": "string", "format": "uuid" }  
       },  
-      "required": \["object\_id", "object\_type", "canonical\_source\_id"\]  
+      "required": ["object_id", "object_type", "canonical_source_id"]  
     },  
     "origin": {  
       "type": "object",  
       "properties": {  
-        "source\_system": { "type": "string" },  
-        "source\_uri": { "type": "string", "format": "uri" },  
+        "source_system": { "type": "string" },  
+        "source_uri": { "type": "string", "format": "uri" },  
         "jurisdiction": { "type": "string" },  
-        "product\_scope": { "type": "array", "items": { "type": "string" } }  
+        "product_scope": { "type": "array", "items": { "type": "string" } }  
       },  
-      "required": \["source\_system", "source\_uri"\]  
+      "required": ["source_system", "source_uri"]  
     },  
     "provenance": {  
       "type": "object",  
@@ -152,95 +158,96 @@ JSON
         "creator": { "type": "string" },  
         "owner": { "type": "string" },  
         "steward": { "type": "string" },  
-        "creation\_date": { "type": "string", "format": "date-time" },  
-        "ingestion\_date": { "type": "string", "format": "date-time" },  
-        "observed\_date": { "type": "string", "format": "date-time" }  
+        "creation_date": { "type": "string", "format": "date-time" },  
+        "ingestion_date": { "type": "string", "format": "date-time" },  
+        "observed_date": { "type": "string", "format": "date-time" }  
       },  
-      "required": \["creator", "owner", "steward", "creation\_date", "ingestion\_date"\]  
+      "required": ["creator", "owner", "steward", "creation_date", "ingestion_date"]  
     },  
     "lifecycle": {  
       "type": "object",  
       "properties": {  
-        "valid\_from": { "type": "string", "format": "date-time" },  
-        "valid\_until": { "type": "string", "format": "date-time" },  
-        "version\_id": { "type": "string" },  
-        "version\_state": { "type": "string", "enum": \["draft", "approved", "active", "deprecated", "superseded", "archived", "deleted"\] },  
+        "valid_from": { "type": "string", "format": "date-time" },  
+        "valid_until": { "type": "string", "format": "date-time" },  
+        "version_id": { "type": "string" },  
+        "version_state": { "type": "string", "enum": ["draft", "approved", "active", "deprecated", "superseded", "archived", "deleted"] },  
         "supersedes": { "type": "string", "format": "uuid" },  
-        "superseded\_by": { "type": "string", "format": "uuid" },  
-        "lineage\_parent": { "type": "string", "format": "uuid" },  
-        "lineage\_children": { "type": "array", "items": { "type": "string", "format": "uuid" } },  
-        "transformation\_history": {  
+        "superseded_by": { "type": "string", "format": "uuid" },  
+        "lineage_parent": { "type": "string", "format": "uuid" },  
+        "lineage_children": { "type": "array", "items": { "type": "string", "format": "uuid" } },  
+        "transformation_history": {  
           "type": "array",  
           "items": {  
             "type": "object",  
             "properties": {  
-              "activity\_id": { "type": "string", "format": "uuid" },  
-              "parser\_method": { "type": "string" },  
-              "normalization\_method": { "type": "string" },  
+              "activity_id": { "type": "string", "format": "uuid" },  
+              "parser_method": { "type": "string" },  
+              "normalization_method": { "type": "string" },  
               "timestamp": { "type": "string", "format": "date-time" }  
             }  
           }  
         }  
       },  
-      "required": \["valid\_from", "version\_id", "version\_state"\]  
+      "required": ["valid_from", "version_id", "version_state"]  
     },  
     "security": {  
       "type": "object",  
       "properties": {  
-        "sensitivity\_class": { "type": "string", "enum": \["public", "internal", "confidential", "secret"\] },  
-        "redaction\_status": { "type": "string", "enum": \["unredacted", "pii\_masked", "privilege\_cleared"\] },  
-        "permission\_scope": {  
+        "sensitivity_class": { "type": "string", "enum": ["public", "internal", "confidential", "secret"] },  
+        "redaction_status": { "type": "string", "enum": ["unredacted", "pii_masked", "privilege_cleared"] },  
+        "permission_scope": {  
           "type": "object",  
           "properties": {  
-            "allowed\_users": { "type": "array", "items": { "type": "string" } },  
-            "allowed\_roles": { "type": "array", "items": { "type": "string" } },  
-            "allowed\_groups": { "type": "array", "items": { "type": "string" } },  
-            "row\_level\_security\_tags": { "type": "array", "items": { "type": "string" } }  
+            "allowed_users": { "type": "array", "items": { "type": "string" } },  
+            "allowed_roles": { "type": "array", "items": { "type": "string" } },  
+            "allowed_groups": { "type": "array", "items": { "type": "string" } },  
+            "row_level_security_tags": { "type": "array", "items": { "type": "string" } }  
           }  
         },  
-        "tenant\_scope": { "type": "string" }  
+        "tenant_scope": { "type": "string" }  
       },  
-      "required": \["sensitivity\_class", "redaction\_status", "permission\_scope", "tenant\_scope"\]  
+      "required": ["sensitivity_class", "redaction_status", "permission_scope", "tenant_scope"]  
     },  
     "compliance": {  
       "type": "object",  
       "properties": {  
-        "retention\_class": { "type": "string" },  
-        "archival\_state": { "type": "string", "enum": \["active", "cold\_archive", "legal\_hold", "disposed"\] },  
-        "legal\_hold\_status": { "type": "boolean" },  
-        "deletion\_timestamp": { "type": "string", "format": "date-time" },  
-        "review\_trigger": {  
+        "retention_class": { "type": "string" },  
+        "archival_state": { "type": "string", "enum": ["active", "cold_archive", "legal_hold", "disposed"] },  
+        "legal_hold_status": { "type": "boolean" },  
+        "deletion_timestamp": { "type": "string", "format": "date-time" },  
+        "review_trigger": {  
           "type": "object",  
           "properties": {  
-            "trigger\_type": { "type": "string", "enum": \["temporal", "event\_driven"\] },  
-            "trigger\_rule": { "type": "string" },  
-            "next\_review\_date": { "type": "string", "format": "date-time" }  
+            "trigger_type": { "type": "string", "enum": ["temporal", "event_driven"] },  
+            "trigger_rule": { "type": "string" },  
+            "next_review_date": { "type": "string", "format": "date-time" }  
           }  
         }  
       },  
-      "required": \["retention\_class", "archival\_state", "legal\_hold\_status"\]  
+      "required": ["retention_class", "archival_state", "legal_hold_status"]  
     },  
     "epistemic": {  
       "type": "object",  
       "properties": {  
-        "canonical\_entity\_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },  
+        "canonical_entity_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },  
         "aliases": { "type": "array", "items": { "type": "string" } },  
-        "extracted\_claims": { "type": "array", "items": { "type": "object" } },  
-        "source\_authority": { "type": "number", "minimum": 0.0, "maximum": 1.0 },  
-        "confidence\_score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },  
-        "citation\_label": { "type": "string" },  
-        "conflict\_status": { "type": "string", "enum": \["resolved", "disputed", "uncontested"\] }  
+        "extracted_claims": { "type": "array", "items": { "type": "object" } },  
+        "source_authority": { "type": "number", "minimum": 0.0, "maximum": 1.0 },  
+        "confidence_score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },  
+        "citation_label": { "type": "string" },  
+        "conflict_status": { "type": "string", "enum": ["resolved", "disputed", "uncontested"] }  
       },  
-      "required": \["source\_authority", "citation\_label", "conflict\_status"\]  
+      "required": ["source_authority", "citation_label", "conflict_status"]  
     }  
   },  
-  "required": \["identity", "origin", "provenance", "lifecycle", "security", "compliance", "epistemic"\]  
+  "required": ["identity", "origin", "provenance", "lifecycle", "security", "compliance", "epistemic"]  
 }
 
 ## **Knowledge Supply Chain Pipeline**
 
 The transformation of raw source systems into governed, context-ready Corpus Objects requires a strict, multi-stage processing pipeline.1 The pipeline is continuous, executing micro-batching and event-driven updates rather than episodic ingestion, to keep the system synchronized with enterprise system changes.6
 
+```
                      RAW SOURCE SYSTEMS  
                              │  
      ┌───────────────────────┼───────────────────────┐  
@@ -277,6 +284,7 @@ SharePoint              Confluence             SQL Databases
                              │  
                              ▼  
                   GOVERNED CORPUS OBJECTS
+```
 
 ### **13-Stage Pipeline Execution Map**
 
@@ -308,9 +316,9 @@ The following evaluation table compares three industry-standard document parsing
 | **Core Structural Engine** | Layout analysis via DocLayNet; table cell parsing via TableFormer.15 | Transformer-based layout analysis and OCR pipeline.15 | Agentic OCR with expert model orchestration.4 |
 | **Table Cell Extraction Accuracy** | **97.9% accuracy** on multi-level, nested, and complex table structures.15 | **100% on simple tables**, but drops to **75% on complex, multi-row structures**.15 | **100% on simple tables**, but fails on complex layouts with column shifts.15 |
 | **Text Extraction Fidelity** | High. Preserves paragraph breaks and technical phrasing.15 | Inconsistent line breaks; merges paragraph breaks; prone to over-extraction.15 | Inconsistent with complex layouts; prone to word merging and content hallucinations.15 |
-| **Single-Page Parse Latency** | **6.28 seconds**.15 | **51.06 seconds** (very slow; highly inefficient for large pipelines).15 | **\~6.00 seconds**.15 |
-| **50-Page Parse Latency** | **65.12 seconds** (demonstrates predictable, linear scaling).15 | **141.02 seconds** (non-linear scaling issues).15 | **\~6.00 seconds** (highly optimized cloud extraction).15 |
-| **Markdown Structural Output** | Good. Clear section headers, though nested headings are sometimes flattened to \#\#.15 | Basic structure extraction; struggles with multi-level section hierarchies.15 | Struggles with deep layout hierarchies; merges section boundaries into blocks.15 |
+| **Single-Page Parse Latency** | **6.28 seconds**.15 | **51.06 seconds** (very slow; highly inefficient for large pipelines).15 | **~6.00 seconds**.15 |
+| **50-Page Parse Latency** | **65.12 seconds** (demonstrates predictable, linear scaling).15 | **141.02 seconds** (non-linear scaling issues).15 | **~6.00 seconds** (highly optimized cloud extraction).15 |
+| **Markdown Structural Output** | Good. Clear section headers, though nested headings are sometimes flattened to ##.15 | Basic structure extraction; struggles with multi-level section hierarchies.15 | Struggles with deep layout hierarchies; merges section boundaries into blocks.15 |
 | **Downstream Architectural Fit** | Best for processing technical documents and dense financial reports.15 | Suitable for batch-oriented ETL data normalization but restricted by latency limitations.15 | Best for high-velocity, lightweight agent workflows where speed is prioritized over table accuracy.15 |
 
 ## **Source Authority and Provenance Models**
@@ -319,7 +327,7 @@ A mature enterprise corpus must account for the reality that organizational docu
 
 ### **Source Authority Model**
 
-To solve this, the system assigns a quantitative **Source Authority Score** (As in the range \[0.0, 1.0\]) to every ingested resource.10 At query time, this score is used as a weight factor during vector retrieval scoring.  
+To solve this, the system assigns a quantitative **Source Authority Score** (As in the range [0.0, 1.0]) to every ingested resource.10 At query time, this score is used as a weight factor during vector retrieval scoring.  
 The table below defines the authority tiers of enterprise knowledge sources:
 
 | Source Class | Target System | As | Volatility | Ownership and Stewards | Compliance Auditing | Appropriate Context Use Case |
@@ -338,68 +346,69 @@ To guarantee complete auditability, the corpus platform must map every step of d
 The RDF Turtle block below illustrates a complete lineage trail from a raw PDF document to a retrieved citation 18:
 
 Code snippet  
-@prefix prov: \<http://www.w3.org/ns/prov\#\>.  
-@prefix xsd: \<http://www.w3.org/2001/XMLSchema\#\>.  
-@prefix corp: \<http://enterprise.ai/corpus/\>.  
-@prefix agent: \<http://enterprise.ai/agents/\>.  
-@prefix act: \<http://enterprise.ai/activities/\>.
+@prefix prov: <http://www.w3.org/ns/prov#>.  
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.  
+@prefix corp: <http://enterprise.ai/corpus/>.  
+@prefix agent: <http://enterprise.ai/agents/>.  
+@prefix act: <http://enterprise.ai/activities/>.
 
-\# 1\. Raw Source Entity representation  
-corp:raw\_hr\_policy\_pdf  
+# 1. Raw Source Entity representation  
+corp:raw_hr_policy_pdf  
     a prov:Entity ;  
-    prov:wasAttributedTo agent:hr\_policy\_director ;  
+    prov:wasAttributedTo agent:hr_policy_director ;  
     prov:generatedAtTime "2026-01-15T09:00:00Z"^^xsd:dateTime.
 
-\# 2\. Parsing Activity  
-act:docling\_parser\_run\_452  
+# 2. Parsing Activity  
+act:docling_parser_run_452  
     a prov:Activity ;  
     prov:startedAtTime "2026-06-06T10:00:00Z"^^xsd:dateTime ;  
     prov:endedAtTime "2026-06-06T10:00:06Z"^^xsd:dateTime ;  
-    prov:wasAssociatedWith agent:docling\_parser\_engine.
+    prov:wasAssociatedWith agent:docling_parser_engine.
 
-\# 3\. Normalized Document Entity  
-corp:normalized\_hr\_policy\_md  
+# 3. Normalized Document Entity  
+corp:normalized_hr_policy_md  
     a prov:Entity ;  
-    prov:wasDerivedFrom corp:raw\_hr\_policy\_pdf ;  
-    prov:wasGeneratedBy act:docling\_parser\_run\_452.
+    prov:wasDerivedFrom corp:raw_hr_policy_pdf ;  
+    prov:wasGeneratedBy act:docling_parser_run_452.
 
-\# 4\. Chunking Activity  
-act:recursive\_splitter\_run\_893  
+# 4. Chunking Activity  
+act:recursive_splitter_run_893  
     a prov:Activity ;  
     prov:startedAtTime "2026-06-06T10:01:00Z"^^xsd:dateTime ;  
-    prov:wasAssociatedWith agent:chunking\_service.
+    prov:wasAssociatedWith agent:chunking_service.
 
-\# 5\. Canonical Chunk Entity  
-corp:canonical\_chunk\_segment\_12  
+# 5. Canonical Chunk Entity  
+corp:canonical_chunk_segment_12  
     a prov:Entity ;  
-    prov:wasDerivedFrom corp:normalized\_hr\_policy\_md ;  
-    prov:wasGeneratedBy act:recursive\_splitter\_run\_893.
+    prov:wasDerivedFrom corp:normalized_hr_policy_md ;  
+    prov:wasGeneratedBy act:recursive_splitter_run_893.
 
-\# 6\. RAG Retrieval Activity  
-act:vector\_retrieval\_query\_901  
+# 6. RAG Retrieval Activity  
+act:vector_retrieval_query_901  
     a prov:Activity ;  
     prov:startedAtTime "2026-06-06T13:45:00Z"^^xsd:dateTime ;  
-    prov:wasAssociatedWith agent:retrieval\_orchestrator.
+    prov:wasAssociatedWith agent:retrieval_orchestrator.
 
-\# 7\. Context Object Entity  
-corp:context\_object\_claim\_901  
+# 7. Context Object Entity  
+corp:context_object_claim_901  
     a prov:Entity ;  
-    prov:wasDerivedFrom corp:canonical\_chunk\_segment\_12 ;  
-    prov:wasGeneratedBy act:vector\_retrieval\_query\_901.
+    prov:wasDerivedFrom corp:canonical_chunk_segment_12 ;  
+    prov:wasGeneratedBy act:vector_retrieval_query_901.
 
-\# Agents  
-agent:hr\_policy\_director a prov:Agent.  
-agent:docling\_parser\_engine a prov:Agent ; prov:actedOnBehalfOf agent:it\_data\_platform\_steward.  
-agent:chunking\_service a prov:Agent.  
-agent:retrieval\_orchestrator a prov:Agent.  
-agent:it\_data\_platform\_steward a prov:Agent.
+# Agents  
+agent:hr_policy_director a prov:Agent.  
+agent:docling_parser_engine a prov:Agent ; prov:actedOnBehalfOf agent:it_data_platform_steward.  
+agent:chunking_service a prov:Agent.  
+agent:retrieval_orchestrator a prov:Agent.  
+agent:it_data_platform_steward a prov:Agent.
 
-Using this structural ledger, a downstream model or auditor can perform recursive graph queries to trace a generated claim back to its raw source.18 If a model cites context\_object\_claim\_901, the system can trace the chain back through canonical\_chunk\_segment\_12 and normalized\_hr\_policy\_md to confirm that the source was raw\_hr\_policy\_pdf, which was created by hr\_policy\_director.18
+Using this structural ledger, a downstream model or auditor can perform recursive graph queries to trace a generated claim back to its raw source.18 If a model cites context_object_claim_901, the system can trace the chain back through canonical_chunk_segment_12 and normalized_hr_policy_md to confirm that the source was raw_hr_policy_pdf, which was created by hr_policy_director.18
 
 ## **Normalization, Deduplication, and Canonicalization**
 
 Unstructured enterprise information frequently contains layout differences, formatting noise, and duplicate content.20 If ignored, this noise pollutes semantic indexes and causes retrieved results to contain redundant or conflicting sections.1
 
+```
 Raw Sources ──► Normalization (UTF-8, ISO 8601, SI units)  
                       │  
                       ▼  
@@ -412,12 +421,13 @@ Raw Sources ──► Normalization (UTF-8, ISO 8601, SI units)
                                                                         │  
                                                                         ▼  
                                                              Knowledge Graph update
+```
 
 ### **Multi-Level Normalization Protocol**
 
 The ingestion pipeline enforces strict normalization standards to ensure uniform metadata filtering and clean text formatting:
 
-* **Document and Text Normalization**: Raw inputs are processed, characters are converted to strict UTF-8, and non-printable elements are stripped. Headings are mapped to standard Markdown \# structures.15  
+* **Document and Text Normalization**: Raw inputs are processed, characters are converted to strict UTF-8, and non-printable elements are stripped. Headings are mapped to standard Markdown # structures.15  
 * **Temporal Normalization**: All document dates are parsed and converted to ISO 8601 UTC format (YYYY-MM-DDTHH:MM:SSZ).1  
 * **Unit and Schema Normalization**: Measurements are converted to standard SI base units, and structural metadata parameters are mapped to strict schema types (e.g., UUID format for identifier fields).  
 * **Language and Locale Handling**: Documents are analyzed via language detection models and tagged with ISO 639-1 codes. Multilingual files map to parallel translation references.  
@@ -427,12 +437,12 @@ The ingestion pipeline enforces strict normalization standards to ensure uniform
 
 The pipeline uses MinHash Locality-Sensitive Hashing (LSH) to identify near-duplicate documents and chunks, preventing redundant files from cluttering the index.1  
 For document token sets A and B, the system calculates their Jaccard similarity:  
-J(A, B) \= |A intersect B| / |A union B|  
+J(A, B) = |A intersect B| / |A union B|  
 MinHash approximates this similarity by applying independent hash functions to represent token permutations.22 The probability that a signature matches is mathematically equivalent to the Jaccard similarity:  
-P(MinHash(A) \= MinHash(B)) \= J(A, B)  
-By building a signature matrix from k independent hash functions (where k \= 128\) and splitting the rows into b bands of r rows, the probability that a document pair hashes to the same bucket in at least one band is expressed as:  
-P\_match \= 1 \- (1 \- s^r)^b  
-where s \= J(A, B).22 The system uses b \= 16 and r \= 8 to set a Jaccard similarity threshold T \= 0.80.1 If a document's Jaccard score exceeds this threshold, it is flagged as a duplicate.  
+P(MinHash(A) = MinHash(B)) = J(A, B)  
+By building a signature matrix from k independent hash functions (where k = 128\) and splitting the rows into b bands of r rows, the probability that a document pair hashes to the same bucket in at least one band is expressed as:  
+P_match = 1 - (1 - s^r)^b  
+where s = J(A, B).22 The system uses b = 16 and r = 8 to set a Jaccard similarity threshold T = 0.80.1 If a document's Jaccard score exceeds this threshold, it is flagged as a duplicate.  
 The system resolves duplicate flags using the following logic:
 
 * **Exact Metadata Match**: If the duplicate file carries the exact same version and timestamp as an existing entry, the system discards the duplicate to save index space.  
@@ -443,13 +453,14 @@ The system resolves duplicate flags using the following logic:
 
 When documents refer to a single entity using different names (e.g., *"Sony"*, *"Sony Interactive"*, *"SIE"*), standard vector searches return fragmented contexts.9 To prevent this, systems must implement **Proxy-Pointer RAG**.9
 
-                      
+
+```                      
                               │  
                      Extract Entity Profile   
                               │  
                     Decompose Sub-Queries:  
-       \- Raw Entity Name: "Sony"  
-       \- Relationship Checks: "owns PlayStation trademark"   
+       - Raw Entity Name: "Sony"  
+       - Relationship Checks: "owns PlayStation trademark"   
                               │  
                               ▼  
                      Vector Database Search  
@@ -461,8 +472,9 @@ When documents refer to a single entity using different names (e.g., *"Sony"*, *
                               │  
                               v  
                    
-                    \- Merges variations to Canonical ID  
-                    \- Maps localized graph neighborhood coordinates
+                    - Merges variations to Canonical ID  
+                    - Maps localized graph neighborhood coordinates
+```
 
 Under this model, the system processes entities as follows:
 
@@ -476,15 +488,17 @@ Under this model, the system processes entities as follows:
 A major vulnerability in enterprise AI search is data exposure through retrieved context.7 Unmanaged vector searches can pull sensitive text (such as salary tables or private communications) and pass them to unauthorized users simply because their semantic vectors match the query.7  
 To resolve this, the system must enforce access control checks **before** vector similarity scoring takes place.8 Applying permissions after retrieval is insecure; it allows unauthorized data to be fetched into memory and exposes security side-channels, such as observing differences in vector search latencies or utilizing unauthorized rerank scores to deduce private text content.8
 
-User Query \+ JWT Token  
+```
+User Query + JWT Token  
          │  
-         ├──\> Native Token-Based Query (Entra ID) ──\> Extract claims (Roles, Groups)   
-         │                                        ──\> Match index security metadata   
-         │                                        ──\> Filter out unauthorized vectors BEFORE ANN search   
+         ├──> Native Token-Based Query (Entra ID) ──> Extract claims (Roles, Groups)   
+         │                                        ──> Match index security metadata   
+         │                                        ──> Filter out unauthorized vectors BEFORE ANN search   
          │  
-         └──\> Security Filter Query Plan (Cerbos) ──\> Evaluate ABAC/RBAC policy   
-                                                  ──\> Generate native SQL/Vector pre-filters   
-                                                  ──\> Execute secure, constrained retrieval 
+         └──> Security Filter Query Plan (Cerbos) ──> Evaluate ABAC/RBAC policy   
+                                                  ──> Generate native SQL/Vector pre-filters   
+                                                  ──> Execute secure, constrained retrieval 
+```
 
 ### **Security Propagation and Sensitivity Inheritance**
 
@@ -495,7 +509,7 @@ If a parent document is classified as confidential, all derived chunks and summa
 
 The following Python implementation patterns demonstrate how to enforce permission-aware indexing and secure query filtering:
 
-#### **1\. Security Metadata and RBAC Pre-Filtering**
+#### **1. Security Metadata and RBAC Pre-Filtering**
 
 At ingestion time, every vector chunk is tagged with its tenant, allowed security groups, and classifications.8 The search engine enforces RBAC prior to approximate nearest neighbor (ANN) matching.8
 
@@ -507,88 +521,88 @@ from typing import List, Dict, Any, Optional
 class SecureChunk:  
     id: str  
     text: str  
-    tenant\_id: str  
-    allowed\_roles: List\[str\]  
+    tenant_id: str  
+    allowed_roles: List[str]  
     department: str  
     classification: str  
-    doc\_version: str
+    doc_version: str
 
 class SecureRetrievalEngine:  
-    def \_\_init\_\_(self, vector\_store\_client: Any):  
-        self.client \= vector\_store\_client
+    def __init__(self, vector_store_client: Any):  
+        self.client = vector_store_client
 
-    def rbac\_prefilter(self, tenant\_id: str, user\_roles: List\[str\]) \-\> Dict\[str, Any\]:  
+    def rbac_prefilter(self, tenant_id: str, user_roles: List[str]) -> Dict[str, Any]:  
         """  
         Generates database-native pre-filtering conditions.  
         Enforces that the tenant matches and the user possesses at least one matching role.  
         """  
         return {  
-            "and": \[  
-                {"field": "tenant\_id", "equals": tenant\_id},  
-                {"field": "allowed\_roles", "in": user\_roles}  
-            \]  
+            "and": [  
+                {"field": "tenant_id", "equals": tenant_id},  
+                {"field": "allowed_roles", "in": user_roles}  
+            ]  
         }
 
-    def secure\_search(self, query\_vector: List\[float\], tenant\_id: str, user\_roles: List\[str\], top\_k: int \= 10) \-\> List:  
-        \# Generate the pre-filter block  
-        filter\_conditions \= self.rbac\_prefilter(tenant\_id, user\_roles)  
+    def secure_search(self, query_vector: List[float], tenant_id: str, user_roles: List[str], top_k: int = 10) -> List:  
+        # Generate the pre-filter block  
+        filter_conditions = self.rbac_prefilter(tenant_id, user_roles)  
           
-        \# Execute the ANN vector search with pre-filtering enforced natively  
-        results \= self.client.search(  
-            vector=query\_vector,  
-            filter\=filter\_conditions,  
-            limit=top\_k  
+        # Execute the ANN vector search with pre-filtering enforced natively  
+        results = self.client.search(  
+            vector=query_vector,  
+            filter=filter_conditions,  
+            limit=top_k  
         )  
         return results
 
-#### **2\. Attribute-Based Access Control (ABAC) Filtering**
+#### **2. Attribute-Based Access Control (ABAC) Filtering**
 
 For fine-grained, dynamic rules (e.g., checking user geography, department match, and clearance level simultaneously), the system utilizes an ABAC filter.8
 
 Python  
 @dataclass  
 class UserContext:  
-    identity\_id: str  
-    tenant\_id: str  
-    departments: List\[str\]  
-    clearance\_level: str  \# e.g., 'public', 'internal', 'confidential'
+    identity_id: str  
+    tenant_id: str  
+    departments: List[str]  
+    clearance_level: str  # e.g., 'public', 'internal', 'confidential'
 
 class ABACEnforcer:  
     @staticmethod  
-    def construct\_abac\_filter(user: UserContext) \-\> Dict\[str, Any\]:  
+    def construct_abac_filter(user: UserContext) -> Dict[str, Any]:  
         """  
         Ensures users can only retrieve chunks matching their department,   
         their exact tenant, and at or below their active clearance level.  
         """  
-        clearance\_hierarchy \= {  
-            "public": \["public"\],  
-            "internal": \["public", "internal"\],  
-            "confidential": \["public", "internal", "confidential"\]  
+        clearance_hierarchy = {  
+            "public": ["public"],  
+            "internal": ["public", "internal"],  
+            "confidential": ["public", "internal", "confidential"]  
         }  
           
-        allowed\_clearances \= clearance\_hierarchy.get(user.clearance\_level, \["public"\])  
+        allowed_clearances = clearance_hierarchy.get(user.clearance_level, ["public"])  
           
         return {  
-            "and": \[  
-                {"field": "tenant\_id", "equals": user.tenant\_id},  
+            "and": [  
+                {"field": "tenant_id", "equals": user.tenant_id},  
                 {"field": "department", "in": user.departments},  
-                {"field": "classification", "in": allowed\_clearances}  
-            \]  
+                {"field": "classification", "in": allowed_clearances}  
+            ]  
         }
 
-#### **3\. Row-Level Security (RLS) for Database-Backed Memory and Agents**
+#### **3. Row-Level Security (RLS) for Database-Backed Memory and Agents**
 
 For agents executing structured SQL queries via Text2SQL, PostgreSQL Row-Level Security must be enforced on the connection session to prevent query injection from leaking cross-tenant data.8
 
 SQL  
-\-- Enable RLS on the core agent memory table  
-ALTER TABLE agent\_memory\_store ENABLE ROW LEVEL SECURITY;
+-- Enable RLS on the core agent memory table  
+ALTER TABLE agent_memory_store ENABLE ROW LEVEL SECURITY;
 
-\-- Establish the tenant isolation policy using session variables  
-CREATE POLICY tenant\_isolation\_policy   
-ON agent\_memory\_store  
+-- Establish the tenant isolation policy using session variables  
+CREATE POLICY tenant_isolation_policy   
+ON agent_memory_store  
 FOR ALL  
-USING (tenant\_id \= NULLIF(current\_setting('app.current\_tenant', true), ''));
+USING (tenant_id = NULLIF(current_setting('app.current_tenant', true), ''));
 
 The database adapter execution pattern maps the authenticated user principal to this session variable prior to query processing 8:
 
@@ -596,32 +610,34 @@ Python
 from sqlalchemy import text  
 from sqlalchemy.orm import Session
 
-def execute\_agent\_query(db\_session: Session, user: UserContext, generated\_sql: str) \-\> List:  
+def execute_agent_query(db_session: Session, user: UserContext, generated_sql: str) -> List:  
     """  
     Executes an LLM-generated SQL query safely.  
     Enforces Row-Level Security by setting the session variable before execution.  
     """  
     try:  
-        \# Enforce the active tenant parameter in the PostgreSQL transaction context  
-        db\_session.execute(  
-            text("SET LOCAL app.current\_tenant \= :tenant"),  
-            {"tenant": user.tenant\_id}  
+        # Enforce the active tenant parameter in the PostgreSQL transaction context  
+        db_session.execute(  
+            text("SET LOCAL app.current_tenant = :tenant"),  
+            {"tenant": user.tenant_id}  
         )  
           
-        \# Execute the generated SQL query. RLS is enforced natively at the database engine level.  
-        result \= db\_session.execute(text(generated\_sql))  
-        return \[dict(row) for row in result.mappings()\]  
+        # Execute the generated SQL query. RLS is enforced natively at the database engine level.  
+        result = db_session.execute(text(generated_sql))  
+        return [dict(row) for row in result.mappings()]  
     except Exception as e:  
-        db\_session.rollback()  
+        db_session.rollback()  
         raise SecurityException(f"SQL execution failed or blocked by policy engine: {str(e)}")
 
 ## **Versioning, Retention, Redaction, and Archival Policy Map**
 
 Enterprise document repositories are dynamic environments.6 A document's legal authority changes as laws adapt, product lines deprecate, and retention schedules expire.14
 
- ──► \[Approved\] ──► \[Active\] ──► ──► ──► \[Archived\] ──►  
+```
+ ──► [Approved] ──► [Active] ──► ──► ──► [Archived] ──►  
                                 │                                            │  
                                 └───(Legal Hold Active)──────────────────────┴──►
+```
 
 ### **Versioning and Supersession Rules**
 
@@ -652,31 +668,33 @@ The policy map below defines the retention and redaction rules for enterprise kn
 | **HR Employee Files** | Metadata-Based: Employee Termination. | 10 Years. | Complete redaction of SSNs, home addresses, and private medical histories.13 | Placed under read-only schema lock; restricted to authorized HR admins.8 |
 | **Legal Contracts** | Time-Based: Expiration of terms. | 20 Years. | Redaction of third-party business names and trade secrets before vector load.13 | Retained on active index under strict legal-access scopes.8 |
 | **Product Manuals** | Version-Based: Product End-of-Life. | Indefinite. | Low-risk; zero redaction required. | Moved to "Legacy Archive" index; matching queries receive a "Superseded" banner. |
-| **Customer Tickets** | Metadata-Based: Resolution Status. | 1 Year. | Automatic extraction and deletion of customer credentials and billing tokens. | Cleared for automatic deletion from index unless marked with a Legal\_Hold tag.14 |
+| **Customer Tickets** | Metadata-Based: Resolution Status. | 1 Year. | Automatic extraction and deletion of customer credentials and billing tokens. | Cleared for automatic deletion from index unless marked with a Legal_Hold tag.14 |
 
 ## **Conflict Resolution and Epistemic Belief Revision**
 
 When retrieval systems ingest conflicting inputs (such as an old API manual and a newer specification, or contradictory policy guidelines), standard RAG blindly merges the text.12 This forces the model into a **Context-Compliance Regime**, where it outputs incorrect or hallucinated claims because the retrieved context dominates its parametric memory.12
 
- ──► Step 1: Contextual Extraction (a\_ctx)  
+```
+ ──► Step 1: Contextual Extraction (a_ctx)  
                               │  
-                       Step 2: Parametric Extraction (a\_param)  
+                       Step 2: Parametric Extraction (a_param)  
                               │  
-                       Step 3: Divergence Check (Compare a\_ctx & a\_param)  
+                       Step 3: Divergence Check (Compare a_ctx & a_param)  
                               │  
-                              ├──(Divergence Detected?)──\> Yes ──\> Step 4: Premise Isolation  
+                              ├──(Divergence Detected?)──> Yes ──> Step 4: Premise Isolation  
                               │                                      │  
                               │                                    Step 5: Resolution Loop   
                               │                                      │  
-                              │                                    \[Output resolved, audited answer\]  
+                              │                                    [Output resolved, audited answer]  
                               │  
-                              └── No ──\>
+                              └── No ──>
+```
 
 ### **Distinguishing Contradiction from Scoped Variation**
 
 A contradiction is not always a quality failure. Two conflicting statements can both be true if their valid operational domains differ. The corpus engine must evaluate three core variables to determine whether a conflict represents a structural error or a scoped variation:
 
-1. **Temporal Domain**: Statement X is valid for Fiscal Year 2025; Statement Y is valid for Fiscal Year 2026\.  
+1. **Temporal Domain**: Statement X is valid for Fiscal Year 2025; Statement Y is valid for Fiscal Year 2026.  
 2. **Jurisdiction / Region**: Statement X applies in California (CA); Statement Y applies in the European Union (EU).  
 3. **Product / Customer Scope**: Statement X governs Enterprise customers; Statement Y governs Basic tier accounts.
 
@@ -686,9 +704,9 @@ If these scopes overlap entirely, a true contradiction exists, and the system mu
 
 To resolve these epistemic knowledge conflicts, systems must implement the **Context-Driven Decomposition (CDD)** belief-revision framework.12 CDD structures the inference process into five distinct steps to detect and arbitrate factual divergence:
 
-* **Step 1: Contextual Extraction**: The model extracts the answer strictly as asserted by the retrieved context (a\_ctx), ignoring its own parametric knowledge.12  
-* **Step 2: Parametric Extraction**: The model generates the answer using only its pre-trained parametric memory (a\_param).12  
-* **Step 3: Divergence Check**: The system compares a\_ctx and a\_param to evaluate if they represent conflicting facts.12  
+* **Step 1: Contextual Extraction**: The model extracts the answer strictly as asserted by the retrieved context (a_ctx), ignoring its own parametric knowledge.12  
+* **Step 2: Parametric Extraction**: The model generates the answer using only its pre-trained parametric memory (a_param).12  
+* **Step 3: Divergence Check**: The system compares a_ctx and a_param to evaluate if they represent conflicting facts.12  
 * **Step 4: Premise Isolation**: If a divergence is detected, the system extracts the discrete premises from the retrieved context C that drive the contradiction.12  
 * **Step 5: Resolution**: The isolated premises are evaluated against source authority metrics, temporal timestamps, and metadata to output the final resolved answer, accompanied by an explicit conflict log.12
 
@@ -713,21 +731,21 @@ The corpus platform must monitor and evaluate its data quality against these fif
 
 | Metric Name | Mathematical Definition / Formulation | Target SLA | Failure Mitigation Strategy |
 | :---- | :---- | :---- | :---- |
-| **1\. Provenance Completeness** | (Objects with Valid source\_uri) / (Total Ingested Objects) 3 | 100.00% | Reject ingestion of files missing verifiable parent URIs.3 |
-| **2\. Metadata Coverage** | (Objects with non-empty Mandatory Keys) / (Total Ingested Objects) | \>99.90% | Route files with incomplete tags to human metadata-tagging queues.4 |
-| **3\. Exact Duplicate Rate** | (Identical Lexical Hash Matches) / (Total Ingested Documents) 21 | \<1.00% | Discard identical files during Stage 8 pipeline execution.1 |
-| **4\. Near-Duplicate Rate** | (MinHash Jaccard Matches at T \>= 0.85) / (Total Ingested Documents) 1 | \<3.00% | Merge similar drafts; retain only the highest-authority version.1 |
-| **5\. Entity Resolution Accuracy** | (Correct Entity merges to Canonical ID) / (Total Extracted Entities) 9 | \>95.00% | Refine entity profile builder templates; adjust LLM merge logic.9 |
-| **6\. Alias Coverage Rate** | (Resolved Entity Aliases) / (Total Entity Synonyms Extracted) 9 | \>90.00% | Run background batch entity extraction and alias table updates.16 |
-| **7\. Permission Leakage Rate** | (Chunks retrieved without valid Role match) / (Total Evaluated Retrievals) 8 | 0.00% | Enforce security checks before vector scoring is calculated.8 |
-| **8\. Redaction Propagation** | (Derived elements correctly redacting term t) / (Total derived elements from parent D) | 100.00% | Cascade parent redactions instantly using parent-child lineage paths. |
-| **9\. Citation Fidelity** | (Generations verified by Cited Source) / (Total Citations Generated) 11 | \>98.00% | Block output if cited context lacks semantic warrant for claims.11 |
-| **10\. Parse Error Rate** | (Mangled paragraph / layout outputs) / (Total Parsed Pages) 2 | \<2.00% | Upgrade parsing pipelines to structure-aware layout engines.2 |
-| **11\. OCR/Table Read Accuracy** | (Correctly extracted cells) / (Total cells in evaluation set) 15 | \>95.00% | Route documents with multi-row tables to Docling/TableFormer.15 |
-| **12\. Stale-Source Rate** | (Active Objects past valid\_until date) / (Total Active Ingested Objects) | \<0.50% | Trigger automated deprecation workflows; notify content owner. |
-| **13\. Conflict Detection Accuracy** | (True Contradictions Identified) / (Total Contradictions in System) 10 | \>95.00% | Implement Context-Driven Decomposition (CDD) at query time.12 |
-| **14\. Lineage Complete Rate** | (Objects with complete PROV-O trail) / (Total Ingested Objects) 18 | 100.00% | Block ingestion of objects with incomplete activity or agent steps. |
-| **15\. Retrieval Eligibility** | (Candidate objects matching active scopes) / (Total Candidate set returned by index) | 100.00% | Reject candidates that violate geographic, version, or tenant scopes. |
+| **1. Provenance Completeness** | (Objects with Valid source_uri) / (Total Ingested Objects) 3 | 100.00% | Reject ingestion of files missing verifiable parent URIs.3 |
+| **2. Metadata Coverage** | (Objects with non-empty Mandatory Keys) / (Total Ingested Objects) | >99.90% | Route files with incomplete tags to human metadata-tagging queues.4 |
+| **3. Exact Duplicate Rate** | (Identical Lexical Hash Matches) / (Total Ingested Documents) 21 | <1.00% | Discard identical files during Stage 8 pipeline execution.1 |
+| **4. Near-Duplicate Rate** | (MinHash Jaccard Matches at T >= 0.85) / (Total Ingested Documents) 1 | <3.00% | Merge similar drafts; retain only the highest-authority version.1 |
+| **5. Entity Resolution Accuracy** | (Correct Entity merges to Canonical ID) / (Total Extracted Entities) 9 | >95.00% | Refine entity profile builder templates; adjust LLM merge logic.9 |
+| **6. Alias Coverage Rate** | (Resolved Entity Aliases) / (Total Entity Synonyms Extracted) 9 | >90.00% | Run background batch entity extraction and alias table updates.16 |
+| **7. Permission Leakage Rate** | (Chunks retrieved without valid Role match) / (Total Evaluated Retrievals) 8 | 0.00% | Enforce security checks before vector scoring is calculated.8 |
+| **8. Redaction Propagation** | (Derived elements correctly redacting term t) / (Total derived elements from parent D) | 100.00% | Cascade parent redactions instantly using parent-child lineage paths. |
+| **9. Citation Fidelity** | (Generations verified by Cited Source) / (Total Citations Generated) 11 | >98.00% | Block output if cited context lacks semantic warrant for claims.11 |
+| **10. Parse Error Rate** | (Mangled paragraph / layout outputs) / (Total Parsed Pages) 2 | <2.00% | Upgrade parsing pipelines to structure-aware layout engines.2 |
+| **11. OCR/Table Read Accuracy** | (Correctly extracted cells) / (Total cells in evaluation set) 15 | >95.00% | Route documents with multi-row tables to Docling/TableFormer.15 |
+| **12. Stale-Source Rate** | (Active Objects past valid_until date) / (Total Active Ingested Objects) | <0.50% | Trigger automated deprecation workflows; notify content owner. |
+| **13. Conflict Detection Accuracy** | (True Contradictions Identified) / (Total Contradictions in System) 10 | >95.00% | Implement Context-Driven Decomposition (CDD) at query time.12 |
+| **14. Lineage Complete Rate** | (Objects with complete PROV-O trail) / (Total Ingested Objects) 18 | 100.00% | Block ingestion of objects with incomplete activity or agent steps. |
+| **15. Retrieval Eligibility** | (Candidate objects matching active scopes) / (Total Candidate set returned by index) | 100.00% | Reject candidates that violate geographic, version, or tenant scopes. |
 
 ## **Knowledge Hygiene Checklist**
 
@@ -735,18 +753,18 @@ Data preparation sets the quality ceiling for all downstream retrieval and gener
 
 | Hygiene Step | Audit Criteria & Validation Rule | Operational System Trigger | Verification State |
 | :---- | :---- | :---- | :---- |
-| **Parser Validation** | Inspect 20 representative parsing outputs.2 Confirm no multi-column text merges horizontally.15 | Run parser comparison test.2 | \[ \] Pending |
-| **OCR/Table Check** | Verify multi-row table cells map to correct parents.15 | TableFormer structural analysis run.15 | \[ \] Pending |
-| **Encoding Cleanup** | Strip non-printable characters; repair broken UTF-8 bytes. | Regex syntax validation script. | \[ \] Pending |
-| **Boilerplate Removal** | Confirm headers, footers, and side navs are completely removed.2 | Sentence frequency analysis pass.1 | \[ \] Pending |
-| **Metadata Verification** | Enforce non-empty tags for mandatory schema keys.1 | Schema validator engine pass.1 | \[ \] Pending |
-| **Deduplication Pass** | Run exact byte hashing and MinHash duplicate checking.1 | Jaccard threshold evaluation pass.2 | \[ \] Pending |
-| **Alias Resolution** | Confirm entity variants map to stable Canonical IDs.9 | Reconciler LLM check.9 | \[ \] Pending |
-| **Redaction Execution** | Verify PII and credentials are masked or removed.2 | Automated DLP scanner check.13 | \[ \] Pending |
-| **Source Authority** | Verify authority tiers are assigned correctly (As).10 | Connector source authority mapping match.10 | \[ \] Pending |
-| **Version Verification** | Confirm document is marked active and has not expired.14 | Temporal validity window verification check.14 | \[ \] Pending |
-| **Permission Check** | Confirm SharePoint/NTFS ACLs match database parameters.23 | Entra ID query test run.8 | \[ \] Pending |
-| **Citation Registration** | Verify document carries a valid citation format.3 | Schema citation tag check.11 | \[ \] Pending |
+| **Parser Validation** | Inspect 20 representative parsing outputs.2 Confirm no multi-column text merges horizontally.15 | Run parser comparison test.2 | [ ] Pending |
+| **OCR/Table Check** | Verify multi-row table cells map to correct parents.15 | TableFormer structural analysis run.15 | [ ] Pending |
+| **Encoding Cleanup** | Strip non-printable characters; repair broken UTF-8 bytes. | Regex syntax validation script. | [ ] Pending |
+| **Boilerplate Removal** | Confirm headers, footers, and side navs are completely removed.2 | Sentence frequency analysis pass.1 | [ ] Pending |
+| **Metadata Verification** | Enforce non-empty tags for mandatory schema keys.1 | Schema validator engine pass.1 | [ ] Pending |
+| **Deduplication Pass** | Run exact byte hashing and MinHash duplicate checking.1 | Jaccard threshold evaluation pass.2 | [ ] Pending |
+| **Alias Resolution** | Confirm entity variants map to stable Canonical IDs.9 | Reconciler LLM check.9 | [ ] Pending |
+| **Redaction Execution** | Verify PII and credentials are masked or removed.2 | Automated DLP scanner check.13 | [ ] Pending |
+| **Source Authority** | Verify authority tiers are assigned correctly (As).10 | Connector source authority mapping match.10 | [ ] Pending |
+| **Version Verification** | Confirm document is marked active and has not expired.14 | Temporal validity window verification check.14 | [ ] Pending |
+| **Permission Check** | Confirm SharePoint/NTFS ACLs match database parameters.23 | Entra ID query test run.8 | [ ] Pending |
+| **Citation Registration** | Verify document carries a valid citation format.3 | Schema citation tag check.11 | [ ] Pending |
 
 ## **Cross-Canon Handoff Map**
 
@@ -780,35 +798,35 @@ Corpus engineering defines the governed data substrate beneath retrieval mechani
 
 1. Build an unstructured data pipeline for RAG | Databricks on AWS, accessed June 6, 2026, [https://docs.databricks.com/aws/en/generative-ai/tutorials/ai-cookbook/quality-data-pipeline-rag](https://docs.databricks.com/aws/en/generative-ai/tutorials/ai-cookbook/quality-data-pipeline-rag)  
 2. RAG Data Preparation: The Foundation That Makes or Breaks Your AI System | sph.sh, accessed June 6, 2026, [https://sph.sh/en/posts/rag-data-preparation/](https://sph.sh/en/posts/rag-data-preparation/)  
-3. Your tasks: Data provenance \- RDMkit, accessed June 6, 2026, [https://rdmkit.elixir-europe.org/data\_provenance](https://rdmkit.elixir-europe.org/data_provenance)  
-4. Unstructured Data Extraction: Turn Documents into Insights \- LlamaIndex, accessed June 6, 2026, [https://www.llamaindex.ai/blog/unstructured-data-extraction](https://www.llamaindex.ai/blog/unstructured-data-extraction)  
-5. Extract Data From PDF Tables: Row-Level Guide \- LlamaIndex, accessed June 6, 2026, [https://www.llamaindex.ai/blog/extracting-repeating-entities-from-documents](https://www.llamaindex.ai/blog/extracting-repeating-entities-from-documents)  
+3. Your tasks: Data provenance - RDMkit, accessed June 6, 2026, [https://rdmkit.elixir-europe.org/data_provenance](https://rdmkit.elixir-europe.org/data_provenance)  
+4. Unstructured Data Extraction: Turn Documents into Insights - LlamaIndex, accessed June 6, 2026, [https://www.llamaindex.ai/blog/unstructured-data-extraction](https://www.llamaindex.ai/blog/unstructured-data-extraction)  
+5. Extract Data From PDF Tables: Row-Level Guide - LlamaIndex, accessed June 6, 2026, [https://www.llamaindex.ai/blog/extracting-repeating-entities-from-documents](https://www.llamaindex.ai/blog/extracting-repeating-entities-from-documents)  
 6. Introducing ACL Hydration: secure knowledge workflows for agentic ..., accessed June 6, 2026, [https://www.datarobot.com/blog/acl-hydration/](https://www.datarobot.com/blog/acl-hydration/)  
-7. Permissions-Aware Authorization for RAG Pipelines \- Cerbos, accessed June 6, 2026, [https://www.cerbos.dev/features-benefits-and-use-cases/access-control-for-rag](https://www.cerbos.dev/features-benefits-and-use-cases/access-control-for-rag)  
+7. Permissions-Aware Authorization for RAG Pipelines - Cerbos, accessed June 6, 2026, [https://www.cerbos.dev/features-benefits-and-use-cases/access-control-for-rag](https://www.cerbos.dev/features-benefits-and-use-cases/access-control-for-rag)  
 8. Secure RAG: Authorisation-Aware Retrieval and Row-Level Security ..., accessed June 6, 2026, [https://photokheecher.medium.com/secure-rag-authorisation-aware-retrieval-and-row-level-security-c6542500ec21](https://photokheecher.medium.com/secure-rag-authorisation-aware-retrieval-and-row-level-security-c6542500ec21)  
 9. Proxy-Pointer RAG: Solving Entity and Relationship Sprawl in Large ..., accessed June 6, 2026, [https://towardsdatascience.com/proxy-pointer-rag-solving-entity-and-relationship-sprawl-in-large-knowledge-graphs/](https://towardsdatascience.com/proxy-pointer-rag-solving-entity-and-relationship-sprawl-in-large-knowledge-graphs/)  
-10. What's the best way to handle conflicting sources in a RAG system? \- Reddit, accessed June 6, 2026, [https://www.reddit.com/r/Rag/comments/1r6i4m3/whats\_the\_best\_way\_to\_handle\_conflicting\_sources/](https://www.reddit.com/r/Rag/comments/1r6i4m3/whats_the_best_way_to_handle_conflicting_sources/)  
-11. Shuhuai Lin \- CatalyzeX, accessed June 6, 2026, [https://www.catalyzex.com/author/Shuhuai%20Lin](https://www.catalyzex.com/author/Shuhuai%20Lin)  
-12. Does RAG Know When Retrieval Is Wrong? Diagnosing Context Compliance under Knowledge Conflict \- arXiv, accessed June 6, 2026, [https://arxiv.org/html/2605.14473v1](https://arxiv.org/html/2605.14473v1)  
-13. Secure AI Governance & Permission-Aware RAG \- FileOrbis, accessed June 6, 2026, [https://www.fileorbis.com/platform/ai-governance/](https://www.fileorbis.com/platform/ai-governance/)  
-14. DoD 5015.02 Certified Software for Records Management \- ZL Technologies, accessed June 6, 2026, [https://www.zlti.com/regulations/dod-certified-software/](https://www.zlti.com/regulations/dod-certified-software/)  
+10. What's the best way to handle conflicting sources in a RAG system? - Reddit, accessed June 6, 2026, [https://www.reddit.com/r/Rag/comments/1r6i4m3/whats_the_best_way_to_handle_conflicting_sources/](https://www.reddit.com/r/Rag/comments/1r6i4m3/whats_the_best_way_to_handle_conflicting_sources/)  
+11. Shuhuai Lin - CatalyzeX, accessed June 6, 2026, [https://www.catalyzex.com/author/Shuhuai%20Lin](https://www.catalyzex.com/author/Shuhuai%20Lin)  
+12. Does RAG Know When Retrieval Is Wrong? Diagnosing Context Compliance under Knowledge Conflict - arXiv, accessed June 6, 2026, [https://arxiv.org/html/2605.14473v1](https://arxiv.org/html/2605.14473v1)  
+13. Secure AI Governance & Permission-Aware RAG - FileOrbis, accessed June 6, 2026, [https://www.fileorbis.com/platform/ai-governance/](https://www.fileorbis.com/platform/ai-governance/)  
+14. DoD 5015.02 Certified Software for Records Management - ZL Technologies, accessed June 6, 2026, [https://www.zlti.com/regulations/dod-certified-software/](https://www.zlti.com/regulations/dod-certified-software/)  
 15. PDF Data Extraction Benchmark 2025: Comparing Docling ..., accessed June 6, 2026, [https://procycons.com/en/blogs/pdf-data-extraction-benchmark/](https://procycons.com/en/blogs/pdf-data-extraction-benchmark/)  
 16. Entity resolution with Elasticsearch & LLMs, Part 2: Matching entities with LLM judgment and semantic search, accessed June 6, 2026, [https://www.elastic.co/search-labs/blog/elasticsearch-entity-resolution-llm-semantic-search](https://www.elastic.co/search-labs/blog/elasticsearch-entity-resolution-llm-semantic-search)  
-17. Multi-Agent RAG Framework for Entity Resolution: Advancing Beyond Single-LLM Approaches with Specialized Agent Coordination \- ResearchGate, accessed June 6, 2026, [https://www.researchgate.net/publication/398342865\_Multi-Agent\_RAG\_Framework\_for\_Entity\_Resolution\_Advancing\_Beyond\_Single-LLM\_Approaches\_with\_Specialized\_Agent\_Coordination](https://www.researchgate.net/publication/398342865_Multi-Agent_RAG_Framework_for_Entity_Resolution_Advancing_Beyond_Single-LLM_Approaches_with_Specialized_Agent_Coordination)  
-18. PROV \- Metadata Standards Catalog, accessed June 6, 2026, [https://rdamsc.bath.ac.uk/msc/m33](https://rdamsc.bath.ac.uk/msc/m33)  
-19. ProvONE: A PROV Extension Data Model for Scientific Workflow Provenance \- DataONE PURLs, accessed June 6, 2026, [https://purl.dataone.org/provone-v1-dev](https://purl.dataone.org/provone-v1-dev)  
-20. Byte-Exact Deduplication in Retrieval-Augmented Generation: A Three-Regime Empirical Analysis Across Public Benchmarks \- arXiv, accessed June 6, 2026, [https://arxiv.org/html/2605.09611v1](https://arxiv.org/html/2605.09611v1)  
-21. Reducing Redundancy in Retrieval-Augmented Generation through Chunk Filtering \- arXiv, accessed June 6, 2026, [https://arxiv.org/html/2604.24334v1](https://arxiv.org/html/2604.24334v1)  
+17. Multi-Agent RAG Framework for Entity Resolution: Advancing Beyond Single-LLM Approaches with Specialized Agent Coordination - ResearchGate, accessed June 6, 2026, [https://www.researchgate.net/publication/398342865_Multi-Agent_RAG_Framework_for_Entity_Resolution_Advancing_Beyond_Single-LLM_Approaches_with_Specialized_Agent_Coordination](https://www.researchgate.net/publication/398342865_Multi-Agent_RAG_Framework_for_Entity_Resolution_Advancing_Beyond_Single-LLM_Approaches_with_Specialized_Agent_Coordination)  
+18. PROV - Metadata Standards Catalog, accessed June 6, 2026, [https://rdamsc.bath.ac.uk/msc/m33](https://rdamsc.bath.ac.uk/msc/m33)  
+19. ProvONE: A PROV Extension Data Model for Scientific Workflow Provenance - DataONE PURLs, accessed June 6, 2026, [https://purl.dataone.org/provone-v1-dev](https://purl.dataone.org/provone-v1-dev)  
+20. Byte-Exact Deduplication in Retrieval-Augmented Generation: A Three-Regime Empirical Analysis Across Public Benchmarks - arXiv, accessed June 6, 2026, [https://arxiv.org/html/2605.09611v1](https://arxiv.org/html/2605.09611v1)  
+21. Reducing Redundancy in Retrieval-Augmented Generation through Chunk Filtering - arXiv, accessed June 6, 2026, [https://arxiv.org/html/2604.24334v1](https://arxiv.org/html/2604.24334v1)  
 22. Improve MinhashLSH for Deduplication on Large Scale Dataset, accessed June 6, 2026, [https://tech.preferred.jp/en/blog/improve-minhashlsh-for-deduplication-on-large-scale-dataset/](https://tech.preferred.jp/en/blog/improve-minhashlsh-for-deduplication-on-large-scale-dataset/)  
-23. Document-Level Access Control \- Azure AI Search | Microsoft Learn, accessed June 6, 2026, [https://learn.microsoft.com/en-us/azure/search/search-document-level-access-overview](https://learn.microsoft.com/en-us/azure/search/search-document-level-access-overview)  
+23. Document-Level Access Control - Azure AI Search | Microsoft Learn, accessed June 6, 2026, [https://learn.microsoft.com/en-us/azure/search/search-document-level-access-overview](https://learn.microsoft.com/en-us/azure/search/search-document-level-access-overview)  
 24. DoD 8180.01, 5015.02 and DTM-22-001 – Everything You Need to ..., accessed June 6, 2026, [https://www.laserfiche.com/resources/blog/dod-8180-01-5015-02-and-dtm-22-001-everything-you-need-to-know/](https://www.laserfiche.com/resources/blog/dod-8180-01-5015-02-and-dtm-22-001-everything-you-need-to-know/)  
-25. DoDI 5015.02, February 24, 2015, Incorporating Change 1 on August 17, 2017 \- Executive Services Directorate, accessed June 6, 2026, [https://www.esd.whs.mil/portals/54/documents/dd/issuances/dodi/501502p.pdf](https://www.esd.whs.mil/portals/54/documents/dd/issuances/dodi/501502p.pdf)  
-26. Does RAG Know When Retrieval Is Wrong? Diagnosing Context Compliance under Knowledge Conflict \- arXiv, accessed June 6, 2026, [https://arxiv.org/html/2605.14473](https://arxiv.org/html/2605.14473)  
+25. DoDI 5015.02, February 24, 2015, Incorporating Change 1 on August 17, 2017 - Executive Services Directorate, accessed June 6, 2026, [https://www.esd.whs.mil/portals/54/documents/dd/issuances/dodi/501502p.pdf](https://www.esd.whs.mil/portals/54/documents/dd/issuances/dodi/501502p.pdf)  
+26. Does RAG Know When Retrieval Is Wrong? Diagnosing Context Compliance under Knowledge Conflict - arXiv, accessed June 6, 2026, [https://arxiv.org/html/2605.14473](https://arxiv.org/html/2605.14473)  
 27. LlamaParse vs. Unstructured: Which platform delivers better document parsing?, accessed June 6, 2026, [https://www.llamaindex.ai/compare/llamaparse-vs-unstructured](https://www.llamaindex.ai/compare/llamaparse-vs-unstructured)  
 28. Document Parsing Benchmarks: Unstructured vs. the Field, accessed June 6, 2026, [https://unstructured.io/benchmarks](https://unstructured.io/benchmarks)  
-29. Attribution Metadata Standard and Use Case Examples \- Research Data Alliance (RDA), accessed June 6, 2026, [https://www.rd-alliance.org/system/files/RDA%20Attribution%20Metadata%20Standard%20and%20Use%20Cases.pdf](https://www.rd-alliance.org/system/files/RDA%20Attribution%20Metadata%20Standard%20and%20Use%20Cases.pdf)  
-30. Does RAG Know When Retrieval Is Wrong? Diagnosing Context Compliance under Knowledge Conflict \- arXiv, accessed June 6, 2026, [https://arxiv.org/pdf/2605.14473](https://arxiv.org/pdf/2605.14473)  
-31. \[2605.14473\] Does RAG Know When Retrieval Is Wrong? Diagnosing Context Compliance under Knowledge Conflict \- arXiv, accessed June 6, 2026, [https://arxiv.org/abs/2605.14473](https://arxiv.org/abs/2605.14473)
+29. Attribution Metadata Standard and Use Case Examples - Research Data Alliance (RDA), accessed June 6, 2026, [https://www.rd-alliance.org/system/files/RDA%20Attribution%20Metadata%20Standard%20and%20Use%20Cases.pdf](https://www.rd-alliance.org/system/files/RDA%20Attribution%20Metadata%20Standard%20and%20Use%20Cases.pdf)  
+30. Does RAG Know When Retrieval Is Wrong? Diagnosing Context Compliance under Knowledge Conflict - arXiv, accessed June 6, 2026, [https://arxiv.org/pdf/2605.14473](https://arxiv.org/pdf/2605.14473)  
+31. [2605.14473] Does RAG Know When Retrieval Is Wrong? Diagnosing Context Compliance under Knowledge Conflict - arXiv, accessed June 6, 2026, [https://arxiv.org/abs/2605.14473](https://arxiv.org/abs/2605.14473)
 
 ---
 
