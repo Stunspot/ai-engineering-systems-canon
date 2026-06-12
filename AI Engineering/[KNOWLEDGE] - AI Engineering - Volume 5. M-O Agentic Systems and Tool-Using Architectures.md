@@ -10,7 +10,9 @@
 # AI-ENG-M — Agentic Orchestration - Autonomy Boundaries, Loop Budgets & Termination
 
 The transition of artificial intelligence from static generative engines to active organizational actors represents a major paradigm shift in software systems engineering.1 Traditional model serving operates on a request-response pattern characterized by isolated, stateless computations where the surrounding application logic maintains absolute control over execution paths.2 Conversely, agentic systems autonomously synthesize their execution paths at runtime, choosing tools, updating operational state, and modifying plans based on continuous environmental observations.2 This shift transfers system risk from single-call correctness to end-to-end behavioral predictability across temporal, resource-constrained, and non-stationary environments.2  
+
 Agentic orchestration is the bounded control discipline that governs this dynamic behavior.6 Autonomy is not an abstract behavior or a design-free capability; it is a strictly regulated architectural lease of decision rights granted to a model under precise runtime constraints.2 An agent loop can only operate safely within production systems when its execution boundary is explicitly mapped, its resource consumption is metered, and its termination and escalation parameters are deterministically enforced.2  
+
 This report establishes the first-class architectural, operational, and Site Reliability Engineering (SRE) patterns required to design, deploy, and govern high-dimensional agentic loops. It serves as the opening document of **Volume 5: Agentic Systems and Tool-Using Architectures**, inheriting state governance principles from AI-ENG-B, economic cost-attribution structures from AI-ENG-C, artifact lifecycles from AI-ENG-I, and high-availability serving architectures from AI-ENG-L.4
 
 ## **Conceptual Glossary**
@@ -42,8 +44,11 @@ To establish a uniform vocabulary for system engineers, platform teams, and gove
 ## **Doctrinal Foundation and Canon Continuity**
 
 The governance of autonomous models requires translating abstract capabilities into concrete systems constraints.2 This report operates under the core systems engineering principle:  
+
 Autonomy must be bounded by state, scope, tools, budgets, checks, and termination. An agent loop is safe only when the system knows what it is trying to accomplish, what it may observe, what it may change, how much it may spend, when it must stop, and when it must escalate.2  
+
 The central architecture question shifts from *"How do we make the system agentic?"* to *"What decisions may the model make, under which constraints, for how many steps, using which tools, with what state, until which stopping condition, and under what review or escalation policy?"*.2  
+
 This document builds directly upon the foundational engineering practices established in previous volumes of the Canon:
 
 * **AI-ENG-B (Context State Governance):** Inherits the context-tenure doctrine, establishing that agent context is a governed resource with explicit tenure, authority, and temporal validity.4  
@@ -71,24 +76,26 @@ Unnecessary system autonomy is a critical driver of latency, financial waste, an
 
 The Autonomy Boundary Model defines the operational limits of what a model can observe, decide, execute, or change at runtime.2 Autonomy is an adjustable dial that must be dynamically calibrated based on the underlying task risk, the sensitivity of the data, and the presence of human oversight.6
 
+```
 ┌────────────────────────────────────────────────────────────────────────┐  
 │                        AUTONOMY BOUNDARY TIER                          │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│                                       │  
-│  \- Network sandboxes, IAM token validation, gateway rate-limiting      │  
+│                                                                        │  
+│  - Network sandboxes, IAM token validation, gateway rate-limiting      │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│  \[ Asynchronous Human Audit Queues \]                                   │  
-│  \- Post-action verification, log audits, compliance signatures         │  
+│  [ Asynchronous Human Audit Queues ]                                   │  
+│  - Post-action verification, log audits, compliance signatures         │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│  \[ User / Operator Confirmation Gates \]                                │  
-│  \- Active approval buttons, budget releases, path validation checks    │  
+│  [ User / Operator Confirmation Gates ]                                │  
+│  - Active approval buttons, budget releases, path validation checks    │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│                                │  
-│  \- Immutable schema validators, parameter boundary checkers, ACLs      │  
+│                                                                        │  
+│  - Immutable schema validators, parameter boundary checkers, ACLs      │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│                                       │  
-│  \- Dynamic step selection, sub-query generation, argument proposals    │  
+│                                                                        │  
+│  - Dynamic step selection, sub-query generation, argument proposals    │  
 └────────────────────────────────────────────────────────────────────────┘
+```
 
 The specific authority boundaries across different system layers are modeled as follows:
 
@@ -116,39 +123,41 @@ The life cycle of an orchestrator run is structured around an iterative control 
 
 | Phase | Operational Objective | Input Dependencies | Grounding & Safety Validation | Downstream Handoff |
 | :---- | :---- | :---- | :---- | :---- |
-| **1\. Goal Intake** | Capture user prompt and validate intent.4 | User query string; request headers. | Reject injections and evaluate semantic compliance. | Target goal object.4 |
-| **2\. Scope Resolution** | Resolve user role, tenant permissions, and limits.1 | Tenant directory; IAM directory. | Restrict access bounds to active user credentials.1 | Session Security Token. |
-| **3\. Policy Check** | Verify goal alignment with organizational safety policies. | Global enterprise compliance rules.12 | Reject requests violating active safety constraints. | Safety Clear Code. |
-| **4\. State Init** | Instantiate task state tracking objects.4 | Goal object; Security Token. | Initialize tracking tables using immutable data patterns.13 | Active Task State.13 |
-| **5\. Plan Selection** | Generate initial execution plan steps.4 | Goal; allowed tool list. | Validate plan steps against allowed capabilities.6 | Initial Executable Plan.1 |
-| **6\. Budget Assign** | Allocate loop, token, and monetary cost budgets.8 | Tenant quotas; task risk profile. | Map deterministic ceilings to the task run.7 | Budget Tracking Token.8 |
-| **7\. Tool Eligibility** | Verify tool registration and active user permissions.6 | Tool registry; active Plan Step. | Intercept and block unauthorized tool calls.11 | Authorized Tool List.11 |
-| **8\. Action Selection** | Select tool and populate parameter arguments.4 | Plan step; context history.4 | Match generated arguments against target tool schemas.5 | Proposed Action Event.5 |
-| **9\. Tool Invocation** | Execute the tool call and capture raw payload.4 | Proposed Action; system secrets.11 | Enforce execution timeouts and catch runtime errors.4 | Raw Tool Output Payload.5 |
-| **10\. Obs Grounding** | Ingest tool outputs and verify factual grounding.4 | Raw Tool Payload; system state. | Reject model-hallucinated or assumed tool outcomes.5 | Grounded Observation.5 |
-| **11\. State Update** | Commit observation to the task state.4 | Grounded Observation; Active State.13 | Commit updates to the versioned state database.13 | Updated Task State.13 |
-| **12\. Validation Check** | Evaluate step quality against acceptance criteria.5 | Updated Task State; criteria list.7 | Score outputs for compliance and semantic accuracy.5 | Validation Score Card.5 |
-| **13\. Reflection Trigger** | Diagnose failures and trigger corrections if needed.7 | Validation Score Card; state logs. | Limit repair attempts to prevent looping.7 | Diagnostic Repair Plan.7 |
-| **14\. Termination Check** | Evaluate stopping and completion criteria.7 | Active Task State; Budget Status.8 | Match progress against termination conditions.7 | Stop / Continue Code. |
-| **15\. Escalation Check** | Pause loop and escalate to supervisor if triggered.5 | Validation failures; budget alarms. | Verify if state warrants immediate human review.5 | Escalation Event Payload.6 |
-| **16\. Final Response** | Compile, format, and return final output. | Validated Task State; target goal. | Ensure output is grounded in recorded observations.1 | Verified User Response.1 |
-| **17\. Memory Write** | Update long-term memory via write gates.3 | Run Trace; current Memory DB.1 | Filter out transient failures and assumptions.3 | Promoted Memory Block.3 |
-| **18\. Trace Logging** | Archive the complete execution trace for audits.1 | Versioned Task State; metric logs. | Write immutable execution records to disk.1 | Audit Trace Archive.1 |
+| **1. Goal Intake** | Capture user prompt and validate intent.4 | User query string; request headers. | Reject injections and evaluate semantic compliance. | Target goal object.4 |
+| **2. Scope Resolution** | Resolve user role, tenant permissions, and limits.1 | Tenant directory; IAM directory. | Restrict access bounds to active user credentials.1 | Session Security Token. |
+| **3. Policy Check** | Verify goal alignment with organizational safety policies. | Global enterprise compliance rules.12 | Reject requests violating active safety constraints. | Safety Clear Code. |
+| **4. State Init** | Instantiate task state tracking objects.4 | Goal object; Security Token. | Initialize tracking tables using immutable data patterns.13 | Active Task State.13 |
+| **5. Plan Selection** | Generate initial execution plan steps.4 | Goal; allowed tool list. | Validate plan steps against allowed capabilities.6 | Initial Executable Plan.1 |
+| **6. Budget Assign** | Allocate loop, token, and monetary cost budgets.8 | Tenant quotas; task risk profile. | Map deterministic ceilings to the task run.7 | Budget Tracking Token.8 |
+| **7. Tool Eligibility** | Verify tool registration and active user permissions.6 | Tool registry; active Plan Step. | Intercept and block unauthorized tool calls.11 | Authorized Tool List.11 |
+| **8. Action Selection** | Select tool and populate parameter arguments.4 | Plan step; context history.4 | Match generated arguments against target tool schemas.5 | Proposed Action Event.5 |
+| **9. Tool Invocation** | Execute the tool call and capture raw payload.4 | Proposed Action; system secrets.11 | Enforce execution timeouts and catch runtime errors.4 | Raw Tool Output Payload.5 |
+| **10. Obs Grounding** | Ingest tool outputs and verify factual grounding.4 | Raw Tool Payload; system state. | Reject model-hallucinated or assumed tool outcomes.5 | Grounded Observation.5 |
+| **11. State Update** | Commit observation to the task state.4 | Grounded Observation; Active State.13 | Commit updates to the versioned state database.13 | Updated Task State.13 |
+| **12. Validation Check** | Evaluate step quality against acceptance criteria.5 | Updated Task State; criteria list.7 | Score outputs for compliance and semantic accuracy.5 | Validation Score Card.5 |
+| **13. Reflection Trigger** | Diagnose failures and trigger corrections if needed.7 | Validation Score Card; state logs. | Limit repair attempts to prevent looping.7 | Diagnostic Repair Plan.7 |
+| **14. Termination Check** | Evaluate stopping and completion criteria.7 | Active Task State; Budget Status.8 | Match progress against termination conditions.7 | Stop / Continue Code. |
+| **15. Escalation Check** | Pause loop and escalate to supervisor if triggered.5 | Validation failures; budget alarms. | Verify if state warrants immediate human review.5 | Escalation Event Payload.6 |
+| **16. Final Response** | Compile, format, and return final output. | Validated Task State; target goal. | Ensure output is grounded in recorded observations.1 | Verified User Response.1 |
+| **17. Memory Write** | Update long-term memory via write gates.3 | Run Trace; current Memory DB.1 | Filter out transient failures and assumptions.3 | Promoted Memory Block.3 |
+| **18. Trace Logging** | Archive the complete execution trace for audits.1 | Versioned Task State; metric logs. | Write immutable execution records to disk.1 | Audit Trace Archive.1 |
 
 ### **Observation Grounding: Intended, Attempted, Observed, Verified, and Assumed Results**
 
 At the orchestration level, observation grounding is a vital guard against state contamination.5 A failure occurs when an agent treats its *intended* or *attempted* actions as *assumed* realities without waiting for the physical tool execution to return a response.5 The orchestrator must implement strict state boundaries separating execution phases:
 
-  \- Model drafts a tool call (e.g., write database record)  
+```
+  - Model drafts a tool call (e.g., write database record)  
      │  
      ▼  
- \- Orchestrator sends request to the target API endpoint  
+ - Orchestrator sends request to the target API endpoint  
      │  
      ▼  
-  \- System parses raw bytes returned from the endpoint  
+  - System parses raw bytes returned from the endpoint  
      │  
      ▼  
-  \- Validator checks if the record was successfully written
+  - Validator checks if the record was successfully written
+```
 
 The task state must only be updated using *verified* results.4 If a tool call fails, timeout errors, connection exceptions, or empty payloads must be recorded as-is.5 The model is strictly prohibited from bypassing this return parsing and assuming successful execution.5
 
@@ -165,7 +174,7 @@ Dynamic planning is valuable for complex tasks with many dependencies but can in
 | **Plan Abandonment** | Halt execution if assumptions are invalidated.7 | Compare task cost to remaining budget.8 | Stop execution and prompt the user for clarification.7 |
 | **Subtask Creation** | Break complex goals into smaller subtasks.4 | Track subtask dependencies using DAG structures.4 | Require clear completion criteria for every subtask.7 |
 | **Dependency Tracking** | Track prerequisite steps and outputs.4 | Block child steps from running until parents finish.4 | Keep a dependency map in the structured task state.4 |
-| **Recursive Depth** | Limit nested child task creation.18 | Restrict the depth of subtasks (D \<= 2).18 | Reject subtask creation if depth limits are violated.18 |
+| **Recursive Depth** | Limit nested child task creation.18 | Restrict the depth of subtasks (D <= 2).18 | Reject subtask creation if depth limits are violated.18 |
 
 ## **The Reflection Trigger Model**
 
@@ -183,6 +192,7 @@ Reflection must be used as a targeted diagnostic tool, not an automatic step app
 
 Open-ended loops are powerful but introduce high variance and unconstrained execution risk.2 To ensure enterprise-grade reliability, autonomy must be structured within the rigid skeleton of a compiled state machine or workflow graph.6
 
+```
                      ┌──────────────────────────────┐  
                      │          Goal Intake         │  
                      └──────────────┬───────────────┘  
@@ -236,37 +246,40 @@ Open-ended loops are powerful but introduce high variance and unconstrained exec
 ┌────────────────────────┐                     ┌────────────────────────┐  
 │     Ask User Node      │                     │     Terminate Node     │  
 └────────────────────────┘                     └────────────────────────┘
+```
 
 The specific graph components are modeled as follows:
 
 | Graph Component | System Role / Node Mapping | Allowable Transitions (Edges) | Guard Conditions |
 | :---- | :---- | :---- | :---- |
-| **Goal Classify** | Determine intent and assign to worker agent.6 | Classify \-\> Scope.6 | User query must be successfully parsed. |
-| **Scope Resolution** | Set resource and security parameters.1 | Scope \-\> Plan.1 | Active user session token must be valid.6 |
-| **Plan Task** | Draft step sequence for execution.4 | Plan \-\> Retrieve.14 | Step count must be within initial limits.7 |
-| **Retrieve Context** | Pull relevant vector knowledge to state.1 | Retrieve \-\> Call Tool.1 | Context window usage must be under 80%.7 |
-| **Call Tool** | Dispatch request to target API.4 | Call Tool \-\> Observe.5 | Tool must match active user permissions.6 |
-| **Observe Result** | Capture raw payload returned by the tool.4 | Observe \-\> Validate.5 | Tool response must be parsed and recorded.5 |
-| **Validate Node** | Verify outcomes against criteria.5 | Validate \-\> Finalize (if valid); Validate \-\> Repair (if invalid).5 | Evaluator must confirm factual grounding.5 |
-| **Repair Node** | Execute local code or query fixes.5 | Repair \-\> Reflect.5 | Cumulative step cost must be under limits.8 |
-| **Reflect Node** | Diagnose step errors to correct plan.7 | Reflect \-\> Plan.12 | Reflection loop count must be \<= 2\.7 |
-| **Ask User** | Prompt operator for inputs.7 | Ask User \-\> Plan.7 | System must suspend execution until input is provided. |
-| **Escalate Node** | Route state to human supervisor.5 | Escalate \-\> Human Review.6 | Triggered on policy violations or budget alarms.8 |
-| **Finalize Node** | Compile complete task outputs.13 | Finalize \-\> Terminate.13 | Validator must verify final outputs.7 |
+| **Goal Classify** | Determine intent and assign to worker agent.6 | Classify -> Scope.6 | User query must be successfully parsed. |
+| **Scope Resolution** | Set resource and security parameters.1 | Scope -> Plan.1 | Active user session token must be valid.6 |
+| **Plan Task** | Draft step sequence for execution.4 | Plan -> Retrieve.14 | Step count must be within initial limits.7 |
+| **Retrieve Context** | Pull relevant vector knowledge to state.1 | Retrieve -> Call Tool.1 | Context window usage must be under 80%.7 |
+| **Call Tool** | Dispatch request to target API.4 | Call Tool -> Observe.5 | Tool must match active user permissions.6 |
+| **Observe Result** | Capture raw payload returned by the tool.4 | Observe -> Validate.5 | Tool response must be parsed and recorded.5 |
+| **Validate Node** | Verify outcomes against criteria.5 | Validate -> Finalize (if valid); Validate -> Repair (if invalid).5 | Evaluator must confirm factual grounding.5 |
+| **Repair Node** | Execute local code or query fixes.5 | Repair -> Reflect.5 | Cumulative step cost must be under limits.8 |
+| **Reflect Node** | Diagnose step errors to correct plan.7 | Reflect -> Plan.12 | Reflection loop count must be <= 2.7 |
+| **Ask User** | Prompt operator for inputs.7 | Ask User -> Plan.7 | System must suspend execution until input is provided. |
+| **Escalate Node** | Route state to human supervisor.5 | Escalate -> Human Review.6 | Triggered on policy violations or budget alarms.8 |
+| **Finalize Node** | Compile complete task outputs.13 | Finalize -> Terminate.13 | Validator must verify final outputs.7 |
 | **Terminate Node** | Close run, write logs, release resources.4 | End of execution path.13 | Active process state is cleaned up.13 |
 
 ### **Graph Compilation and State Transitions**
 
 Before execution, the graph layout is compiled and validated to detect circular dependencies, unresolvable nodes, or deadlocks.13 Once compiled, the graph structure is immutable; the model cannot dynamically inject new states or rewrite transition rules during runtime.13
 
+```
 ┌────────────────────────────────────────────────────────┐  
 │             GRAPH COMPILATION CHECKPOINT               │  
 ├────────────────────────────────────────────────────────┤  
-│  1\. Check for circular loops without exit nodes        │  
-│  2\. Verify all edge transitions are mapped to guards    │  
-│  3\. Confirm every node has an assigned budget gate     │  
-│  4\. Ensure terminal nodes are unreachable from halts   │  
+│  1. Check for circular loops without exit nodes        │  
+│  2. Verify all edge transitions are mapped to guards   │  
+│  3. Confirm every node has an assigned budget gate     │  
+│  4. Ensure terminal nodes are unreachable from halts   │  
 └────────────────────────────────────────────────────────┘
+```
 
 At each transition, state is saved to a persistent, versioned database (such as PostgreSQL or Redis).13 This design isolates failures, prevents race conditions, and allows long-running or interrupted workflows to recover exactly where they stalled without losing context.4  
 Several common multi-agent topology patterns present distinct operational characteristics:
@@ -280,15 +293,15 @@ Several common multi-agent topology patterns present distinct operational charac
 Operational budget enforcement is the single most critical line of defense against runaway agentic behavior.8 Real-world incidents demonstrate that unconstrained agentic loops can enter high-frequency retry cycles when encountering minor API failures, generating tens of thousands of dollars in model invoice costs in a matter of hours.8  
 The orchestrator must implement a formal Loop Budget Framework that treats budget metrics as active control signals rather than post-hoc reports.8  
 Let an agent A operate on a task T within an environment E.8 The total computational budget B allocated to the run is defined as:  
-B \= B\_internal \+ B\_external  
-where B\_internal is the internal cognitive budget consumed by model inference (measured in input and output tokens), and B\_external is the external execution budget consumed by environmental actions (measured in tool executions, database transactions, or monetary cost).8  
-The remaining budget R\_t at any discrete execution step t is formulated as:  
-R\_t \= B \- sum(C\_i for i \= 1 to t)  
-where C\_i represents the verified cost incurred at step i.8  
+B = B_internal + B_external  
+where B_internal is the internal cognitive budget consumed by model inference (measured in input and output tokens), and B_external is the external execution budget consumed by environmental actions (measured in tool executions, database transactions, or monetary cost).8  
+The remaining budget R_t at any discrete execution step t is formulated as:  
+R_t = B - sum(C_i for i = 1 to t)  
+where C_i represents the verified cost incurred at step i.8  
 To prevent agents from spending resources on hopeless execution trajectories, the orchestrator should run a Progressive Interval Estimation (PIE) protocol.8 At each step t of the execution plan, the system queries the agent (or a specialized budget-estimator model) to predict a confidence-aware interval representing the lower (L) and upper (U) bounds of remaining cost-to-completion 8:  
-PIE\_t \= \[L\_t, U\_t\]  
-The orchestrator triggers a priority alert and initiates early termination (A\_t \= 1\) the moment the remaining budget is lower than the projected lower bound of completion cost 8:  
-A\_t \= 1 if R\_t \< L\_t  
+PIE_t = [L_t, U_t]  
+The orchestrator triggers a priority alert and initiates early termination (A_t = 1) the moment the remaining budget is lower than the projected lower bound of completion cost 8:  
+A_t = 1 if R_t < L_t  
 This proactive halting mechanism saves between 28% and 64% of total token and execution expenditures on failed trajectories.8  
 Every agentic loop must be subjected to a multi-tiered budget cap matrix, with default thresholds adapted to the task risk profile:
 
@@ -311,17 +324,19 @@ To enforce these budgets at the systems level, SREs must configure the serving g
 
 Uncontrolled state growth is a primary driver of agentic degradation.7 As an agent loop executes, the accumulation of raw tool outputs, intermediate planning drafts, and validation critiques causes context bloat.7 This context accumulation degrades the model's performance, increases latency, and elevates the risk of retrieval-related omissions. Systems must implement a rigorous state governance model that separates and manages memory along strict lines of tenure and authority.
 
+```
 ┌────────────────────────────────────────────────────────────────────────┐  
 │                       STATE GOVERNANCE PLATFORM                        │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│                     │  
-│  \- Temporal working memory      \- Machine-readable tracking table      │  
-│  \- Discarded on step change     \- Persists over entire active run      │  
+│                                                                        │  
+│  - Temporal working memory      - Machine-readable tracking table      │  
+│  - Discarded on step change     - Persists over entire active run      │  
 ├─────────────────────────────────┴──────────────────────────────────────┤  
-│  \[ Persistent Memory \]                                 │  
-│  \- Promoted via write gates     \- Immutable execution record           │  
-│  \- Long-term storage (DB)       \- Read-only; SRE / Auditor access      │  
+│  [ Persistent Memory ]                                                 │  
+│  - Promoted via write gates     - Immutable execution record           │  
+│  - Long-term storage (DB)       - Read-only; SRE / Auditor access      │  
 └────────────────────────────────────────────────────────────────────────┘
+```
 
 The specific properties of each state component are defined as follows:
 
@@ -343,26 +358,27 @@ State contamination occurs when an agent references stale observations or unveri
 
 The orchestrator, not the model, is the ultimate authority governing tool dispatch.6 To prevent tool overreach and uncontrolled executions, the system must apply a rigorous selection and validation policy.11
 
+```
 ┌────────────────────────────────────────────────────────────────────────┐  
 │                        TOOL SELECTION PLATFORM                         │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│                          1\. Model Suggestion                           │  
-│     \- Model requests tool call with parameter arguments                │  
+│                          1. Model Suggestion                           │  
+│     - Model requests tool call with parameter arguments                │  
 └───────────────────────────────────┬────────────────────────────────────┘  
                                     ▼  
 ┌────────────────────────────────────────────────────────────────────────┐  
-│                        2\. Schema Serialization                         │  
-│     \- Validates types, ranges, and structures of parameters            │  
+│                        2. Schema Serialization                         │  
+│     - Validates types, ranges, and structures of parameters            │  
 └───────────────────────────────────┬────────────────────────────────────┘  
                                     ▼  
 ┌────────────────────────────────────────────────────────────────────────┐  
-│                         3\. Security Validation                         │  
-│     \- Verifies session tokens, user boundaries, and sanitizes strings  │  
+│                         3. Security Validation                         │  
+│     - Verifies session tokens, user boundaries, and sanitizes strings  │  
 └───────────────────────────────────┬────────────────────────────────────┘  
                                     ▼  
 ┌────────────────────────────────────────────────────────────────────────┐  
-│                          4\. Policy Interceptor                         │  
-│     \- Evaluates write-safety and budget checks                         │  
+│                          4. Policy Interceptor                         │  
+│     - Evaluates write-safety and budget checks                         │  
 └───────────────────────────────────┬────────────────────────────────────┘  
                                     ▼  
                             ┌───────┴───────┐  
@@ -372,8 +388,9 @@ The orchestrator, not the model, is the ultimate authority governing tool dispat
                  ▼          └───────────────┘          ▼  
 ┌─────────────────────────────┐            ┌─────────────────────────────┐  
 │       TOOL DISPATCH         │            │      BLOCK & RETRY/HALT     │  
-│  \- System executes action   │            │  \- Drops request immediately│  
+│  - System executes action   │            │  - Drops request immediately│  
 └─────────────────────────────┘            └─────────────────────────────┘
+```
 
 The system evaluates the eligibility of a tool using several criteria:
 
@@ -401,38 +418,40 @@ Every agentic workflow must explicitly configure and monitor conditions across a
 | Termination Code | System Classification | Underlying Root Cause / Trigger | Required Orchestrator Action |
 | :---- | :---- | :---- | :---- |
 | **SUCCESS** | Normal | Output meets all validation and safety criteria.7 | Closes task state, writes trace logs, and returns output.4 |
-| **PARTIAL\_SUCCESS** | Graceful Degradation | Primary goal achieved, but secondary actions timed out.5 | Compiles completed steps and returns partial output.11 |
+| **PARTIAL_SUCCESS** | Graceful Degradation | Primary goal achieved, but secondary actions timed out.5 | Compiles completed steps and returns partial output.11 |
 | **IMPOSSIBLE** | Explicit Handback | Model determines required input fields are missing.7 | Stops execution and prompts user for missing inputs.7 |
-| **BUDGET\_EXHAUSTED** | System Intercept | Accumulated run costs exceed step or monetary caps.7 | Terminates active execution threads and logs budget breach.5 |
+| **BUDGET_EXHAUSTED** | System Intercept | Accumulated run costs exceed step or monetary caps.7 | Terminates active execution threads and logs budget breach.5 |
 | **TIMEOUT** | System Intercept | Execution duration exceeds wall-clock bounds.4 | Drops container execution and alerts active SRE teams.4 |
-| **UNSAFE\_DETECTION** | Safety Guard | Content scanner flags injection or policy violation. | Halts execution, blocks the session, and triggers security alarm. |
-| **MISSING\_INFO** | Explicit Handback | System detects missing parameters during planning.7 | Switches node to Ask User state and awaits input.7 |
-| **AMBIGUOUS\_INTENT** | Explicit Handback | User query maps to multiple conflicting plans.7 | Stops execution and requests plan verification.1 |
-| **LOW\_CONFIDENCE** | Quality Scorer Halt | Verification score drops below safety threshold.5 | Suspends task state and routes to supervisor queue.22 |
-| **REPEATED\_FAILURE** | Resilience Failure | Tool calls return exceptions after maximum retries.5 | Trips the circuit breaker and triggers escalation.5 |
-| **SOURCE\_CONFLICT** | Validation Scorer Halt | Retrieved document facts directly contradict. | Freezes progress and logs the discrepancy for review.5 |
-| **VALIDATION\_FAIL** | Quality Scorer Halt | Output fails format or schema compliance checks.5 | Runs 1 repair pass; escalates if failure persists.5 |
-| **PERMISSION\_DENIED** | Security Guard | Model attempts to access an unauthorized tool.24 | Blocks the active run and registers a security ticket.24 |
-| **UNAVAILABLE\_DEP** | System Intercept | Vital external API endpoint is offline.5 | Switches system to degraded mode using static fallbacks.5 |
-| **CONFIRM\_REQUIRED** | Human-in-the-Loop | Model proposes executing a write-capable tool.6 | Suspends execution and presents parameters to operator.4 |
-| **REVIEW\_REQUIRED** | Human-in-the-Loop | Task outcome falls under compliance auditing.22 | Routes final plan and outputs to asynchronous audit queue.22 |
-| **USER\_CANCEL** | Explicit Handback | Operator manually aborts the execution run.7 | Halts container and archives the execution history.4 |
+| **UNSAFE_DETECTION** | Safety Guard | Content scanner flags injection or policy violation. | Halts execution, blocks the session, and triggers security alarm. |
+| **MISSING_INFO** | Explicit Handback | System detects missing parameters during planning.7 | Switches node to Ask User state and awaits input.7 |
+| **AMBIGUOUS_INTENT** | Explicit Handback | User query maps to multiple conflicting plans.7 | Stops execution and requests plan verification.1 |
+| **LOW_CONFIDENCE** | Quality Scorer Halt | Verification score drops below safety threshold.5 | Suspends task state and routes to supervisor queue.22 |
+| **REPEATED_FAILURE** | Resilience Failure | Tool calls return exceptions after maximum retries.5 | Trips the circuit breaker and triggers escalation.5 |
+| **SOURCE_CONFLICT** | Validation Scorer Halt | Retrieved document facts directly contradict. | Freezes progress and logs the discrepancy for review.5 |
+| **VALIDATION_FAIL** | Quality Scorer Halt | Output fails format or schema compliance checks.5 | Runs 1 repair pass; escalates if failure persists.5 |
+| **PERMISSION_DENIED** | Security Guard | Model attempts to access an unauthorized tool.24 | Blocks the active run and registers a security ticket.24 |
+| **UNAVAILABLE_DEP** | System Intercept | Vital external API endpoint is offline.5 | Switches system to degraded mode using static fallbacks.5 |
+| **CONFIRM_REQUIRED** | Human-in-the-Loop | Model proposes executing a write-capable tool.6 | Suspends execution and presents parameters to operator.4 |
+| **REVIEW_REQUIRED** | Human-in-the-Loop | Task outcome falls under compliance auditing.22 | Routes final plan and outputs to asynchronous audit queue.22 |
+| **USER_CANCEL** | Explicit Handback | Operator manually aborts the execution run.7 | Halts container and archives the execution history.4 |
 
 When these termination parameters are triggered, or when high-risk operations are requested, the orchestrator maps the current state to the appropriate remediation path using an Escalation Trigger Matrix:
 
+```
                           ┌────────────────────────┐  
                           │    TRIGGER DETECTED    │  
                           └───────────┬────────────┘  
                                       │  
             ┌─────────────────────────┼─────────────────────────┐  
             ▼                         ▼                         ▼  
-          \[ Human Intervention \]      
+          [ Human Intervention ]      
 ┌────────────────────────┐┌────────────────────────┐┌────────────────────────┐  
 │    FAIL-CLOSED STOP    ││    HUMAN-IN-THE-LOOP   ││   DEGRADED ROADMAPPING │  
-│  \- High-risk security  ││  \- Plan confirmation   ││  \- Temporary system    │  
+│  - High-risk security  ││  - Plan confirmation   ││  - Temporary system    │  
 │    violation or cost   ││    or missing inputs   ││    timeout or service  │  
 │    cap blowout         ││    requested           ││    outage detected     │  
 └────────────────────────┘└────────────────────────┘└────────────────────────┘
+```
 
 The specific escalation triggers are mapped to their corresponding system actions:
 
@@ -460,8 +479,8 @@ Agentic architectures introduce emergent system-level failure surfaces that do n
 | **Hallucinated Obs** | Model claims tool ran and succeeded.3 | Model bypasses return parsers to output answers.5 | Tool registry reports zero actual invocations.5 | Halt active loop and trigger quality score failure. | Enforce schema parsing on returned payloads.5 |
 | **Premature Term** | Loop halts before completing the goal.7 | Broad or missing plan validation checks.7 | Validation node returns false after stop command.7 | Return status to active and resume execution steps.7 | Require verified physical evidence before termination.7 |
 | **Refusal to Stop** | Loop continues despite goal validation.7 | Over-reflection loops ignore success states.7 | Step counter exceeds initial plan bounds.11 | Force state change to final and return response.11 | Build independent validation nodes into the graph.7 |
-| **Over-Reflection** | High token spend on minor formatting checks.7 | Prompts force continuous self-criticism passes.7 | High token consumption with zero state changes.7 | Skip reflection and continue to next plan step.7 | Limit sequential reflection steps to \<= 2 passes.7 |
-| **Redundant Decomp** | Model breaks tasks into duplicate subtasks.18 | Weak plan tracking; missing dependency trees.18 | Identical subtask signatures in the active plan.18 | Consolidate tasks and clear duplicate plan entries. | Restrict recursive task decomposition depth to D \<= 2\.18 |
+| **Over-Reflection** | High token spend on minor formatting checks.7 | Prompts force continuous self-criticism passes.7 | High token consumption with zero state changes.7 | Skip reflection and continue to next plan step.7 | Limit sequential reflection steps to <= 2 passes.7 |
+| **Redundant Decomp** | Model breaks tasks into duplicate subtasks.18 | Weak plan tracking; missing dependency trees.18 | Identical subtask signatures in the active plan.18 | Consolidate tasks and clear duplicate plan entries. | Restrict recursive task decomposition depth to D <= 2.18 |
 | **Duplicate Actions** | Identical API requests sent to target.18 | Parsing errors; missing transaction locks.5 | High-frequency matching API call signatures.18 | Block API requests and run recovery logic.5 | Enforce client-side transaction locks on dispatches.5 |
 | **Budget Blowout** | Invoice spikes over a short duration.8 | Unconstrained loops run without active caps.8 | Monetary cost exceeds target threshold.8 | Kill active execution and revoke tenant access.18 | Enforce loop and token budget controls on runs.8 |
 | **Stale State** | Model plans based on outdated observations.3 | Missing cache invalidation; state update gaps.6 | Active state timestamps lag tool executions.5 | Invalidate active state caches and rerun lookups.5 | Implement state tenure rules and validation steps.6 |
@@ -476,23 +495,23 @@ To support comprehensive auditing, every run must compile an immutable Agent Run
 
 | Target Metric | Measurement Unit | Ideal Target Score | Evaluation Collection Method |
 | :---- | :---- | :---- | :---- |
-| **Task Success Rate** | Percentage | \>= 98.0%.5 | Offline regression testing on golden validation sets.12 |
-| **Trajectory Quality** | Path variance score | \<= 1.15 variance. | Compute path alignment against reference paths. |
+| **Task Success Rate** | Percentage | >= 98.0%.5 | Offline regression testing on golden validation sets.12 |
+| **Trajectory Quality** | Path variance score | <= 1.15 variance. | Compute path alignment against reference paths. |
 | **Correct Termination** | Match accuracy | 100% accuracy.7 | Verify runs halt with correct catalog status codes.7 |
-| **Escalation Accuracy** | Precision/Recall | \>= 95.0% precision.5 | Inject validation anomalies to test human routes.5 |
-| **Step Count Efficiency** | Average integer count | \<= 8 steps per task. | Monitor telemetry logs for average steps completed.3 |
-| **Loop Depth Limit** | Integer count | Max depth \<= 2\.18 | Track parent-child spawning limits in tracing logs.18 |
-| **Tool-Call Count** | Average integer count | \<= 12 calls per task. | Monitor api gateway logs for invocation counts.12 |
-| **Failed Tool Calls** | Count per session | \<= 1 call per session.5 | Track returned exceptions and 4xx/5xx API codes.5 |
-| **Retry Count Rate** | Percentage | \<= 5.0% of dispatches. | Track total retries vs first-time tool successes.5 |
-| **Timeout Rate** | Percentage | \<= 1.0% of runs.5 | Monitor SRE runtime alerts for wall-clock drops.4 |
+| **Escalation Accuracy** | Precision/Recall | >= 95.0% precision.5 | Inject validation anomalies to test human routes.5 |
+| **Step Count Efficiency** | Average integer count | <= 8 steps per task. | Monitor telemetry logs for average steps completed.3 |
+| **Loop Depth Limit** | Integer count | Max depth <= 2.18 | Track parent-child spawning limits in tracing logs.18 |
+| **Tool-Call Count** | Average integer count | <= 12 calls per task. | Monitor api gateway logs for invocation counts.12 |
+| **Failed Tool Calls** | Count per session | <= 1 call per session.5 | Track returned exceptions and 4xx/5xx API codes.5 |
+| **Retry Count Rate** | Percentage | <= 5.0% of dispatches. | Track total retries vs first-time tool successes.5 |
+| **Timeout Rate** | Percentage | <= 1.0% of runs.5 | Monitor SRE runtime alerts for wall-clock drops.4 |
 | **Budget Adherence** | Percentage | 100% adherence.8 | Track budget overrun exceptions at the gateway level.8 |
 | **Cost per Success** | Monetary USD | Within plan budget.8 | Compare average successful cost vs total project margins.8 |
-| **System Latency** | Milliseconds | \<= 15,000 ms (p95).21 | Track overall time-to-first-token and task finish.21 |
-| **Repair Success Rate** | Percentage | \>= 90.0% recovery.5 | Track runs that complete after executing repair states.5 |
+| **System Latency** | Milliseconds | <= 15,000 ms (p95).21 | Track overall time-to-first-token and task finish.21 |
+| **Repair Success Rate** | Percentage | >= 90.0% recovery.5 | Track runs that complete after executing repair states.5 |
 | **Memory Write Quality** | Grounding score | 100% grounding.3 | Verify memory blocks are supported by observations.3 |
-| **Human Override Rate** | Percentage | \<= 2.0% of approvals. | Track operator rejection rates in review queues.6 |
-| **User Correction Rate** | Percentage | \<= 5.0% of sessions. | Monitor session context for user revision loops.7 |
+| **Human Override Rate** | Percentage | <= 2.0% of approvals. | Track operator rejection rates in review queues.6 |
+| **User Correction Rate** | Percentage | <= 5.0% of sessions. | Monitor session context for user revision loops.7 |
 | **Trace Completeness** | Telemetry coverage | 100% coverage.1 | Audit trace files for missing state steps.1 |
 
 ### **Trajectory Evaluation vs. End-State Scans**
@@ -552,31 +571,31 @@ An agentic workflow must terminate and escalate based on explicit, programmatic 
 
 #### **Works cited**
 
-1. Governance by Design: Architecting Agentic AI for Organizational Learning and Scalable Autonomy \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2605.20210v1](https://arxiv.org/html/2605.20210v1)  
+1. Governance by Design: Architecting Agentic AI for Organizational Learning and Scalable Autonomy - arXiv, accessed June 9, 2026, [https://arxiv.org/html/2605.20210v1](https://arxiv.org/html/2605.20210v1)  
 2. Bounded Autonomy: Behavioral Specification Languages and ..., accessed June 9, 2026, [https://www.authorea.com/doi/full/10.22541/au.177083908.89981049/v1](https://www.authorea.com/doi/full/10.22541/au.177083908.89981049/v1)  
 3. A Developer's Guide to Building Scalable AI: Workflows vs Agents | Towards Data Science, accessed June 9, 2026, [https://towardsdatascience.com/a-developers-guide-to-building-scalable-ai-workflows-vs-agents/](https://towardsdatascience.com/a-developers-guide-to-building-scalable-ai-workflows-vs-agents/)  
-4. Agentic Automation \- Grid Dynamics, accessed June 9, 2026, [https://www.griddynamics.com/glossary/agentic-automation](https://www.griddynamics.com/glossary/agentic-automation)  
-5. Self-Healing Agentic Orchestrators for Reliable Tool-Augmented Large Language Model Systems \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2606.01416v1](https://arxiv.org/html/2606.01416v1)  
-6. AI agent orchestration: In-depth guide to coordinating autonomous systems \- N-iX, accessed June 9, 2026, [https://www.n-ix.com/ai-agent-orchestration/](https://www.n-ix.com/ai-agent-orchestration/)  
-7. Stopping Conditions That Actually Stop Multi-Agent Loops \- DEV Community, accessed June 9, 2026, [https://dev.to/dowhatmatters/stopping-conditions-that-actually-stop-multi-agent-loops-bnb](https://dev.to/dowhatmatters/stopping-conditions-that-actually-stop-multi-agent-loops-bnb)  
-8. Budget-Aware LLM Agents. Evaluation, Failure Modes, and Trainable Cost Control, accessed June 9, 2026, [https://www.researchgate.net/publication/405474946\_Budget-Aware\_LLM\_Agents\_Evaluation\_Failure\_Modes\_and\_Trainable\_Cost\_Control](https://www.researchgate.net/publication/405474946_Budget-Aware_LLM_Agents_Evaluation_Failure_Modes_and_Trainable_Cost_Control)  
+4. Agentic Automation - Grid Dynamics, accessed June 9, 2026, [https://www.griddynamics.com/glossary/agentic-automation](https://www.griddynamics.com/glossary/agentic-automation)  
+5. Self-Healing Agentic Orchestrators for Reliable Tool-Augmented Large Language Model Systems - arXiv, accessed June 9, 2026, [https://arxiv.org/html/2606.01416v1](https://arxiv.org/html/2606.01416v1)  
+6. AI agent orchestration: In-depth guide to coordinating autonomous systems - N-iX, accessed June 9, 2026, [https://www.n-ix.com/ai-agent-orchestration/](https://www.n-ix.com/ai-agent-orchestration/)  
+7. Stopping Conditions That Actually Stop Multi-Agent Loops - DEV Community, accessed June 9, 2026, [https://dev.to/dowhatmatters/stopping-conditions-that-actually-stop-multi-agent-loops-bnb](https://dev.to/dowhatmatters/stopping-conditions-that-actually-stop-multi-agent-loops-bnb)  
+8. Budget-Aware LLM Agents. Evaluation, Failure Modes, and Trainable Cost Control, accessed June 9, 2026, [https://www.researchgate.net/publication/405474946_Budget-Aware_LLM_Agents_Evaluation_Failure_Modes_and_Trainable_Cost_Control](https://www.researchgate.net/publication/405474946_Budget-Aware_LLM_Agents_Evaluation_Failure_Modes_and_Trainable_Cost_Control)  
 9. Open-Source LLMs in 2026: What Teams Actually Trust | by Thinking Loop | Medium, accessed June 9, 2026, [https://medium.com/@ThinkingLoop/open-source-llms-in-2026-what-teams-actually-trust-1f2e0ebbbda9](https://medium.com/@ThinkingLoop/open-source-llms-in-2026-what-teams-actually-trust-1f2e0ebbbda9)  
-10. \[2606.01416\] Self-Healing Agentic Orchestrators for Reliable Tool-Augmented Large Language Model Systems \- arXiv, accessed June 9, 2026, [https://arxiv.org/abs/2606.01416](https://arxiv.org/abs/2606.01416)  
+10. [2606.01416] Self-Healing Agentic Orchestrators for Reliable Tool-Augmented Large Language Model Systems - arXiv, accessed June 9, 2026, [https://arxiv.org/abs/2606.01416](https://arxiv.org/abs/2606.01416)  
 11. How to Build Agentic AI: Core Steps, Key Risks, and Smart Solutions | by Designveloper, accessed June 9, 2026, [https://dsvgroup.medium.com/how-to-build-agentic-ai-core-steps-key-risks-and-smart-solutions-04ff809d0200?source=rss-------1](https://dsvgroup.medium.com/how-to-build-agentic-ai-core-steps-key-risks-and-smart-solutions-04ff809d0200?source=rss-------1)  
-12. 20 Agentic AI Workflow Patterns That Actually Work in 2025 \- Skywork, accessed June 9, 2026, [https://skywork.ai/blog/agentic-ai-examples-workflow-patterns-2025/](https://skywork.ai/blog/agentic-ai-examples-workflow-patterns-2025/)  
-13. LangGraph Multi-Agent Orchestration: Complete Framework Guide \+ Architecture Analysis 2025 \- Latenode Blog, accessed June 9, 2026, [https://latenode.com/blog/ai-frameworks-technical-infrastructure/langgraph-multi-agent-orchestration/langgraph-multi-agent-orchestration-complete-framework-guide-architecture-analysis-2025](https://latenode.com/blog/ai-frameworks-technical-infrastructure/langgraph-multi-agent-orchestration/langgraph-multi-agent-orchestration-complete-framework-guide-architecture-analysis-2025)  
-14. Teaching LangChain Agents to Plan & Run Multi-Step, Multi-Tool Workflows \- Medium, accessed June 9, 2026, [https://medium.com/@avigoldfinger/teaching-langchain-agents-to-plan-run-multi-step-multi-tool-workflows-82ac908fd56e](https://medium.com/@avigoldfinger/teaching-langchain-agents-to-plan-run-multi-step-multi-tool-workflows-82ac908fd56e)  
-15. Multi-Agent Orchestration and Architecture \- Runpod, accessed June 9, 2026, [https://www.runpod.io/articles/guides/multi-agent-orchestration-and-architecture](https://www.runpod.io/articles/guides/multi-agent-orchestration-and-architecture)  
-16. I spent a long time thinking about how to build good AI agents. This is the simplest way I can explain it. : r/ClaudeCode \- Reddit, accessed June 9, 2026, [https://www.reddit.com/r/ClaudeCode/comments/1rt37um/i\_spent\_a\_long\_time\_thinking\_about\_how\_to\_build/](https://www.reddit.com/r/ClaudeCode/comments/1rt37um/i_spent_a_long_time_thinking_about_how_to_build/)  
-17. \[2606.00198\] BAGEN: Are LLM Agents Budget-Aware? \- arXiv, accessed June 9, 2026, [https://arxiv.org/abs/2606.00198](https://arxiv.org/abs/2606.00198)  
-18. Sudden spike in GitHub Copilot usage after running background\_task \#418, accessed June 9, 2026, [https://github.com/code-yeongyu/oh-my-openagent/issues/418](https://github.com/code-yeongyu/oh-my-openagent/issues/418)  
+12. 20 Agentic AI Workflow Patterns That Actually Work in 2025 - Skywork, accessed June 9, 2026, [https://skywork.ai/blog/agentic-ai-examples-workflow-patterns-2025/](https://skywork.ai/blog/agentic-ai-examples-workflow-patterns-2025/)  
+13. LangGraph Multi-Agent Orchestration: Complete Framework Guide + Architecture Analysis 2025 - Latenode Blog, accessed June 9, 2026, [https://latenode.com/blog/ai-frameworks-technical-infrastructure/langgraph-multi-agent-orchestration/langgraph-multi-agent-orchestration-complete-framework-guide-architecture-analysis-2025](https://latenode.com/blog/ai-frameworks-technical-infrastructure/langgraph-multi-agent-orchestration/langgraph-multi-agent-orchestration-complete-framework-guide-architecture-analysis-2025)  
+14. Teaching LangChain Agents to Plan & Run Multi-Step, Multi-Tool Workflows - Medium, accessed June 9, 2026, [https://medium.com/@avigoldfinger/teaching-langchain-agents-to-plan-run-multi-step-multi-tool-workflows-82ac908fd56e](https://medium.com/@avigoldfinger/teaching-langchain-agents-to-plan-run-multi-step-multi-tool-workflows-82ac908fd56e)  
+15. Multi-Agent Orchestration and Architecture - Runpod, accessed June 9, 2026, [https://www.runpod.io/articles/guides/multi-agent-orchestration-and-architecture](https://www.runpod.io/articles/guides/multi-agent-orchestration-and-architecture)  
+16. I spent a long time thinking about how to build good AI agents. This is the simplest way I can explain it. : r/ClaudeCode - Reddit, accessed June 9, 2026, [https://www.reddit.com/r/ClaudeCode/comments/1rt37um/i_spent_a_long_time_thinking_about_how_to_build/](https://www.reddit.com/r/ClaudeCode/comments/1rt37um/i_spent_a_long_time_thinking_about_how_to_build/)  
+17. [2606.00198] BAGEN: Are LLM Agents Budget-Aware? - arXiv, accessed June 9, 2026, [https://arxiv.org/abs/2606.00198](https://arxiv.org/abs/2606.00198)  
+18. Sudden spike in GitHub Copilot usage after running background_task #418, accessed June 9, 2026, [https://github.com/code-yeongyu/oh-my-openagent/issues/418](https://github.com/code-yeongyu/oh-my-openagent/issues/418)  
 19. Five techniques to reach the efficient frontier of LLM inference | Google Cloud Blog, accessed June 9, 2026, [https://cloud.google.com/blog/topics/developers-practitioners/five-techniques-to-reach-the-efficient-frontier-of-llm-inference](https://cloud.google.com/blog/topics/developers-practitioners/five-techniques-to-reach-the-efficient-frontier-of-llm-inference)  
-20. Why Inference Systems Are the New AI Bottleneck \- Newline.co, accessed June 9, 2026, [https://www.newline.co/@Dipen/why-inference-systems-are-the-new-ai-bottleneck--a9bc0631](https://www.newline.co/@Dipen/why-inference-systems-are-the-new-ai-bottleneck--a9bc0631)  
-21. Training to Inference: Why AI Cloud Must Catch Up \- DigitalOcean, accessed June 9, 2026, [https://www.digitalocean.com/community/conceptual-articles/training-to-inference-why-ai-cloud-must-catch-up](https://www.digitalocean.com/community/conceptual-articles/training-to-inference-why-ai-cloud-must-catch-up)  
-22. Human in the loop (HITL) AI Agents with LangGraph & Elastic \- Elasticsearch Labs, accessed June 9, 2026, [https://www.elastic.co/search-labs/blog/human-in-the-loop-hitllanggraph-elasticsearch](https://www.elastic.co/search-labs/blog/human-in-the-loop-hitllanggraph-elasticsearch)  
+20. Why Inference Systems Are the New AI Bottleneck - Newline.co, accessed June 9, 2026, [https://www.newline.co/@Dipen/why-inference-systems-are-the-new-ai-bottleneck--a9bc0631](https://www.newline.co/@Dipen/why-inference-systems-are-the-new-ai-bottleneck--a9bc0631)  
+21. Training to Inference: Why AI Cloud Must Catch Up - DigitalOcean, accessed June 9, 2026, [https://www.digitalocean.com/community/conceptual-articles/training-to-inference-why-ai-cloud-must-catch-up](https://www.digitalocean.com/community/conceptual-articles/training-to-inference-why-ai-cloud-must-catch-up)  
+22. Human in the loop (HITL) AI Agents with LangGraph & Elastic - Elasticsearch Labs, accessed June 9, 2026, [https://www.elastic.co/search-labs/blog/human-in-the-loop-hitllanggraph-elasticsearch](https://www.elastic.co/search-labs/blog/human-in-the-loop-hitllanggraph-elasticsearch)  
 23. Bounded Autonomy: Behavioral Specification Languages and Runtime Enforcement Architectures for Trustworthy Agentic AI Systems | Authorea, accessed June 9, 2026, [https://www.authorea.com/doi/full/10.22541/au.177083908.89981049](https://www.authorea.com/doi/full/10.22541/au.177083908.89981049)  
-24. I built a circuit breaker SDK for LLM agents — catches loops, budget overruns, and privilege escalations : r/LangChain \- Reddit, accessed June 9, 2026, [https://www.reddit.com/r/LangChain/comments/1tu7ite/i\_built\_a\_circuit\_breaker\_sdk\_for\_llm\_agents/](https://www.reddit.com/r/LangChain/comments/1tu7ite/i_built_a_circuit_breaker_sdk_for_llm_agents/)  
-25. BAGEN: Are LLM Agents Budget-Aware? \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2606.00198v1](https://arxiv.org/html/2606.00198v1)
+24. I built a circuit breaker SDK for LLM agents — catches loops, budget overruns, and privilege escalations : r/LangChain - Reddit, accessed June 9, 2026, [https://www.reddit.com/r/LangChain/comments/1tu7ite/i_built_a_circuit_breaker_sdk_for_llm_agents/](https://www.reddit.com/r/LangChain/comments/1tu7ite/i_built_a_circuit_breaker_sdk_for_llm_agents/)  
+25. BAGEN: Are LLM Agents Budget-Aware? - arXiv, accessed June 9, 2026, [https://arxiv.org/html/2606.00198v1](https://arxiv.org/html/2606.00198v1)
 
 ---
 
@@ -585,9 +604,13 @@ An agentic workflow must terminate and escalate based on explicit, programmatic 
 ## **Architectural Foundations: Probabilistic Proposals and Deterministic Edges**
 
 In the engineering of production-grade agentic AI systems, a critical transition occurs at the boundary where generative models interface with the surrounding runtime environment. Generative language models are inherently probabilistic engines that operate on statistical token distributions. Because their outputs are non-deterministic, treating them as direct execution actors with unmediated access to databases, file systems, network sockets, or external transactional APIs introduces unacceptable systemic risks.1 This report establishes the architectural and engineering doctrine of tool contract engineering:  
-**Probabilistic actors need deterministic edges. A model may propose an action, but the system must validate, constrain, serialize, authorize, execute, and record that action through explicit contracts before anything touches real state.**  
+
+> **Probabilistic actors need deterministic edges. A model may propose an action, but the system must validate, constrain, serialize, authorize, execute, and record that action through explicit contracts before anything touches real state.**  
+
 This core principle organizes the design of the execution boundary. The foundational question in systems design is not "Can the model call tools?" but "What exact operation is being proposed, what arguments are valid, what permissions apply, what side effects may occur, what confirmation is required, what happens on retry, what transaction boundary governs execution, and what structured observation returns to the agent loop?"  
+
 Architecturally, tool integration must not be treated as a simple model capability toggle or an inference-time prompt formatting detail. Instead, it must be governed as a highly structured, bidirectional interface discipline.2 While primitive function-calling APIs simply shape model output into JSON payloads, they fail to provide the safety, isolation, authentication, idempotency, or consistency guarantees required by enterprise software.4 The model generates a proposed action; the system must intercept, parse, validate, authorize, execute, and record that proposal inside a deterministic wrapper.2  
+
 This boundary is bidirectional: inputs require strict schemas, semantic validation, credential injection, and transaction isolation, while outputs require structured status, typed results, and normalized observation parameters to prevent models from processing raw, unparsed system exceptions or ambiguous natural language.2
 
 ## **Canon Placement and Continuity**
@@ -638,13 +661,13 @@ AI-ENG-N inherits critical principles from earlier canon modules:
 
 A mature tool contract is a declarative schema. It defines not just how to call a tool, but the entire operational, security, resource, and transactional posture of the interaction.4
 
-JSON  
+```JSON  
 {  
   "$schema": "https://json-schema.org/draft/2020-12/schema",  
   "id": "https://canon.ai-eng.org/v5/tool-contract.schema.json",  
   "title": "ToolContract",  
   "type": "object",  
-  "required": \[  
+  "required": [  
     "identity",  
     "affordance",  
     "runtime",  
@@ -652,127 +675,129 @@ JSON
     "transactional",  
     "idempotency",  
     "observability"  
-  \],  
+  ],  
   "additionalProperties": false,  
   "properties": {  
     "identity": {  
       "type": "object",  
-      "required": \["name", "version", "owner", "deprecation"\],  
+      "required": ["name", "version", "owner", "deprecation"],  
       "additionalProperties": false,  
       "properties": {  
         "name": {   
           "type": "string",   
-          "pattern": "^\[a-zA-Z0-9\_.-\]{1,128}$"   
+          "pattern": "^[a-zA-Z0-9_.-]{1,128}$"   
         },  
         "version": { "type": "string" },  
         "owner": { "type": "string" },  
         "deprecation": {  
           "type": "object",  
-          "required": \["status", "sunset\_date"\],  
+          "required": ["status", "sunset_date"],  
           "additionalProperties": false,  
           "properties": {  
-            "status": { "type": "string", "enum": \["active", "deprecated", "sunsetted"\] },  
-            "sunset\_date": { "type": \["string", "null"\], "format": "date" }  
+            "status": { "type": "string", "enum": ["active", "deprecated", "sunsetted"] },  
+            "sunset_date": { "type": ["string", "null"], "format": "date" }  
           }  
         }  
       }  
     },  
     "affordance": {  
       "type": "object",  
-      "required": \["model\_description", "allowed\_use\_cases", "forbidden\_use\_cases", "input\_schema", "output\_schema"\],  
+      "required": ["model_description", "allowed_use_cases", "forbidden_use_cases", "input_schema", "output_schema"],  
       "additionalProperties": false,  
       "properties": {  
-        "model\_description": { "type": "string" },  
-        "allowed\_use\_cases": { "type": "array", "items": { "type": "string" } },  
-        "forbidden\_use\_cases": { "type": "array", "items": { "type": "string" } },  
-        "input\_schema": { "type": "object" },  
-        "output\_schema": { "type": "object" }  
+        "model_description": { "type": "string" },  
+        "allowed_use_cases": { "type": "array", "items": { "type": "string" } },  
+        "forbidden_use_cases": { "type": "array", "items": { "type": "string" } },  
+        "input_schema": { "type": "object" },  
+        "output_schema": { "type": "object" }  
       }  
     },  
     "runtime": {  
       "type": "object",  
-      "required": \["timeout\_ms", "rate\_limits", "cost\_profile", "sandbox\_isolated"\],  
+      "required": ["timeout_ms", "rate_limits", "cost_profile", "sandbox_isolated"],  
       "additionalProperties": false,  
       "properties": {  
-        "timeout\_ms": { "type": "integer", "minimum": 1 },  
-        "rate\_limits": {  
+        "timeout_ms": { "type": "integer", "minimum": 1 },  
+        "rate_limits": {  
           "type": "object",  
-          "required": \["window\_sec", "max\_requests"\],  
+          "required": ["window_sec", "max_requests"],  
           "additionalProperties": false,  
           "properties": {  
-            "window\_sec": { "type": "integer" },  
-            "max\_requests": { "type": "integer" }  
+            "window_sec": { "type": "integer" },  
+            "max_requests": { "type": "integer" }  
           }  
         },  
-        "cost\_profile": {  
+        "cost_profile": {  
           "type": "object",  
-          "required": \["currency", "cost\_per\_call"\],  
+          "required": ["currency", "cost_per_call"],  
           "additionalProperties": false,  
           "properties": {  
             "currency": { "type": "string" },  
-            "cost\_per\_call": { "type": "number" }  
+            "cost_per_call": { "type": "number" }  
           }  
         },  
-        "sandbox\_isolated": { "type": "boolean" }  
+        "sandbox_isolated": { "type": "boolean" }  
       }  
     },  
     "security": {  
       "type": "object",  
-      "required": \["required\_scopes", "tenant\_scoped", "secrets\_boundary"\],  
+      "required": ["required_scopes", "tenant_scoped", "secrets_boundary"],  
       "additionalProperties": false,  
       "properties": {  
-        "required\_scopes": { "type": "array", "items": { "type": "string" } },  
-        "tenant\_scoped": { "type": "boolean" },  
-        "secrets\_boundary": {  
+        "required_scopes": { "type": "array", "items": { "type": "string" } },  
+        "tenant_scoped": { "type": "boolean" },  
+        "secrets_boundary": {  
           "type": "string",  
-          "enum": \["gateway\_injected", "execution\_sandbox", "none"\]  
+          "enum": ["gateway_injected", "execution_sandbox", "none"]  
         }  
       }  
     },  
     "transactional": {  
       "type": "object",  
-      "required": \["side\_effect\_class", "confirmation\_required", "semantics", "compensation\_tool"\],  
+      "required": ["side_effect_class", "confirmation_required", "semantics", "compensation_tool"],  
       "additionalProperties": false,  
       "properties": {  
-        "side\_effect\_class": {  
+        "side_effect_class": {  
           "type": "string",  
           "enum":  
         },  
-        "confirmation\_required": { "type": "boolean" },  
+        "confirmation_required": { "type": "boolean" },  
         "semantics": {  
           "type": "string",  
           "enum":  
         },  
-        "compensation\_tool": { "type": \["string", "null"\] }  
+        "compensation_tool": { "type": ["string", "null"] }  
       }  
     },  
     "idempotency": {  
       "type": "object",  
-      "required": \["supported", "key\_header", "ttl\_seconds"\],  
+      "required": ["supported", "key_header", "ttl_seconds"],  
       "additionalProperties": false,  
       "properties": {  
         "supported": { "type": "boolean" },  
-        "key\_header": { "type": "string" },  
-        "ttl\_seconds": { "type": "integer" }  
+        "key_header": { "type": "string" },  
+        "ttl_seconds": { "type": "integer" }  
       }  
     },  
     "observability": {  
       "type": "object",  
-      "required": \["trace\_attributes", "error\_taxonomy\_mapping"\],  
+      "required": ["trace_attributes", "error_taxonomy_mapping"],  
       "additionalProperties": false,  
       "properties": {  
-        "trace\_attributes": { "type": "array", "items": { "type": "string" } },  
-        "error\_taxonomy\_mapping": { "type": "object", "additionalProperties": { "type": "string" } }  
+        "trace_attributes": { "type": "array", "items": { "type": "string" } },  
+        "error_taxonomy_mapping": { "type": "object", "additionalProperties": { "type": "string" } }  
       }  
     }  
   }  
 }
+```
 
 ### **Model-Facing Affordances versus System-Facing Contracts**
 
 A common architectural error is using the same representation for two distinct targets: the generative model and the execution system.
 
 * **Model-Facing Affordances:** These are designed solely to guide model behavior during tool selection and token generation.4 They are written in natural language descriptions engineered for high semantic clarity, instructing the model on *when* to choose a tool, *what* arguments are required, and the logical boundaries of those parameters.4 This is an advisory layer.  
+
 * **System-Facing Contracts:** These are rigid, programmatically enforced boundaries executed by the host application's deterministic wrapper.2 They perform physical schema checks, authorization validations, cost tracking, and transaction safety controls. The system-facing contract does not negotiate with the model; it enforces the invariants of the runtime environment to protect it from incorrect model behavior.
 
 ### **Tool Versioning and Behavior Drift**
@@ -788,9 +813,9 @@ To achieve predictable tool selection and argument generation, tool description 
 
 | Design Dimension | Pattern | Anti-Pattern | Operational Reason |
 | :---- | :---- | :---- | :---- |
-| **Tool Naming** | fetch\_account\_v1, charge\_invoice\_v2.4 | do\_stuff, handle\_billing, update.4 | Prevent tool selection confusion when model choices overlap.4 |
+| **Tool Naming** | fetch_account_v1, charge_invoice_v2.4 | do_stuff, handle_billing, update.4 | Prevent tool selection confusion when model choices overlap.4 |
 | **Tool Descriptions** | "EXECUTE ONLY to permanently void an invoice. Requester MUST have verified billing access.".4 | "Voids invoices or updates metadata on client files." | Narrow the model's action space by defining strict preconditions.4 |
-| **Parameter Mapping** | "invoice\_id": "The UUID of the invoice to void, matching 'inv\_.\*'." | "id": "The identifier." | Guide the model to extract and map exact parameters from context.14 |
+| **Parameter Mapping** | "invoice_id": "The UUID of the invoice to void, matching 'inv_.*'." | "id": "The identifier." | Guide the model to extract and map exact parameters from context.14 |
 | **Enum Boundary Definition** | "reason":.14 | "reason": "Why the invoice was voided (free text)." | Eliminate free-text generation at the boundary of a system transaction.14 |
 
 ### **Schema Design Guide for Model-Callable Tools**
@@ -798,7 +823,7 @@ To achieve predictable tool selection and argument generation, tool description 
 To achieve high schema adherence, schemas must be designed as strict behavioral control surfaces.14 When using strict schema parsing (such as OpenAI's Structured Outputs with strict: true or equivalent frameworks), several key constraints must be built directly into the schema 15:
 
 1. **Mandatory Field Declarations:** Optional keys are not supported in strict validation schemas.13 All properties listed under properties must be declared in the required array.15  
-2. **Optional Property Emulation:** To define an optional property, developers must construct a JSON Schema union type with null (e.g., "type": \["string", "null"\]), and explicitly provide null as the default value.14  
+2. **Optional Property Emulation:** To define an optional property, developers must construct a JSON Schema union type with null (e.g., "type": ["string", "null"]), and explicitly provide null as the default value.14  
 3. **Strict Object Constraints:** Every object definition must include "additionalProperties": false recursively to prevent the model from injecting parameters outside the schema.15  
 4. **Schema Keyword Limitations:** Specific JSON Schema constraints, such as minLength, maxLength, pattern, format, minimum, and maximum are completely unsupported under strict parsing modes in certain primary provider SDKs.15 Consequently, physical range validations must be managed by the application validation layer rather than relying on logit-level restrictions during inference.23
 
@@ -808,73 +833,75 @@ To achieve high schema adherence, schemas must be designed as strict behavioral 
 
 Before a model's proposed tool invocation is sent to the execution engine, it must pass through a multi-stage validation pipeline.4
 
+```
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 1\. Syntactic Parse Gate     │ ──► \[Failure\] ──► Emit SYNTACTIC\_PARSE\_FAIL  
+│ 1. Syntactic Parse Gate     │ ──► [Failure] ──► Emit SYNTACTIC_PARSE_FAIL  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 2\. Structural Schema Gate   │ ──► \[Failure\] ──► Emit STRUCTURAL\_VIOLATION  
+│ 2. Structural Schema Gate   │ ──► [Failure] ──► Emit STRUCTURAL_VIOLATION  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 3\. Type Checking Gate       │ ──► \[Failure\] ──► Emit TYPE\_MISMATCH  
+│ 3. Type Checking Gate       │ ──► [Failure] ──► Emit TYPE_MISMATCH  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 4\. Range Validation Gate    │ ──► \[Failure\] ──► Emit OUT\_OF\_BOUNDS  
+│ 4. Range Validation Gate    │ ──► [Failure] ──► Emit OUT_OF_BOUNDS  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 5\. Semantic Logic Gate      │ ──► \[Failure\] ──► Emit SEMANTIC\_INVALIDITY  
+│ 5. Semantic Logic Gate      │ ──► [Failure] ──► Emit SEMANTIC_INVALIDITY  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 6\. IAM Scope Check Gate     │ ──► \[Failure\] ──► Emit PERMISSION\_DENIED  
+│ 6. IAM Scope Check Gate     │ ──► [Failure] ──► Emit PERMISSION_DENIED  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 7\. Policy Compliance Gate   │ ──► \[Failure\] ──► Emit POLICY\_VIOLATION  
+│ 7. Policy Compliance Gate   │ ──► [Failure] ──► Emit POLICY_VIOLATION  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 8\. State Consistency Gate   │ ──► \[Failure\] ──► Emit STALE\_STATE  
+│ 8. State Consistency Gate   │ ──► [Failure] ──► Emit STALE_STATE  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 9\. Confirmation Logic Gate  │ ──► \[Pending\] ──► Emit CONFIRMATION\_MISSING  
+│ 9. Confirmation Logic Gate  │ ──► [Pending] ──► Emit CONFIRMATION_MISSING  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 10\. Loop Budget Gate        │ ──► \[Failure\] ──► Emit BUDGET\_EXHAUSTED  
+│ 10. Loop Budget Gate        │ ──► [Failure] ──► Emit BUDGET_EXHAUSTED  
 └─────────────────────────────┘  
                │  
                ▼
+```
 
 The table below defines the operation, error output, and error response strategy for each validation stage:
 
 | Pipeline Gate | Execution Activity | Target Exception | Recovery Strategy |
 | :---- | :---- | :---- | :---- |
-| **Syntactic** | Parse raw generated text into structured JSON; catch format errors.4 | SYNTACTIC\_PARSE\_FAIL | Reject execution. Route raw error details to the model's repair loop.7 |
-| **Structural** | Match parsed JSON against the JSON Schema schema; check for unexpected parameters.4 | STRUCTURAL\_VIOLATION | Fail request. Prompt the model with missing or extra properties.7 |
-| **Type** | Validate parameter types (e.g., ensure strings are not integers and booleans are not text strings).4 | TYPE\_MISMATCH | Reject execution. Provide explicit type requirements to the model.7 |
-| **Range** | Enforce numerical boundaries, array item counts, and string lengths.4 | OUT\_OF\_BOUNDS | Fail request. Enforce range parameters and prompt model for corrective values.7 |
-| **Semantic** | Evaluate cross-field logic (e.g., ensure transaction amount is positive, or start date precedes end date).14 | SEMANTIC\_INVALIDITY | Reject request. Map the business logic violation and instruct the agent.7 |
-| **Permission** | Verify active IAM scopes, tenant bounds, and user session permissions for the tool.2 | PERMISSION\_DENIED | Halt execution. Escalate to system logs, log security events, and notify user.2 |
-| **Policy** | Validate corporate risk metrics, compliance rules, and security boundaries.3 | POLICY\_VIOLATION | Terminate loop. Log policy failure to security dashboards.2 |
-| **State** | Verify the target resource exists, is unlocked, and is in a valid state for update.17 | STALE\_STATE | Return the actual database state of the object, prompting the agent to recheck intent.17 |
-| **Confirmation** | Check if risk profile mandates human review; verify active approval token.2 | CONFIRMATION\_MISSING | Pause loop execution. Yield control to user interface, emitting a confirmation card.4 |
-| **Budget** | Monitor session token consumption, clock limits, and total monetary budgets.8 | BUDGET\_EXHAUSTED | Terminate the run trace immediately, escalating to platform operations.8 |
+| **Syntactic** | Parse raw generated text into structured JSON; catch format errors.4 | SYNTACTIC_PARSE_FAIL | Reject execution. Route raw error details to the model's repair loop.7 |
+| **Structural** | Match parsed JSON against the JSON Schema schema; check for unexpected parameters.4 | STRUCTURAL_VIOLATION | Fail request. Prompt the model with missing or extra properties.7 |
+| **Type** | Validate parameter types (e.g., ensure strings are not integers and booleans are not text strings).4 | TYPE_MISMATCH | Reject execution. Provide explicit type requirements to the model.7 |
+| **Range** | Enforce numerical boundaries, array item counts, and string lengths.4 | OUT_OF_BOUNDS | Fail request. Enforce range parameters and prompt model for corrective values.7 |
+| **Semantic** | Evaluate cross-field logic (e.g., ensure transaction amount is positive, or start date precedes end date).14 | SEMANTIC_INVALIDITY | Reject request. Map the business logic violation and instruct the agent.7 |
+| **Permission** | Verify active IAM scopes, tenant bounds, and user session permissions for the tool.2 | PERMISSION_DENIED | Halt execution. Escalate to system logs, log security events, and notify user.2 |
+| **Policy** | Validate corporate risk metrics, compliance rules, and security boundaries.3 | POLICY_VIOLATION | Terminate loop. Log policy failure to security dashboards.2 |
+| **State** | Verify the target resource exists, is unlocked, and is in a valid state for update.17 | STALE_STATE | Return the actual database state of the object, prompting the agent to recheck intent.17 |
+| **Confirmation** | Check if risk profile mandates human review; verify active approval token.2 | CONFIRMATION_MISSING | Pause loop execution. Yield control to user interface, emitting a confirmation card.4 |
+| **Budget** | Monitor session token consumption, clock limits, and total monetary budgets.8 | BUDGET_EXHAUSTED | Terminate the run trace immediately, escalating to platform operations.8 |
 
 ## **Deterministic Wrapper Architecture**
 
@@ -882,40 +909,42 @@ The table below defines the operation, error output, and error response strategy
 
 The deterministic wrapper acts as the secure boundary layer protecting internal environments from raw, model-driven tool execution requests.2 It intercepts the model's proposed action, parses it, validates it, injects credentials outside the model's view, manages state, and returns a structured observation object.2
 
-                \[ Probabilistic Model Loop \]  
+```
+                [ Probabilistic Model Loop ]  
                              │  
                              ▼ (Proposes Tool Call)  
 ┌────────────────────────────────────────────────────────────┐  
 │                  DETERMINISTIC WRAPPER                     │  
 ├────────────────────────────────────────────────────────────┤  
-│ 1\. Parser: Converts raw generated token text to JSON    │  
+│ 1. Parser: Converts raw generated token text to JSON    │  
 ├────────────────────────────────────────────────────────────┤  
-│ 2\. Schema & Semantic Validator: Checks types & bounds  │  
+│ 2. Schema & Semantic Validator: Checks types & bounds  │  
 ├────────────────────────────────────────────────────────────┤  
-│ 3\. IAM Checker: Validates OAuth scopes & tokens \[27\]       │  
+│ 3. IAM Checker: Validates OAuth scopes & tokens [27]       │  
 ├────────────────────────────────────────────────────────────┤  
-│ 4\. Policy Interceptor: Enforces compliance & limits    │  
+│ 4. Policy Interceptor: Enforces compliance & limits    │  
 ├────────────────────────────────────────────────────────────┤  
-│ 5\. Confirmation Gate: Pauses for operator review        │  
+│ 5. Confirmation Gate: Pauses for operator review        │  
 ├────────────────────────────────────────────────────────────┤  
-│ 6\. Idempotency Mgr: Deduplicates repeating requests     │  
+│ 6. Idempotency Mgr: Deduplicates repeating requests     │  
 ├────────────────────────────────────────────────────────────┤  
-│ 7\. Transaction Mgr: Starts transaction or saga         │  
+│ 7. Transaction Mgr: Starts transaction or saga         │  
 ├────────────────────────────────────────────────────────────┤  
-│ 8\. Executor: Runs isolated code in sandbox           │  
+│ 8. Executor: Runs isolated code in sandbox           │  
 ├────────────────────────────────────────────────────────────┤  
-│ 9\. Output Normalizer: Normalizes observation JSON       │  
+│ 9. Output Normalizer: Normalizes observation JSON       │  
 ├────────────────────────────────────────────────────────────┤  
-│ 10\. Trace Logger: Emits OpenTelemetry span telemetry   │  
+│ 10. Trace Logger: Emits OpenTelemetry span telemetry   │  
 └────────────────────────────────────────────────────────────┘  
                              │  
                              ▼ (Emits Structured Payload)  
-                \[ Normalized Observation \]
+                [ Normalized Observation ]
+```
 
 ### **Credentials and Token Isolation**
 
 Under no circumstances should raw secrets, API keys, OAuth tokens, database passwords, or private certificates be loaded directly into model context windows or defined in tool argument parameters.2 This is a critical security vulnerability.  
-The model should only generate symbolic arguments, such as account\_id or workspace\_id.2 The deterministic wrapper intercepts these symbolic values, retrieves the corresponding credentials from a secure secrets vault, and injects those credentials during the execution phase, keeping sensitive tokens entirely hidden from the model's view.2
+The model should only generate symbolic arguments, such as account_id or workspace_id.2 The deterministic wrapper intercepts these symbolic values, retrieves the corresponding credentials from a secure secrets vault, and injects those credentials during the execution phase, keeping sensitive tokens entirely hidden from the model's view.2
 
 ## **Side-Effect Classification and Control**
 
@@ -925,12 +954,12 @@ Tools must be cataloged based on their risk profile and the difficulty of revers
 
 | Side-Effect Class | Definition | Target System Gates | Idempotency Posture | Confirmation Policy |
 | :---- | :---- | :---- | :---- | :---- |
-| **READ\_ONLY** | Retrieves data, performs calculations, or queries databases without modifying state.17 | Syntactic, Structural, Type, Range, Permission, State, Budget. | Exempt (assumed safe to retry by default).17 | No confirmation required. |
-| **EPHEMERAL\_WRITE** | Modifies temporary workspace objects, such as writing to scratch directory or code sandbox memory.2 | Syntactic, Structural, Type, Range, Permission, Budget. | Highly Recommended on state-mutating steps.18 | No confirmation required. |
-| **LOW\_RISK\_INTERNAL** | Updates non-customer-visible database records, such as modifying internal ticket tags.17 | Syntactic, Structural, Type, Range, Permission, State, Budget. | Mandatory (low-latency key tracking).17 | No confirmation required. |
-| **MEDIUM\_RISK\_WRITE** | Modifies operational database state, such as creating ticket drafts or internal comments.4 | All gates except full compliance checks. | Mandatory (24-hour persistent key).18 | Optional (managed by orchestrator rules).25 |
-| **HIGH\_RISK\_EXTERNAL** | Sends emails, alters client profile data, or schedules system calendar updates.18 | All gates including user permission checks.6 | Strictly Mandatory (durable relational persistence).17 | Mandatory user confirmation required.2 |
-| **CRITICAL\_MUTATION** | Executes financial transfers, modifies access controls, or deploys codebase updates.3 | All gates including dual-control and compliance reviews.2 | Strictly Mandatory (distributed saga tracking).10 | Mandatory multi-party or operator gate.2 |
+| **READ_ONLY** | Retrieves data, performs calculations, or queries databases without modifying state.17 | Syntactic, Structural, Type, Range, Permission, State, Budget. | Exempt (assumed safe to retry by default).17 | No confirmation required. |
+| **EPHEMERAL_WRITE** | Modifies temporary workspace objects, such as writing to scratch directory or code sandbox memory.2 | Syntactic, Structural, Type, Range, Permission, Budget. | Highly Recommended on state-mutating steps.18 | No confirmation required. |
+| **LOW_RISK_INTERNAL** | Updates non-customer-visible database records, such as modifying internal ticket tags.17 | Syntactic, Structural, Type, Range, Permission, State, Budget. | Mandatory (low-latency key tracking).17 | No confirmation required. |
+| **MEDIUM_RISK_WRITE** | Modifies operational database state, such as creating ticket drafts or internal comments.4 | All gates except full compliance checks. | Mandatory (24-hour persistent key).18 | Optional (managed by orchestrator rules).25 |
+| **HIGH_RISK_EXTERNAL** | Sends emails, alters client profile data, or schedules system calendar updates.18 | All gates including user permission checks.6 | Strictly Mandatory (durable relational persistence).17 | Mandatory user confirmation required.2 |
+| **CRITICAL_MUTATION** | Executes financial transfers, modifies access controls, or deploys codebase updates.3 | All gates including dual-control and compliance reviews.2 | Strictly Mandatory (distributed saga tracking).10 | Mandatory multi-party or operator gate.2 |
 
 ### **Side-Effect and Loop Budgets**
 
@@ -943,7 +972,7 @@ The system must track token-consumption rates, clock time, tool invocation count
 
 Because at-least-once delivery is the only mathematically viable model over unreliable network transports, engineering for idempotency is a non-negotiable requirement for all side-effecting operations.17  
 An idempotency key must be unique, stable across retries, and bound strictly to the logical scope of the operation.9 Keys must be generated deterministically on the client or wrapper side using the SHA-256 hash of the parameters and the logical coordinates of the task:  
-Key \= SHA-256(Workflow ID |  
+Key = SHA-256(Workflow ID |  
 | Tenant ID |  
 | User ID |  
 | Payload Hash)  
@@ -954,106 +983,107 @@ This formulation prevents key-reuse exploits and accidental collisions.9
 A common systemic failure is the Time-of-Check to Time-of-Use (TOCTOU) vulnerability.17 Using high-performance distributed key-value caches like Redis for idempotency checks (e.g., executing a SETNX lock, performing the payment API call, and then writing the result) introduces a race condition.17 Two concurrent retries can both check the cache, see that the key does not exist, and proceed to execute the payment twice.17  
 The only safe implementation for critical mutation workflows is to co-locate the idempotency record and the business transaction in the same relational database transaction.17 The unique database constraint on the idempotency key column serves as the atomic locking mechanism 9:
 
-SQL  
-\-- Production Idempotency Table Schema  
-CREATE TABLE idempotency\_keys (  
-    tenant\_id BIGINT NOT NULL,  
-    idempotency\_key TEXT NOT NULL,  
-    request\_hash BYTEA NOT NULL,  
+```SQL  
+-- Production Idempotency Table Schema  
+CREATE TABLE idempotency_keys (  
+    tenant_id BIGINT NOT NULL,  
+    idempotency_key TEXT NOT NULL,  
+    request_hash BYTEA NOT NULL,  
     status TEXT NOT NULL CHECK (status IN ('PENDING', 'COMPLETED', 'FAILED')),  
-    response\_status INTEGER,  
-    response\_body JSONB,  
-    created\_at TIMESTAMPTZ NOT NULL DEFAULT now(),  
-    completed\_at TIMESTAMPTZ,  
-    expires\_at TIMESTAMPTZ NOT NULL,  
-    PRIMARY KEY (tenant\_id, idempotency\_key)  
+    response_status INTEGER,  
+    response_body JSONB,  
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),  
+    completed_at TIMESTAMPTZ,  
+    expires_at TIMESTAMPTZ NOT NULL,  
+    PRIMARY KEY (tenant_id, idempotency_key)  
 );
 
-CREATE INDEX idempotency\_expires\_idx ON idempotency\_keys (expires\_at)   
+CREATE INDEX idempotency_expires_idx ON idempotency_keys (expires_at)   
 WHERE status IN ('PENDING', 'COMPLETED');
 
 Go  
 // Example of Relational Co-location of State and Intent  
-func ExecuteIdempotentAction(ctx context.Context, db \*sql.DB, tenantID int64, key string, hashbyte, action func() (int,byte, error)) (int,byte, error) {  
+func ExecuteIdempotentAction(ctx context.Context, db *sql.DB, tenantID int64, key string, hashbyte, action func() (int,byte, error)) (int,byte, error) {  
     tx, err := db.BeginTx(ctx, nil)  
-    if err\!= nil {  
+    if err!= nil {  
         return 0, nil, err  
     }  
     defer tx.Rollback()
 
-    // 1\. Attempt to claim the key atomically  
+    // 1. Attempt to claim the key atomically  
     var status string  
     var cachedStatus int  
     var cachedBodybyte  
     var storedHashbyte  
       
-    err \= tx.QueryRowContext(ctx,   
-        \`SELECT status, response\_status, response\_body, request\_hash   
-         FROM idempotency\_keys WHERE tenant\_id \= $1 AND idempotency\_key \= $2 FOR UPDATE\`,   
-        tenantID, key).Scan(\&status, \&cachedStatus, \&cachedBody, \&storedHash)
+    err = tx.QueryRowContext(ctx,   
+        `SELECT status, response_status, response_body, request_hash   
+         FROM idempotency_keys WHERE tenant_id = $1 AND idempotency_key = $2 FOR UPDATE`,   
+        tenantID, key).Scan(&status, &cachedStatus, &cachedBody, &storedHash)
 
-    if err \== nil {  
+    if err == nil {  
         // Key exists: handle duplicate request  
-        if\!bytes.Equal(storedHash, hash) {  
-            return 422, nil, fmt.Errorf("REQUEST\_SIGNATURE\_MISMATCH")  
+        if!bytes.Equal(storedHash, hash) {  
+            return 422, nil, fmt.Errorf("REQUEST_SIGNATURE_MISMATCH")  
         }  
-        if status \== "PENDING" {  
-            return 409, nil, fmt.Errorf("CONCURRENT\_REQUEST\_IN\_PROGRESS")  
+        if status == "PENDING" {  
+            return 409, nil, fmt.Errorf("CONCURRENT_REQUEST_IN_PROGRESS")  
         }  
         return cachedStatus, cachedBody, nil  
-    } else if err\!= sql.ErrNoRows {  
+    } else if err!= sql.ErrNoRows {  
         return 0, nil, err  
     }
 
     // Key does not exist: reserve it  
-    \_, err \= tx.ExecContext(ctx,   
-        \`INSERT INTO idempotency\_keys (tenant\_id, idempotency\_key, request\_hash, status, expires\_at)   
-         VALUES ($1, $2, $3, 'PENDING', now() \+ INTERVAL '24 hours')\`,   
+    _, err = tx.ExecContext(ctx,   
+        `INSERT INTO idempotency_keys (tenant_id, idempotency_key, request_hash, status, expires_at)   
+         VALUES ($1, $2, $3, 'PENDING', now() + INTERVAL '24 hours')`,   
         tenantID, key, hash)  
-    if err\!= nil {  
+    if err!= nil {  
         return 0, nil, err  
     }
 
-    if err := tx.Commit(); err\!= nil {  
+    if err := tx.Commit(); err!= nil {  
         return 0, nil, err  
     }
 
-    // 2\. Execute the actual side-effect outside the locking transaction  
+    // 2. Execute the actual side-effect outside the locking transaction  
     respCode, respBody, execErr := action()  
       
     txUpdate, err := db.BeginTx(ctx, nil)  
-    if err\!= nil {  
+    if err!= nil {  
         return 0, nil, err  
     }  
     defer txUpdate.Rollback()
 
-    if execErr\!= nil {  
+    if execErr!= nil {  
         // Mark as failed to allow subsequent retries  
-        \_, \_ \= txUpdate.ExecContext(ctx,   
-            \`UPDATE idempotency\_keys SET status \= 'FAILED'   
-             WHERE tenant\_id \= $1 AND idempotency\_key \= $2\`, tenantID, key)  
-        \_ \= txUpdate.Commit()  
+        _, _ = txUpdate.ExecContext(ctx,   
+            `UPDATE idempotency_keys SET status = 'FAILED'   
+             WHERE tenant_id = $1 AND idempotency_key = $2`, tenantID, key)  
+        _ = txUpdate.Commit()  
         return respCode, respBody, execErr  
     }
 
-    // 3\. Complete the reservation with the execution response  
-    \_, err \= txUpdate.ExecContext(ctx,   
-        \`UPDATE idempotency\_keys   
-         SET status \= 'COMPLETED', response\_status \= $3, response\_body \= $4, completed\_at \= now()   
-         WHERE tenant\_id \= $1 AND idempotency\_key \= $2\`,   
+    // 3. Complete the reservation with the execution response  
+    _, err = txUpdate.ExecContext(ctx,   
+        `UPDATE idempotency_keys   
+         SET status = 'COMPLETED', response_status = $3, response_body = $4, completed_at = now()   
+         WHERE tenant_id = $1 AND idempotency_key = $2`,   
         tenantID, key, respCode, respBody)  
-    if err\!= nil {  
+    if err!= nil {  
         return 0, nil, err  
     }
 
     return respCode, respBody, txUpdate.Commit()  
 }
+```
 
 ### **Distinguishing Retries from Repair Loops**
 
 * **Retry Dynamics:** Retries address transient, environmental failures (e.g., 503 Server Error, network timeouts).4 The request remains unchanged, and the execution wrapper retries using exponential backoff with random jitter 19:
 
-wait\_time \= base\_time \* 2^n \+/- jitter
+wait_time = base_time * 2^n +/- jitter
 
 * **Repair Loops:** Repair loops address semantic or structural failures where the model's payload is invalid.7 The client does not repeat the request. Instead, the validation error is formatted and returned to the model.7 The model corrects the parameters, creates a new execution proposal, and submits it to the validation pipeline.7
 
@@ -1095,20 +1125,21 @@ Confirmation gates must map directly to the risk level of the tool's side effect
 
 ### **Anti-Patterns: Consent Theater versus Payload Inspection**
 
-Many agentic systems suffer from "consent theater," where the user is presented with a generic, uninformative prompt such as: *"The agent wishes to run tool charge\_card. Do you want to proceed?"* This fails to provide meaningful security.4  
+Many agentic systems suffer from "consent theater," where the user is presented with a generic, uninformative prompt such as: *"The agent wishes to run tool charge_card. Do you want to proceed?"* This fails to provide meaningful security.4  
 A secure confirmation gate must present the **concrete payload** and the **expected consequences** of the execution.2 It must show the exact parameters (such as the target account, amount, and fee) and highlight any potential anomalies (e.g., if the recipient address has changed).2
 
+```
 ┌──────────────────────────────────────────────────────────┐  
 │              CONFIRMATION REQUEST REQUIRED               │  
 ├──────────────────────────────────────────────────────────┤  
 │ Action: Charge Customer Card                             │  
-│ Target Account ID: cust\_9921\_beta                        │  
+│ Target Account ID: cust_9921_beta                        │  
 │ Amount: $4,999.00 USD                                    │  
 │ Idempotency Fingerprint: f2a8...3b1a                     │  
 │ Target Gateway: Stripe Production                        │  
 │                                                          │  
-│           │  
 └──────────────────────────────────────────────────────────┘
+```
 
 ## **Output Contracts and Observation Quality**
 
@@ -1116,57 +1147,57 @@ A secure confirmation gate must present the **concrete payload** and the **expec
 
 To ensure the agent receives reliable data, the output returned by the execution wrapper must match a normalized contract.4 Tool executions must never return unstructured, raw logs or database exception traces directly to the model context.2
 
-JSON  
+```JSON  
 {  
   "$schema": "https://json-schema.org/draft/2020-12/schema",  
   "id": "https://canon.ai-eng.org/v5/observation.schema.json",  
   "title": "ObservationObject",  
   "type": "object",  
-  "required": \[  
-    "tool\_identity",  
-    "execution\_metadata",  
+  "required": [  
+    "tool_identity",  
+    "execution_metadata",  
     "status",  
-    "result\_payload"  
-  \],  
+    "result_payload"  
+  ],  
   "additionalProperties": false,  
   "properties": {  
-    "tool\_identity": {  
+    "tool_identity": {  
       "type": "object",  
-      "required": \["name", "version", "call\_id"\],  
+      "required": ["name", "version", "call_id"],  
       "additionalProperties": false,  
       "properties": {  
         "name": { "type": "string" },  
         "version": { "type": "string" },  
-        "call\_id": { "type": "string", "format": "uuid" }  
+        "call_id": { "type": "string", "format": "uuid" }  
       }  
     },  
-    "execution\_metadata": {  
+    "execution_metadata": {  
       "type": "object",  
-      "required": \["timestamp", "latency\_ms", "idempotency\_hit", "trace\_id"\],  
+      "required": ["timestamp", "latency_ms", "idempotency_hit", "trace_id"],  
       "additionalProperties": false,  
       "properties": {  
         "timestamp": { "type": "string", "format": "date-time" },  
-        "latency\_ms": { "type": "integer" },  
-        "idempotency\_hit": { "type": "boolean" },  
-        "trace\_id": { "type": "string" }  
+        "latency_ms": { "type": "integer" },  
+        "idempotency_hit": { "type": "boolean" },  
+        "trace_id": { "type": "string" }  
       }  
     },  
     "status": {  
       "type": "object",  
-      "required": \["code", "is\_error", "taxonomy\_class"\],  
+      "required": ["code", "is_error", "taxonomy_class"],  
       "additionalProperties": false,  
       "properties": {  
         "code": { "type": "integer" },  
-        "is\_error": { "type": "boolean" },  
-        "taxonomy\_class": {   
+        "is_error": { "type": "boolean" },  
+        "taxonomy_class": {   
           "type": "string",  
           "enum":  
         }  
       }  
     },  
-    "result\_payload": {  
+    "result_payload": {  
       "type": "object",  
-      "required": \["data", "errors", "warnings", "verification\_hints"\],  
+      "required": ["data", "errors", "warnings", "verification_hints"],  
       "additionalProperties": false,  
       "properties": {  
         "data": { "type": "object" },  
@@ -1174,7 +1205,7 @@ JSON
           "type": "array",  
           "items": {  
             "type": "object",  
-            "required": \["field", "message", "retryable"\],  
+            "required": ["field", "message", "retryable"],  
             "additionalProperties": false,  
             "properties": {  
               "field": { "type": "string" },  
@@ -1184,19 +1215,20 @@ JSON
           }  
         },  
         "warnings": { "type": "array", "items": { "type": "string" } },  
-        "verification\_hints": {  
+        "verification_hints": {  
           "type": "object",  
-          "required": \["target\_state\_endpoint", "delay\_seconds"\],  
+          "required": ["target_state_endpoint", "delay_seconds"],  
           "additionalProperties": false,  
           "properties": {  
-            "target\_state\_endpoint": { "type": \["string", "null"\] },  
-            "delay\_seconds": { "type": "integer" }  
+            "target_state_endpoint": { "type": ["string", "null"] },  
+            "delay_seconds": { "type": "integer" }  
           }  
         }  
       }  
     }  
   }  
 }
+```
 
 ## **Safe Execution Pattern Library**
 
@@ -1214,20 +1246,20 @@ When a tool execution fails, the wrapper must map the technical response to a st
 
 | Technical Error Code | Systemic Definition | Is Retryable? | Standard System Response Vector |
 | :---- | :---- | :---- | :---- |
-| SYNTACTIC\_PARSE\_FAIL | The model's generated output could not be parsed as valid JSON.4 | Yes (via repair) | Forward parsing details to the model's repair loop.7 |
-| STRUCTURAL\_VIOLATION | The parsed JSON fails to adhere to the input schema.4 | Yes (via repair) | Return the schema requirements to the repair loop.7 |
-| TYPE\_MISMATCH | A parameter's type differs from the schema definition.4 | Yes (via repair) | Map types and prompt the repair engine.7 |
-| OUT\_OF\_BOUNDS | A parameter falls outside allowed numeric or range limits.4 | Yes (via repair) | Specify range boundaries and prompt repair.7 |
-| SEMANTIC\_INVALIDITY | The parameters violate application business rules.14 | No | Halt execution. Prompt agent to recheck inputs.14 |
-| PERMISSION\_DENIED | The user, tenant, or agent lacks the required authorization scopes.6 | No | Terminate transaction. Route trace to security logs.2 |
-| POLICY\_VIOLATION | The requested action violates system safety or compliance guidelines.3 | No | Halt execution. Trigger alert to compliance team.25 |
-| STALE\_STATE | The target resource state has changed since the action was proposed.17 | Yes (on refresh) | Update context with the new state; prompt model to re-evaluate.17 |
-| CONFIRMATION\_MISSING | The tool requires explicit approval, but no valid token was found.2 | No | Pause loop execution. Emit a card to the operator.4 |
-| BUDGET\_EXHAUSTED | The session cost, latency, or token limit has been exceeded.8 | No | Terminate the run trace and notify operations.8 |
-| RATE\_LIMITED | The tool endpoint has hit its execution limits.4 | Yes | Back off and retry using jittered intervals.4 |
+| SYNTACTIC_PARSE_FAIL | The model's generated output could not be parsed as valid JSON.4 | Yes (via repair) | Forward parsing details to the model's repair loop.7 |
+| STRUCTURAL_VIOLATION | The parsed JSON fails to adhere to the input schema.4 | Yes (via repair) | Return the schema requirements to the repair loop.7 |
+| TYPE_MISMATCH | A parameter's type differs from the schema definition.4 | Yes (via repair) | Map types and prompt the repair engine.7 |
+| OUT_OF_BOUNDS | A parameter falls outside allowed numeric or range limits.4 | Yes (via repair) | Specify range boundaries and prompt repair.7 |
+| SEMANTIC_INVALIDITY | The parameters violate application business rules.14 | No | Halt execution. Prompt agent to recheck inputs.14 |
+| PERMISSION_DENIED | The user, tenant, or agent lacks the required authorization scopes.6 | No | Terminate transaction. Route trace to security logs.2 |
+| POLICY_VIOLATION | The requested action violates system safety or compliance guidelines.3 | No | Halt execution. Trigger alert to compliance team.25 |
+| STALE_STATE | The target resource state has changed since the action was proposed.17 | Yes (on refresh) | Update context with the new state; prompt model to re-evaluate.17 |
+| CONFIRMATION_MISSING | The tool requires explicit approval, but no valid token was found.2 | No | Pause loop execution. Emit a card to the operator.4 |
+| BUDGET_EXHAUSTED | The session cost, latency, or token limit has been exceeded.8 | No | Terminate the run trace and notify operations.8 |
+| RATE_LIMITED | The tool endpoint has hit its execution limits.4 | Yes | Back off and retry using jittered intervals.4 |
 | TIMEOUT | The tool execution failed to complete within the timeout window.4 | Yes | Apply retry logic or escalate if failures persist.4 |
-| IDEMPOTENCY\_CONFLICT | An execution attempt with this key is currently in progress.17 | Yes (later) | Return 409 Conflict with a suggested retry delay.17 |
-| SIGNATURE\_MISMATCH | A duplicate key was received, but the payload hash does not match.9 | No | Reject the request immediately to prevent payload tampering.17 |
+| IDEMPOTENCY_CONFLICT | An execution attempt with this key is currently in progress.17 | Yes (later) | Return 409 Conflict with a suggested retry delay.17 |
+| SIGNATURE_MISMATCH | A duplicate key was received, but the payload hash does not match.9 | No | Reject the request immediately to prevent payload tampering.17 |
 
 ## **Tool Contract Failure Mode Map**
 
@@ -1252,28 +1284,28 @@ To run reliable agentic systems, SRE teams must track specific operational metri
 
 * **Schema-Valid Call Rate (SVCR):** The ratio of tool execution proposals that successfully pass structural JSON schema checks on the first attempt:
 
-SVCR \= Successful Structural Checks / Total Tool Call Proposals
+SVCR = Successful Structural Checks / Total Tool Call Proposals
 
 * **Validation Failure Rate (VFR):** The frequency of semantic, permission, and state validation checks that fail before execution:
 
-VFR \= Rejected Execution Attempts / Total Tool Call Proposals
+VFR = Rejected Execution Attempts / Total Tool Call Proposals
 
 * **Repair Success Rate (RSR):** The percentage of validation failures that are successfully corrected by the model's repair loop within the allocated budget:
 
-RSR \= Successfully Repaired Calls / Total Triggered Repair Loops
+RSR = Successfully Repaired Calls / Total Triggered Repair Loops
 
 * **Idempotency Key Collision Rate (IKCR):** The rate of duplicate request attempts blocked or replayed by the idempotency layer:
 
-IKCR \= Idempotency Key Matches / Total Mutating Requests
+IKCR = Idempotency Key Matches / Total Mutating Requests
 
 ### **OpenTelemetry and Context Propagation**
 
 System operators must integrate tool execution spans with distributed tracing standards.28 Every tool call must generate a tracing span conforming to OpenTelemetry GenAI semantic conventions, propagating context through the Model Context Protocol (MCP) metadata layer 28:
 
-1. **Context Propagation:** Inject W3C Trace Context parameters (traceparent and tracestate) directly into the \_meta property bag of JSON-RPC requests.28  
+1. **Context Propagation:** Inject W3C Trace Context parameters (traceparent and tracestate) directly into the _meta property bag of JSON-RPC requests.28  
 2. **Span Linkage:** Ensure the outer model inference span is linked directly to the tool execution wrapper span.28  
-3. **Domain Mapping:** Set gen\_ai.operation.name to execute\_tool, and map the low-cardinality target parameter to the exact tool contract name.28  
-4. **Error Recording:** If a tool execution fails with isError: true, the span status must be marked as an error, and the error.type attribute must be set to tool\_error.4
+3. **Domain Mapping:** Set gen_ai.operation.name to execute_tool, and map the low-cardinality target parameter to the exact tool contract name.28  
+4. **Error Recording:** If a tool execution fails with isError: true, the span status must be marked as an error, and the error.type attribute must be set to tool_error.4
 
 ## **Cross-Canon Handoff Map**
 
@@ -1320,42 +1352,42 @@ Tool outputs must be cleaned, typed, and structured before they are returned to 
 
 #### **Works cited**
 
-1. Specification \- Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/specification/2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25)  
-2. Security Best Practices \- Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/docs/tutorials/security/security\_best\_practices](https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices)  
-3. mcp-security-best-practices-2025.md \- GitHub, accessed June 9, 2026, [https://github.com/microsoft/mcp-for-beginners/blob/main/02-Security/mcp-security-best-practices-2025.md](https://github.com/microsoft/mcp-for-beginners/blob/main/02-Security/mcp-security-best-practices-2025.md)  
-4. Tools \- Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/specification/2025-11-25/server/tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)  
+1. Specification - Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/specification/2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25)  
+2. Security Best Practices - Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices](https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices)  
+3. mcp-security-best-practices-2025.md - GitHub, accessed June 9, 2026, [https://github.com/microsoft/mcp-for-beginners/blob/main/02-Security/mcp-security-best-practices-2025.md](https://github.com/microsoft/mcp-for-beginners/blob/main/02-Security/mcp-security-best-practices-2025.md)  
+4. Tools - Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/specification/2025-11-25/server/tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)  
 5. Structured model outputs | OpenAI API, accessed June 9, 2026, [https://developers.openai.com/api/docs/guides/structured-outputs](https://developers.openai.com/api/docs/guides/structured-outputs)  
-6. MCP Server Security Best Practices to Prevent Risk \- Descope, accessed June 9, 2026, [https://www.descope.com/blog/post/mcp-server-security-best-practices](https://www.descope.com/blog/post/mcp-server-security-best-practices)  
-7. Postmortem: How a runaway LLM loop burned through tokens for 40 minutes before I caught it : r/SaaS \- Reddit, accessed June 9, 2026, [https://www.reddit.com/r/SaaS/comments/1s5jff7/postmortem\_how\_a\_runaway\_llm\_loop\_burned\_through/](https://www.reddit.com/r/SaaS/comments/1s5jff7/postmortem_how_a_runaway_llm_loop_burned_through/)  
+6. MCP Server Security Best Practices to Prevent Risk - Descope, accessed June 9, 2026, [https://www.descope.com/blog/post/mcp-server-security-best-practices](https://www.descope.com/blog/post/mcp-server-security-best-practices)  
+7. Postmortem: How a runaway LLM loop burned through tokens for 40 minutes before I caught it : r/SaaS - Reddit, accessed June 9, 2026, [https://www.reddit.com/r/SaaS/comments/1s5jff7/postmortem_how_a_runaway_llm_loop_burned_through/](https://www.reddit.com/r/SaaS/comments/1s5jff7/postmortem_how_a_runaway_llm_loop_burned_through/)  
 8. ai-eng-m-agentic-orchestration.md  
 9. Idempotency in Distributed Systems: Design Patterns Beyond 'Retry ..., accessed June 9, 2026, [https://aloknecessary.github.io/blogs/idempotency-distributed-systems/](https://aloknecessary.github.io/blogs/idempotency-distributed-systems/)  
-10. How to Implement the Saga Pattern for Distributed Transactions \- OneUptime, accessed June 9, 2026, [https://oneuptime.com/blog/post/2026-02-20-microservices-saga-pattern/view](https://oneuptime.com/blog/post/2026-02-20-microservices-saga-pattern/view)  
-11. Saga Design Pattern \- Azure Architecture Center | Microsoft Learn, accessed June 9, 2026, [https://learn.microsoft.com/en-us/azure/architecture/patterns/saga](https://learn.microsoft.com/en-us/azure/architecture/patterns/saga)  
-12. LLM Failover & Load Balancing for Provider Outages \- Truefoundry, accessed June 9, 2026, [https://www.truefoundry.com/blog/llm-failover-load-balancing-provider-outages](https://www.truefoundry.com/blog/llm-failover-load-balancing-provider-outages)  
-13. Codex provider: output\_format schemas fail OpenAI Structured Outputs strict-mode (missing additionalProperties:false) · Issue \#1843 · coleam00/Archon \- GitHub, accessed June 9, 2026, [https://github.com/coleam00/Archon/issues/1843](https://github.com/coleam00/Archon/issues/1843)  
-14. OpenAI Structured Outputs: Complete Developer Guide \- Digital Applied, accessed June 9, 2026, [https://www.digitalapplied.com/blog/openai-structured-outputs-complete-guide](https://www.digitalapplied.com/blog/openai-structured-outputs-complete-guide)  
+10. How to Implement the Saga Pattern for Distributed Transactions - OneUptime, accessed June 9, 2026, [https://oneuptime.com/blog/post/2026-02-20-microservices-saga-pattern/view](https://oneuptime.com/blog/post/2026-02-20-microservices-saga-pattern/view)  
+11. Saga Design Pattern - Azure Architecture Center | Microsoft Learn, accessed June 9, 2026, [https://learn.microsoft.com/en-us/azure/architecture/patterns/saga](https://learn.microsoft.com/en-us/azure/architecture/patterns/saga)  
+12. LLM Failover & Load Balancing for Provider Outages - Truefoundry, accessed June 9, 2026, [https://www.truefoundry.com/blog/llm-failover-load-balancing-provider-outages](https://www.truefoundry.com/blog/llm-failover-load-balancing-provider-outages)  
+13. Codex provider: output_format schemas fail OpenAI Structured Outputs strict-mode (missing additionalProperties:false) · Issue #1843 · coleam00/Archon - GitHub, accessed June 9, 2026, [https://github.com/coleam00/Archon/issues/1843](https://github.com/coleam00/Archon/issues/1843)  
+14. OpenAI Structured Outputs: Complete Developer Guide - Digital Applied, accessed June 9, 2026, [https://www.digitalapplied.com/blog/openai-structured-outputs-complete-guide](https://www.digitalapplied.com/blog/openai-structured-outputs-complete-guide)  
 15. How to use structured outputs with Azure OpenAI in Microsoft Foundry Models, accessed June 9, 2026, [https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/structured-outputs](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/structured-outputs)  
-16. OpenAPI additionalProperties \- APIMatic, accessed June 9, 2026, [https://www.apimatic.io/openapi/additionalproperties](https://www.apimatic.io/openapi/additionalproperties)  
+16. OpenAPI additionalProperties - APIMatic, accessed June 9, 2026, [https://www.apimatic.io/openapi/additionalproperties](https://www.apimatic.io/openapi/additionalproperties)  
 17. Idempotency Patterns: Building Retry-Safe Distributed Systems ..., accessed June 9, 2026, [https://backendbytes.com/articles/idempotency-patterns-distributed-systems/](https://backendbytes.com/articles/idempotency-patterns-distributed-systems/)  
-18. Idempotency Keys: The API Pattern That Saves You From Duplicate Payments and Phantom Records \- DEV Community, accessed June 9, 2026, [https://dev.to/apikumo/idempotency-keys-the-api-pattern-that-saves-you-from-duplicate-payments-and-phantom-records-51b2](https://dev.to/apikumo/idempotency-keys-the-api-pattern-that-saves-you-from-duplicate-payments-and-phantom-records-51b2)  
-19. Designing robust and predictable APIs with idempotency \- Stripe, accessed June 9, 2026, [https://stripe.com/blog/idempotency](https://stripe.com/blog/idempotency)  
-20. Idempotent requests | Stripe API Reference, accessed June 9, 2026, [https://docs.stripe.com/api/idempotent\_requests](https://docs.stripe.com/api/idempotent_requests)  
+18. Idempotency Keys: The API Pattern That Saves You From Duplicate Payments and Phantom Records - DEV Community, accessed June 9, 2026, [https://dev.to/apikumo/idempotency-keys-the-api-pattern-that-saves-you-from-duplicate-payments-and-phantom-records-51b2](https://dev.to/apikumo/idempotency-keys-the-api-pattern-that-saves-you-from-duplicate-payments-and-phantom-records-51b2)  
+19. Designing robust and predictable APIs with idempotency - Stripe, accessed June 9, 2026, [https://stripe.com/blog/idempotency](https://stripe.com/blog/idempotency)  
+20. Idempotent requests | Stripe API Reference, accessed June 9, 2026, [https://docs.stripe.com/api/idempotent_requests](https://docs.stripe.com/api/idempotent_requests)  
 21. Idempotency in Distributed Transaction Systems | The ByteDoodle Blog, accessed June 9, 2026, [https://blog.bytedoodle.com/idempotency-in-distributed-transaction-systems/](https://blog.bytedoodle.com/idempotency-in-distributed-transaction-systems/)  
-22. Navigating OpenAI's JSON-Structured Outputs: Limitations and Solutions \- Daniel Saiz, accessed June 9, 2026, [https://dsaiztc.com/blog/posts/navigating-openai-json-structured-outputs.html](https://dsaiztc.com/blog/posts/navigating-openai-json-structured-outputs.html)  
-23. I got tired of digging through Structured Outputs docs for every provider, so I tested what JSON Schema constraints actually work : r/LLMDevs \- Reddit, accessed June 9, 2026, [https://www.reddit.com/r/LLMDevs/comments/1tarfl4/i\_got\_tired\_of\_digging\_through\_structured\_outputs/](https://www.reddit.com/r/LLMDevs/comments/1tarfl4/i_got_tired_of_digging_through_structured_outputs/)  
-24. Why structured outputs / strict JSON schema became non-negotiable in production agents : r/AI\_Agents \- Reddit, accessed June 9, 2026, [https://www.reddit.com/r/AI\_Agents/comments/1qeetme/why\_structured\_outputs\_strict\_json\_schema\_became/](https://www.reddit.com/r/AI_Agents/comments/1qeetme/why_structured_outputs_strict_json_schema_became/)  
+22. Navigating OpenAI's JSON-Structured Outputs: Limitations and Solutions - Daniel Saiz, accessed June 9, 2026, [https://dsaiztc.com/blog/posts/navigating-openai-json-structured-outputs.html](https://dsaiztc.com/blog/posts/navigating-openai-json-structured-outputs.html)  
+23. I got tired of digging through Structured Outputs docs for every provider, so I tested what JSON Schema constraints actually work : r/LLMDevs - Reddit, accessed June 9, 2026, [https://www.reddit.com/r/LLMDevs/comments/1tarfl4/i_got_tired_of_digging_through_structured_outputs/](https://www.reddit.com/r/LLMDevs/comments/1tarfl4/i_got_tired_of_digging_through_structured_outputs/)  
+24. Why structured outputs / strict JSON schema became non-negotiable in production agents : r/AI_Agents - Reddit, accessed June 9, 2026, [https://www.reddit.com/r/AI_Agents/comments/1qeetme/why_structured_outputs_strict_json_schema_became/](https://www.reddit.com/r/AI_Agents/comments/1qeetme/why_structured_outputs_strict_json_schema_became/)  
 25. MCP security: Risks, MCP server exposure, and best practices for the AI agent era, accessed June 9, 2026, [https://www.nudgesecurity.com/post/mcp-security-risks-mcp-server-exposure-and-best-practices-for-the-ai-agent-era](https://www.nudgesecurity.com/post/mcp-security-risks-mcp-server-exposure-and-best-practices-for-the-ai-agent-era)  
-26. Understanding Authorization in MCP \- Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/docs/tutorials/security/authorization](https://modelcontextprotocol.io/docs/tutorials/security/authorization)  
-27. Is that allowed? Authentication and authorization in Model Context Protocol \- Stack Overflow, accessed June 9, 2026, [https://stackoverflow.blog/2026/01/21/is-that-allowed-authentication-and-authorization-in-model-context-protocol/](https://stackoverflow.blog/2026/01/21/is-that-allowed-authentication-and-authorization-in-model-context-protocol/)  
-28. Semantic conventions for Model Context Protocol (MCP) \- OpenTelemetry, accessed June 9, 2026, [https://opentelemetry.io/docs/specs/semconv/gen-ai/mcp/](https://opentelemetry.io/docs/specs/semconv/gen-ai/mcp/)  
-29. Idempotency | System Design \- AlgoMaster.io, accessed June 9, 2026, [https://algomaster.io/learn/system-design/idempotency](https://algomaster.io/learn/system-design/idempotency)  
-30. Model Context Protocol \- MLOps Community, accessed June 9, 2026, [https://mlops.community/blog/model-context-protocol](https://mlops.community/blog/model-context-protocol)  
-31. How Consistent Are LLM Agents? Measuring Behavioral Reproducibility in Multi-Step Tool-Calling Pipelines \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2605.28840v1](https://arxiv.org/html/2605.28840v1)  
-32. The Agent That Spent $47K on Itself: An Autonomous-Loop Postmortem \- DEV Community, accessed June 9, 2026, [https://dev.to/gabrielanhaia/the-agent-that-spent-47k-on-itself-an-autonomous-loop-postmortem-3313](https://dev.to/gabrielanhaia/the-agent-that-spent-47k-on-itself-an-autonomous-loop-postmortem-3313)  
-33. Saga patterns \- AWS Prescriptive Guidance, accessed June 9, 2026, [https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga.html](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga.html)  
+26. Understanding Authorization in MCP - Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/docs/tutorials/security/authorization](https://modelcontextprotocol.io/docs/tutorials/security/authorization)  
+27. Is that allowed? Authentication and authorization in Model Context Protocol - Stack Overflow, accessed June 9, 2026, [https://stackoverflow.blog/2026/01/21/is-that-allowed-authentication-and-authorization-in-model-context-protocol/](https://stackoverflow.blog/2026/01/21/is-that-allowed-authentication-and-authorization-in-model-context-protocol/)  
+28. Semantic conventions for Model Context Protocol (MCP) - OpenTelemetry, accessed June 9, 2026, [https://opentelemetry.io/docs/specs/semconv/gen-ai/mcp/](https://opentelemetry.io/docs/specs/semconv/gen-ai/mcp/)  
+29. Idempotency | System Design - AlgoMaster.io, accessed June 9, 2026, [https://algomaster.io/learn/system-design/idempotency](https://algomaster.io/learn/system-design/idempotency)  
+30. Model Context Protocol - MLOps Community, accessed June 9, 2026, [https://mlops.community/blog/model-context-protocol](https://mlops.community/blog/model-context-protocol)  
+31. How Consistent Are LLM Agents? Measuring Behavioral Reproducibility in Multi-Step Tool-Calling Pipelines - arXiv, accessed June 9, 2026, [https://arxiv.org/html/2605.28840v1](https://arxiv.org/html/2605.28840v1)  
+32. The Agent That Spent $47K on Itself: An Autonomous-Loop Postmortem - DEV Community, accessed June 9, 2026, [https://dev.to/gabrielanhaia/the-agent-that-spent-47k-on-itself-an-autonomous-loop-postmortem-3313](https://dev.to/gabrielanhaia/the-agent-that-spent-47k-on-itself-an-autonomous-loop-postmortem-3313)  
+33. Saga patterns - AWS Prescriptive Guidance, accessed June 9, 2026, [https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga.html](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga.html)  
 34. What is Model Context Protocol (MCP)? A guide | Google Cloud, accessed June 9, 2026, [https://cloud.google.com/discover/what-is-model-context-protocol](https://cloud.google.com/discover/what-is-model-context-protocol)  
-35. Specification (Draft) \- Model Context Protocol （MCP）, accessed June 9, 2026, [https://modelcontextprotocol.info/specification/draft/](https://modelcontextprotocol.info/specification/draft/)  
-36. The best providers for MCP server authentication in 2026 \- WorkOS, accessed June 9, 2026, [https://workos.com/blog/best-mcp-server-authentication-providers](https://workos.com/blog/best-mcp-server-authentication-providers)
+35. Specification (Draft) - Model Context Protocol （MCP）, accessed June 9, 2026, [https://modelcontextprotocol.info/specification/draft/](https://modelcontextprotocol.info/specification/draft/)  
+36. The best providers for MCP server authentication in 2026 - WorkOS, accessed June 9, 2026, [https://workos.com/blog/best-mcp-server-authentication-providers](https://workos.com/blog/best-mcp-server-authentication-providers)
 
 ---
 
@@ -1374,30 +1406,32 @@ To maintain structural durability within the *AI Engineering Systems Canon*, thi
 * **AI-ENG-N (Tool Contracts)** owns the execution gateway. It determines whether a proposed tool call is syntactically valid, authorized, safe, and idempotent prior to execution. It manages deterministic wrappers, validation schemas, and structural output contracts.  
 * **AI-ENG-O (Action Verification)** owns the post-action truth. It determines what actually occurred after execution, whether the agent’s task state can be updated, whether the user can be notified of completion, and the exact recovery path that must execute if reality diverges from the model’s belief.
 
-  \+---------------------------------------------------------------------------------+  
-  |                            Volume 5 Architectural Boundaries                     |  
-  \+---------------------------------------------------------------------------------+  
+```
+  +---------------------------------------------------------------------------------+  
+  |                            Volume 5 Architectural Boundaries                    |  
+  +---------------------------------------------------------------------------------+  
   |  AI-ENG-M: Agentic Orchestration                                                |  
-  |  \- Decision-making loop                                                         |  
-  |  \- Plan generation and sub-goal management                                      |  
-  |  \- Autonomy boundaries and loop budgets                                         |  
-  \+---------------------------------------------------------------------------------+  
+  |  - Decision-making loop                                                         | 
+  |  - Plan generation and sub-goal management                                      |  
+  |  - Autonomy boundaries and loop budgets                                         |  
+  +---------------------------------------------------------------------------------+  
                                          |  
                                          v  
-  \+---------------------------------------------------------------------------------+  
+  +---------------------------------------------------------------------------------+  
   |  AI-ENG-N: Tool Contracts                                                       |  
-  |  \- Parameter validation and deterministic wrappers                              |  
-  |  \- Security mapping and credentials injection                                   |  
-  |  \- Idempotency key generation and confirmation gates                            |  
-  \+---------------------------------------------------------------------------------+  
+  |  - Parameter validation and deterministic wrappers                              |  
+  |  - Security mapping and credentials injection                                   |  
+  |  - Idempotency key generation and confirmation gates                            |  
+  +---------------------------------------------------------------------------------+  
                                          |  
                                          v  
-  \+---------------------------------------------------------------------------------+  
+  +---------------------------------------------------------------------------------+  
   |  AI-ENG-O: Action Verification (Truth-Management Layer)                         |  
-  |  \- Post-execution state verification and readbacks                              |  
-  |  \- Discrepancy classification and state reconciliation                          |  
-  |  \- Rollback, compensation sagas, and forward recovery                           |  
-  \+---------------------------------------------------------------------------------+
+  |  - Post-execution state verification and readbacks                              |  
+  |  - Discrepancy classification and state reconciliation                          |  
+  |  - Rollback, compensation sagas, and forward recovery                           |  
+  +---------------------------------------------------------------------------------+
+```
 
 Furthermore, this report inherits and extends doctrines from across the broader canon:
 
@@ -1434,19 +1468,21 @@ To establish a uniform vocabulary for platform architects, agent engineers, and 
 ## **The Core Doctrine of Post-Execution Truth**
 
 The architectural foundation of action verification is post-execution truth management. To maintain consistency in distributed systems, platform architects must distinguish between several distinct representations of state. These layers must not be conflated, as each represents a different phase of the execution lifecycle:  
-Planned \-\> Proposed \-\> Validated \-\> Executed \-\> Observed \-\> Verified \-\> Reconciled \-\> Reported
+Planned -> Proposed -> Validated -> Executed -> Observed -> Verified -> Reconciled -> Reported
 
 ### **Why Every Transition Matters**
 
-  Planned   \---\>   Proposed   \---\>   Validated   \---\>   Executed  
+```
+  Planned   --->   Proposed   --->   Validated   --->   Executed  
      |                |                  |                 |  
 (Plan may be     (Proposal may     (Validated call    (Execution may  
  wrong/stale)     be malformed)     may still fail)    time out/abort)  
                                                            |  
-  Reported  \<---  Reconciled  \<---   Verified    \<---   Observed  
+  Reported  <---  Reconciled  <---   Verified    <---   Observed  
      |                |                  |                 |  
 (User report     (Authoritative     (Observation is    (Success returned  
  can't outrun)    state may lag)     only evidence)     may be premature)
+```
 
 1. **Planned to Proposed:** A plan may be syntactically correct but semantically flawed, or it may be based on outdated information.  
 2. **Proposed to Validated:** A proposal generated by a probabilistic model may contain malformed parameters, invalid types, or unauthorized scopes that must be caught by schema checks.  
@@ -1463,7 +1499,7 @@ For example:
 
 * An email service tool may return { "status": "sent" } upon accepting a payload, but the message may still be blocked downstream by a spam filter.  
 * A database write tool may return { "status": "success" }, but the transaction may have hit a database read replica rather than the primary writer node, resulting in a stale read on subsequent queries.  
-* A container creation tool may return { "id": "container\_123" }, but the container may crash-loop immediately after startup.
+* A container creation tool may return { "id": "container_123" }, but the container may crash-loop immediately after startup.
 
 Therefore, a robust system must treat all initial tool observations as unverified claims. The task state must remain locked until an active verification check confirms the change against the authoritative system of record.
 
@@ -1491,38 +1527,40 @@ From an operational and security standpoint, hallucinated success is highly seri
 
 The core engine of action verification is the State Reconciliation Model. This model compares five distinct layers of state to guarantee consistency across the agentic boundary.
 
-  \+--------------------------------------------------------------+  
+```
+  +--------------------------------------------------------------+  
   |                        Intended State                        |  
   |             (User goal: "Increase credit line")              |  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
                                 |  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                       Requested State                        |  
-  |           (API parameters: "requested\_amount": 5000\)         |  
-  \+--------------------------------------------------------------+  
+  |           (API parameters: "requested_amount": 5000)         |  
+  +--------------------------------------------------------------+  
                                 |  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                        Observed State                        |  
   |        (Tool response: HTTP 202 Accepted, "status": "pending")|  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
                                 |  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                     Authoritative State                      |  
-  |         (Database read: "credit\_limit": 5000, LSN: 240892\)   |  
-  \+--------------------------------------------------------------+  
+  |         (Database read: "credit_limit": 5000, LSN: 240892)   |  
+  +--------------------------------------------------------------+  
                                 |  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                     Believed Task State                      |  
   |          (Orchestrator log: "Credit update reconciled")      |  
-  \+--------------------------------------------------------------+
+  +--------------------------------------------------------------+
+```
 
 To ensure system integrity, these state layers must reconcile according to strict mathematical and logical invariants. Let SI be the Intended State, SR be the Requested State, SO be the Observed State, SA be the Authoritative State, and SB be the Believed Task State.  
 An action is considered legally and operationally reconciled if and only if:  
-SA \== SI AND SB is updated with the value of SA  
+SA == SI AND SB is updated with the value of SA  
 If SO returns success but SA does not match SI, a state discrepancy exists. To manage these discrepancies across different operations, systems must apply specific alignment requirements:
 
 | State Layer | Source of Truth | Trust Level | Alignment Requirement |
@@ -1537,15 +1575,17 @@ If SO returns success but SA does not match SI, a state discrepancy exists. To m
 
 To safely process tool outputs, the orchestrator must pass the returned observation through a progressive security and truth verification ladder.
 
-   \<-- Bypasses replicas, logged to immutable ledger  
+```
+   <-- Bypasses replicas, logged to immutable ledger  
                  ^  
-        \<-- Divergence checked, parameters match intent  
+        <-- Divergence checked, parameters match intent  
                  ^  
-  \[ Level 2: Verified Observation \]   \<-- Confirmed via independent API readback  
+  [ Level 2: Verified Observation ]   <-- Confirmed via independent API readback  
                  ^  
-  \[ Level 1: Normalized Observation \] \<-- Raw error codes/JSON mapped to schemas  
+  [ Level 1: Normalized Observation ] <-- Raw error codes/JSON mapped to schemas  
                  ^  
-   \<-- Unstructured terminal streams/unfiltered API
+   <-- Unstructured terminal streams/unfiltered API
+```
 
 * **Level 0: Raw Tool Prose/Output:** Unstructured text, standard output/error streams, or unfiltered API error objects directly from the run environment. *Security Posture:* Extremely unsafe. Subject to tool-use hallucinations, prompt injection, or parsing failures.  
 * **Level 1: Normalized Observation:** Standardized observation schema mapping raw results into typed properties (such as text, JSON, or resource references), isolating raw stack traces. *Security Posture:* Syntactically safe for model consumption but unverified against the physical state.  
@@ -1573,72 +1613,72 @@ Not all actions carry the same operational risk, financial exposure, or legal co
 
 | Side-Effect Class | Required Post-Action Check | Authoritative Verification Source | Permitted Fallback Routing | Latency Tolerance | Human-Review Trigger Threshold |
 | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Read-Only Observation** | Verify TLS certificates, request-response integrity, query parameters echo. | Read-only replica database. | Fallback to primary writer on replica timeout. | \< 100 ms | Never triggered for read operations. |
-| **Ephemeral Write** | Verify file existence, absolute path normalization, write sandboxing, file size. | Sandboxed filesystem monitor. | Abort task and raise execution exception. | \< 500 ms | Triggered only on security sandbox violations. |
-| **Low-Risk Internal Write** | Read-after-write key lookup, verify row count \= 1, assert matching version number. | Primary database writer node. | Fallback to lagging replica with warning log. | \< 1.5 s | Triggered on persistent write conflicts after retries. |
-| **Medium-Risk Operational Write** | Verify object status, diff before/after state properties, check message delivery status. | Application service API or distributed state cache. | Queue for asynchronous verification retries. | \< 5.0 s | Triggered on verification failures exceeding 3 retries. |
-| **High-Risk External Write** | Poll delivery service API, fetch unique tracking ID, verify email DKIM/DMARC signatures. | Third-party partner system API or gateway ledger. | None. Hold transaction in pending state. | \< 30.0 s | Triggered on status declines or payment mismatches. |
-| **Critical Mutation** | Multi-source ledger reconciliation, confirm cryptographic signature, run compliance checks. | Immutable audit ledger or consensus database. | None. Fail closed and lock the transaction. | Asynchronous (\< 10 min) | **Always triggered.** Requires explicit operator sign-off before commit. |
+| **Read-Only Observation** | Verify TLS certificates, request-response integrity, query parameters echo. | Read-only replica database. | Fallback to primary writer on replica timeout. | < 100 ms | Never triggered for read operations. |
+| **Ephemeral Write** | Verify file existence, absolute path normalization, write sandboxing, file size. | Sandboxed filesystem monitor. | Abort task and raise execution exception. | < 500 ms | Triggered only on security sandbox violations. |
+| **Low-Risk Internal Write** | Read-after-write key lookup, verify row count = 1, assert matching version number. | Primary database writer node. | Fallback to lagging replica with warning log. | < 1.5 s | Triggered on persistent write conflicts after retries. |
+| **Medium-Risk Operational Write** | Verify object status, diff before/after state properties, check message delivery status. | Application service API or distributed state cache. | Queue for asynchronous verification retries. | < 5.0 s | Triggered on verification failures exceeding 3 retries. |
+| **High-Risk External Write** | Poll delivery service API, fetch unique tracking ID, verify email DKIM/DMARC signatures. | Third-party partner system API or gateway ledger. | None. Hold transaction in pending state. | < 30.0 s | Triggered on status declines or payment mismatches. |
+| **Critical Mutation** | Multi-source ledger reconciliation, confirm cryptographic signature, run compliance checks. | Immutable audit ledger or consensus database. | None. Fail closed and lock the transaction. | Asynchronous (< 10 min) | **Always triggered.** Requires explicit operator sign-off before commit. |
 
 ## **Post-Action Check Pattern Library**
 
 To operationalize verification across diverse system types, platform designers must implement specific, deterministic post-action validation checks. The following patterns define how these checks are executed for common tool families.
 
-### **1\. Databases**
+### **1. Databases**
 
 * *Validation Action:* Issue a read-after-write query directly to the database writer node, using snapshot isolation to bypass replica lag.  
 * *Verification Parameters:* Verify that the target row exists, the Log Sequence Number (LSN) or row version has incremented, the modified field values match the requested state, and the tenant ID is correct.  
 * *Failure Indicator:* The row count is zero, the row version is stale, or the transaction is blocked by a database lock timeout.
 
-### **2\. Filesystems**
+### **2. Filesystems**
 
 * *Validation Action:* Run a path normalization check to prevent directory traversal attacks. Resolve the target file path outside the local execution sandbox.  
 * *Verification Parameters:* Verify that the file exists, the file size matches the write buffer, the file extension is on the allowlist, and the SHA-256 cryptographic hash matches the source payload.  
 * *Failure Indicator:* The file is not found on the host system (sandboxed write illusion), or the calculated hash does not match the expected value.
 
-### **3\. Email Services**
+### **3. Email Services**
 
 * *Validation Action:* Poll the email delivery service API using the returned unique message ID.  
 * *Verification Parameters:* Verify that the recipient's address is resolved, the status is delivered or queued, and the message has passed SPF, DKIM, and DMARC alignment checks.  
 * *Failure Indicator:* The message is flagged as bounced, rejected by the gateway, or quarantined by spam filters.
 
-### **4\. Calendar Systems**
+### **4. Calendar Systems**
 
 * *Validation Action:* Read the target user's calendar event details using the unique event ID.  
 * *Verification Parameters:* Verify that the event ID exists, the meeting time and timezone are correct, the attendee guest list matches, and the organizer ID is verified.  
 * *Failure Indicator:* The event conflicts with an existing booking, the attendee invitation bounces, or a duplicate event ID is detected.
 
-### **5\. Payments and Refunds**
+### **5. Payments and Refunds**
 
 * *Validation Action:* Query the payment processor ledger using a stable business idempotency key.  
 * *Verification Parameters:* Verify that the transaction status is captured or authorized, the settled amount and currency match the purchase order, and a unique transaction ID is committed.  
 * *Failure Indicator:* The transaction is declined, a duplicate charge is detected under the same idempotency key, or the settled amount diverges.
 
-### **6\. CRM and Ticketing**
+### **6. CRM and Ticketing**
 
 * *Validation Action:* Fetch the updated CRM object or ticket record using the returned unique ID.  
 * *Verification Parameters:* Verify that the ticket status is updated or created, the assignee matches the routing logic, and the change history logs the correct actor ID and workflow ID.  
 * *Failure Indicator:* The field changes are missing, the assignee remains unresolved, or the database write times out due to record locking.
 
-### **7\. Deployment Pipelines**
+### **7. Deployment Pipelines**
 
 * *Validation Action:* Query the deployment orchestrator API to monitor container health metrics and rollout progress.  
 * *Verification Parameters:* Verify that the active rollout stage reaches 100%, all container health checks pass, and the error budget is unaffected.  
 * *Failure Indicator:* An automated rollback is triggered, container crash loops are detected, or the error budget is exceeded.
 
-### **8\. Procurement Systems**
+### **8. Procurement Systems**
 
 * *Validation Action:* Query the procurement register to match the purchase order (PO) details against the approved schema.  
 * *Verification Parameters:* Verify that the PO status is approved, the vendor SKU matches the catalog, and the transaction cost falls within the allocated system margin.  
 * *Failure Indicator:* An unauthorized SKU is detected, the PO is rejected due to spend limits, or a pricing mismatch occurs.
 
-### **9\. Browser and Web Automations**
+### **9. Browser and Web Automations**
 
 * *Validation Action:* Inspect the page state, execute target selector assertions, and verify DOM elements after interaction.  
 * *Verification Parameters:* Verify that the confirmation element is present, the target URL matches the success path, and the downloaded file hash matches.  
 * *Failure Indicator:* The target selector times out, the navigation is blocked by a CAPTCHA challenge, or form validation fails.
 
-### **10\. Security and Infrastructure**
+### **10. Security and Infrastructure**
 
 * *Validation Action:* Query the directory access controls or run a live token assertion check.  
 * *Verification Parameters:* Verify that the subject token lacks excluded scopes, the target policy matches the updated IAM schema, and the change is logged to the security audit trail.  
@@ -1650,79 +1690,83 @@ In complex, distributed systems, operations rarely succeed or fail in a simple b
 
 ### **Real-World Partial Failure Scenarios**
 
-  \+---------------------------------------------------------------------------------+  
+```
+  +---------------------------------------------------------------------------------+  
   |                            Partial Failure Examples                             |  
-  \+---------------------------------------------------------------------------------+  
+  +---------------------------------------------------------------------------------+  
           |  
-          \+---\> CRM ticket is created, but assignee email notification bounces.  
+          +---> CRM ticket is created, but assignee email notification bounces.  
           |  
-          \+---\> Calendar event is scheduled, but one attendee invitation fails.  
+          +---> Calendar event is scheduled, but one attendee invitation fails.  
           |  
-          \+---\> Credit card payment is authorized, but downstream capture times out.  
+          +---> Credit card payment is authorized, but downstream capture times out.  
           |  
-          \+---\> Refund is initiated on a ledger, but bank settlement is delayed.  
+          +---> Refund is initiated on a ledger, but bank settlement is delayed.  
           |  
-          \+---\> File is uploaded to storage, but downstream vector indexing fails.  
+          +---> File is uploaded to storage, but downstream vector indexing fails.  
           |  
-          \+---\> Database write is committed, but cache invalidation times out.  
+          +---> Database write is committed, but cache invalidation times out.  
           |  
-          \+---\> Deployment rolls out to region US-East, but fails in region EU-West.  
+          +---> Deployment rolls out to region US-East, but fails in region EU-West.  
           |  
-          \+---\> CRM update is accepted, but downstream sync is delayed.  
+          +---> CRM update is accepted, but downstream sync is delayed.  
           |  
-          \+---\> Email is queued at the SMTP gateway, but rejected by recipient server.  
+          +---> Email is queued at the SMTP gateway, but rejected by recipient server.  
           |  
-          \+---\> Write commits on primary node, but verification read hits stale replica.
+          +---> Write commits on primary node, but verification read hits stale replica.
+```
 
 To manage these scenarios without corrupting the agent's belief system, the system state machine must represent the following lifecycle states:
 
-                 \+-----------+  
+```
+                 +-----------+  
                  | Proposed  |  
-                 \+-----------+  
+                 +-----------+  
                        |  
                        v  
-                 \+-----------+  
+                 +-----------+  
                  | Validated |  
-                 \+-----------+  
+                 +-----------+  
                        |  
                        v  
-                 \+-----------+  
+                 +-----------+  
                  | Executing |  
-                 \+-----------+  
+                 +-----------+  
                        |  
-        \+--------------+--------------+  
+        +--------------+--------------+  
         |                             |  
         v                             v  
-  \+-----------+                 \+-----------+  
+  +-----------+                 +-----------+  
   | Accepted  |                 |  Failed   |  
-  \+-----------+                 \+-----------+  
+  +-----------+                 +-----------+  
         |                             |  
         v                             v  
-  \+-----------+                 \+-----------+  
+  +-----------+                 +-----------+  
   |  Pending  |                 |   Error   |  
-  \+-----------+                 \+-----------+  
+  +-----------+                 +-----------+  
         |                             |  
         v                             v  
-  \+-----------+                 \+-----------+  
+  +-----------+                 +-----------+  
   | Committed |                 | Escalated |  
-  \+-----------+                 \+-----------+  
+  +-----------+                 +-----------+  
         |                             |  
         v                             v  
-  \+-----------------------+     \+-----------+  
+  +-----------------------+     +-----------+  
   |  Partially Committed  |     | Abandoned |  
-  \+-----------------------+     \+-----------+  
+  +-----------------------+     +-----------+  
         |  
-        \+------------+  
+        +------------+  
         |            |  
         v            v  
-  \+--------------+ \+-------------+  
+  +--------------+ +-------------+  
   | Compensating | | Rolled Back |  
-  \+--------------+ \+-------------+  
+  +--------------+ +-------------+  
         |  
         v  
-  \+--------------+  
+  +--------------+  
   | Compensated  |  
-  \+--------------+
+  +--------------+
+```
 
 ### **Technical System States and Transitions**
 
@@ -1744,12 +1788,14 @@ To manage these scenarios without corrupting the agent's belief system, the syst
 
 When a discrepancy is detected during verification, the system must choose an appropriate recovery path based on the transactional semantics of the target systems.
 
+```
                                       Pivot Transaction  
                                               |  
                                               v  
-  \---\> \---\> \---\>  
+  ---> ---> --->  
            |                          |                         |                        |  
      (Compensable)              (Compensable)              (Idempotent)             (Idempotent)
+```
 
 ### **Rollback**
 
@@ -1788,8 +1834,8 @@ To handle verification failures deterministically, the system applies a set of r
 
 | Discrepancy Type | Verification Finding | Active Operational Condition | Target Recovery Action | Technical Rationale |
 | :---- | :---- | :---- | :---- | :---- |
-| **Observation / Authority Mismatch** | Tool returned success, but readback shows old state. | Seconds behind source \<= 5.0 s. | **Retry Verification** | The replica is likely lagging; a brief delay before retrying allows replication to catch up. |
-| **Observation / Authority Mismatch** | Tool returned success, but readback shows old state. | Seconds behind source \> 5.0 s. | **Force Master Read** | Significant replication lag detected; bypass the replica and query the master database directly. |
+| **Observation / Authority Mismatch** | Tool returned success, but readback shows old state. | Seconds behind source <= 5.0 s. | **Retry Verification** | The replica is likely lagging; a brief delay before retrying allows replication to catch up. |
+| **Observation / Authority Mismatch** | Tool returned success, but readback shows old state. | Seconds behind source > 5.0 s. | **Force Master Read** | Significant replication lag detected; bypass the replica and query the master database directly. |
 | **Observation / Authority Mismatch** | Tool returned success, but readback shows old state. | Target system lacks a read API or verification endpoint. | **Escalate and Hold** | Verification is impossible; freeze the workflow and route the task to manual operator review. |
 | **Verification Timeout** | Verification polling timed out during check. | Action is classed as reversible. | **Compensate and Stop** | Prevent the system from hanging; run compensating actions to clean up and report a failure. |
 | **Verification Timeout** | Verification polling timed out during check. | Action is irreversible. | **Hold and Escalate** | Reversing is impossible; freeze the workflow and route the task to manual operator review. |
@@ -1806,92 +1852,93 @@ To handle verification failures deterministically, the system applies a set of r
 
 To support security audits, automated replays, and forensic investigations, the system must log every action transition within a structured, append-only Action Ledger. Unlike runtime traces (which track raw execution paths and latency), the Action Ledger records the logical state changes and verification proof for each transaction.
 
-JSON  
+```JSON  
 {  
   "$schema": "https://json-schema.org/draft/2020-12/schema",  
   "title": "ActionLedgerEntry",  
   "type": "object",  
-  "required": \[  
-    "action\_id",  
-    "workflow\_run\_id",  
-    "tenant\_id",  
-    "user\_id",  
-    "idempotency\_key",  
-    "side\_effect\_class",  
-    "intended\_outcome",  
-    "execution\_status",  
+  "required": [  
+    "action_id",  
+    "workflow_run_id",  
+    "tenant_id",  
+    "user_id",  
+    "idempotency_key",  
+    "side_effect_class",  
+    "intended_outcome",  
+    "execution_status",  
     "timestamps"  
-  \],  
+  ],  
   "properties": {  
-    "action\_id": { "type": "string", "format": "uuid" },  
-    "workflow\_run\_id": { "type": "string", "format": "uuid" },  
-    "tenant\_id": { "type": "string" },  
-    "user\_id": { "type": "string" },  
-    "idempotency\_key": { "type": "string" },  
-    "side\_effect\_class": {   
+    "action_id": { "type": "string", "format": "uuid" },  
+    "workflow_run_id": { "type": "string", "format": "uuid" },  
+    "tenant_id": { "type": "string" },  
+    "user_id": { "type": "string" },  
+    "idempotency_key": { "type": "string" },  
+    "side_effect_class": {   
       "type": "string",   
-      "enum": \["read-only", "ephemeral-write", "low-risk-write", "medium-risk-write", "high-risk-write", "critical-mutation"\]   
+      "enum": ["read-only", "ephemeral-write", "low-risk-write", "medium-risk-write", "high-risk-write", "critical-mutation"]   
     },  
-    "intended\_outcome": {  
+    "intended_outcome": {  
       "type": "object",  
-      "required": \["target\_resource", "expected\_state"\],  
+      "required": ["target_resource", "expected_state"],  
       "properties": {  
-        "target\_resource": { "type": "string" },  
-        "expected\_state": { "type": "object" }  
+        "target_resource": { "type": "string" },  
+        "expected_state": { "type": "object" }  
       }  
     },  
-    "validated\_payload\_hash": { "type": "string" },  
-    "execution\_status": {   
+    "validated_payload_hash": { "type": "string" },  
+    "execution_status": {   
       "type": "string",   
-      "enum": \["proposed", "validated", "executing", "accepted", "pending", "committed", "partially-committed", "failed", "compensating", "compensated", "rolled-back", "review-required", "abandoned"\]   
+      "enum": ["proposed", "validated", "executing", "accepted", "pending", "committed", "partially-committed", "failed", "compensating", "compensated", "rolled-back", "review-required", "abandoned"]   
     },  
-    "observation\_object": {  
+    "observation_object": {  
       "type": "object",  
-      "required": \["status\_code", "payload"\],  
+      "required": ["status_code", "payload"],  
       "properties": {  
-        "status\_code": { "type": "integer" },  
+        "status_code": { "type": "integer" },  
         "payload": { "type": "object" }  
       }  
     },  
-    "verification\_query": {  
+    "verification_query": {  
       "type": "object",  
-      "required": \["query\_endpoint", "parameters"\],  
+      "required": ["query_endpoint", "parameters"],  
       "properties": {  
-        "query\_endpoint": { "type": "string" },  
+        "query_endpoint": { "type": "string" },  
         "parameters": { "type": "object" }  
       }  
     },  
-    "verification\_result": {  
+    "verification_result": {  
       "type": "object",  
-      "required": \["verified\_state", "mismatch\_detected"\],  
+      "required": ["verified_state", "mismatch_detected"],  
       "properties": {  
-        "verified\_state": { "type": "object" },  
-        "mismatch\_detected": { "type": "boolean" },  
-        "discrepancy\_classification": { "type": "string" }  
+        "verified_state": { "type": "object" },  
+        "mismatch_detected": { "type": "boolean" },  
+        "discrepancy_classification": { "type": "string" }  
       }  
     },  
     "recovery": {  
       "type": "object",  
       "properties": {  
-        "recovery\_decision": { "type": "string" },  
-        "compensation\_action\_id": { "type": "string", "format": "uuid" },  
-        "rollback\_action\_id": { "type": "string", "format": "uuid" },  
-        "escalated\_to\_user\_id": { "type": "string" }  
+        "recovery_decision": { "type": "string" },  
+        "compensation_action_id": { "type": "string", "format": "uuid" },  
+        "rollback_action_id": { "type": "string", "format": "uuid" },  
+        "escalated_to_user_id": { "type": "string" }  
       }  
     },  
     "timestamps": {  
       "type": "object",  
-      "required": \["proposed\_at"\],  
+      "required": ["proposed_at"],  
       "properties": {  
-        "proposed\_at": { "type": "string", "format": "date-time" },  
-        "executed\_at": { "type": "string", "format": "date-time" },  
-        "verified\_at": { "type": "string", "format": "date-time" },  
-        "reconciled\_at": { "type": "string", "format": "date-time" }  
+        "proposed_at": { "type": "string", "format": "date-time" },  
+        "executed_at": { "type": "string", "format": "date-time" },  
+        "verified_at": { "type": "string", "format": "date-time" },  
+        "reconciled_at": { "type": "string", "format": "date-time" }  
       }  
     },  
-    "trace\_parent\_id": { "type": "string" }  
+    "trace_parent_id": { "type": "string" }  
   }  
 }
+```
 
 The difference between a trace and an action ledger is operational and qualitative:
 
@@ -1902,32 +1949,34 @@ The difference between a trace and an action ledger is operational and qualitati
 
 To prevent model belief drift—where a model plans subsequent steps based on assumptions about its own execution success—the orchestrator must enforce a strict separation between the model's generation context and the verified task state.
 
-  \+--------------------------------------------------------------+  
+```
+  +--------------------------------------------------------------+  
   |                   Model Execution Context                    |  
-  |   Model: "I will call charge\_card() for $100."              |  
-  \+--------------------------------------------------------------+  
+  |   Model: "I will call charge_card() for $100."              |  
+  +--------------------------------------------------------------+  
                                 |  
                                 | (API call initiated)  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                Deterministic Execution Layer                 |  
   |   Returns: HTTP 202, "status": "pending"                     |  
   |   (Task state remains locked at "unpaid")                    |  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
                                 |  
                                 | (Asynchronous Verification)  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                     Authoritative Ledger                     |  
   |   Confirms: Charge settled on bank register                  |  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
                                 |  
                                 | (State updated & grounding context injected)  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                   Model Evaluation Context                   |  
   |   Model: "Verification confirmed. The order is paid."        |  
-  \+--------------------------------------------------------------+
+  +--------------------------------------------------------------+
+```
 
 1. **Read-Only Orchestrator State:** The orchestrator maintains the structured task state outside the model's context window. This state cannot be modified by the model's output text. It is updated only via structured verification events.  
 2. **State-Grounding Context Injection:** When the model is invoked for its next planning step, the orchestrator injects the verified task state directly into the system prompt context. The model is forced to evaluate its next steps based on this grounded truth, rather than relying on its historical generation logs.  

@@ -196,7 +196,7 @@ where lambda represents the temporal decay rate, and (t - t_last) is the duratio
 
 When correcting behavioral errors or enforcing constraints in a production system, engineers must climb an explicit **Intervention Ladder**. Systems should be designed to execute the lightest, most reversible, and most maintainable change first before committing resources to heavy weight-adaptation or training cycles.4
 
-        
+```       
           ▲  
           │   10. Model Distillation   
           │    9. Preference Tuning (DPO / SecAlign)   
@@ -208,7 +208,7 @@ When correcting behavioral errors or enforcing constraints in a production syste
           │    3. Harness-Level Role/Delimiter Assembly   
           │    2. Few-Shot Example & Output Frame Tuning   
           │    1. Semantic & Instruction-Level Editing   
-          │  
+```
       
 
 ### **Adaptation Choice Matrix**

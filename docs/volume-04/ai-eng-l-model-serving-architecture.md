@@ -55,45 +55,107 @@ To ensure structural durability for retrieval-augmented generation (RAG) and est
 A robust serving platform must orchestrate multiple software and hardware layers to deliver deterministic SLAs on top of non-deterministic model engines. The reference architecture diagram below traces the path of a client request down to physical GPU clusters.
 
 ```
-+---------------------------------------------------------------------------------+  
-|                                 CLIENT CLIENT                                   |  
-+---------------------------------------------------------------------------------+  
-                                         |  
-                                         v  
-+---------------------------------------------------------------------------------+  
-|                     API GATEWAY / INGRESS (SSL, Global Auth)                    |  
-+---------------------------------------------------------------------------------+  
-                                         |  
-                                         v  
-+---------------------------------------------------------------------------------+  
-|               TENANT POLICY ENGINE & RATE LIMITER (Redis, Quotas)               |  
-+---------------------------------------------------------------------------------+  
-                                         |  
-                                         v  
-+---------------------------------------------------------------------------------+  
-|          MODEL ROUTER / CLASSIFIER (RouteLLM, Semantic Cache Lookup)            |  
-+---------------------------------------------------------------------------------+  
-                                         |  
-                                         v  
-+---------------------------------------------------------------------------------+  
-|        LOAD BALANCER & DISPATCH LAYER (EPP, Late-Binding Flow Control)          |  
-+---------------------------------------------------------------------------------+  
-                /               |                                                         
-                        /                |                \  
-                       v                 v                 v  
-+---------------------------------------------------------------------------------+  
-|            QUEUES & ADMISSION CONTROLLERS (Priority Queuing, Headroom)          |  
-+---------------------------------------------------------------------------------+  
-                         |               |               |  
-                         v               v               v  
-+---------------------------------------------------------------------------------+  
-|                  INFERENCE SERVERS (vLLM, SGLang, Triton, Ray)                  |  
-+---------------------------------------------------------------------------------+  
-                         |               |               |  
-                         v               v               v  
-+---------------------------------------------------------------------------------+  
-|            ACCELERATED HARDWARE (GPUs, HBM, PCIe Topology, NUMA Nodes)          |  
-+---------------------------------------------------------------------------------+
++----------------------------------------------------------------------------------------------------+
+|                              SERVING STACK REFERENCE ARCHITECTURE                                  |
++----------------------------------------------------------------------------------------------------+
+|                                                                                                    |
+|                                        [ Client / SDK ]                                            |
+|                                               |                                                    |
+|                                               v                                                    |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                              API Gateway / Ingress                                       |      |
+|  |                                                                                          |      |
+|  |  TLS termination | global auth | corporate SSO | coarse rate limits | request logging    |      |
+|  +---------------------------------------------+--------------------------------------------+      |
+|                                                |                                                   |
+|                                                v                                                   |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                         Tenant Policy Engine & Rate Limiter                              |      |
+|  |                                                                                          |      |
+|  |  API key validation | tenant tier | quotas | RPM / TPM / concurrency | budget ceilings   |      |
+|  +---------------------------------------------+--------------------------------------------+      |
+|                                                |                                                   |
+|                                                v                                                   |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                          Request Classification / Context Analysis                       |      |
+|  |                                                                                          |      |
+|  |  modality | language | context length | schema need | risk level | latency / cost target |      |
+|  +---------------------------------------------+--------------------------------------------+      |
+|                                                |                                                   |
+|                                                v                                                   |
+|  +---------------------------------------------------------------------------------------------+   |
+|  |                              Model Router / Gateway                                         |   |
+|  |                                                                                             |   |
+|  |  static rules | semantic routing | portfolio selection | fallback policy | canary split     |   |
+|  +----------------------+----------------------+----------------------+------------------------+   |
+|                         |                      |                      |                            |
+|                         |                      |                      |                            |
+|                         v                      v                      v                            |
+|          +-------------------------+  +-----------------------+  +-----------------------------+   |
+|          | Cache Layers            |  | Retrieval / Tool      |  | Control Plane Snapshot      |   |
+|          |                         |  | Sidecars              |  |                             |   |
+|          | semantic cache          |  | vector retrieval      |  | routing policy              |   |
+|          | prompt / prefix cache   |  | tool gateways         |  | model metadata              |   |
+|          | radix cache telemetry   |  | MCP / API connectors  |  | tenant configs              |   |
+|          +-----------+-------------+  +-----------+-----------+  | release manifests           |   |
+|                      |                            |              | rollback state              |   |
+|                      +------------+---------------+              +-------------+---------------+   |
+|                                   |                                            |                   |
+|                                   v                                            |                   |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                         Load Balancer & Dispatch Layer                                   |      |
+|  |                                                                                          |      |
+|  |  queue depth | prefix affinity | adapter residency | cache warmth | late-binding flow ctrl  |   |
+|  +----------------------+----------------------+----------------------+------------------------+   |
+|                         |                      |                      |                            |
+|                         v                      v                      v                            |
+|          +-------------------------+  +-----------------------+  +-----------------------------+   |
+|          | Queue / Admission Lane  |  | Queue / Admission Lane|  | Queue / Admission Lane      |   |
+|          | premium / low-latency   |  | standard interactive  |  | batch / background          |   |
+|          | priority + headroom     |  | fair-share scheduling |  | async deferral              |   |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   |
+|                      |                            |                            |                   |
+|                      +----------------------------+----------------------------+                   |
+|                                                   |                                                |
+|                                                   v                                                |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                                  Inference Servers                                       |      |
+|  |                                                                                          |      |
+|  |  vLLM | SGLang | TensorRT-LLM | Triton | Ray Serve | KServe runtime containers           |      |
+|  |                                                                                          |      |
+|  |  model loading | continuous batching | paged KV cache | adapters | telemetry hooks       |      |
+|  +----------------------+----------------------+----------------------+----------------------------+
+|                         |                      |                      |                            |
+|                         v                      v                      v                            |
+|          +-------------------------+  +-----------------------+  +-----------------------------+   |
+|          | GPU Pool A              |  | GPU Pool B            |  | GPU Pool C                  |   |
+|          | warm frontier models    |  | quantized specialists |  | batch / overflow / fallback |   |
+|          | HBM + KV cache          |  | LoRA adapter resident |  | degraded-mode capacity      |   |
+|          +-------------------------+  +-----------------------+  +-----------------------------+   |
+|                                                   |                                                |
+|                                                   v                                                |
+|  +--------------------------------------------------------------------------------------------+    |
+|  |                              Output Validation Layer                                       |    |
+|  |                                                                                            |    |
+|  |  schema validation | safety filters | tool-result checks | grounding checks | retry gates  |    |
+|  +----------------------+--------------------------------------+------------------------------+    |
+|                         |                                      |                                   |
+|                         v                                      v                                   |
+|              [ Valid Response Stream ]              [ Fallback / Retry / Human Review ]            |
+|                         |                                      |                                   |
+|                         +----------------------+---------------+                                   |
+|                                                |                                                   |
+|                                                v                                                   |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                                   Telemetry & Audit                                      |      |
+|  |                                                                                          |      |
+|  |  traces | TTFT | ITL | queue depth | cache hit rate | model SHA | tenant cost | failures |      |
+|  +------------------------------------------------------------------------------------------+      |
+|                                                                                                    |
++----------------------------------------------------------------------------------------------------+
+| Supporting control-plane services: Model Registry, Artifact Store, Autoscaler, Rollback            |
+| Controller, Health Checks, Policy Config Store, and Release/Canary Manager.                        |
++----------------------------------------------------------------------------------------------------+
 ```
 
 ### **Serving Stack Reference Architecture**
@@ -157,38 +219,97 @@ Before any model checkpoint or adapter is promoted to active serving, it must pa
 ### **Serving Compatibility Gate Model**
 
 ```
-        |  
-        v  
-+-----------------------+  
-|  Model Architecture   |  Check model configuration files against compiled engine runtimes.  
-+-----------------------+  
-        | Passed  
-        v  
-+-----------------------+  
-|  Tokenizer Integrity  |  Verify vocabulary matches and check input prompt template configurations.  
-+-----------------------+  
-        | Passed  
-        v  
-+-----------------------+  
-| Quantization Format   |  Validate quantization scheme (FP8, INT4) against target GPU architecture.  
-+-----------------------+  
-        | Passed  
-        v  
-+-----------------------+  
-| Adapter Compatibility |  Verify dynamic adapter target matches parent model structure.  
-+-----------------------+  
-        | Passed  
-        v  
-+-----------------------+  
-| Kernel Compatibility  |  Verify target hardware supports optimized FlashAttention and DeepEP kernels.[16, 42]  
-+-----------------------+  
-        | Passed  
-        v  
-+-----------------------+  
-| Compilation & Capture |  Run test compilation to generate and cache CUDA graph templates.  
-+-----------------------+  
-        | Passed  
-        v
++--------------------------------------------------------------------------------------------------+
+|                                SERVING COMPATIBILITY GATE MODEL                                  |
++--------------------------------------------------------------------------------------------------+
+|                                                                                                  |
+|  Goal: prevent incompatible model artifacts from reaching live inference hardware.               |
+|                                                                                                  |
+|  [ Candidate Serving Artifact ]                                                                  |
+|        |                                                                                         |
+|        |  model weights | tokenizer | prompt template | quantization config | LoRA adapters      |
+|        v                                                                                         |
+|  [ Target Serving Environment ]                                                                  |
+|        |                                                                                         |
+|        |  runtime engine | GPU type | CUDA stack | kernel set | memory budget | deployment tier  |
+|        v                                                                                         |
+|                                                                                                  |
+|  +------------------------------------------------------------------------------------------+    |
+|  |  Gate 1: Model Architecture                                                              |    |
+|  |  Check config files, layer structure, attention type, MoE layout, rope scaling, and      |    |
+|  |  engine support against vLLM / SGLang / TensorRT-LLM / Triton target runtime.            |    |
+|  +---------------------------------------------+--------------------------------------------+    |
+|                                                | Passed                                          |
+|                                                v                                                 |
+|  +------------------------------------------------------------------------------------------+    |
+|  |  Gate 2: Tokenizer and Template Integrity                                                |    |
+|  |  Verify vocabulary, special tokens, chat template, BOS/EOS behavior, tool-call tokens,   |    |
+|  |  and tokenizer compression ratio against expected production prompts.                    |    |
+|  +---------------------------------------------+--------------------------------------------+    |
+|                                                | Passed                                          |
+|                                                v                                                 |
+|  +------------------------------------------------------------------------------------------+    |
+|  |  Gate 3: Precision / Quantization Format                                                 |    |
+|  |  Validate FP16 / BF16 / FP8 / INT8 / INT4 format against target GPU architecture,        |    |
+|  |  runtime kernels, calibration assumptions, and dequantization path.                      |    |
+|  +---------------------------------------------+--------------------------------------------+    |
+|                                                | Passed                                          |
+|                                                v                                                 |
+|  +------------------------------------------------------------------------------------------+    |
+|  |  Gate 4: Adapter Compatibility                                                           |    |
+|  |  Confirm LoRA / adapter target modules, rank, tokenizer assumptions, routing labels,     |    |
+|  |  and parent-model SHA match the active base checkpoint.                                  |    |
+|  +---------------------------------------------+--------------------------------------------+    |
+|                                                | Passed                                          |
+|                                                v                                                 |
+|  +------------------------------------------------------------------------------------------+    |
+|  |  Gate 5: Kernel and Hardware Compatibility                                               |    |
+|  |  Verify FlashAttention, paged KV cache, CUDA graph capture, DeepEP / MoE kernels,        |    |
+|  |  tensor parallelism, and GPU compute capability support.                                 |    |
+|  +---------------------------------------------+--------------------------------------------+    |
+|                                                | Passed                                          |
+|                                                v                                                 |
+|  +-------------------------------------------------------------------------------------------+   |
+|  |  Gate 6: Memory Envelope                                                                  |   |
+|  |  Dry-run VRAM allocation for weights, KV cache, batch size, max context length, adapters, |   |
+|  |  framework overhead, and safety headroom. Reject likely OOM or swap-heavy deployments.    |   |
+|  +---------------------------------------------+---------------------------------------------+   |
+|                                                | Passed                                          |
+|                                                v                                                 |
+|  +------------------------------------------------------------------------------------------+    |
+|  |  Gate 7: Compilation and Runtime Capture                                                 |    |
+|  |  Run startup compile, kernel warmup, CUDA graph capture, tokenizer smoke test, and mock  |    |
+|  |  request execution. Cache successful templates where supported.                          |    |
+|  +---------------------------------------------+--------------------------------------------+    |
+|                                                | Passed                                          |
+|                                                v                                                 |
+|  +------------------------------------------------------------------------------------------+    |
+|  |  Gate 8: Serving Smoke Test                                                              |    |
+|  |  Execute representative prompts through routing, batching, KV allocation, streaming,     |    |
+|  |  validation, telemetry, and fallback hooks.                                              |    |
+|  +---------------------------------------------+--------------------------------------------+    |
+|                                                | Passed                                          |
+|                                                v                                                 |
+|                                      [ Register as Canary Route ]                                |
+|                                                |                                                 |
+|                                                v                                                 |
+|                                      [ Promote if Telemetry Holds ]                              |
+|                                                                                                  |
+|  Failure path from any gate:                                                                     |
+|                                                                                                  |
+|        [ Gate Failure ]                                                                          |
+|              |                                                                                   |
+|              v                                                                                   |
+|        [ Reject Artifact / Block Promotion ]                                                     |
+|              |                                                                                   |
+|              +--> emit compatibility report                                                      |
+|              +--> keep previous stable route active                                              |
+|              +--> quarantine artifact or return to build pipeline                                |
+|                                                                                                  |
++--------------------------------------------------------------------------------------------------+
+| Doctrine: a model is not deployable merely because it loads. It must fit the runtime, tokenizer, |
+| precision path, adapter stack, kernel set, memory envelope, validation layer, and rollback plan. |
++--------------------------------------------------------------------------------------------------+
 ```
 
 ## **Routing Architecture & Multi-Model Orchestration**
@@ -196,23 +317,84 @@ Before any model checkpoint or adapter is promoted to active serving, it must pa
 A multi-model routing layer transforms an expensive, fragile model cluster into a resilient, cost-efficient utility.4 Most production routing architectures implement a hybrid design: static routing rules process explicit identifiers, semantic routing evaluates prompt intents, and cascading pipelines handle failure recovery.4
 
 ```
-                  
-                              |  
-                              +---------------------------------------+  
-                              | Prompt Context Analysis                |  
-                              v                                       v  
-                     [ Intent Match? ]                         
-                       /           \                             /           \  
-                 Yes  /             \  No                  Yes  /             \  No  
-                     v               v                         v               v  
-               [ Capability Evaluator ]    
-                     |               |                         |               |  
-                     |               +-------------------------+               |  
-                     v                                                         v  
-                                                     
-                     |  
-                     v  
-            
++----------------------------------------------------------------------------------------------------+
+|                         ROUTING ARCHITECTURE & MULTI-MODEL ORCHESTRATION                           |
++----------------------------------------------------------------------------------------------------+
+|                                                                                                    |
+|  [ Incoming Request ]                                                                              |
+|        |                                                                                           |
+|        v                                                                                           |
+|  +---------------------------------------------------------------------------------------------+   |
+|  |                              Prompt Context Analysis                                        |   |
+|  |                                                                                             |   |
+|  |  Extract: tenant | region | modality | language | context length | schema need | risk       |   |
+|  |           task type | latency target | budget ceiling | tool requirements | user tier       |   |
+|  +----------------------+----------------------+----------------------+------------------------+   |
+|                         |                      |                      |                            |
+|                         v                      v                      v                            |
+|              [ Static Rule? ]        [ Semantic Intent? ]       [ Safety / Policy Risk? ]          |
+|                    /   \                    /   \                       /   \                      |
+|              Yes  /     \ No          Yes  /     \ No             High /     \ Normal              |
+|                  v       v                v       v                   v       v                    |
+|        [ Explicit Route ]      [ Capability Evaluator ]      [ Secure / Human ]                    |
+|        model id, tenant tier,         |                       [ Review Route ]                     |
+|        region, tool contract          |                               |                            |
+|                  |                    v                               |                            |
+|                  |        +-------------------------------------+      |                           |
+|                  |        |       Capability / Cost Evaluator    |      |                          |
+|                  |        |                                     |      |                           |
+|                  |        | - reasoning depth                   |      |                           |
+|                  |        | - tool-use reliability              |      |                           |
+|                  |        | - schema adherence                  |      |                           |
+|                  |        | - multimodal fit                    |      |                           |
+|                  |        | - long-context fit                  |      |                           |
+|                  |        | - queue depth and availability      |      |                           |
+|                  |        | - cost per successful outcome       |      |                           |
+|                  |        +------------------+------------------+      |                           |
+|                  |                           |                         |                           |
+|                  +---------------------------+-------------------------+                           |
+|                                              |                                                     |
+|                                              v                                                     |
+|  +---------------------------------------------------------------------------------------------+   |
+|  |                                Route Selection Layer                                        |   |
+|  +----------------------+----------------------+----------------------+------------------------+   |
+|                         |                      |                      |                            |
+|                         v                      v                      v                            |
+|          +-------------------------+  +-----------------------+  +------------------------------+  |
+|          | Low-Cost Local Model    |  | Premium Frontier Model |  | Specialized Model Route     |  |
+|          |                         |  |                       |  |                              |  |
+|          | classification          |  | deep reasoning         |  | code / math / vision        |  |
+|          | extraction              |  | high-risk synthesis    |  | embeddings / reranking      |  |
+|          | simple drafting         |  | long-context analysis  |  | structured-output specialist|  |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+----------------+  |
+|                      |                            |                            |                   |
+|                      +----------------------------+----------------------------+                   |
+|                                                   |                                                |
+|                                                   v                                                |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                                  Execution + Validation                                  |      |
+|  |                                                                                          |      |
+|  |  Run model -> validate schema -> check tool args -> verify grounding -> inspect safety   |      |
+|  +----------------------+--------------------------------------+----------------------------+      |
+|                         |                                      |                                   |
+|                         v                                      v                                   |
+|              [ Validation Pass ]                    [ Validation / Confidence Failure ]            |
+|                         |                                      |                                   |
+|                         v                                      v                                   |
+|              [ Return Response ]              +-------------------------------+                    |
+|                                               | Cascading Fallback Controller |                    |
+|                                               +---------------+---------------+                    |
+|                                                               |                                    |
+|                                                               v                                    |
+|                                      [ Retry on stronger / safer route ]                           |
+|                                                               |                                    |
+|                                      [ Human Review or Fail-Closed Path ]                          |
+|                                                                                                    |
++----------------------------------------------------------------------------------------------------+
+| Routing doctrine: prefer pre-generation routing when the request can be classified cheaply;        |
+| use cascades only when the first route is likely to pass validation. Log every routing decision    |
+| with rejected alternatives, validation results, cost, latency, and fallback path.                  |
++----------------------------------------------------------------------------------------------------+
 ```
 
 Task-based and capability-based routing map straightforward requests to low-parameter models, while routing reasoning-heavy tasks to frontier networks.4 Risk-based routing automatically redirects high-stakes workflows (e.g., financial transactions or patient-facing diagnostic requests) to secure, pre-validated local models or human review queues.4  
@@ -241,21 +423,106 @@ To prevent these conditions, modern balancers implement memory-, cache-, and ada
 ### **Load Balancing Model for LLM Serving**
 
 ```
-                            
-                                    |  
-                                    v  
-                         <-- Extract model + strict char budget   
-                                    |  
-                                    v  
-                         <-- Blake2b hash on 256-token window   
-                                    |  
-                                    v  
-                       [ Prefix Overlap Lookup ]   <-- Score prefix match against nodes   
-                                    |  
-                                    v  
-                       [ Load-Aware Evaluator ]    <-- Adjust scores based on active queues   
-                                    |  
-                                    v  
++-------------------------------------------------------------------------------------------------+
+|                              LOAD BALANCING MODEL FOR LLM SERVING                               |
++-------------------------------------------------------------------------------------------------+
+|                                                                                                 |
+|  [ Incoming Inference Request ]                                                                 |
+|        |                                                                                        |
+|        v                                                                                        |
+|  +------------------------------------------------------------------------------------------+   |
+|  |                              Routing Key Extraction                                      |   |
+|  |                                                                                          |   |
+|  |  Extract stable fields:                                                                  |   |
+|  |  - target model                                                                          |   |
+|  |  - tenant / priority tier                                                                |   |
+|  |  - LoRA adapter or specialist route                                                      |   |
+|  |  - system prompt prefix                                                                  |   |
+|  |  - first user-turn prefix                                                                |   |
+|  |  - strict token / character budget                                                       |   |
+|  +---------------------------------------------+--------------------------------------------+   |
+|                                                |                                                |
+|                                                v                                                |
+|  +------------------------------------------------------------------------------------------+   |
+|  |                              Prefix Hash Construction                                    |   |
+|  |                                                                                          |   |
+|  |  Tokenize selected prefix window.                                                        |   |
+|  |  Compute stable hash, e.g.:                                                              |   |
+|  |                                                                                          |   |
+|  |      prefix_hash = blake2b(model_id | adapter_id | system_prefix | first_user_prefix)    |   |
+|  |      candidate_rank = prefix_hash % data_parallel_size                                   |   |
+|  |                                                                                          |   |
+|  |  Purpose: keep related turns near the replica holding warm KV / prefix cache blocks.     |   |
+|  +---------------------------------------------+--------------------------------------------+   |
+|                                                |                                                |
+|                                                v                                                |
+|  +------------------------------------------------------------------------------------------+   |
+|  |                              Cache-Affinity Lookup                                       |   |
+|  |                                                                                          |   |
+|  |  Score candidate replicas by:                                                            |   |
+|  |  - exact prefix-cache hit                                                                |   |
+|  |  - partial radix-tree prefix overlap                                                     |   |
+|  |  - active KV block residency                                                             |   |
+|  |  - semantic-cache hit, if safe for task                                                  |   |
+|  |  - adapter already loaded in HBM                                                         |   |
+|  +---------------------------------------------+--------------------------------------------+   |
+|                                                |                                                |
+|                                                v                                                |
+|  +------------------------------------------------------------------------------------------+   |
+|  |                              Load-Aware Evaluator                                        |   |
+|  |                                                                                          |   |
+|  |  Adjust cache-affinity score using live serving pressure:                                |   |
+|  |  - queue depth                                                                           |   |
+|  |  - waiting request count                                                                 |   |
+|  |  - active decode batch size                                                              |   |
+|  |  - HBM / KV cache occupancy                                                              |   |
+|  |  - preemption or recompute rate                                                          |   |
+|  |  - tenant fairness and reserved headroom                                                 |   |
+|  |  - p95 / p99 TTFT and inter-token latency                                                |   |
+|  +---------------------------------------------+--------------------------------------------+   |
+|                                                |                                                |
+|                                                v                                                |
+|  +------------------------------------------------------------------------------------------+   |
+|  |                         Late-Binding Dispatch Decision                                   |   |
+|  |                                                                                          |   |
+|  |  Hold request centrally until a downstream execution slot is actually available.         |   |
+|  |  Avoid binding early to a node that becomes saturated before the request reaches GPU.    |   |
+|  +-------------------------+--------------------------+--------------------------+----------+   |
+|                            |                          |                          |              |
+|                            v                          v                          v              |
+|+----------------------------+  +----------------------------+  +----------------------------+   |
+|| Replica A                  |  | Replica B                  |  | Replica C                  |   |
+||                            |  |                            |  |                            |   |
+|| Warm prefix cache: high    |  | Warm prefix cache: medium  |  | Warm prefix cache: low     |   |
+|| Queue depth: moderate      |  | Queue depth: low           |  | Queue depth: low           |   |
+|| Adapter resident: yes      |  | Adapter resident: no       |  | Adapter resident: yes      |   |
+|| HBM pressure: acceptable   |  | HBM pressure: acceptable   |  | HBM pressure: high         |   |
+|+-------------+--------------+  +-------------+--------------+  +-------------+--------------+   |
+|              |                               |                               |                  |
+|              +-------------------------------+-------------------------------+                  |
+|                                              |                                                  |
+|                                              v                                                  |
+|                                  [ Best Replica Selected ]                                      |
+|                                              |                                                  |
+|                                              v                                                  |
+|  +------------------------------------------------------------------------------------------+   |
+|  |                              Queue / Admission Controller                                |   |
+|  |                                                                                          |   |
+|  |  Admit if capacity exists; otherwise apply priority queueing, backpressure, downgrade,   |   |
+|  |  async deferral, or HTTP 429 / 503 depending on tenant policy and workload class.        |   |
+|  +---------------------------------------------+--------------------------------------------+   |
+|                                                |                                                |
+|                                                v                                                |
+|                                      [ Inference Server Execution ]                             |
+|                                                |                                                |
+|                                                v                                                |
+|                                  [ Stream Response + Emit Telemetry ]                           |
+|                                                                                                 |
++-------------------------------------------------------------------------------------------------+
+| Doctrine: route to the warmest acceptable replica, not merely the emptiest one. Round-robin     |
+| ignores prompt length, KV cache locality, adapter residency, and HBM pressure, which is how one |
+| gets very expensive chaos with a progress bar.                                                  |
++-------------------------------------------------------------------------------------------------+
 ```                       
 
 * **Consistent Hashing:** Hashes request parameters (e.g., Tenant ID) to route sequential requests from the same user to the same replica, preserving localized cache affinity.7  
@@ -288,13 +555,72 @@ When serving heavy workloads, processing prompts (prefills) and generating token
 Disaggregating these phases onto dedicated prefill and decode pools isolates execution.11 In a disaggregated deployment, a proxy coordinates the multi-step request flow: it dispatches the prompt to a prefill worker, waits for completion, transfers the resulting KV cache to a decode worker, and streams the generated tokens back to the client.21
 
 ```
-Client Request -> [ Proxy ]  
-                     |  
-                     +---> (Prefill Request) -> [ Prefill Node ] -- (Generate KV Cache)  
-                     |                                 |  
-                     |                        (RDMA / NVLink) [12, 21]  
-                     |                                 v  
-                     +---> (Decode Request)  -> -- (Generate Tokens) -> Client [45]
++-------------------------------------------------------------------------------------------------+
+|                                  PREFILL-DECODE DISAGGREGATION                                  |
++-------------------------------------------------------------------------------------------------+
+|                                                                                                 |
+|  Goal: separate compute-bound prompt processing from memory-bandwidth-bound token generation.   |
+|                                                                                                 |
+|  [ Client Request ]                                                                             |
+|        |                                                                                        |
+|        v                                                                                        |
+|  +------------------------------------------------------------------------------------------+   |
+|  |                                      Proxy / Router                                      |   |
+|  |                                                                                          |   |
+|  |  - selects prefill pool and decode pool                                                  |   |
+|  |  - reserves decode-side KV blocks                                                        |   |
+|  |  - coordinates transfer backend                                                          |   |
+|  |  - streams final tokens back to client                                                   |   |
+|  +----------------------------+-------------------------------------------------------------+   |
+|                               |                                                                 |
+|                               | 1. Bootstrap / preallocate KV                                   |
+|                               v                                                                 |
+|  +-------------------------------------------------------------------------------------------+  |
+|  |                                  Decode Instance Pool                                     |  |
+|  |                                                                                           |  |
+|  |  [ Prealloc Queue ] -> [ Transfer Queue ] -> [ Waiting Queue ] -> [ Running Decode Batch ]|  |
+|  |        ^                     ^                     ^                       |              |  |
+|  |        |                     |                     |                       |              |  |
+|  |        |                     |                     |                       v              |  |
+|  |        |                     |                     |              generate next tokens    |  |
+|  +--------+---------------------+---------------------+-----------------------+--------------+  |
+|           ^                     ^                                             |                 |
+|           |                     | 4. KV received;                             |                 |
+|           |                     |    request becomes decode-ready             |                 |
+|           | 2. decode memory    |                                             |                 |
+|           |    reservation ack  |                                             |                 |
+|           |                     |                                             v                 |
+|  +--------+---------------------+------------------------------------------------------------+  |
+|  |                                  Prefill Instance Pool                                    |  |
+|  |                                                                                           |  |
+|  |  [ Bootstrap Queue ] -> [ Waiting Queue ] -> [ Inflight Queue ]                           |  |
+|  |        |                     |                    |                                       |  |
+|  |        |                     |                    |                                       |  |
+|  |        |                     v                    v                                       |  |
+|  |        |          compute prompt forward pass     monitor KV transfer status              |  |
+|  |        |                                                                                  |  |
+|  +--------+----------------------------+-----------------------------------------------------+  |
+|                                        |                                                        |
+|                                        | 3. stream / push KV cache blocks                       |
+|                                        v                                                        |
+|                         +-------------------------------------------+                           |
+|                         | KV Transfer Backend                       |                           |
+|                         |                                           |                           |
+|                         | RDMA | NVLink | NIXL | Mooncake-style     |                           |
+|                         | layerwise KV movement into decode memory  |                           |
+|                         +--------------------+----------------------+                           |
+|                                              |                                                  |
+|                                              v                                                  |
+|                                  [ Decode Pool Resumes Generation ]                             |
+|                                              |                                                  |
+|                                              v                                                  |
+|                                  [ Tokens Streamed to Client ]                                  |
+|                                                                                                 |
++-------------------------------------------------------------------------------------------------+
+| Doctrine: prefill is compute-bound; decode is memory-bandwidth-bound. Disaggregation improves   |
+| throughput only when KV transfer and decode-side preallocation are cheaper than mixed-node      |
+| head-of-line blocking.                                                                          |
++-------------------------------------------------------------------------------------------------+
 ```
 
 To support disaggregated execution, SGLang manages specialized queues across prefill and decode instances.12
@@ -312,17 +638,110 @@ Multi-tenant enterprise serving architectures must protect hardware pools from t
 ### **Tenant-Aware Capacity Model**
 
 ```
- -> [ API Key Lookup ] ->  
-                                                    |  
-                                                    v  
-                                      [ Limit Exceeded? ]  
-                                        /             \  
-                                  Yes  /               \ No  
-                                      v                 v  
-                               
-                                                   - MIG Partitioning   
-                                                   - CUDA MPS SM Allocation   
-                                                   - PCIe-Aware Placement 
++----------------------------------------------------------------------------------------------------+
+|                                  TENANT-AWARE CAPACITY MODEL                                       |
++----------------------------------------------------------------------------------------------------+
+|                                                                                                    |
+|  Goal: prevent one tenant from starving shared GPU capacity, queue slots, HBM, PCIe bandwidth,     |
+|  or premium model access.                                                                          |
+|                                                                                                    |
+|  [ Incoming Request ]                                                                              |
+|        |                                                                                           |
+|        v                                                                                           |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                                  API Key Lookup                                          |      |
+|  |                                                                                          |      |
+|  |  Resolve opaque key -> tenant ID, plan, priority tier, region, allowed models, budgets.  |      |
+|  +---------------------------------------------+--------------------------------------------+      |
+|                                                |                                                   |
+|                                                v                                                   |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                              Tenant Policy Resolution                                    |      |
+|  |                                                                                          |      |
+|  |  Load: RPM limit | TPM limit | concurrency cap | spend ceiling | model entitlement       |      |
+|  |        data residency | isolation requirement | fallback tier | queue priority           |      |
+|  +---------------------------------------------+--------------------------------------------+      |
+|                                                |                                                   |
+|                                                v                                                   |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                          Atomic Limit / Quota Enforcement                                |      |
+|  |                                                                                          |      |
+|  |  Redis token buckets and Lua locks enforce:                                              |      |
+|  |  - requests per minute                                                                   |      |
+|  |  - tokens per minute                                                                     |      |
+|  |  - active concurrent requests                                                            |      |
+|  |  - daily / monthly budget ceilings                                                       |      |
+|  +---------------------------------------------+--------------------------------------------+      |
+|                                                |                                                   |
+|                                      [ Limit Exceeded? ]                                           |
+|                                         /             \                                            |
+|                                  Yes   /               \   No                                      |
+|                                       v                 v                                          |
+|  +-----------------------------------------+     +--------------------------------------------+    |
+|  |       Backpressure / Rejection Path     |     |       Weighted Fair Admission Path         |    |
+|  |                                         |     |                                            |    |
+|  |  - HTTP 429 for rate-limit breach       |     |  - assign tenant priority class            |    |
+|  |  - HTTP 402 / budget error if exhausted |     |  - reserve headroom for premium tiers      |    |
+|  |  - downgrade route if policy permits    |     |  - place request in fair-share queue       |    |
+|  |  - async deferral for batch workload    |     |  - prevent noisy-neighbor starvation       |    |
+|  +--------------------+--------------------+     +---------------------+----------------------+    |
+|                       |                                        |                                   |
+|                       v                                        v                                   |
+|              [ Return Clean Error                 +-------------------------------+                |
+|                or Degraded Route ]                | Capacity Classifier           |                |
+|                                                    |                               |               |
+|                                                    | - interactive vs batch        |               |
+|                                                    | - low-risk vs high-risk       |               |
+|                                                    | - premium vs standard tier    |               |
+|                                                    | - isolation requirement       |               |
+|                                                    +---------------+---------------+               |
+|                                                                    |                               |
+|                                                                    v                               |
+|  +---------------------------------------------------------------------------------------------+   |
+|  |                         Logical Scheduling / Queue Isolation                                |   |
+|  |                                                                                             |   |
+|  |  Weighted fair queues | priority lanes | per-tenant concurrency slots | reserved headroom   |   |
+|  |  circuit breakers    | retry limits   | agent recursion limits       | downgrade policy     |   |
+|  +----------------------+----------------------+----------------------+------------------------+   |
+|                         |                      |                      |                            |
+|                         v                      v                      v                            |
+|          +-------------------------+  +-----------------------+  +-----------------------------+   |
+|          | Shared Standard Pool    |  | Premium Low-Latency   |  | Isolated / Regulated Pool   |   |
+|          |                         |  | Pool                  |  |                             |   |
+|          | fair-share scheduling   |  | reserved queue slots  |  | tenant-specific routing     |   |
+|          | small / medium models   |  | warm frontier models  |  | private region / VPC / node |   |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   |
+|                      |                            |                            |                   |
+|                      +----------------------------+----------------------------+                   |
+|                                                   |                                                |
+|                                                   v                                                |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                              Hardware Isolation Layer                                    |      |
+|  |                                                                                          |      |
+|  |  Select physical placement based on tenant class and workload pressure:                  |      |
+|  |                                                                                          |      |
+|  |  - MIG partitioning: hard GPU/HBM partition for stronger isolation                       |      |
+|  |  - CUDA MPS allocation: dynamic SM and memory-share control                              |      |
+|  |  - PCIe-aware placement: avoid shared-bus contention and NUMA hot spots                  |      |
+|  |  - adapter / cache affinity: route to nodes with warm LoRA or prefix cache state         |      |
+|  +---------------------------------------------+--------------------------------------------+      |
+|                                                |                                                   |
+|                                                v                                                   |
+|                                     [ Inference Execution ]                                        |
+|                                                |                                                   |
+|                                                v                                                   |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                               Usage Accounting & Telemetry                               |      |
+|  |                                                                                          |      |
+|  |  Record tenant ID, queue wait, TTFT, ITL, tokens, GPU pool, cache hits, failures, spend. |      |
+|  |  Feed metrics back into quota state, billing, autoscaling, abuse detection, and SLOs.    |      |
+|  +------------------------------------------------------------------------------------------+      |
+|                                                                                                    |
++----------------------------------------------------------------------------------------------------+
+| Doctrine: tenant isolation starts at the gateway but does not end there. Logical quotas prevent    |
+| request floods; physical placement prevents one tenant from ruining GPU, HBM, PCIe, and tail       |
+| latency for everyone else.                                                                         |
++----------------------------------------------------------------------------------------------------+   
 ```
 
 * **Opaque Key Verification:** Resolves tenant identity at the gateway using hashed keys, matching requests to billing plans and routing tables.  
@@ -385,21 +804,106 @@ To enforce usage policies, platforms deploy rate limiters that track requests an
 ### **Rate Limit and Quota Model**
 
 ```
-                     
-                               |  
-                               v  
-                      
-                               |  
-         +---------------------+---------------------+  
-         |                     |                     |  
-         v                     v                     v  
-                       [ Concurrency ]  
-- Tracks RPM via       - Tracks input/output - Tracks in-flight  
-  sorted sets.    limits per user.      active slots.  
-         |                     |                     |  
-         +---------------------+---------------------+  
-                               |  
-                               v  
++----------------------------------------------------------------------------------------------------+
+|                                  RATE LIMIT AND QUOTA MODEL                                        |
++----------------------------------------------------------------------------------------------------+
+|                                                                                                    |
+|  Goal: enforce tenant usage limits before requests consume scarce GPU, queue, KV-cache,            |
+|  tool-call, or budget resources.                                                                   |
+|                                                                                                    |
+|  [ Incoming Request ]                                                                              |
+|        |                                                                                           |
+|        v                                                                                           |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                              Tenant Identity Resolution                                  |      |
+|  |                                                                                          |      |
+|  |  API key -> tenant ID | plan | priority tier | region | model entitlement | billing scope|      |
+|  +---------------------------------------------+--------------------------------------------+      |
+|                                                |                                                   |
+|                                                v                                                   |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                              Usage Policy Lookup                                         |      |
+|  |                                                                                          |      |
+|  |  Load active limits for the tenant:                                                      |      |
+|  |                                                                                          |      |
+|  |  - requests per minute                                                                   |      |
+|  |  - tokens per minute                                                                     |      |
+|  |  - concurrent requests                                                                   |      |
+|  |  - agent recursion / tool-call depth                                                     |      |
+|  |  - daily, monthly, or contract budget ceiling                                            |      |
+|  +---------------------------------------------+--------------------------------------------+      |
+|                                                |                                                   |
+|                                                v                                                   |
+|  +---------------------------------------------------------------------------------------------+   |
+|  |                              Atomic Usage Check                                             |   |
+|  |                                                                                             |   |
+|  |  Redis / durable counter layer applies token buckets, sliding windows, and Lua locks        |   |
+|  |  so high-concurrency requests cannot bypass limits through TOCTOU races.                    |   |
+|  +----------------------+----------------------+----------------------+------------------------+   |
+|                         |                      |                      |                            |
+|                         v                      v                      v                            |
+|          +-------------------------+  +-----------------------+  +-----------------------------+   |
+|          | RPM Meter               |  | TPM Meter             |  | Concurrency Meter           |   |
+|          |                         |  |                       |  |                             |   |
+|          | Sliding-window request  |  | Input + output token  |  | Active in-flight requests   |   |
+|          | count per tenant / key  |  | budget per time slice |  | and reserved execution slots|   |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   |
+|                      |                            |                            |                   |
+|                      v                            v                            v                   |
+|          +-------------------------+  +-----------------------+  +-----------------------------+   |
+|          | Agent Step Meter        |  | Budget Meter          |  | Abuse / Retry Meter         |   |
+|          |                         |  |                       |  |                             |   |
+|          | Max tool calls, loops,  |  | Daily / monthly spend |  | Retry storms, recursion,    |   |
+|          | recursive turns, and    |  | ceiling and per-query |  | burst spikes, suspicious    |   |
+|          | workflow depth          |  | cost estimate         |  | usage patterns              |   |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   |
+|                      |                            |                            |                   |
+|                      +----------------------------+----------------------------+                   |
+|                                                   |                                                |
+|                                                   v                                                |
+|                                      [ Any Limit Exceeded? ]                                       |
+|                                             /             \                                        |
+|                                      Yes   /               \   No                                  |
+|                                           v                 v                                      |
+|  +--------------------------------------------+    +---------------------------------------------+ |
+|  |             Backpressure Path              |    |             Admission Path                  | |
+|  |                                            |    |                                             | |
+|  |  Select response by violation type:        |    |  Reserve counters and execution slot:       | |
+|  |                                            |    |                                             | |
+|  |  - HTTP 429: rate or concurrency exceeded  |    |  - increment request counter                | |
+|  |  - HTTP 402 / budget error: spend ceiling  |    |  - reserve estimated token budget           | |
+|  |  - HTTP 400: context or policy violation   |    |  - acquire concurrency slot                 | |
+|  |  - HTTP 503: backend saturation            |    |  - assign queue priority                    | |
+|  |  - downgrade route if policy permits       |    |  - attach tenant and billing metadata       | |
+|  |  - async deferral for batch work           |    |  - forward to queue / router / executor     | |
+|  +----------------------+---------------------+    +----------------------+----------------------+ |
+|                         |                                           |                              |
+|                         v                                           v                              |
+|          [ Clean Error / Degraded Route ]              [ Queue / Routing / Execution ]             |
+|                         |                                           |                              |
+|                         +--------------------+----------------------+                              |
+|                                              |                                                     |
+|                                              v                                                     |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                              Usage Finalization                                          |      |
+|  |                                                                                          |      |
+|  |  After execution, reconcile actual input tokens, generated tokens, tool calls, latency,  |      |
+|  |  retries, GPU pool, cache hits, and final cost against reserved quota.                   |      |
+|  +---------------------------------------------+--------------------------------------------+      |
+|                                                |                                                   |
+|                                                v                                                   |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                              Telemetry / Billing / Abuse Feedback                        |      |
+|  |                                                                                          |      |
+|  |  Emit tenant usage records for billing, dashboards, quota updates, autoscaling, anomaly  |      |
+|  |  detection, and circuit-breaker policy.                                                  |      |
+|  +------------------------------------------------------------------------------------------+      |
+|                                                                                                    |
++----------------------------------------------------------------------------------------------------+
+| Doctrine: rate limits protect the request path; quotas protect the business contract;              |
+| concurrency limits protect execution slots; budget ceilings protect the wallet from catching       |
+| fire and calling it innovation.                                                                    |
++----------------------------------------------------------------------------------------------------+
 ```                 
 
 * **Requests Per Minute (RPM):** Monitored per tenant using sliding-window Redis sorted sets, rejecting bursts exceeding plans.  
@@ -431,13 +935,76 @@ To protect users from cold-start latencies, architectures implement model reside
 ### **Model Residency Strategy**
 
 ```
-[ Active GPU Pool ]  
-  |-- Warm Masters (Frontier models kept resident in HBM; captured CUDA graphs) [3, 43]  
-  |-- Dynamic LoRA Cache (Parent model warm in HBM; loads dynamic adapters on demand)   
-  |
-  |-- On-Demand Specialists (Quantized models loaded to HBM on first call)   
-  |
-  |-- Async Batch Lanes (Offline models loaded only for scheduled batch tasks) [3, 8, 19]
++---------------------------------------------------------------------------------------------------+
+|                                      MODEL RESIDENCY STRATEGY                                     |
++---------------------------------------------------------------------------------------------------+
+|                                                                                                   |
+|  Goal: decide which model artifacts stay hot in GPU memory, which remain warm nearby, and         |
+|  which are loaded only when demand justifies the cold-start cost.                                 |
+|                                                                                                   |
+|  +------------------------------------------------------------------------------------------+     |
+|  |                                Model Registry / Artifact Store                           |     |
+|  |                                                                                          |     |
+|  |  SHA-pinned base models | quantized variants | LoRA adapters | CUDA templates | snapshots|     |
+|  +---------------------------------------------+--------------------------------------------+     |
+|                                                |                                                  |
+|                                                v                                                  |
+|  +------------------------------------------------------------------------------------------+     |
+|  |                              Residency Policy Controller                                 |     |
+|  |                                                                                          |     |
+|  |  Inputs: traffic frequency | latency SLA | model size | tenant tier | cold-start cost    |     |
+|  |          GPU supply | adapter demand | batch schedule | fallback requirement             |     |
+|  +----------------------+----------------------+----------------------+---------------------+     |
+|                         |                      |                      |                           |
+|                         v                      v                      v                           |
+|          +-------------------------+  +-----------------------+  +-----------------------------+  |
+|          | Tier 1: Hot Residency   |  | Tier 2: Warm Residency |  | Tier 3: On-Demand Residency|  |
+|          |                         |  |                       |  |                             |  |
+|          | Frontier / primary      |  | Parent model resident  |  | Quantized specialists,     |  |
+|          | models kept loaded in   |  | in HBM; adapters,      |  | rarely used tools, regional|  |
+|          | GPU HBM with warmed     |  | CUDA graphs, tokenizer |  | models, overflow capacity. |  |
+|          | kernels and captured    |  | state, and snapshots   |  | Loaded into HBM on first   |  |
+|          | CUDA graphs.            |  | kept close to runtime. |  | qualifying request.        |  |
+|          |                         |  |                       |  |                             |  |
+|          | Best for: low-latency   |  | Best for: dynamic      |  | Best for: medium-latency   |  |
+|          | interactive traffic.    |  | LoRA / adapter traffic.|  | specialized routes.        |  |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+  |
+|                      |                            |                            |                  |
+|                      |                            |                            v                  |
+|                      |                            |               +-----------------------------+ |
+|                      |                            |               | Cold-Start Mitigation       | |
+|                      |                            |               |                             | |
+|                      |                            |               | local weight cache          | |
+|                      |                            |               | snapshot restore            | |
+|                      |                            |               | precompiled templates       | |
+|                      |                            |               | eager startup mode          | |
+|                      |                            |               +-------------+---------------+ |
+|                      |                            |                             |                 |
+|                      +----------------------------+-----------------------------+                 |
+|                                                   |                                               |
+|                                                   v                                               |
+|  +------------------------------------------------------------------------------------------+     |
+|  |                              Tier 4: Async / Batch Residency                             |     |
+|  |                                                                                          |     |
+|  |  Offline models loaded only for scheduled jobs, bulk evaluation, embedding refreshes,    |     |
+|  |  backfills, nightly processing, or non-interactive tenant workloads.                     |     |
+|  +---------------------------------------------+--------------------------------------------+     |
+|                                                |                                                  |
+|                                                v                                                  |
+|  +------------------------------------------------------------------------------------------+     |
+|  |                              Router / Autoscaler Feedback                                |     |
+|  |                                                                                          |     |
+|  |  Promote models upward when request volume, SLA pressure, or fallback importance rises.  |     |
+|  |  Demote models downward when traffic falls, GPU pressure spikes, or cache value decays.  |     |
+|  +---------------------------------------------+--------------------------------------------+     |
+|                                                |                                                  |
+|                                                v                                                  |
+|                                  [ Active GPU Pool Allocation ]                                   |
+|                                                                                                   |
++---------------------------------------------------------------------------------------------------+
+| Residency rule: keep latency-critical and high-frequency models hot; keep likely specialists      |
+| warm; load rare models on demand; push non-interactive work into async batch lanes.               |
++---------------------------------------------------------------------------------------------------+
 ```
 
 To optimize serverless cold starts, runtimes trade peak execution performance for fast startup times.43 For example, launching vLLM with the --enforce-eager flag skips time-consuming compiler optimizations and CUDA graph captures, reducing cold starts from 460 seconds to 219 seconds.43  
@@ -463,19 +1030,98 @@ Selecting a deployment topology requires balancing tradeoffs across compliance, 
 Architectures must isolate failures proactively to preserve user-facing SLAs.8 If a component degrades, the serving platform must transition traffic immediately to healthy backups.27
 
 ```
-                               |  
-                               |  
-              +----------------+----------------+  
-              |                                 |  
-              v                                 v  
-              |                                 |  
-              v                                 v  
-              |                                 |  
-              v                                 v  
-                                                |  
-                               +----------------+----------------+  
-                               |                                 |  
-                               v                                 v  
++------------------------------------------------------------------------------------------------+
+|                         HIGH AVAILABILITY, FAILOVER, AND DEGRADED MODES                        |
++------------------------------------------------------------------------------------------------+
+|                                                                                                |
+|  Goal: preserve service continuity when a serving component, model route, region, GPU pool,    |
+|  provider, registry, cache layer, or telemetry path degrades.                                  |
+|                                                                                                |
+|  [ Live Production Traffic ]                                                                   |
+|        |                                                                                       |
+|        v                                                                                       |
+|  +------------------------------------------------------------------------------------------+  |
+|  |                         Health Checks / Telemetry Watchers                               |  |
+|  |                                                                                          |  |
+|  |  Monitor: API latency | router timeouts | queue depth | GPU OOM | registry failures      |  |
+|  |           cache loss | provider errors | P95/P99 TTFT | validation failures              |  |
+|  +---------------------------------------------+--------------------------------------------+  |
+|                                                |                                               |
+|                                                v                                               |
+|                                      [ Component Healthy? ]                                    |
+|                                         /             \                                        |
+|                                  Yes   /               \   No                                  |
+|                                       v                 v                                      |
+|                          [ Continue Primary Route ]     +-----------------------------------+  |
+|                                                         | Trip Circuit Breaker              |  |
+|                                                         | isolate unhealthy component       |  |
+|                                                         | stop routing new traffic there    |  |
+|                                                         +----------------+------------------+  |
+|                                                                          |                     |
+|                                                                          v                     |
+|+------------------------------------------------------------------------------------------+    |
+||                              Failure Classification                                      |    |
+|+----------------------+----------------------+----------------------+---------------------+    |
+|                       |                      |                      |                          |
+|                       v                      v                      v                          |
+|        +-------------------------+  +-----------------------+  +-----------------------------+ |
+|        | Runtime / GPU Failure   |  | Route / Provider      |  | Registry / Artifact Failure | |
+|        |                         |  | Failure               |  |                             | |
+|        | OOM, SIGSEGV, HBM       |  | router timeout, API   |  | missing weights, checksum   | |
+|        | pressure, preemption    |  | outage, region drop   |  | mismatch, mount timeout     | |
+|        +-----------+-------------+  +-----------+-----------+  +-------------+---------------+ |
+|                    |                            |                            |                 |
+|                    v                            v                            v                 |
+|          [ Backup GPU Pool ]       [ Secondary Route / Region ]     [ Previous Stable SHA ]    |
+|                      |                            |                            |               |
+|                      +----------------------------+----------------------------+               |
+|                                                   |                                            |
+|                                                   v                                            |
+|                                      [ Capacity Available? ]                                   |
+|                                         /             \                                        |
+|                                  Yes   /               \   No                                  |
+|                                       v                 v                                      |
+|  +-----------------------------------------+     +-------------------------------------------+ |
+|  |             Failover Route              |     |              Degraded Mode                | |
+|  |                                         |     |                                           | |
+|  |  - reroute to healthy replica           |     |  - downgrade to smaller model             | |
+|  |  - shift to secondary region            |     |  - disable tools or long-context mode     | |
+|  |  - use external provider fallback       |     |  - return cached-safe response            | |
+|  |  - rollback to prior model version      |     |  - async defer batch or low-priority work | |
+|  |  - preserve tenant and trace metadata   |     |  - shed traffic with clean 429 / 503      | |
+|  +--------------------+--------------------+     +----------------------+--------------------+ |
+|                       |                                                 |                      |
+|                       +--------------------+----------------------------+                      |
+|                                            |                                                   |
+|                                            v                                                   |
+|  +------------------------------------------------------------------------------------------+  |
+|  |                              Response Preservation                                       |  |
+|  |                                                                                          |  |
+|  |  Stream response if safe; otherwise return standardized degraded-service message with    |  |
+|  |  retry guidance, request ID, and trace linkage.                                          |  |
+|  +---------------------------------------------+--------------------------------------------+  |
+|                                                |                                               |
+|                                                v                                               |
+|  +------------------------------------------------------------------------------------------+  |
+|  |                              Recovery Controller                                         |  |
+|  |                                                                                          |  |
+|  |  Restart containers | restore snapshots | resync registry | warm replacement nodes       |  |
+|  |  rehydrate cache    | verify health     | run smoke tests | reopen circuit gradually     |  |
+|  +---------------------------------------------+--------------------------------------------+  |
+|                                                |                                               |
+|                                                v                                               |
+|  +------------------------------------------------------------------------------------------+  |
+|  |                              Post-Failover Telemetry                                     |  |
+|  |                                                                                          |  |
+|  |  Log failure cause, affected tenants, fallback route, degraded-mode duration, latency,   |  |
+|  |  cost impact, validation results, and rollback / recovery actions.                       |  |
+|  +------------------------------------------------------------------------------------------+  |
+|                                                                                                |
++------------------------------------------------------------------------------------------------+
+| Doctrine: failover should isolate the failing component, preserve the user-facing workflow when|
+| possible, degrade gracefully when capacity is constrained, and never require live traffic to   |
+| discover whether the replacement path works.                                                   |
++------------------------------------------------------------------------------------------------+
 ```
 
 ### **High-Availability and Failover Model**
@@ -494,11 +1140,95 @@ When capacity is severely constrained, platforms transition to degraded serving 
 ### **Degraded-Mode Serving Pattern Library**
 
 ```
-[ Active Capacity Constraints ]  
-  |-- Primary Route Saturated -> Model Downgrade (Diverts 70B queries to 8B parameter replicas)   
-  |-- Local GPU Outages       -> Provider Fallback (Redirects local tasks to external hosted API)   
-  |-- Dynamic Storage Drops   -> Cached-Safe (Returns cached responses for identical context queries)   
-  |-- Queue Saturation Peaks  -> Async Deferral (Pushes interactive requests to scheduled batch queues) 
++----------------------------------------------------------------------------------------------------+
+|                              DEGRADED-MODE SERVING PATTERN LIBRARY                                 |
++----------------------------------------------------------------------------------------------------+
+|                                                                                                    |
+|  Goal: preserve essential user workflows during partial capacity, provider, model, storage,        |
+|  cache, tool, or validation failures.                                                              |
+|                                                                                                    |
+|  [ Active Capacity / Reliability Constraint ]                                                      |
+|        |                                                                                           |
+|        v                                                                                           |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                              Constraint Classifier                                       |      |
+|  |                                                                                          |      |
+|  |  Identify: saturation | outage | storage failure | cache loss | tool failure | risk level|      |
+|  |            affected tenants | affected models | expected duration | SLA impact           |      |
+|  +----------------------+----------------------+----------------------+---------------------+      |
+|                         |                      |                      |                            |
+|                         v                      v                      v                            |
+|          +-------------------------+  +-----------------------+  +-----------------------------+   |
+|          | Primary Route Saturated |  | Local GPU / Region    |  | Dynamic Storage / Registry  |   |
+|          |                         |  | Outage                |  | Failure                     |   |
+|          | queue depth high        |  | unhealthy GPU pool    |  | weights unavailable         |   |
+|          | TTFT / ITL rising       |  | zone unavailable      |  | adapter load failure        |   |
+|          | HBM pressure high       |  | provider errors       |  | checksum / mount failure    |   |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   |
+|                      |                            |                            |                   |
+|                      v                            v                            v                   |
+|          [ Model Downgrade ]       [ Provider / Region Fallback ]  [ Previous Stable Artifact ]    |
+|                      |                            |                            |                   |
+|                      |                            |                            |                   |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   |
+|          | Use smaller or cheaper  |  | Redirect to healthy   |  | Roll back to known-good     |   |
+|          | model tier; reduce      |  | region, external API, |  | model SHA, warm snapshot,   |   |
+|          | max tokens, context,    |  | or backup GPU pool.   |  | or cached local artifact.   |   |
+|          | or reasoning effort.    |  |                       |  |                             |   |
+|          +-------------------------+  +-----------------------+  +-----------------------------+   |
+|                         |                      |                      |                            |
+|                         v                      v                      v                            |
+|          +-------------------------+  +-----------------------+  +-----------------------------+   |
+|          | Cache / Retrieval Loss  |  | Tool / Validator      |  | Queue Saturation / Burst    |   |
+|          |                         |  | Failure               |  | Traffic                     |   |
+|          | semantic cache down     |  | tool gateway down     |  | request spike               |   |
+|          | prefix cache cold       |  | schema validator down |  | retry storm                 |   |
+|          | retrieval unavailable   |  | policy checker down   |  | batch jobs competing        |   |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   |
+|                      |                            |                            |                   |
+|                      v                            v                            v                   |
+|          [ Cached-Safe / Direct ]   [ Feature Clipping ]        [ Async Deferral / Shedding ]      |
+|                      |                            |                            |                   |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   |
+|          | Return verified cached  |  | Disable affected      |  | Move low-priority work to   |   |
+|          | responses when exact    |  | tools, long-context   |  | batch lane, enforce 429 /   |   |
+|          | match is safe; otherwise|  | features, autonomous  |  | 503, preserve premium and   |   |
+|          | bypass cache and warn.  |  | actions, or strict    |  | interactive headroom.       |   |
+|          |                         |  | modes as needed.      |  |                             |   |
+|          +-------------------------+  +-----------------------+  +-----------------------------+   |
+|                                                   |                                                |
+|                                                   |                                                |
+|                                                   v                                                |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                              Risk and Safety Gate                                        |      |
+|  |                                                                                          |      |
+|  |  Low-risk workflow  -> continue in degraded mode with visible limitations.               |      |
+|  |  High-risk workflow -> fail closed, human review, or require retry after recovery.       |      |
+|  +---------------------------------------------+--------------------------------------------+      |
+|                                                |                                                   |
+|                                                v                                                   |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                              User-Facing Response Policy                                 |      |
+|  |                                                                                          |      |
+|  |  - stream degraded answer if safe                                                        |      |
+|  |  - disclose reduced capability when relevant                                             |      |
+|  |  - attach request ID / trace ID                                                          |      |
+|  |  - avoid silent downgrade for high-stakes tasks                                          |      |
+|  |  - return clean 429 / 503 / validation error when service cannot safely continue         |      |
+|  +---------------------------------------------+--------------------------------------------+      |
+|                                                |                                                   |
+|                                                v                                                   |
+|  +------------------------------------------------------------------------------------------+      |
+|  |                              Recovery and Exit Criteria                                  |      |
+|  |                                                                                          |      |
+|  |  Restore normal route only after health checks, smoke tests, capacity recovery, registry |      |
+|  |  validation, cache rehydration, and telemetry stability confirm the primary path is safe.|      |
+|  +------------------------------------------------------------------------------------------+      |
+|                                                                                                    |
++----------------------------------------------------------------------------------------------------+
+| Degraded-mode rule: reduce capability before losing availability, but fail closed whenever the     |
+| degraded path cannot preserve safety, correctness, privacy, or contractual boundaries.             |
++----------------------------------------------------------------------------------------------------+
 ```
 
 ## **Serving Observability and Operations**
@@ -506,14 +1236,103 @@ When capacity is severely constrained, platforms transition to degraded serving 
 Observability in model serving must look beyond host-level CPU and memory footprints.3 Trace records must connect physical hardware performance back to active model versions and tenant identities, allowing SREs to isolate regressions instantly.1
 
 ```
-                  
-                               |  
-          +--------------------+--------------------+  
-          |                    |                    |  
-          v                    v                    v  
-  [ Gateway Headers ]  [ Model Metadata ]    
-  - Tenant ID   - Model Version SHA  - TTFT / ITL   
-  - Priority Tier      - Decoders    - Preemptions [14]
++--------------------------------------------------------------------------------------------------+
+|                              SERVING OBSERVABILITY AND OPERATIONS                                |
++--------------------------------------------------------------------------------------------------+
+|                                                                                                  |
+|  Goal: connect user-facing behavior, model versions, tenant identity, routing decisions,         |
+|  runtime state, GPU pressure, validation results, and recovery actions into one traceable view.  |
+|                                                                                                  |
+|  [ Live Inference Request ]                                                                      |
+|        |                                                                                         |
+|        v                                                                                         |
+|  +-------------------------------------------------------------------------------------------+   |
+|  |                              Trace Context Envelope                                       |   |
+|  |                                                                                           |   |
+|  |  request_id | session_id | tenant_id | priority_tier | region | route_id | model_target   |   |
+|  |  prompt_hash | prefix_hash | tool_policy | schema_policy | budget_scope | user-visible SLA|   |
+|  +---------------------------------------------+---------------------------------------------+   |
+|                                                |                                                 |
+|                                                v                                                 |
+|  +------------------------------------------------------------------------------------------+    |
+|  |                                  Serving Path Events                                     |    |
+|  +----------------------+----------------------+----------------------+---------------------+    |
+|                         |                      |                      |                          |
+|                         v                      v                      v                          |
+|          +-------------------------+  +-----------------------+  +----------------------------+  |
+|          | Gateway / Policy        |  | Router / Load Balancer|  | Queue / Admission          |  |
+|          |                         |  |                       |  |                            |  |
+|          | auth result             |  | selected model        |  | queue wait time            |  |
+|          | rate-limit decision     |  | rejected alternatives |  | priority lane              |  |
+|          | quota state             |  | cache-affinity score  |  | admission / rejection      |  |
+|          | tenant entitlement      |  | route confidence      |  | backpressure response      |  |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+--------------+  |
+|                      |                            |                            |                 |
+|                      v                            v                            v                 |
+|          +-------------------------+  +-----------------------+  +-----------------------------+ |
+|          | Inference Runtime       |  | Hardware / GPU State  |  | Validation / Fallback       | |
+|          |                         |  |                       |  |                             | |
+|          | model version SHA       |  | GPU ID / pool         |  | schema pass / fail          | |
+|          | tokenizer version       |  | HBM occupancy         |  | safety pass / fail          | |
+|          | decoder parameters      |  | KV cache usage        |  | tool-result verification    | |
+|          | TTFT / ITL / TPS        |  | preemption events     |  | retry route / fail-closed   | |
+|          | batch size              |  | OOM / kernel errors   |  | degraded-mode activation    | |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+ |
+|                      |                            |                            |                 |
+|                      +----------------------------+----------------------------+                 |
+|                                                   |                                              |
+|                                                   v                                              |
+|  +------------------------------------------------------------------------------------------+    |
+|  |                              Telemetry Collection Layer                                  |    |
+|  |   OpenTelemetry traces | Prometheus metrics |                                            |    |
+|  |   structured logs | GPU/DCGM metrics | audit events                                      |    |
+|  +----------------------+----------------------+----------------------+---------------------+    |
+|                         |                      |                      |                          |
+|                         v                      v                      v                          |
+|          +-------------------------+  +-----------------------+  +-----------------------------+ |
+|          | Metrics Store           |  | Trace / Log Store     |  | Cost / Usage Ledger         | |
+|          |                         |  |                       |  |                             | |
+|          | latency histograms      |  | request replay trail  |  | input / output tokens       | |
+|          | queue depth             |  | routing decisions     |  | cache savings               | |
+|          | cache hit rate          |  | validation failures   |  | retries and fallbacks       | |
+|          | GPU saturation          |  | incident evidence     |  | tenant billing allocation   | |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+ |
+|                      |                            |                            |                 |
+|                      +----------------------------+----------------------------+                 |
+|                                                   |                                              |
+|                                                   v                                              |
+|  +------------------------------------------------------------------------------------------+    |
+|  |                              Operational Interpretation                                  |    |
+|  +----------------------+----------------------+----------------------+---------------------+    |
+|                         |                      |                      |                          |
+|                         v                      v                      v                          |
+|          +-------------------------+  +-----------------------+  +-----------------------------+ |
+|          | Dashboards              |  | Alerting / SLOs       |  | Root-Cause Analysis         | |
+|          |                         |  |                       |  |                             | |
+|          | tenant health           |  | p95 / p99 TTFT        |  | router regression           | |
+|          | model health            |  | OOM rate              |  | cache-affinity loss         | |
+|          | pool utilization        |  | validation error rate |  | cold-start storm            | |
+|          | cost per success        |  | queue saturation      |  | GPU / PCIe contention       | |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+ |
+|                      |                            |                            |                 |
+|                      +----------------------------+----------------------------+                 |
+|                                                   |                                              |
+|                                                   v                                              |
+|  +---------------------------------------------------------------------------------------------+ |
+|  |                              Automated Operations Loop                                      | |
+|  |                                                                                             | |
+|  |  trigger runbook | trip circuit breaker | shift traffic | scale GPU nodes | rollback model  | |
+|  |  degrade service | shed low-priority work | rehydrate cache | verify recovery | reopen route| |
+|  +---------------------------------------------+-----------------------------------------------+ |  
+|                                                |                                                 |
+|                                                v                                                 |
+|                              [ Stable Serving State or Incident Record ]                         |
+|                                                                                                  |
++--------------------------------------------------------------------------------------------------+
+| Observability rule: every response should be explainable as a path through tenant policy,        |
+| routing, queueing, cache state, runtime execution, hardware pressure, validation, fallback,      |
+| and cost accounting.                                                                             |
++--------------------------------------------------------------------------------------------------+
 ```
 
 
@@ -535,21 +1354,123 @@ To maintain system reliability, SREs deploy automated runbooks to detect and res
 ### **Operational Runbook Execution Guidance**
 
 ```                        
-                                  |  
-                      +-----------+-----------+  
-                      |                       |  
-                      v                       v  
-             
-                      |                       |  
-                      v                       v  
-               ( Check Grafana )       ( Verify Logs )  
-                      |                       |  
-            Wait count waiting > 10?   OOM / SIGSEGV exit codes?  
-                    /     \                 /     \  
-              Yes  /       \ No       Yes  /       \ No  
-                  v         v             v         v  
-         [ Provision GPUs ][ Check ]   [ Verify ]  
-         [ via Karpenter  ][ NVLink]  [ Container][ Hardware]
++---------------------------------------------------------------------------------------------------+
+|                              OPERATIONAL RUNBOOK EXECUTION GUIDANCE                               |
++---------------------------------------------------------------------------------------------------+
+|                                                                                                   |
+|  Goal: convert serving anomalies into repeatable diagnosis, containment, remediation,             |
+|  verification, and incident documentation steps.                                                  |
+|                                                                                                   |
+|  [ Alert / SLO Breach / User-Visible Degradation ]                                                |
+|        |                                                                                          |
+|        v                                                                                          |
+|  +------------------------------------------------------------------------------------------+     |
+|  |                              Incident Intake                                             |     |
+|  |                                                                                          |     |
+|  |  Capture: request IDs | affected tenants | model route | region | severity | start time  |     |
+|  |           symptoms | recent deploys | canary status | active fallback state              |     |
+|  +---------------------------------------------+--------------------------------------------+     |
+|                                                |                                                  |
+|                                                v                                                  |
+|  +---------------------------------------------------------------------------------------------+  |
+|  |                              First Triage Dashboard                                         |  |
+|  |                                                                                             |  |
+|  |  Check Grafana / Prometheus / tracing dashboards for:                                       |  |
+|  |                                                                                             |  |
+|  |  - waiting request count                                                                    |  |
+|  |  - p95 / p99 TTFT and inter-token latency                                                   |  |
+|  |  - GPU HBM utilization                                                                      |  |
+|  |  - KV cache occupancy                                                                       |  |
+|  |  - OOM / SIGSEGV / kernel errors                                                            |  |
+|  |  - router timeout and validation failure rates                                              |  |
+|  +----------------------+----------------------+----------------------+------------------------+  |
+|                         |                      |                      |                           |
+|                         v                      v                      v                           |
+|          [ Queue Saturation? ]      [ Runtime Crash / OOM? ]    [ Routing / Validation Spike? ]   |
+|                /      \                    /      \                     /       \                 |
+|          Yes  /        \ No          Yes  /        \ No           Yes  /         \ No             |
+|              v          v                v          v                 v           v               |
+|  +----------------+  +----------------+  +----------------+  +----------------+  +-------------+  |
+|  | Provision /    |  | Check Network, |  | Isolate Failed |  | Check Runtime  |  | Inspect     |  |
+|  | Shift Capacity |  | Registry, and  |  | Replica / GPU  |  | Logs, Kernels, |  | Router,     |  |
+|  |                |  | Provider Path  |  | Pool           |  | and Memory     |  | Prompts,    |  |
+|  |                |  |                |  |                |  | Envelope       |  | Schemas     |  |
+|  +-------+--------+  +-------+--------+  +-------+--------+  +-------+--------+  +------+------+  |
+|          |                   |                   |                   |                  |         |
+|          v                   v                   v                   v                  v         |
+|  +------------------------------------------------------------------------------------------+     |
+|  |                              Containment Action                                          |     |
+|  |                                                                                          |     |
+|  |  Select the least disruptive safe action:                                                |     |
+|  |                                                                                          |     |
+|  |  - trip circuit breaker for unhealthy route                                              |     |
+|  |  - shed or defer low-priority traffic                                                    |     |
+|  |  - shift traffic to backup pool / region / provider                                      |     |
+|  |  - downgrade model tier for low-risk workloads                                           |     |
+|  |  - rollback to previous model or serving image SHA                                       |     |
+|  |  - freeze new deployments while incident is active                                       |     |
+|  +---------------------------------------------+--------------------------------------------+     |
+|                                                |                                                  |
+|                                                v                                                  |
+|  +------------------------------------------------------------------------------------------+     |
+|  |                              Remediation Path                                            |     |
+|  +----------------------+----------------------+----------------------+---------------------+     |
+|                         |                      |                      |                           |
+|                         v                      v                      v                           |
+|          +-------------------------+  +-----------------------+  +-----------------------------+  |
+|          | Capacity Remediation    |  | Runtime Remediation   |  | Routing / Policy Fix        |  |
+|          |                         |  |                       |  |                             |  |
+|          | provision GPU nodes     |  | restart container     |  | restore static route        |  |
+|          | drain overloaded queue  |  | lower max context     |  | disable bad canary          |  |
+|          | increase warm pool      |  | reduce batch pressure |  | repair schema / validator   |  |
+|          | defer batch work        |  | reload stable weights |  | update fallback policy      |  |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+  |
+|                      |                            |                            |                  |
+|                      +----------------------------+----------------------------+                  |
+|                                                   |                                               |
+|                                                   v                                               |
+|  +------------------------------------------------------------------------------------------+     |
+|  |                              Recovery Verification                                       |     |
+|  |                                                                                          |     |
+|  |  Verify before reopening full traffic:                                                   |     |
+|  |                                                                                          |     |
+|  |  - health checks pass                                                                    |     |
+|  |  - mock inference succeeds                                                               |     |
+|  |  - TTFT / ITL return to SLO range                                                        |     |
+|  |  - queue depth normalizes                                                                |     |
+|  |  - GPU memory remains stable                                                             |     |
+|  |  - validation failures return to baseline                                                |     |
+|  |  - fallback route is no longer receiving abnormal volume                                 |     |
+|  +---------------------------------------------+--------------------------------------------+     |
+|                                                |                                                  |
+|                                      [ Recovery Verified? ]                                       |
+|                                         /             \                                           |
+|                                  Yes   /               \   No                                     |
+|                                       v                 v                                         |
+|  +-----------------------------------------+     +-------------------------------------------+    |
+|  |          Gradual Route Reopen           |     |     Continue Containment / Escalate       |    |
+|  |                                         |     |                                           |    |
+|  |  - reopen circuit gradually             |     |  - widen degraded mode                    |    |
+|  |  - restore canary or primary route      |     |  - escalate to SRE / platform owner       |    |
+|  |  - monitor p95 / p99 tails              |     |  - invoke vendor / provider support       |    |
+|  |  - keep rollback ready                  |     |  - extend traffic freeze                  |    |
+|  +--------------------+--------------------+     +----------------+--------------------------+    |
+|                       |                                           |                               |
+|                       v                                           v                               |
+|           [ Stable Serving State ]                    [ Active Incident Continues ]               |
+|                       |                                                                           |
+|                       v                                                                           |
+|  +------------------------------------------------------------------------------------------+     |
+|  |                              Incident Record / Review                                    |     |
+|  |                                                                                          |     |
+|  |  Store: root cause | detection gap | affected tenants | timeline | remediation steps     |     |
+|  |         route changes | cost impact | rollback action | follow-up prevention tasks       |     |
+|  +------------------------------------------------------------------------------------------+     |
+|                                                                                                   |
++---------------------------------------------------------------------------------------------------+
+| Runbook rule: contain first, diagnose second, restore gradually, and document enough evidence     |
+| that the next recurrence is shorter, safer, and less expensive.                                   |
++---------------------------------------------------------------------------------------------------+
 ```
 
 ## **Cross-Canon Handoff Map**
@@ -557,28 +1478,71 @@ To maintain system reliability, SREs deploy automated runbooks to detect and res
 The serving topologies, load balancers, and traffic governance policies established in AI-ENG-L provide the runtime foundation for downstream systems in the canon.
 
 ```
-+-----------------------------------------------------------------------------------------+  
-|                  AI-ENG-L: Serving Architecture, Routing & Load Balancing                |  
-+-----------------------------------------------------------------------------------------+  
-       |                               |                               |  
-       | Context Isolation             | Dynamic Tool Routing          | Telemetry & Tracing  
-       v                               v                               v  
-+-----------------------+       +-----------------------+       +-----------------------+  
-|  AI-ENG-T: Tenant     |       |  AI-ENG-M: Agent      |       |  AI-ENG-Z: Telemetry, |  
-|  Isolation & Leakage  |       |  Loops & Budgets      |       |  Evals & Auditing     |  
-+-----------------------+       +-----------------------+       +-----------------------+  
-       |                               |                               |  
-       v                               v                               v  
-+-----------------------+       +-----------------------+       +-----------------------+  
-|  AI-ENG-V: Resource   |       |  AI-ENG-N: Tool       |       |  AI-ENG-AB: Replayable|  
-|  Abuse & Wallet Denial|       |  Contract Boundaries  |       |  Traces               |  
-+-----------------------+       +-----------------------+       +-----------------------+  
-                                       |                               |  
-                                       v                               v  
-                                +-----------------------+       +-----------------------+  
-                                |  AI-ENG-O: Action     |       |  AI-ENG-AC: Incident  |  
-                                |  Verification Paths   |       |  Response & Playbooks |  
-                                +-----------------------+       +-----------------------+
++------------------------------------------------------------------------------------------------+
+|                    AI-ENG-L: SERVING ARCHITECTURE, ROUTING & LOAD BALANCING                    |
++------------------------------------------------------------------------------------------------+
+|                                                                                                |
+|  Transfers the runtime contracts that downstream systems depend on:                            |
+|                                                                                                |
+|  - model routes and fallback paths                                                             |
+|  - tenant identity, quotas, and capacity limits                                                |
+|  - queueing, batching, cache, and GPU-placement metadata                                       |
+|  - tool-routing budgets and validation boundaries                                              |
+|  - telemetry traces, model SHAs, latency records, and rollback signals                         |
+|                                                                                                |
++----------------------+----------------------+----------------------+---------------------------+
+                       |                      |                      |
+                       v                      v                      v
+
++--------------------------------+  +--------------------------------+  +--------------------------------+
+| Runtime Isolation &            |  | Agent / Tool Execution         |  | Telemetry, Evaluation & Audit  |
+| Resource Governance            |  | Boundaries                     |  | Trails                         |
++--------------------------------+  +--------------------------------+  +--------------------------------+
+|                                |  |                                |  |                                |
+| AI-ENG-T: Tenant Isolation     |  | AI-ENG-M: Agent Loops          |  | AI-ENG-Z: Telemetry, Evals     |
+| - tenant cache keys            |  | - model routes by step budget  |  | - route, latency, and failure  |
+| - GPU partition boundaries     |  | - recursion and cost ceilings  |  |   telemetry                    |
+| - cross-tenant leakage guards  |  | - dynamic execution budgets    |  | - serving-quality observability|
+|                                |  |                                |  |                                |
+|             |                  |  |             |                  |  |             |                  |
+|             v                  |  |             v                  |  |             v                  |
+| AI-ENG-V: Resource Abuse       |  | AI-ENG-N: Tool Contracts       |  | AI-ENG-AA: Serving Evaluations |
+| - RPM / TPM / concurrency      |  | - schema-aware route choices   |  | - live model scoring           |
+| - budget ceilings              |  | - tool argument validation     |  | - route-quality adjustment     |
+| - denial-of-wallet controls    |  | - fail-closed tool boundaries  |  | - eval-informed canaries       |
+|                                |  |                                |  |                                |
+|             |                  |  |             |                  |  |             |                  |
+|             v                  |  |             v                  |  |             v                  |
+| AI-ENG-AE: Infrastructure      |  | AI-ENG-O: Action Verification  |  | AI-ENG-AB: Replayable Traces   |
+| Efficiency                     |  | - high-stakes action gates     |  | - request reconstruction       |
+| - cache-hit optimization       |  | - human review routing         |  | - prompt/cache/model evidence  |
+| - GPU utilization strategy     |  | - transaction safety paths     |  | - audit-ready execution trails |
++--------------------------------+  +--------------------------------+  +--------------------------------+
+                       |                      |
+                       v                      v
++--------------------------------+  +--------------------------------+
+| Resilience, Fallback &         |  | Production Strategy &          |
+| Incident Response              |  | Build / Buy Decisions          |
++--------------------------------+  +--------------------------------+
+|                                |  |                                |
+| AI-ENG-W: Fallback Chains      |  | AI-ENG-S: Production Pathology |
+| - degraded-mode routes         |  | - queue saturation diagnosis   |
+| - model downgrade paths        |  | - GPU OOM / cold-start storms  |
+| - provider / region failover   |  | - cache-affinity regressions   |
+|                                |  |                                |
+|             |                  |  |             |                  |
+|             v                  |  |             v                  |
+| AI-ENG-AC: Incident Response   |  | AI-ENG-AH: Build / Buy Strategy|
+| - circuit breakers             |  | - hosting economics            |
+| - rollback playbooks           |  | - topology tradeoffs           |
+| - recovery verification        |  | - managed vs self-hosted fit   |
++--------------------------------+  +--------------------------------+
+
++------------------------------------------------------------------------------------------------+
+| Handoff rule: AI-ENG-L does not merely describe where models run. It exports the runtime        |
+| contracts that downstream reports use to govern tenants, tools, fallbacks, traces, incidents,   |
+| evaluations, resource abuse, infrastructure efficiency, and hosting strategy.                   |
++------------------------------------------------------------------------------------------------+
 ```
 
 ### **Cross-Canon Handoff Map**

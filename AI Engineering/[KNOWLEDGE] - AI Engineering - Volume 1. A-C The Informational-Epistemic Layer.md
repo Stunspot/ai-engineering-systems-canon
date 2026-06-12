@@ -6,6 +6,7 @@
   - [AI-ENG-C — The Economic Physics of Inference - Tradeoffs, Cost Attribution & System Margins](#ai-eng-c--the-economic-physics-of-inference---tradeoffs-cost-attribution--system-margins)
 
 ---
+
 # AI-ENG-A - Model Steering - Harness Engineering, Prompt Semantics, and Adaptation Choice
 
 ## **The Paradigm of Model Steering**
@@ -817,7 +818,7 @@ To maintain a mathematically precise and audit-ready representation of historica
 
 To preserve complete auditability and prevent silent data loss, records in a bitemporal database are immutable.24 Updates are executed by closing the transaction window of the active record and writing a new version 23:
 
-SQL  
+```SQL  
 -- Step 1: Invalidate the existing, older period by setting its tx_end to current_time  
 UPDATE context_store   
 SET tx_end = '2026-06-06T12:15:00Z'   
@@ -826,6 +827,7 @@ WHERE canonical_entity_id = 'usr-9921-aef4' AND tx_end IS NULL;
 -- Step 2: Insert the new period representing the current valid state of the data  
 INSERT INTO context_store (object_id, canonical_entity_id, content, valid_from, valid_until, tx_start, tx_end)  
 VALUES ('uuid-4412', 'usr-9921-aef4', 'User is now based in Chicago office.', '2026-06-06T12:00:00Z', NULL, '2026-06-06T12:15:00Z', NULL);
+```
 
 This model enables the compiler to resolve complex historical transitions, such as retroactive changes or future-dated policies.37 For example, if a user's pricing tier is updated on April 1st but backdated to be valid from February 15th, a bitemporal database can accurately recreate exactly what the system believed on March 1st versus what is true in the real world for that same date.24
 
@@ -840,9 +842,9 @@ Relation Types (7 Primary Chronological Relationships, 6 Inverses):
                         
 4. A Starts B        [ A ]  
                       
-5. A During B          [ A ]  
+5. A During B        [ A ]  
                       
-6. A Finishes B          [ A ]  
+6. A Finishes B      [ A ]  
                       
 7. A Equals B        [  A  ]  
                     
@@ -1158,18 +1160,18 @@ Conversely, the decode phase is sequential and memory-bandwidth-bound. 7 To gene
 
 The KV cache is the essential optimization that prevents the decode phase from recalculating the key-value matrices for all prior tokens at every step, which would result in O(N^2) computational scaling. 9 However, caching these activations shifts the system bottleneck from raw compute to memory capacity. 4  
 The physical memory footprint of the KV cache for a single request sequence is governed by the following mathematical formula 9:  
-M\_KV \= 2 \* L \* H\_KV \* D \* S \* B \* N\_bytes  
+M_KV = 2 * L * H_KV * D * S * B * N_bytes  
 Where:
 
 * L represents the number of transformer layers in the model. 11  
-* H\_KV represents the number of Key-Value attention heads. In Multi-Head Attention (MHA), this is equal to the number of query heads (H\_Q). 11 In Grouped-Query Attention (GQA), query heads are grouped, resulting in H\_KV \= H\_Q / G, where G is the grouping factor. 17 In Multi-Query Attention (MQA), H\_KV \= 1\. 9  
+* H_KV represents the number of Key-Value attention heads. In Multi-Head Attention (MHA), this is equal to the number of query heads (H_Q). 11 In Grouped-Query Attention (GQA), query heads are grouped, resulting in H_KV = H_Q / G, where G is the grouping factor. 17 In Multi-Query Attention (MQA), H_KV = 1. 9  
 * D represents the head dimension (the size of the hidden states per head). 11  
 * S represents the total sequence length (input context length plus output generation length). 9  
 * B represents the active batch size processed concurrently. 11  
-* N\_bytes represents the byte width of the numerical precision used for the KV cache elements. 9
+* N_bytes represents the byte width of the numerical precision used for the KV cache elements. 9
 
-For a baseline Multi-Head Attention model of 70 Billion parameters configured with standard FP16 precision (N\_bytes \= 2), 80 layers, 64 attention heads, a head dimension of 128, and a sequence length of 32,768 tokens at batch size 1, the raw KV cache size calculation yields 17:  
-M\_KV \= 2 \* 80 \* 64 \* 128 \* 32,768 \* 1 \* 2 \= 85.9 GB  
+For a baseline Multi-Head Attention model of 70 Billion parameters configured with standard FP16 precision (N_bytes = 2), 80 layers, 64 attention heads, a head dimension of 128, and a sequence length of 32,768 tokens at batch size 1, the raw KV cache size calculation yields 17:  
+M_KV = 2 * 80 * 64 * 128 * 32,768 * 1 * 2 = 85.9 GB  
 This exceeds the total VRAM of a flagship NVIDIA H100 GPU (80GB), rendering high-concurrency execution impossible without advanced structural optimizations. 17
 
 ### **Structural Architecture Optimizations**
@@ -1177,12 +1179,12 @@ This exceeds the total VRAM of a flagship NVIDIA H100 GPU (80GB), rendering high
 To reduce this VRAM consumption, contemporary models deploy three architectural optimizations:
 
 1. **Grouped-Query Attention (GQA):** By grouping multiple query heads to share a single KV head (typically an 8:1 ratio), GQA achieves a proportional 8-fold reduction in the active size of the KV cache with negligible impact on model quality. 17  
-2. **Cluster Local Attention (CLA) / Layer Sharing:** CLA architectures allow adjacent transformer layers to share calculated KV attention projections, enabling an additional 2-fold reduction in the KV cache size by introducing a layer sharing factor (F) 18: M\_KV \= approximately (2 \* L \* H\_KV \* D \* S \* B \* N\_bytes) / F  
+2. **Cluster Local Attention (CLA) / Layer Sharing:** CLA architectures allow adjacent transformer layers to share calculated KV attention projections, enabling an additional 2-fold reduction in the KV cache size by introducing a layer sharing factor (F) 18: M_KV = approximately (2 * L * H_KV * D * S * B * N_bytes) / F  
 3. **KV Cache Quantization:** Downcasting the stored key-value states from standard 16-bit precisions (BF16/FP16) to low-bit alternatives (FP8 or NVFP4) directly compresses the storage memory footprint. 17
 
 The physical VRAM savings achieved by these precision transitions are systematically outlined in the table below:
 
-| KV Cache Precision | Bytes Per Element (N\_bytes) | Relative Storage Size vs. BF16 | Impact on GPU Memory Bandwidth | Operational Headroom / Concurrent Users |
+| KV Cache Precision | Bytes Per Element (N_bytes) | Relative Storage Size vs. BF16 | Impact on GPU Memory Bandwidth | Operational Headroom / Concurrent Users |
 | :---- | :---- | :---- | :---- | :---- |
 | **BF16 / FP16** | 2.0 | 100% (Baseline) | Extreme bottleneck; slow transfers. | Low; easily triggers out-of-memory (OOM) errors. |
 | **FP8** | 1.0 | 50% Savings | Moderate relief; 2x data density per transfer. | High; doubles maximum batch capacity on a single device. 17 |
@@ -1190,7 +1192,7 @@ The physical VRAM savings achieved by these precision transitions are systematic
 
 ### **PagedAttention and Dynamic Memory Allocations**
 
-Historically, serving systems were forced to pre-allocate contiguous chunks of VRAM corresponding to the maximum possible sequence length (S\_max) for each request. 17 If a user requested a 32,768-token limit but only generated 500 tokens, the remaining 32,268 tokens' worth of VRAM remained locked and unutilized, resulting in up to 80% virtual memory fragmentation and severe capacity waste. 17  
+Historically, serving systems were forced to pre-allocate contiguous chunks of VRAM corresponding to the maximum possible sequence length (S_max) for each request. 17 If a user requested a 32,768-token limit but only generated 500 tokens, the remaining 32,268 tokens' worth of VRAM remained locked and unutilized, resulting in up to 80% virtual memory fragmentation and severe capacity waste. 17  
 PagedAttention resolves this fragmentation by borrowing virtual memory paging from operating systems. 7 It partitions the KV cache of a sequence into non-contiguous, fixed-size blocks (typically representing 16 tokens). 7 As tokens are generated, new pages are dynamically mapped from a global pool. 12 When a request completes, its allocated pages are immediately returned to the pool. 12 This allows serving engines to operate with near-zero physical memory fragmentation, dramatically increasing concurrent GPU utilization. 3
 
 ## **Context Economics: Caching, Persistence, and State Management**
@@ -1216,7 +1218,7 @@ This mechanism hashes sequence blocks (defined at page boundary granularities) a
 #### **SGLang RadixAttention**
 
 Instead of utilizing a flat lookup table, SGLang structures cached KV activations into a dynamic radix tree (a compressed prefix trie). 19 Edges represent sequences of token IDs. 24 When a request arrives, SGLang traces the prompt through the radix tree, matching the longest available prefix. 19  
-Computation resumes exactly at the tree's divergence point. 19 Crucially, SGLang supports zero-cost memory sharing for multi-agent loops and alternative branching (forking). 25 Active nodes currently mapped to a request increase their reference counts (lock\_ref \> 0), which protects them from eviction. 24 Once execution completes, their locks are decremented, making them eligible for Least Recently Used (LRU) or Least Frequently Used (LFU) eviction under memory pressure. 24
+Computation resumes exactly at the tree's divergence point. 19 Crucially, SGLang supports zero-cost memory sharing for multi-agent loops and alternative branching (forking). 25 Active nodes currently mapped to a request increase their reference counts (lock_ref > 0), which protects them from eviction. 24 Once execution completes, their locks are decremented, making them eligible for Least Recently Used (LRU) or Least Frequently Used (LFU) eviction under memory pressure. 24
 
 #### **Remote KV Offloading (LMCache)**
 
@@ -1228,25 +1230,25 @@ When a subsequent request hits the remote cache, the blocks are streamed back. 7
 Enterprise AI teams utilizing managed APIs face fundamentally different caching cost dynamics depending on the provider's economic model.
 
 * **OpenAI Automatic Caching:** OpenAI implements automatic prefix caching behind their API endpoints. 13 There are no explicit markers required. 15 Caching hits occur automatically if a prompt shares a prefix with a recently processed request, providing a flat 50% discount on input tokens (e.g., GPT-5.4 input reduces from USD 2.50 to USD 0.25 per million tokens). 27 The cache life is managed dynamically (typically 5 to 10 minutes of inactivity). 15  
-* **Anthropic Explicit Cache Breakpoints:** Anthropic requires the application to explicitly define cache breakpoints by placing "cache\_control": {"type": "ephemeral"} tags on specific blocks in the message array (such as tools, system prompts, or document chunks). 30 This model introduces explicit financial write/read cycles:  
+* **Anthropic Explicit Cache Breakpoints:** Anthropic requires the application to explicitly define cache breakpoints by placing "cache_control": {"type": "ephemeral"} tags on specific blocks in the message array (such as tools, system prompts, or document chunks). 30 This model introduces explicit financial write/read cycles:  
   * **Cache Writes:** Charged at a premium rate (1.25 times standard input for 5-minute TTL, 2 times for 1-hour TTL). 30  
   * **Cache Reads:** Charged at a massive discount (0.1 times standard input, equivalent to a 90% savings). 30 The cache is refreshed cost-free upon every read hit. 30 This structure dictates that a 5-minute cache write pays for itself after exactly one subsequent hit, while a 1-hour write pays for itself after two hits. 30  
 * **Google Gemini Storage-Rent Caching:** Google AI Studio and Vertex AI introduce a distinct hybrid economic model. 5 Writing to the context cache incurs standard input token rates, and reading from the cache receives a 75% to 90% discount. 5 However, Gemini charges an hourly storage rent for keeping the context compiled in GPU memory (e.g., USD 4.50 per million tokens per hour for Gemini 3.1 Pro). 5
 
-This storage-rent model introduces a temporal-density optimization boundary. If a massive compiled context (such as a 1M token repository) is queried too infrequently, the accumulated hourly rent will exceed the cost of executing standard uncached prefill operations. Let T\_gap be the time gap (in hours) between sequential queries, C\_prefill be the standard prefill cost, C\_read be the cache read cost, and R\_storage be the hourly storage rent. Caching remains economically optimal if and only if:  
-T\_gap \* R\_storage \+ C\_read \< C\_prefill  
+This storage-rent model introduces a temporal-density optimization boundary. If a massive compiled context (such as a 1M token repository) is queried too infrequently, the accumulated hourly rent will exceed the cost of executing standard uncached prefill operations. Let T_gap be the time gap (in hours) between sequential queries, C_prefill be the standard prefill cost, C_read be the cache read cost, and R_storage be the hourly storage rent. Caching remains economically optimal if and only if:  
+T_gap * R_storage + C_read < C_prefill  
 The pricing structures, thresholds, and execution mechanics of the leading commercial caching platforms are compared below:
 
 | Provider / Model | Input Price (per 1M) | Cache Hit Price (per 1M) | Caching Savings | Minimum Cacheable Context | TTL / Storage Pricing | Billing Rule / Surcharges |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| **OpenAI GPT-5.4** 27 | USD 2.50 | USD 0.25 | 90% | \~1,024 tokens 13 | Automatic; 5m-1hr inactivity 15 | Surcharge above 272K context (doubles input rate) 29 |
+| **OpenAI GPT-5.4** 27 | USD 2.50 | USD 0.25 | 90% | ~1,024 tokens 13 | Automatic; 5m-1hr inactivity 15 | Surcharge above 272K context (doubles input rate) 29 |
 | **Anthropic Claude Sonnet 4.6** 22 | USD 3.00 | USD 0.30 | 90% | 1,024 tokens 30 | 5m default (refreshed free); 1hr explicit 30 | 5m write costs 1.25x (USD 3.75); 1hr write costs 2.0x (USD 6.00) 30 |
-| **Google Gemini 3.1 Pro** 5 | USD 2.00 | USD 0.50 | 75% | 32,768 tokens (explicit) 5 | Storage rent: USD 4.50 per 1M tokens/hour 5 | Contexts \>200K double input (USD 4.00) & raise output 50% (USD 18\) 5 |
-| **DeepSeek V4** 21 | USD 0.30 | USD 0.03 | 90% | \~1,024 tokens 13 | Automatic prefix caching 21 | Flat rates up to 1M context 21 |
+| **Google Gemini 3.1 Pro** 5 | USD 2.00 | USD 0.50 | 75% | 32,768 tokens (explicit) 5 | Storage rent: USD 4.50 per 1M tokens/hour 5 | Contexts >200K double input (USD 4.00) & raise output 50% (USD 18\) 5 |
+| **DeepSeek V4** 21 | USD 0.30 | USD 0.03 | 90% | ~1,024 tokens 13 | Automatic prefix caching 21 | Flat rates up to 1M context 21 |
 
 ## **Execution Graph Accounting & The Inference Cost Stack**
 
-A naive financial model assumes the cost of an AI interaction is bounded by a single API request: Input Tokens \* Input Price \+ Output Tokens \* Output Price. In production systems, a single user click routinely triggers an entire execution graph. 1
+A naive financial model assumes the cost of an AI interaction is bounded by a single API request: Input Tokens * Input Price + Output Tokens * Output Price. In production systems, a single user click routinely triggers an entire execution graph. 1
 
 ### **The Comprehensive Inference Cost Stack**
 
@@ -1259,7 +1261,7 @@ To model AI system margins, engineers must account for the full physical stack o
 | **Internal Reasoning** | Thinking Tokens | Direct | Reasoning steps billed at standard output rates (e.g., DeepSeek R1). 5 | Uncapped output token generation; can expand costs superlinearly on math/debug tasks. 5 |
 | **Data Grounding** | Embeddings & Vector Search | Direct | Vector database hosting, embedding generation fees. 1 | Adds retrieval latency; must be weighed against long-context ingestion. 5 |
 | **Verification Loops** | Schema Validators & LLM Judgments | Direct | Secondary programmatic runs, JSON-schema parsers. 1 | Increases latency; guarantees structural output safety. 34 |
-| **Outage Mitigations** | Failed Run Retries & Fallback Routing | Hidden | Duplicate executions across redundant endpoints. 1 | Inflates cost-per-successful-outcome (C\_effective). 1 |
+| **Outage Mitigations** | Failed Run Retries & Fallback Routing | Hidden | Duplicate executions across redundant endpoints. 1 | Inflates cost-per-successful-outcome (C_effective). 1 |
 | **Manual Escapes** | Human-in-the-Loop Reviews | Hidden | Manual review queues, operational hourly labor. | The single most expensive escalation path; must be bypassed for standard tasks. 35 |
 | **System Operations** | Gateway Logging & Observability | Hidden | Cloud egress, telemetry logs, ClickHouse storage. 1 | Minor but persistent cost-to-serve overhead. 2 |
 
@@ -1268,14 +1270,14 @@ To model AI system margins, engineers must account for the full physical stack o
 To mathematically capture the dynamic behavior of an AI workflow, we model the total cost of a user interaction as the sum of all nodes traversed in the execution graph, weighted by their failure rates and loop structures. 1  
 Let G be the execution graph containing a set of operational nodes V. Each node i in V has:
 
-* C\_i: The unit cost of executing node i (encompassing token pricing, compute, or API fees). 1  
-* N\_i: The number of times node i is executed in the transaction (capturing sequential retries or loops). 1
+* C_i: The unit cost of executing node i (encompassing token pricing, compute, or API fees). 1  
+* N_i: The number of times node i is executed in the transaction (capturing sequential retries or loops). 1
 
 The absolute total cost of an execution instance is:  
-C\_total \= sum(C\_i \* N\_i for i in V)  
-Now, let P\_success be the overall probability that the graph resolves into an accepted, production-grade state. If an execution path fails a validation step, it triggers an alternate path or a regeneration loop. 1 This leads to the defining metric of system efficiency, the **Effective Cost per Successful Outcome (C\_effective)**:  
-C\_effective \= sum(E\[C\_i \* N\_i\] for i in V) / P\_success  
-Where E\[C\_i \* N\_i\] is the mathematical expected cost of executing node i under the active routing policy. Under this formulation, if a cheap model (C\_i \= USD 0.01) has a low task success rate (P\_success \= 50%) and routinely triggers validation failures that force retries or human intervention, its C\_effective will quickly exceed that of an expensive frontier model (C\_i \= USD 0.05) that achieves P\_success \= 98% on its initial, single-pass forward run. 1
+C_total = sum(C_i * N_i for i in V)  
+Now, let P_success be the overall probability that the graph resolves into an accepted, production-grade state. If an execution path fails a validation step, it triggers an alternate path or a regeneration loop. 1 This leads to the defining metric of system efficiency, the **Effective Cost per Successful Outcome (C_effective)**:  
+C_effective = sum(E[C_i * N_i] for i in V) / P_success  
+Where E[C_i * N_i] is the mathematical expected cost of executing node i under the active routing policy. Under this formulation, if a cheap model (C_i = USD 0.01) has a low task success rate (P_success = 50%) and routinely triggers validation failures that force retries or human intervention, its C_effective will quickly exceed that of an expensive frontier model (C_i = USD 0.05) that achieves P_success = 98% on its initial, single-pass forward run. 1
 
 ## **Real-time Cost Attribution & Gateway FinOps**
 
@@ -1286,8 +1288,8 @@ To operationalize the doctrine of *attribution before optimization*, enterprise 
 Every model-directed request passing through an AI gateway (e.g., LiteLLM, Portkey, or custom proxies) must carry a telemetry payload, injected via standardized transport headers. 1 The standard protocol utilizes a single JSON-serialized header, such as X-TFY-METADATA, ensuring metadata is defined at the initial client call boundary. 1  
 Crucially, the gateway must distinguish between low-cardinality and high-cardinality metadata fields 1:
 
-* **Low-Cardinality Fields (Tag-for-Aggregation):** Dimensions like team\_id, application\_name, environment (dev/prod), or model\_class. 1 These are projected directly as metric labels in time-series databases (e.g., Prometheus) for fast, low-overhead dashboards and anomaly tracking. 1  
-* **High-Cardinality Fields (Tag-for-Audit):** Identifiers like user\_id, session\_id, pipeline\_run\_id, or customer\_tenant\_id. 1 Projecting these as metric labels would cause a metric cardinality explosion, crashing monitoring services. 1 Instead, these remain locked within the structured logs of tracing backends (OpenTelemetry spans, Jaeger, ClickHouse) for targeted forensics and ad-hoc queries. 1
+* **Low-Cardinality Fields (Tag-for-Aggregation):** Dimensions like team_id, application_name, environment (dev/prod), or model_class. 1 These are projected directly as metric labels in time-series databases (e.g., Prometheus) for fast, low-overhead dashboards and anomaly tracking. 1  
+* **High-Cardinality Fields (Tag-for-Audit):** Identifiers like user_id, session_id, pipeline_run_id, or customer_tenant_id. 1 Projecting these as metric labels would cause a metric cardinality explosion, crashing monitoring services. 1 Instead, these remain locked within the structured logs of tracing backends (OpenTelemetry spans, Jaeger, ClickHouse) for targeted forensics and ad-hoc queries. 1
 
 To prevent developers from needing to manually pass these headers across complex microservice boundaries, the gateway implements automatic propagation. 1 By wrapping downstream requests inside OpenTelemetry tracing spans, context propagation headers (e.g., W3C Trace Context) automatically carry the initial metadata payload down the entire execution tree. 1 If a parent request triggers multiple tool executions, asynchronous validation runs, or fallback model chains, each sub-span inherits the identical parent attribution fields without code modifications. 1  
 Alternatively, organizations can deploy eBPF (Extended Berkeley Packet Filter) runtime sensors directly to their Kubernetes clusters. 6 These sensors inspect the layer 7 HTTP payloads of all network traffic routed to AI gateways, dynamically mapping token-usage records back to the calling workload, customer IP, or namespace without requiring any changes to the application code. 6
@@ -1298,28 +1300,28 @@ To ensure compatibility as system architecture scales, every traced LLM transact
 
 | Column Name | Data Type | Source Field | Cardinality | FinOps / Operational Purpose |
 | :---- | :---- | :---- | :---- | :---- |
-| **trace\_id** | String | ctx.trace\_id | High 1 | Bridges distinct microservice execution spans to a single user interaction. 1 |
-| **tenant\_id** | String | X-TFY-METADATA.tenant | Low / Med 1 | Enforces customer contract isolation and subscription cost calculations. 1 |
-| **user\_id** | String | X-TFY-METADATA.user\_id | High 2 | Audits usage patterns to flag abnormal consumer behaviors. 2 |
-| **feature\_id** | String | X-TFY-METADATA.feature | Low 1 | Identifies cost metrics by individual product surface (e.g., autocomplete, chat). 1 |
-| **workflow\_id** | String | X-TFY-METADATA.workflow | Low / Med 1 | Isolates cost parameters by high-level task automation sequences. 1 |
-| **journey\_stage** | String | X-TFY-METADATA.stage | Low | Breaks down execution-graph costs by operational phase (e.g., intent, draft, check). |
-| **business\_outcome** | String | ctx.resolution\_label | Low 1 | Connects spent context tokens to user success criteria (accepted, abandoned). 1 |
-| **model\_id** | String | gen\_ai.response.model | Low 1 | Tracks cost vectors against the specific model version invoked. 1 |
-| **provider** | String | gen\_ai.response.provider | Low 1 | Compares performance and pricing across distinct cloud endpoints. 1 |
-| **prompt\_version** | String | ctx.prompt.version | Low 1 | Benchmarks the economic impacts of prompt adjustments. 1 |
-| **context\_tokens** | Integer | gen\_ai.usage.input | Metric 1 | Measures raw, uncached prefill volume. 1 |
-| **cached\_tokens** | Integer | gen\_ai.usage.cache\_read | Metric 1 | Quantifies optimization savings from prompt caching mechanisms. 1 |
-| **generated\_tokens** | Integer | gen\_ai.usage.output | Metric 1 | Measures active autoregressive decode generation volume. 1 |
-| **retrieval\_calls** | Integer | vector\_db.query\_count | Metric | Tracks vector database pricing overhead. |
-| **tool\_calls** | Integer | gen\_ai.usage.tool\_calls | Metric 1 | Tracks external API cost dependencies. 1 |
-| **validator\_calls** | Integer | validator.eval\_count | Metric 1 | Measures programmatic parsing and validation overhead. 1 |
-| **eval\_calls** | Integer | judge.eval\_count | Metric 1 | Computes LLM-as-a-Judge cost overhead. 1 |
-| **retry\_count** | Integer | ctx.retry\_attempts | Metric 1 | Identifies loops caused by quality failures. 1 |
-| **latency\_ms** | Integer | ctx.duration\_ms | Metric 1 | Audits system performance and latency SLA compliance. 1 |
-| **error\_status** | Boolean | ctx.failed | Low 1 | Calculates service level agreements and system uptime. 1 |
-| **acceptance\_status** | Boolean | ctx.accepted | Low 1 | Computes quality-adjusted success criteria. 1 |
-| **revenue\_proxy** | Decimal | tenant.contract\_value | Metric | Directly calculates unit-level gross margins. 6 |
+| **trace_id** | String | ctx.trace_id | High 1 | Bridges distinct microservice execution spans to a single user interaction. 1 |
+| **tenant_id** | String | X-TFY-METADATA.tenant | Low / Med 1 | Enforces customer contract isolation and subscription cost calculations. 1 |
+| **user_id** | String | X-TFY-METADATA.user_id | High 2 | Audits usage patterns to flag abnormal consumer behaviors. 2 |
+| **feature_id** | String | X-TFY-METADATA.feature | Low 1 | Identifies cost metrics by individual product surface (e.g., autocomplete, chat). 1 |
+| **workflow_id** | String | X-TFY-METADATA.workflow | Low / Med 1 | Isolates cost parameters by high-level task automation sequences. 1 |
+| **journey_stage** | String | X-TFY-METADATA.stage | Low | Breaks down execution-graph costs by operational phase (e.g., intent, draft, check). |
+| **business_outcome** | String | ctx.resolution_label | Low 1 | Connects spent context tokens to user success criteria (accepted, abandoned). 1 |
+| **model_id** | String | gen_ai.response.model | Low 1 | Tracks cost vectors against the specific model version invoked. 1 |
+| **provider** | String | gen_ai.response.provider | Low 1 | Compares performance and pricing across distinct cloud endpoints. 1 |
+| **prompt_version** | String | ctx.prompt.version | Low 1 | Benchmarks the economic impacts of prompt adjustments. 1 |
+| **context_tokens** | Integer | gen_ai.usage.input | Metric 1 | Measures raw, uncached prefill volume. 1 |
+| **cached_tokens** | Integer | gen_ai.usage.cache_read | Metric 1 | Quantifies optimization savings from prompt caching mechanisms. 1 |
+| **generated_tokens** | Integer | gen_ai.usage.output | Metric 1 | Measures active autoregressive decode generation volume. 1 |
+| **retrieval_calls** | Integer | vector_db.query_count | Metric | Tracks vector database pricing overhead. |
+| **tool_calls** | Integer | gen_ai.usage.tool_calls | Metric 1 | Tracks external API cost dependencies. 1 |
+| **validator_calls** | Integer | validator.eval_count | Metric 1 | Measures programmatic parsing and validation overhead. 1 |
+| **eval_calls** | Integer | judge.eval_count | Metric 1 | Computes LLM-as-a-Judge cost overhead. 1 |
+| **retry_count** | Integer | ctx.retry_attempts | Metric 1 | Identifies loops caused by quality failures. 1 |
+| **latency_ms** | Integer | ctx.duration_ms | Metric 1 | Audits system performance and latency SLA compliance. 1 |
+| **error_status** | Boolean | ctx.failed | Low 1 | Calculates service level agreements and system uptime. 1 |
+| **acceptance_status** | Boolean | ctx.accepted | Low 1 | Computes quality-adjusted success criteria. 1 |
+| **revenue_proxy** | Decimal | tenant.contract_value | Metric | Directly calculates unit-level gross margins. 6 |
 
 ## **Latency Budgets & Queueing Theory in Production**
 
@@ -1327,22 +1329,22 @@ When deploying models into production, machine learning metrics like "tokens per
 
 ### **Latency Budget Decomposition**
 
-To prevent user experience degradation, systems must establish a strict **End-to-End Latency SLO** (e.g., P95 \< 1000 ms). 3 This budget must be systematically decomposed into non-negotiable hardware and software segments 3:  
-Latency Budget \= T\_queue \+ T\_retrieval \+ T\_prefill \+ T\_decode \+ T\_tool \+ T\_validation \+ T\_retry \+ T\_eval \+ T\_network \+ T\_human  
+To prevent user experience degradation, systems must establish a strict **End-to-End Latency SLO** (e.g., P95 < 1000 ms). 3 This budget must be systematically decomposed into non-negotiable hardware and software segments 3:  
+Latency Budget = T_queue + T_retrieval + T_prefill + T_decode + T_tool + T_validation + T_retry + T_eval + T_network + T_human  
 The target targets and allocation profiles for these segments are detailed below:
 
 | Budget Segment | Target Apportionment | Physics / Resource Constraint | Latency Mitigations |
 | :---- | :---- | :---- | :---- |
-| **Queue Time (T\_queue)** | 5% to 10% | Bounded by host concurrency limits and rate queue queues. 3 | Keep active cluster utilization rho \< 0.7. 3 |
-| **Retrieval Time (T\_retrieval)** | 5% | Bounded by vector database lookup and network overhead. | Implement index caching and fast embeddings pipeline. 1 |
-| **Prefill Time (T\_prefill)** | 15% to 20% | Computation-bound; scales with context size. 7 | Enable prefix caching; run chunked prefill. 13 |
-| **Decode Time (T\_decode)** | 50% to 60% | Memory-bandwidth-bound; scales with token length. 7 | Use speculative decoding; enforce output caps. 3 |
-| **Tool Execution (T\_tool)** | 10% | Bounded by external API latency and transport networks. | Run tool queries in parallel threads. |
-| **Validation (T\_validation)** | 5% | Bounded by host CPU parsers and regex compilation times. 36 | Compile grammar state-machines ahead of time. 36 |
-| **Retry Overheads (T\_retry)** | 0% (Exceptional) | Multiplying factor over entire latency stack. 1 | Escalate to higher-capability model early. 1 |
-| **Judge Eval (T\_eval)** | 5% (Async fallback) | Computation-bound; dependent on judge prompt size. 1 | Execute safety checks asynchronously where possible. |
-| **Network Egress (T\_network)** | 5% | Bounded by geographical distance and network hops. | Colocate gateways with target serving instances. |
-| **Human Review (T\_human)** | Excluded from SLA | Bounded by operational workflow response times. | Decouple human approvals from real-time workflows. |
+| **Queue Time (T_queue)** | 5% to 10% | Bounded by host concurrency limits and rate queue queues. 3 | Keep active cluster utilization rho < 0.7. 3 |
+| **Retrieval Time (T_retrieval)** | 5% | Bounded by vector database lookup and network overhead. | Implement index caching and fast embeddings pipeline. 1 |
+| **Prefill Time (T_prefill)** | 15% to 20% | Computation-bound; scales with context size. 7 | Enable prefix caching; run chunked prefill. 13 |
+| **Decode Time (T_decode)** | 50% to 60% | Memory-bandwidth-bound; scales with token length. 7 | Use speculative decoding; enforce output caps. 3 |
+| **Tool Execution (T_tool)** | 10% | Bounded by external API latency and transport networks. | Run tool queries in parallel threads. |
+| **Validation (T_validation)** | 5% | Bounded by host CPU parsers and regex compilation times. 36 | Compile grammar state-machines ahead of time. 36 |
+| **Retry Overheads (T_retry)** | 0% (Exceptional) | Multiplying factor over entire latency stack. 1 | Escalate to higher-capability model early. 1 |
+| **Judge Eval (T_eval)** | 5% (Async fallback) | Computation-bound; dependent on judge prompt size. 1 | Execute safety checks asynchronously where possible. |
+| **Network Egress (T_network)** | 5% | Bounded by geographical distance and network hops. | Colocate gateways with target serving instances. |
+| **Human Review (T_human)** | Excluded from SLA | Bounded by operational workflow response times. | Decouple human approvals from real-time workflows. |
 
 ### **Queueing Theory and System Stability**
 
@@ -1350,12 +1352,12 @@ We model LLM serving engines (such as vLLM or SGLang clusters) as multi-server q
 
 * lambda be the incoming arrival rate of user requests (requests per second). 3  
 * S be the average service time of a request, encompassing both prefill and decode stages. 3  
-* mu \= 1 / S be the average service rate per active GPU replica worker. 3  
+* mu = 1 / S be the average service rate per active GPU replica worker. 3  
 * k be the number of concurrent GPU replicas/workers in the serving cluster. 3
 
 The baseline system **Utilization (rho)** is defined by 3:  
-rho \= lambda / (k \* mu) \= (lambda \* S) / k  
-Under standard queueing models, the average waiting time in the queue (W\_q) scales superlinearly as utilization approaches saturation (rho approaching 1). 3 A system operating at rho \= 0.95 (95% utilization) under highly variable arrival patterns (e.g., bursty Poisson traffic) will see queueing delays blow up, creating catastrophic tail latency spikes (the P99 latency can easily stretch to several times the baseline service time S). 3  
+rho = lambda / (k * mu) = (lambda * S) / k  
+Under standard queueing models, the average waiting time in the queue (W_q) scales superlinearly as utilization approaches saturation (rho approaching 1). 3 A system operating at rho = 0.95 (95% utilization) under highly variable arrival patterns (e.g., bursty Poisson traffic) will see queueing delays blow up, creating catastrophic tail latency spikes (the P99 latency can easily stretch to several times the baseline service time S). 3  
 To protect strict real-time SLOs, production AI platforms must enforce admission control to keep rho strictly between 0.4 and 0.7, balancing raw cost-efficiency (which demands high utilization) against tail latency protections. 3  
 Furthermore, as proven by Chengyi Nie et al., stability conditions in LLM serving are not constrained by compute capacity alone, but by a dual-resource limit: **Compute Capacity and KV Cache VRAM Memory**. 4 Because each active sequence locks physical KV memory blocks over its entire generation lifetime, if the cumulative memory demand of concurrent requests exceeds the global page pool size of the GPU, the serving cluster destabilizes. 4 The system must either drop requests, offload pages (causing latency spikes), or execute aggressive preemptions. 7
 
@@ -1364,8 +1366,8 @@ Furthermore, as proven by Chengyi Nie et al., stability conditions in LLM servin
 To optimize throughput without violating latency bounds, serving engines execute **Dynamic Batching (Continuous Batching)**. 3 Rather than waiting for a static block of requests to assemble, continuous batching injects new incoming prefill requests into the active decoding batch at iteration boundaries. 7  
 This scheduler behavior is governed by two key tuning parameters 3:
 
-1. batch\_max: The absolute upper limit of concurrent sequences processed in a single forward pass. 3 Larger values optimize raw system throughput (Tokens per Second) but increase latency per token, as the GPU must process larger memory blocks. 10  
-2. batch\_wait\_max: The maximum duration (in milliseconds) the scheduler is permitted to hold a slot open to wait for new arrivals to pack the batch. 3 Setting this too high artificially inflates the TTFT of early-arriving requests; setting it too low underutilizes hardware parallelism. 3
+1. batch_max: The absolute upper limit of concurrent sequences processed in a single forward pass. 3 Larger values optimize raw system throughput (Tokens per Second) but increase latency per token, as the GPU must process larger memory blocks. 10  
+2. batch_wait_max: The maximum duration (in milliseconds) the scheduler is permitted to hold a slot open to wait for new arrivals to pack the batch. 3 Setting this too high artificially inflates the TTFT of early-arriving requests; setting it too low underutilizes hardware parallelism. 3
 
 ## **The Quality-Cost-Reliability Frontier & Routing Economics**
 
@@ -1377,9 +1379,9 @@ The table below outlines the core economic and operational properties of the dom
 
 | Execution Route | Input Cost (per 1M) | Output Cost (per 1M) | Latency Profile (TTFT / TPOT) | Quality / Reasoning Depth | Operational Risk | Target Workload Profile |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Small Models** (e.g., Haiku 4.5) 22 | USD 1.00 22 | USD 5.00 22 | Ultra-low (\<150ms / \<15ms) 35 | Low; prone to structural and logical failures. | High hallucination rates on complex data. | High-volume sorting, simple extraction, routing. 35 |
-| **Frontier Models** (e.g., Sonnet 4.6) 22 | USD 3.00 22 | USD 15.00 22 | Moderate (\~500ms / \~25ms) | High; strong logical flow and semantic depth. 38 | High raw cost on long-context runs. | Sophisticated reasoning, code generation, multi-document QA. 22 |
-| **Reasoning Models** (e.g., DeepSeek R1) 21 | USD 0.55 21 | USD 2.19 21 | High TTFT (\~2s+ due to initial thinking steps) | Exceptional; self-correcting logic chains. | Uncapped thinking token cost explosions. 5 | Math problems, deep code debugging, complex legal reviews. 35 |
+| **Small Models** (e.g., Haiku 4.5) 22 | USD 1.00 22 | USD 5.00 22 | Ultra-low (<150ms / <15ms) 35 | Low; prone to structural and logical failures. | High hallucination rates on complex data. | High-volume sorting, simple extraction, routing. 35 |
+| **Frontier Models** (e.g., Sonnet 4.6) 22 | USD 3.00 22 | USD 15.00 22 | Moderate (~500ms / ~25ms) | High; strong logical flow and semantic depth. 38 | High raw cost on long-context runs. | Sophisticated reasoning, code generation, multi-document QA. 22 |
+| **Reasoning Models** (e.g., DeepSeek R1) 21 | USD 0.55 21 | USD 2.19 21 | High TTFT (~2s+ due to initial thinking steps) | Exceptional; self-correcting logic chains. | Uncapped thinking token cost explosions. 5 | Math problems, deep code debugging, complex legal reviews. 35 |
 | **Open-Source Local** (e.g., Llama-3-8B FP8) 17 | Amortized hardware-hour | Amortized hardware-hour | Scaled by active batch size 10 | Medium; highly dependent on fine-tune quality. | High capital/infra maintenance costs. 20 | Massively repeated workflows, strict privacy constraints. 20 |
 | **Fine-Tuned Models** | Moderate host premium | Moderate host premium | Low to Medium | High on domain-specific boundaries. | Catastrophic regression outside training domain. | Specialized medical, financial, or industrial task automation. 20 |
 | **Async Batch API** 30 | 50% discount 30 | 50% discount 30 | High (Up to 24-hour turnaround) | Matches parent model. | Incompatible with interactive workflows. 20 | Overnight reporting, massive backfill data extractions. 20 |
@@ -1388,14 +1390,14 @@ The table below outlines the core economic and operational properties of the dom
 
 Speculative Decoding (SD) is a hardware-level optimization designed to bypass the memory-bandwidth bottleneck of large verifier models during the decode phase. 37 It pairs a massive target model (the **Verifier**) with a lightweight speculator mechanism (the **Draft Model**). 37
 
-1. **Draft Generation:** The small draft model sequentially generates a short chain of candidate tokens (typically K \= 3 to 12 tokens) at ultra-high speed. 38  
+1. **Draft Generation:** The small draft model sequentially generates a short chain of candidate tokens (typically K = 3 to 12 tokens) at ultra-high speed. 38  
 2. **Parallel Verification:** The target verifier model processes all K candidate tokens simultaneously in a single, parallel compute forward pass. 41  
 3. **Rejection Sampling:** The verifier accepts the longest valid prefix matching its own probability distribution, discarding any divergent branch, and continues from the first mismatch. 38
 
 This process speeds up inference because verified tokens are generated in parallel, reducing the total count of sequential memory fetches required from slow HBM. 38  
-However, in production serving systems, the economics of Speculative Decoding are highly dynamic. 37 The effective speedup (S\_eff) is a function of the **Draft Model Acceptance Rate (alpha)**—the probability that the verifier accepts a speculated token—and the server load 37:
+However, in production serving systems, the economics of Speculative Decoding are highly dynamic. 37 The effective speedup (S_eff) is a function of the **Draft Model Acceptance Rate (alpha)**—the probability that the verifier accepts a speculated token—and the server load 37:
 
-* **At Low Server Loads (Batch Size approximately 1):** Memory bandwidth is the absolute bottleneck. 7 If alpha is high (e.g., alpha \> 0.7), speculative decoding delivers dramatic latency reductions (often 2-fold to 3-fold faster TTFT and TPOT). 13  
+* **At Low Server Loads (Batch Size approximately 1):** Memory bandwidth is the absolute bottleneck. 7 If alpha is high (e.g., alpha > 0.7), speculative decoding delivers dramatic latency reductions (often 2-fold to 3-fold faster TTFT and TPOT). 13  
 * **At High Server Loads (Large Batch Sizes):** Continuous batching naturally packs the GPU, shifting the system from being memory-bandwidth-bound to compute-capacity-bound. 7 Under these conditions, executing draft model inferences and processing speculative verification arrays consumes valuable Tensor core FLOPs and locks down additional KV cache page memory. 37 The overhead of speculation begins to degrade performance, and speculative decoding can actually become slower than standard vanilla decoding. 37
 
 ## **System Margins & Operational Safety Nets**
@@ -1411,8 +1413,8 @@ To ensure systematic resilience, an AI platform must continuously monitor and ba
 | **Token Margin** | The remaining context window headroom before encountering sequence limits. | Absolute model context window size. | Trigger Context Compiler pruning / summarize history. |
 | **Context-Window Margin** | The buffer between current prompt length and attention quality degradation. | Context limit where model attention begins to decay. | Truncate history; filter dynamic few-shot examples. 13 |
 | **Cache-Hit Margin** | The hit ratio headroom required to prevent cache thrashing. | Drop below 40% hit rate on key system blocks. 26 | Switch to temporal-priority pinning; isolate tenant scopes. 12 |
-| **Latency Margin** | The duration buffer between current execution times and user SLOs. 3 | SLO limit (P95 \> 1000 ms). 3 | Deactivate speculative checks; switch to fallback routes. 3 |
-| **Throughput Margin** | The headroom between average request volumes and server capacity. | Arrival rate exceeding maximum service capability (rho \>= 1). 3 | Engage circuit-breakers; shed low-tier request queues. 3 |
+| **Latency Margin** | The duration buffer between current execution times and user SLOs. 3 | SLO limit (P95 > 1000 ms). 3 | Deactivate speculative checks; switch to fallback routes. 3 |
+| **Throughput Margin** | The headroom between average request volumes and server capacity. | Arrival rate exceeding maximum service capability (rho >= 1). 3 | Engage circuit-breakers; shed low-tier request queues. 3 |
 | **Rate-Limit Margin** | The remaining API quota before encountering provider HTTP 429 errors. | Provider-enforced Requests/Tokens Per Minute limits. | Dynamic gateway request throttling; rotate API key pools. 20 |
 | **Retry Margin** | The maximum remaining validation loop budget before an execution chain is aborted. | Crossing the maximum allowable retry ceiling (typically 3). 1 | Abort generation loop; escalate request to fallback model. 1 |
 | **Eval Margin** | The acceptable quality score gap on real-time evaluations before triggers engage. | Quality score falling below target acceptance threshold. | Re-route to premium frontier model. 1 |
@@ -1427,28 +1429,28 @@ Building reliability into probabilistic AI systems requires explicit financial i
 
 | Reliability Mechanism | Billed Token Multiplier | Direct Network / Hosting Cost | Latency Overhead (Prefill / Decode) | System Defect Protected |
 | :---- | :---- | :---- | :---- | :---- |
-| **Schema Validation** 34 | None | Negligible CPU parsing overhead. | 0% Prefill / \+10% to \+30% TPOT due to logit-masking. 34 | Prevents parsing exceptions and malformed JSON structures. 34 |
-| **Constrained Decoding** 36 | None | Negligible. | 0% Prefill / \+15% to \+40% TPOT under complex grammar. | Eliminates field hallucinations, ensuring database safety. 36 |
-| **Automated Retries** 1 | N\_retry \* Base Cost 1 | Redundant API charges. 1 | \+100% \* N\_retry End-to-End Latency. 1 | Recovers from minor formatting errors. 1 |
+| **Schema Validation** 34 | None | Negligible CPU parsing overhead. | 0% Prefill / +10% to +30% TPOT due to logit-masking. 34 | Prevents parsing exceptions and malformed JSON structures. 34 |
+| **Constrained Decoding** 36 | None | Negligible. | 0% Prefill / +15% to +40% TPOT under complex grammar. | Eliminates field hallucinations, ensuring database safety. 36 |
+| **Automated Retries** 1 | N_retry * Base Cost 1 | Redundant API charges. 1 | +100% * N_retry End-to-End Latency. 1 | Recovers from minor formatting errors. 1 |
 | **Fallback Models** 1 | Variable (1.5x to 5.0x baseline). 1 | Secondary provider billing premiums. 1 | Prefill reset penalty; adds network route swap delay. 3 | Protects against provider outages and rate limit blocks. 1 |
-| **Citation Verification** | \+20% to \+50% Input Tokens | Secondary search extraction database fees. | \+150 ms Prefill validation pass. 3 | Mitigates hallucinated facts and unsupported claims. |
-| **Tool-Result Check** | \+30% Input context 1 | Billed API execution overhead. | Bounded by tool execution network delays. | Blocks corrupted or dangerous database executions. |
-| **Safety Guardrails** | Double token cost (input \+ output evaluation) | Separate hosting costs if running local guards. | Double prefill blocking path; adds post-decode check. 3 | Prevents prompt injections and toxic content generation. |
+| **Citation Verification** | +20% to +50% Input Tokens | Secondary search extraction database fees. | +150 ms Prefill validation pass. 3 | Mitigates hallucinated facts and unsupported claims. |
+| **Tool-Result Check** | +30% Input context 1 | Billed API execution overhead. | Bounded by tool execution network delays. | Blocks corrupted or dangerous database executions. |
+| **Safety Guardrails** | Double token cost (input + output evaluation) | Separate hosting costs if running local guards. | Double prefill blocking path; adds post-decode check. 3 | Prevents prompt injections and toxic content generation. |
 
 ## **Unit Economics by User Journey**
 
 To analyze how these economic principles manifest in real business applications, we deconstruct the unit economics of ten standard user journeys across contemporary enterprise platforms 20:
 
-### **1\. Customer Support Resolution Loop**
+### **1. Customer Support Resolution Loop**
 
 A user submits a ticket, triggering a multi-turn RAG conversation. 20
 
-* *Cost Profile:* Highly cost-sensitive; target cost-to-serve is \< USD 0.05 per session. 43  
+* *Cost Profile:* Highly cost-sensitive; target cost-to-serve is < USD 0.05 per session. 43  
 * *State Management:* Relies on strict prefix caching of the core product manual and system persona. 43  
 * *Routing Logic:* Primary execution on Claude Haiku 4.5 or Gemini 2.5 Flash-Lite. 22 Under high load, cache hit ratios are maintained above 70% by stripping conversational IDs from the prompt prefix. 14  
 * *Risk:* Retry storms caused by ambiguous user inputs. 1
 
-### **2\. Multi-Document Contract Review**
+### **2. Multi-Document Contract Review**
 
 A corporate legal analyst uploads five contracts (totaling 150,000 tokens) to cross-reference clauses. 5
 
@@ -1457,7 +1459,7 @@ A corporate legal analyst uploads five contracts (totaling 150,000 tokens) to cr
 * *Routing Logic:* The 150K repository is written once (USD 0.30) and sustained at a low storage rent (USD 4.50/M tokens/hour). 5 50 query runs cost only USD 4.07 per day vs USD 15.00 uncached, yielding 73% savings. 5  
 * *Risk:* Attention dilution across massive context frames. 5
 
-### **3\. Automated Executive Report Generation**
+### **3. Automated Executive Report Generation**
 
 The system processes structured database tables to compile weekly performance slide briefings. 20
 
@@ -1466,7 +1468,7 @@ The system processes structured database tables to compile weekly performance sl
 * *Routing Logic:* routed exclusively through the Async Batch API of premium models (e.g., Claude Sonnet 4.6 Batch). 22 This bypasses real-time queues and shaves exactly 50% off standard token pricing. 20  
 * *Risk:* High latency, though managed within the 24-hour SLA. 20
 
-### **4\. Code-base Debugging Assistant**
+### **4. Code-base Debugging Assistant**
 
 An engineering agent scans an entire repository (50,000 tokens context), compiles dependencies, and attempts to resolve a complex logical bug. 5
 
@@ -1475,7 +1477,7 @@ An engineering agent scans an entire repository (50,000 tokens context), compile
 * *Routing Logic:* DeepSeek R1 or OpenAI o3. 21 A single prompt can run 15,000 input tokens but generate 4,000 internal thinking tokens before resolving a 500-token fix. 5 Because thinking tokens are billed at standard output rates (USD 2.19 to USD 8.00 per million), the cost profile is highly back-loaded. 5  
 * *Risk:* Runaway reasoning loops where the model consumes thousands of thinking tokens without converging on a valid output. 5
 
-### **5\. Medical Research Synthesis**
+### **5. Medical Research Synthesis**
 
 An oncology research tool compiles twenty newly published research papers (approx. 200,000 tokens) to flag drug interaction anomalies. 20
 
@@ -1484,7 +1486,7 @@ An oncology research tool compiles twenty newly published research papers (appro
 * *Routing Logic:* Claude Sonnet 4.6 flat-rate context routes. 22  
 * *Risk:* Exploding prefill billing on long uncached inputs. 7
 
-### **6\. Automated HR Onboarding Agent**
+### **6. Automated HR Onboarding Agent**
 
 A chat assistant guides a new employee through payroll setup and compliance questionnaires. 20
 
@@ -1493,7 +1495,7 @@ A chat assistant guides a new employee through payroll setup and compliance ques
 * *Routing Logic:* Quantized local model (e.g., Llama-3-8B FP8) hosted on dedicated host instances to bypass network egress and provider rate queuing. 3  
 * *Risk:* High capital infrastructure maintenance costs. 20
 
-### **7\. Precision Invoicing Data Extraction**
+### **7. Precision Invoicing Data Extraction**
 
 An agent parses thousands of daily PDFs to extract standardized structured transaction fields. 20
 
@@ -1502,7 +1504,7 @@ An agent parses thousands of daily PDFs to extract standardized structured trans
 * *Routing Logic:* Structured logit-masked constrained decoding on highly efficient small models (e.g., GPT-4.1-mini). 29  
 * *Risk:* TPOT degradation due to heavy CPU logit validation scans during generation. 36
 
-### **8\. Enterprise Sales Enablement Engine**
+### **8. Enterprise Sales Enablement Engine**
 
 An agent scans a prospect’s public website to draft hyper-personalized sales collateral.
 
@@ -1511,7 +1513,7 @@ An agent scans a prospect’s public website to draft hyper-personalized sales c
 * *Routing Logic:* Premium frontier models (e.g., GPT-5.5-pro). 27  
 * *Risk:* Inflated cost if prospect data is processed uncached.
 
-### **9\. Multi-Agent Supply Chain Automation**
+### **9. Multi-Agent Supply Chain Automation**
 
 Ten autonomous agents coordinate sequentially to process logistics changes, tool-calls, and validations. 20
 
@@ -1520,7 +1522,7 @@ Ten autonomous agents coordinate sequentially to process logistics changes, tool
 * *Routing Logic:* Mixed-routing pipeline; routing classification occurs on cheap models, escalating only complex nodes to premium models. 8  
 * *Risk:* Runaway agentic loops where cascading failures in one agent trigger retry storms across the entire graph. 1
 
-### **10\. High-Impact Transaction Approval**
+### **10. High-Impact Transaction Approval**
 
 An AI agent executes final financial audits on enterprise transactions exceeding USD 1M before manual signature. 20
 
@@ -1533,89 +1535,89 @@ An AI agent executes final financial audits on enterprise transactions exceeding
 
 To transition from architectural analysis to production execution, engineering teams must deploy targeted optimization levers across three core domains 1:
 
-### **1\. Prompt Alignment Engineering**
+### **1. Prompt Alignment Engineering**
 
 * **Front-load Static Elements:** Always position static structures (system prompts, tool descriptions, reference documentation) at the absolute beginning of the prompt string. 13 Put highly dynamic parameters (user queries, unique transaction IDs, current timestamps) at the absolute end. 13 This maximizes the identical prefix overlap, achieving up to 90% caching hits. 13  
 * **Strip Dynamic IDs from Prefixes:** Never insert UUIDs, current timestamps, or user-specific markers early in the prompt structure. 14 Doing so completely breaks prefix hash matching for all subsequent tokens, forcing a full, expensive cold-prefill computation. 14  
 * **Deterministic Serialization:** Ensure that context-compilation states (such as serialized JSON objects or tool definitions) utilize stable, deterministic key ordering. 14 Random orderings (a common issue in language runtimes like Go or Swift) yield distinct tokenization IDs, destroying cache hit rates. 14  
 * **Ensure Precise Spacing Alignment:** Prefix caching is byte-exact. 14 A single trailing space, incorrect capitalization, or newline difference between request prompts breaks the hash, causing a catastrophic cache miss. 14
 
-### **2\. Serving Engine Fine-Tuning**
+### **2. Serving Engine Fine-Tuning**
 
 * **Deploy RadixTree Caching:** Ensure the serving cluster utilizes RadixAttention mechanisms (such as SGLang or vLLM automatic prefix caching) to enable zero-overhead memory reuse across concurrent sessions. 12  
 * **Quantize KV Caches:** Downcast serving engines to FP8 or NVFP4 KV storage allocations to instantly reclaim up to 75% of GPU memory capacity, expanding batch headroom. 17  
 * **Hierarchical CPU Host Offloading:** Configure connectors like LMCache to offload inactive context blocks to host DDR5 memory or local tmpfs RAM buffers, preventing expensive remote cold-prefills on long-context queries. 7
 
-### **3\. Architectural Routing Control**
+### **3. Architectural Routing Control**
 
 * **Route to Batch APIs:** For non-urgent workflows (such as reporting pipelines or nightly database extractions), route requests through the Batch API to instantly slash token costs by 50%. 20  
-* **Configure Speculative Decoding carefully:** Deploy draft speculator models (e.g., EAGLE draft heads) for low-concurrency, real-time interactive workloads to optimize TPOT latency. 41 Automatically deactivate speculation when serving engine queue utilization exceeds rho \> 0.7. 3
+* **Configure Speculative Decoding carefully:** Deploy draft speculator models (e.g., EAGLE draft heads) for low-concurrency, real-time interactive workloads to optimize TPOT latency. 41 Automatically deactivate speculation when serving engine queue utilization exceeds rho > 0.7. 3
 
 ## **Cost Pathologies & Serving Failure Modes**
 
 Without active observability and structural safeguards, enterprise AI platforms routinely succumb to distinctive cost pathologies:
 
-### **1\. Conversational Context Bloat**
+### **1. Conversational Context Bloat**
 
 * *Physical Mechanism:* Multi-turn chat applications continuously append old message blocks to the input context of every new turn without truncation. 2  
 * *Economic Impact:* Prefill processing costs and active VRAM consumption grow quadratically with each successive turn, quickly exhausting GPU page pools and triggering high latency. 4  
 * *Prevention:* Force the Context Compiler to run lossy context pruning, summarizing old conversation stages once context lengths exceed designated token ceilings. 5
 
-### **2\. Cache Invalidation Loops**
+### **2. Cache Invalidation Loops**
 
 * *Physical Mechanism:* A template engine dynamically injects a real-time timestamp or incrementing session counter early in the system prompt. 14  
 * *Economic Impact:* Complete prefix cache invalidation across every single request, forcing the serving engine to execute full, expensive cold-prefills. 14  
 * *Prevention:* Restrict template compilers from injecting dynamic variables anywhere except the final prompt suffix. 13
 
-### **3\. Validation Retry Storms**
+### **3. Validation Retry Storms**
 
 * *Physical Mechanism:* Downstream JSON parsers reject a slightly misformatted schema generated by a cheap model and trigger immediate, unthrottled loop regenerations. 1  
 * *Economic Impact:* The system enters an infinite computational loop, executing hundreds of rapid, concurrent API calls that saturate budgets and block rate-limit quotas. 1  
 * *Prevention:* Enforce a strict, low-ceiling Retry Budget; implement exponential backoff; automatically escalate to a higher-tier model or human review queue after 3 consecutive validation failures. 1
 
-### **4\. Runaway Agentic Loops**
+### **4. Runaway Agentic Loops**
 
 * *Physical Mechanism:* Autonomous agents invoke recursive tool-calls, reading their own intermediate errors as new prompt inputs.  
 * *Economic Impact:* Massive, compounding billing spikes within minutes, entirely untracked at the user level until invoices materialize. 2  
 * *Prevention:* Implement a centralized gateway proxy that enforces a hard cost-ceiling constraint per pipeline run, automatically aborting sessions that cross the threshold. 1
 
-### **5\. Overuse of Premium Frontier Models**
+### **5. Overuse of Premium Frontier Models**
 
 * *Physical Mechanism:* Developers route simple, low-entropy tasks (such as string formatting or binary categorization) to high-tier models by default. 20  
 * *Economic Impact:* Massive cost inflation with zero marginal performance improvement. 5  
 * *Prevention:* Implement an upstream intent classification classifier to filter and route low-entropy requests to cheap models. 8
 
-### **6\. Underpowered Loop Saturation**
+### **6. Underpowered Loop Saturation**
 
 * *Physical Mechanism:* Force a highly complex logical task to execute entirely on an underpowered, cheap model to reduce per-token billing. 1  
-* *Economic Impact:* The cheap model continuously fails evaluations, generating high verification overheads and massive retry loops. 1 The Effective Cost (C\_effective) ends up higher than if a frontier model had executed the task on its initial attempt. 1  
+* *Economic Impact:* The cheap model continuously fails evaluations, generating high verification overheads and massive retry loops. 1 The Effective Cost (C_effective) ends up higher than if a frontier model had executed the task on its initial attempt. 1  
 * *Prevention:* Navigate the Quality-Cost-Reliability frontier using real-time task categorization and routing. 5
 
-### **7\. Evaluation and Telemetry Sprawl**
+### **7. Evaluation and Telemetry Sprawl**
 
 * *Physical Mechanism:* Run multiple real-time, LLM-as-a-Judge evaluations synchronously over every production session. 1  
 * *Economic Impact:* Evaluation billing begins to exceed primary generation costs, causing latency constraints to fail. 1  
 * *Prevention:* Run heavy evaluations asynchronously in offline databases; utilize lightweight local classifier models for real-time safety checking. 1
 
-### **8\. Tool Latency Cascades**
+### **8. Tool Latency Cascades**
 
 * *Physical Mechanism:* An agent invokes multiple slow external APIs sequentially, appending each output to the prompt context.  
 * *Economic Impact:* System latency degrades, and concurrent active requests hold memory blocks open in VRAM for extended durations, leading to VRAM starvation. 3  
 * *Prevention:* Execute tool queries in parallel threads; implement strict timeouts and fallback defaults.
 
-### **9\. Human-Review bottlenecks**
+### **9. Human-Review bottlenecks**
 
 * *Physical Mechanism:* Low-risk anomalies are routed to a manual legal/operations review queue.  
 * *Economic Impact:* Operational workflow halts; human labor costs dwarf AI system execution costs.  
 * *Prevention:* Set dynamic confidence scoring triggers; only route critical risk items to human pipelines.
 
-### **10\. Tenant-Level Cost Imbalances**
+### **10. Tenant-Level Cost Imbalances**
 
 * *Physical Mechanism:* A single high-volume customer tenant continuously executes long-context queries, saturating the shared API key quota. 1  
 * *Economic Impact:* Sudden, cluster-wide rate throttling (HTTP 429\) that impacts all other customer accounts. 1  
 * *Prevention:* Deploy eBPF sensor tracking or API proxy routing to enforce strict, tenant-level token bucket limits. 1
 
-### **11\. Green-Dashboard Fallacy**
+### **11. Green-Dashboard Fallacy**
 
 * *Physical Mechanism:* Infrastructure dashboards show 100% availability, low latency, and low error rates, while downstream logs show a massive rate of validation failures and user abandonments. 1  
 * *Economic Impact:* High operational spend delivering zero business value.  
@@ -1634,9 +1636,9 @@ To maintain this monitoring infrastructure without introducing overhead to the p
 
 The gateway continuously evaluates rolling aggregation metrics against strict threshold limits to prevent runaway loops or budget overruns 1:
 
-* **Daily Tenant Budgets:** ClickHouse aggregates spent token dollars per tenant\_id on a rolling 24-hour window. 1 If a tenant’s rolling spend crosses 80% of their daily budget, the gateway fires an asynchronous alert. 1 If it crosses 100%, the gateway engages a hard limit, returning an immediate HTTP 402 (Payment Required) block. 1  
+* **Daily Tenant Budgets:** ClickHouse aggregates spent token dollars per tenant_id on a rolling 24-hour window. 1 If a tenant’s rolling spend crosses 80% of their daily budget, the gateway fires an asynchronous alert. 1 If it crosses 100%, the gateway engages a hard limit, returning an immediate HTTP 402 (Payment Required) block. 1  
 * **Concurrency and Queue Depth Throttling:** If the active serving engine's queue utilization (rho) crosses 0.85, the gateway activates dynamic shedding. 3 Lower-tier users are temporarily rejected with an HTTP 429 error, protecting tail latency (P99) for enterprise customers. 3  
-* **Real-time Loop Detection:** The gateway runs a fast window-count on identical user\_id and workflow\_id streams. 1 If the request frequency for a single agent session exceeds 10 calls per minute, the gateway flags an active runaway loop and terminates the trace context. 1
+* **Real-time Loop Detection:** The gateway runs a fast window-count on identical user_id and workflow_id streams. 1 If the request frequency for a single agent session exceeds 10 calls per minute, the gateway flags an active runaway loop and terminates the trace context. 1
 
 ## **Cross-Canon Handoff Map**
 
@@ -1665,49 +1667,49 @@ To sustain economic control over production AI systems, architects must maintain
 
 #### **Works cited**
 
-1. LLM Cost Attribution at Scale: Metadata Tagging, Team Budgets, and Chargeback Reports \- Truefoundry, accessed June 6, 2026, [https://www.truefoundry.com/blog/llm-cost-attribution-team-budgets](https://www.truefoundry.com/blog/llm-cost-attribution-team-budgets)  
-2. How to Track LLM Token Usage and Cost | Guide \- Worklytics, accessed June 6, 2026, [https://www.worklytics.co/blog/how-to-track-llm-token-usage-and-cost](https://www.worklytics.co/blog/how-to-track-llm-token-usage-and-cost)  
-3. Queueing Theory for LLM Inference \- DZone, accessed June 6, 2026, [https://dzone.com/articles/queueing-theory-for-llm-inference](https://dzone.com/articles/queueing-theory-for-llm-inference)  
+1. LLM Cost Attribution at Scale: Metadata Tagging, Team Budgets, and Chargeback Reports - Truefoundry, accessed June 6, 2026, [https://www.truefoundry.com/blog/llm-cost-attribution-team-budgets](https://www.truefoundry.com/blog/llm-cost-attribution-team-budgets)  
+2. How to Track LLM Token Usage and Cost | Guide - Worklytics, accessed June 6, 2026, [https://www.worklytics.co/blog/how-to-track-llm-token-usage-and-cost](https://www.worklytics.co/blog/how-to-track-llm-token-usage-and-cost)  
+3. Queueing Theory for LLM Inference - DZone, accessed June 6, 2026, [https://dzone.com/articles/queueing-theory-for-llm-inference](https://dzone.com/articles/queueing-theory-for-llm-inference)  
 4. A Queueing-Theoretic Framework for Stability Analysis of LLM Inference with KV Cache Memory Constraints | OpenReview, accessed June 6, 2026, [https://openreview.net/forum?id=AWLJJRgvbA](https://openreview.net/forum?id=AWLJJRgvbA)  
-5. Gemini 3.1 Pro: Cost Control \- Verdent AI, accessed June 6, 2026, [https://www.verdent.ai/guides/gemini-3-1-pro-pricing](https://www.verdent.ai/guides/gemini-3-1-pro-pricing)  
+5. Gemini 3.1 Pro: Cost Control - Verdent AI, accessed June 6, 2026, [https://www.verdent.ai/guides/gemini-3-1-pro-pricing](https://www.verdent.ai/guides/gemini-3-1-pro-pricing)  
 6. Attribute | Cloud Cost Attribution & FinOps Without Tagging, accessed June 6, 2026, [https://attrb.io/](https://attrb.io/)  
 7. KV Caching with vLLM, LMCache, and Ceph, accessed June 6, 2026, [https://ceph.io/en/news/blog/2025/vllm-kv-caching/](https://ceph.io/en/news/blog/2025/vllm-kv-caching/)  
 8. Predicted-Latency Based Scheduling for LLMs | llm-d, accessed June 6, 2026, [https://llm-d.ai/blog/predicted-latency-based-scheduling-for-llms](https://llm-d.ai/blog/predicted-latency-based-scheduling-for-llms)  
-9. Chapter 22: KV Cache \- Making Autoregressive Inference Fast | Transformer Architecture, accessed June 6, 2026, [https://waylandz.com/llm-transformer-book-en/chapter-22-kv-cache/](https://waylandz.com/llm-transformer-book-en/chapter-22-kv-cache/)  
+9. Chapter 22: KV Cache - Making Autoregressive Inference Fast | Transformer Architecture, accessed June 6, 2026, [https://waylandz.com/llm-transformer-book-en/chapter-22-kv-cache/](https://waylandz.com/llm-transformer-book-en/chapter-22-kv-cache/)  
 10. Decoding Real-Time LLM Inference: A Guide to the Latency vs. Throughput Bottleneck | by Nadeem Khan(NK) | LearnWithNK | Medium, accessed June 6, 2026, [https://medium.com/learnwithnk/decoding-real-time-llm-inference-a-guide-to-the-latency-vs-throughput-bottleneck-c1ad96442d50](https://medium.com/learnwithnk/decoding-real-time-llm-inference-a-guide-to-the-latency-vs-throughput-bottleneck-c1ad96442d50)  
-11. KV Cache Memory Calculation for LLMs | Technical Guide \- Lyceum Technology, accessed June 6, 2026, [https://lyceum.technology/magazine/kv-cache-memory-calculation-llm/](https://lyceum.technology/magazine/kv-cache-memory-calculation-llm/)  
-12. Automatic Prefix Caching \- vLLM Documentation, accessed June 6, 2026, [https://docs.vllm.ai/en/stable/design/prefix\_caching/](https://docs.vllm.ai/en/stable/design/prefix_caching/)  
-13. Prompt Caching Infrastructure: Reducing LLM Costs and Latency \- Introl, accessed June 6, 2026, [https://introl.com/blog/prompt-caching-infrastructure-llm-cost-latency-reduction-guide-2025](https://introl.com/blog/prompt-caching-infrastructure-llm-cost-latency-reduction-guide-2025)  
-14. Prefix caching | LLM Inference Handbook \- BentoML, accessed June 6, 2026, [https://bentoml.com/llm/inference-optimization/prefix-caching](https://bentoml.com/llm/inference-optimization/prefix-caching)  
+11. KV Cache Memory Calculation for LLMs | Technical Guide - Lyceum Technology, accessed June 6, 2026, [https://lyceum.technology/magazine/kv-cache-memory-calculation-llm/](https://lyceum.technology/magazine/kv-cache-memory-calculation-llm/)  
+12. Automatic Prefix Caching - vLLM Documentation, accessed June 6, 2026, [https://docs.vllm.ai/en/stable/design/prefix_caching/](https://docs.vllm.ai/en/stable/design/prefix_caching/)  
+13. Prompt Caching Infrastructure: Reducing LLM Costs and Latency - Introl, accessed June 6, 2026, [https://introl.com/blog/prompt-caching-infrastructure-llm-cost-latency-reduction-guide-2025](https://introl.com/blog/prompt-caching-infrastructure-llm-cost-latency-reduction-guide-2025)  
+14. Prefix caching | LLM Inference Handbook - BentoML, accessed June 6, 2026, [https://bentoml.com/llm/inference-optimization/prefix-caching](https://bentoml.com/llm/inference-optimization/prefix-caching)  
 15. Prompt caching | OpenAI API, accessed June 6, 2026, [https://developers.openai.com/api/docs/guides/prompt-caching](https://developers.openai.com/api/docs/guides/prompt-caching)  
 16. Gemini Developer API pricing, accessed June 6, 2026, [https://ai.google.dev/gemini-api/docs/pricing](https://ai.google.dev/gemini-api/docs/pricing)  
 17. KV Cache Optimization: Serve 10x More Users on the Same GPU (2026) | Spheron Blog, accessed June 6, 2026, [https://www.spheron.network/blog/kv-cache-optimization-guide/](https://www.spheron.network/blog/kv-cache-optimization-guide/)  
-18. Reducing Transformer Key-Value Cache Size with Cross-Layer Attention, accessed June 6, 2026, [https://proceedings.neurips.cc/paper\_files/paper/2024/file/9e23d020c18e4c40d81c6a0fc7a46f68-Paper-Conference.pdf](https://proceedings.neurips.cc/paper_files/paper/2024/file/9e23d020c18e4c40d81c6a0fc7a46f68-Paper-Conference.pdf)  
+18. Reducing Transformer Key-Value Cache Size with Cross-Layer Attention, accessed June 6, 2026, [https://proceedings.neurips.cc/paper_files/paper/2024/file/9e23d020c18e4c40d81c6a0fc7a46f68-Paper-Conference.pdf](https://proceedings.neurips.cc/paper_files/paper/2024/file/9e23d020c18e4c40d81c6a0fc7a46f68-Paper-Conference.pdf)  
 19. SGLang Production Deployment Guide: RadixAttention and Multi-Turn Inference on GPU Cloud (2026) | Spheron Blog, accessed June 6, 2026, [https://www.spheron.network/blog/sglang-production-deployment-guide/](https://www.spheron.network/blog/sglang-production-deployment-guide/)  
-20. Token Economics: Managing AI Value in SaaS Model Token Costs \- The FinOps Foundation, accessed June 6, 2026, [https://www.finops.org/wg/token-economics-saas/](https://www.finops.org/wg/token-economics-saas/)  
+20. Token Economics: Managing AI Value in SaaS Model Token Costs - The FinOps Foundation, accessed June 6, 2026, [https://www.finops.org/wg/token-economics-saas/](https://www.finops.org/wg/token-economics-saas/)  
 21. DeepSeek API 2026: Complete Pricing, Setup & V4/R1 Cost Guide | NxCode, accessed June 6, 2026, [https://www.nxcode.io/resources/news/deepseek-api-pricing-complete-guide-2026](https://www.nxcode.io/resources/news/deepseek-api-pricing-complete-guide-2026)  
-22. Claude API Pricing 2026: Full Anthropic Cost Breakdown \- Metacto, accessed June 6, 2026, [https://www.metacto.com/blogs/anthropic-api-pricing-a-full-breakdown-of-costs-and-integration](https://www.metacto.com/blogs/anthropic-api-pricing-a-full-breakdown-of-costs-and-integration)  
-23. Why large MoE models break latency budgets and what speculative decoding changes in production systems \- Nebius, accessed June 6, 2026, [https://nebius.com/blog/posts/moe-spec-decoding](https://nebius.com/blog/posts/moe-spec-decoding)  
-24. RadixAttention \- SGLang, accessed June 6, 2026, [https://sgl-project-sglang-93.mintlify.app/concepts/radix-attention](https://sgl-project-sglang-93.mintlify.app/concepts/radix-attention)  
-25. Radix Attention in SGLang vs. PagedAttention \- Rajat Pandit, accessed June 6, 2026, [https://rajatpandit.com/ai-engineering/radixattention-vs-pagedattention/](https://rajatpandit.com/ai-engineering/radixattention-vs-pagedattention/)  
-26. Prefix Caching \- SGLang, accessed June 6, 2026, [https://sgl-project-sglang-93.mintlify.app/concepts/prefix-caching](https://sgl-project-sglang-93.mintlify.app/concepts/prefix-caching)  
+22. Claude API Pricing 2026: Full Anthropic Cost Breakdown - Metacto, accessed June 6, 2026, [https://www.metacto.com/blogs/anthropic-api-pricing-a-full-breakdown-of-costs-and-integration](https://www.metacto.com/blogs/anthropic-api-pricing-a-full-breakdown-of-costs-and-integration)  
+23. Why large MoE models break latency budgets and what speculative decoding changes in production systems - Nebius, accessed June 6, 2026, [https://nebius.com/blog/posts/moe-spec-decoding](https://nebius.com/blog/posts/moe-spec-decoding)  
+24. RadixAttention - SGLang, accessed June 6, 2026, [https://sgl-project-sglang-93.mintlify.app/concepts/radix-attention](https://sgl-project-sglang-93.mintlify.app/concepts/radix-attention)  
+25. Radix Attention in SGLang vs. PagedAttention - Rajat Pandit, accessed June 6, 2026, [https://rajatpandit.com/ai-engineering/radixattention-vs-pagedattention/](https://rajatpandit.com/ai-engineering/radixattention-vs-pagedattention/)  
+26. Prefix Caching - SGLang, accessed June 6, 2026, [https://sgl-project-sglang-93.mintlify.app/concepts/prefix-caching](https://sgl-project-sglang-93.mintlify.app/concepts/prefix-caching)  
 27. Pricing | OpenAI API, accessed June 6, 2026, [https://developers.openai.com/api/docs/pricing](https://developers.openai.com/api/docs/pricing)  
-28. Prompt Caching 201 \- OpenAI Developers, accessed June 6, 2026, [https://developers.openai.com/cookbook/examples/prompt\_caching\_201](https://developers.openai.com/cookbook/examples/prompt_caching_201)  
-29. Azure OpenAI Service \- Pricing, accessed June 6, 2026, [https://azure.microsoft.com/en-us/pricing/details/azure-openai/](https://azure.microsoft.com/en-us/pricing/details/azure-openai/)  
-30. Prompt caching \- Claude API Docs \- Claude Console, accessed June 6, 2026, [https://platform.claude.com/docs/en/build-with-claude/prompt-caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)  
-31. Gemini API Pricing Calculator & Cost Guide (Jun 2026\) \- CostGoat, accessed June 6, 2026, [https://costgoat.com/pricing/gemini-api](https://costgoat.com/pricing/gemini-api)  
-32. Pricing \- Claude API Docs, accessed June 6, 2026, [https://platform.claude.com/docs/en/about-claude/pricing](https://platform.claude.com/docs/en/about-claude/pricing)  
-33. Gemini 3.1 Pro Preview \- API Pricing & Benchmarks \- OpenRouter, accessed June 6, 2026, [https://openrouter.ai/google/gemini-3.1-pro-preview](https://openrouter.ai/google/gemini-3.1-pro-preview)  
-34. DeepSeek V3 \- API Pricing & Benchmarks \- OpenRouter, accessed June 6, 2026, [https://openrouter.ai/deepseek/deepseek-chat](https://openrouter.ai/deepseek/deepseek-chat)  
-35. Anthropic API Pricing: Official Token Rates for Every Claude Model (2026) \- PE Collective, accessed June 6, 2026, [https://pecollective.com/tools/anthropic-api-pricing/](https://pecollective.com/tools/anthropic-api-pricing/)  
-36. SGLang in Production: A Developer's Guide to Structured Generation, RadixAttention, and Multi-Step LLM Pipelines \- Runpod, accessed June 6, 2026, [https://www.runpod.io/articles/guides/blog-sglang-production-llm-pipelines](https://www.runpod.io/articles/guides/blog-sglang-production-llm-pipelines)  
-37. \[2605.15051\] An Interpretable Latency Model for Speculative Decoding in LLM Serving, accessed June 6, 2026, [https://arxiv.org/abs/2605.15051](https://arxiv.org/abs/2605.15051)  
-38. Faster, cheaper, just as smart: Improving the economics of LLM inference with speculative decoding \- Red Hat, accessed June 6, 2026, [https://www.redhat.com/en/blog/solving-economics-llm-inference-speculative-decoding](https://www.redhat.com/en/blog/solving-economics-llm-inference-speculative-decoding)  
+28. Prompt Caching 201 - OpenAI Developers, accessed June 6, 2026, [https://developers.openai.com/cookbook/examples/prompt_caching_201](https://developers.openai.com/cookbook/examples/prompt_caching_201)  
+29. Azure OpenAI Service - Pricing, accessed June 6, 2026, [https://azure.microsoft.com/en-us/pricing/details/azure-openai/](https://azure.microsoft.com/en-us/pricing/details/azure-openai/)  
+30. Prompt caching - Claude API Docs - Claude Console, accessed June 6, 2026, [https://platform.claude.com/docs/en/build-with-claude/prompt-caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)  
+31. Gemini API Pricing Calculator & Cost Guide (Jun 2026\) - CostGoat, accessed June 6, 2026, [https://costgoat.com/pricing/gemini-api](https://costgoat.com/pricing/gemini-api)  
+32. Pricing - Claude API Docs, accessed June 6, 2026, [https://platform.claude.com/docs/en/about-claude/pricing](https://platform.claude.com/docs/en/about-claude/pricing)  
+33. Gemini 3.1 Pro Preview - API Pricing & Benchmarks - OpenRouter, accessed June 6, 2026, [https://openrouter.ai/google/gemini-3.1-pro-preview](https://openrouter.ai/google/gemini-3.1-pro-preview)  
+34. DeepSeek V3 - API Pricing & Benchmarks - OpenRouter, accessed June 6, 2026, [https://openrouter.ai/deepseek/deepseek-chat](https://openrouter.ai/deepseek/deepseek-chat)  
+35. Anthropic API Pricing: Official Token Rates for Every Claude Model (2026) - PE Collective, accessed June 6, 2026, [https://pecollective.com/tools/anthropic-api-pricing/](https://pecollective.com/tools/anthropic-api-pricing/)  
+36. SGLang in Production: A Developer's Guide to Structured Generation, RadixAttention, and Multi-Step LLM Pipelines - Runpod, accessed June 6, 2026, [https://www.runpod.io/articles/guides/blog-sglang-production-llm-pipelines](https://www.runpod.io/articles/guides/blog-sglang-production-llm-pipelines)  
+37. [2605.15051] An Interpretable Latency Model for Speculative Decoding in LLM Serving, accessed June 6, 2026, [https://arxiv.org/abs/2605.15051](https://arxiv.org/abs/2605.15051)  
+38. Faster, cheaper, just as smart: Improving the economics of LLM inference with speculative decoding - Red Hat, accessed June 6, 2026, [https://www.redhat.com/en/blog/solving-economics-llm-inference-speculative-decoding](https://www.redhat.com/en/blog/solving-economics-llm-inference-speculative-decoding)  
 39. DeepSeek API Pricing 2026 — Cheapest LLM ($0.14/M Input) | TLDL | TLDL, accessed June 6, 2026, [https://www.tldl.io/resources/deepseek-api-pricing](https://www.tldl.io/resources/deepseek-api-pricing)  
 40. Anthropic API Pricing in 2026: Complete Guide — Models, Caching, Batch & Optimization, accessed June 6, 2026, [https://www.finout.io/blog/anthropic-api-pricing](https://www.finout.io/blog/anthropic-api-pricing)  
 41. An Introduction to Speculative Decoding for Reducing Latency in AI Inference | NVIDIA Technical Blog, accessed June 6, 2026, [https://developer.nvidia.com/blog/an-introduction-to-speculative-decoding-for-reducing-latency-in-ai-inference/](https://developer.nvidia.com/blog/an-introduction-to-speculative-decoding-for-reducing-latency-in-ai-inference/)  
-42. An Interpretable Latency Model for Speculative Decoding in LLM Serving \- arXiv, accessed June 6, 2026, [https://arxiv.org/html/2605.15051v1](https://arxiv.org/html/2605.15051v1)  
-43. DeepSeek Pricing Explained: How to Get the Most Token for Your Dollar \- Flowith Blog, accessed June 6, 2026, [https://flowith.io/blog/deepseek-pricing-explained-most-tokens-per-dollar/](https://flowith.io/blog/deepseek-pricing-explained-most-tokens-per-dollar/)  
-44. Google Gemini API Pricing 2026: Complete Cost Guide per 1M Tokens \- Metacto, accessed June 6, 2026, [https://www.metacto.com/blogs/the-true-cost-of-google-gemini-a-guide-to-api-pricing-and-integration](https://www.metacto.com/blogs/the-true-cost-of-google-gemini-a-guide-to-api-pricing-and-integration)
+42. An Interpretable Latency Model for Speculative Decoding in LLM Serving - arXiv, accessed June 6, 2026, [https://arxiv.org/html/2605.15051v1](https://arxiv.org/html/2605.15051v1)  
+43. DeepSeek Pricing Explained: How to Get the Most Token for Your Dollar - Flowith Blog, accessed June 6, 2026, [https://flowith.io/blog/deepseek-pricing-explained-most-tokens-per-dollar/](https://flowith.io/blog/deepseek-pricing-explained-most-tokens-per-dollar/)  
+44. Google Gemini API Pricing 2026: Complete Cost Guide per 1M Tokens - Metacto, accessed June 6, 2026, [https://www.metacto.com/blogs/the-true-cost-of-google-gemini-a-guide-to-api-pricing-and-integration](https://www.metacto.com/blogs/the-true-cost-of-google-gemini-a-guide-to-api-pricing-and-integration)
 
 ---
