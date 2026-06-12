@@ -1,7 +1,9 @@
 # AI-ENG-M — Agentic Orchestration - Autonomy Boundaries, Loop Budgets & Termination
 
 The transition of artificial intelligence from static generative engines to active organizational actors represents a major paradigm shift in software systems engineering.1 Traditional model serving operates on a request-response pattern characterized by isolated, stateless computations where the surrounding application logic maintains absolute control over execution paths.2 Conversely, agentic systems autonomously synthesize their execution paths at runtime, choosing tools, updating operational state, and modifying plans based on continuous environmental observations.2 This shift transfers system risk from single-call correctness to end-to-end behavioral predictability across temporal, resource-constrained, and non-stationary environments.2  
+
 Agentic orchestration is the bounded control discipline that governs this dynamic behavior.6 Autonomy is not an abstract behavior or a design-free capability; it is a strictly regulated architectural lease of decision rights granted to a model under precise runtime constraints.2 An agent loop can only operate safely within production systems when its execution boundary is explicitly mapped, its resource consumption is metered, and its termination and escalation parameters are deterministically enforced.2  
+
 This report establishes the first-class architectural, operational, and Site Reliability Engineering (SRE) patterns required to design, deploy, and govern high-dimensional agentic loops. It serves as the opening document of **Volume 5: Agentic Systems and Tool-Using Architectures**, inheriting state governance principles from AI-ENG-B, economic cost-attribution structures from AI-ENG-C, artifact lifecycles from AI-ENG-I, and high-availability serving architectures from AI-ENG-L.4
 
 ## **Conceptual Glossary**
@@ -33,8 +35,11 @@ To establish a uniform vocabulary for system engineers, platform teams, and gove
 ## **Doctrinal Foundation and Canon Continuity**
 
 The governance of autonomous models requires translating abstract capabilities into concrete systems constraints.2 This report operates under the core systems engineering principle:  
+
 Autonomy must be bounded by state, scope, tools, budgets, checks, and termination. An agent loop is safe only when the system knows what it is trying to accomplish, what it may observe, what it may change, how much it may spend, when it must stop, and when it must escalate.2  
+
 The central architecture question shifts from *"How do we make the system agentic?"* to *"What decisions may the model make, under which constraints, for how many steps, using which tools, with what state, until which stopping condition, and under what review or escalation policy?"*.2  
+
 This document builds directly upon the foundational engineering practices established in previous volumes of the Canon:
 
 * **AI-ENG-B (Context State Governance):** Inherits the context-tenure doctrine, establishing that agent context is a governed resource with explicit tenure, authority, and temporal validity.4  
@@ -62,24 +67,26 @@ Unnecessary system autonomy is a critical driver of latency, financial waste, an
 
 The Autonomy Boundary Model defines the operational limits of what a model can observe, decide, execute, or change at runtime.2 Autonomy is an adjustable dial that must be dynamically calibrated based on the underlying task risk, the sensitivity of the data, and the presence of human oversight.6
 
+```
 ┌────────────────────────────────────────────────────────────────────────┐  
 │                        AUTONOMY BOUNDARY TIER                          │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│                                       │  
-│  \- Network sandboxes, IAM token validation, gateway rate-limiting      │  
+│                                                                        │  
+│  - Network sandboxes, IAM token validation, gateway rate-limiting      │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│  \[ Asynchronous Human Audit Queues \]                                   │  
-│  \- Post-action verification, log audits, compliance signatures         │  
+│  [ Asynchronous Human Audit Queues ]                                   │  
+│  - Post-action verification, log audits, compliance signatures         │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│  \[ User / Operator Confirmation Gates \]                                │  
-│  \- Active approval buttons, budget releases, path validation checks    │  
+│  [ User / Operator Confirmation Gates ]                                │  
+│  - Active approval buttons, budget releases, path validation checks    │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│                                │  
-│  \- Immutable schema validators, parameter boundary checkers, ACLs      │  
+│                                                                        │  
+│  - Immutable schema validators, parameter boundary checkers, ACLs      │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│                                       │  
-│  \- Dynamic step selection, sub-query generation, argument proposals    │  
+│                                                                        │  
+│  - Dynamic step selection, sub-query generation, argument proposals    │  
 └────────────────────────────────────────────────────────────────────────┘
+```
 
 The specific authority boundaries across different system layers are modeled as follows:
 
@@ -107,39 +114,41 @@ The life cycle of an orchestrator run is structured around an iterative control 
 
 | Phase | Operational Objective | Input Dependencies | Grounding & Safety Validation | Downstream Handoff |
 | :---- | :---- | :---- | :---- | :---- |
-| **1\. Goal Intake** | Capture user prompt and validate intent.4 | User query string; request headers. | Reject injections and evaluate semantic compliance. | Target goal object.4 |
-| **2\. Scope Resolution** | Resolve user role, tenant permissions, and limits.1 | Tenant directory; IAM directory. | Restrict access bounds to active user credentials.1 | Session Security Token. |
-| **3\. Policy Check** | Verify goal alignment with organizational safety policies. | Global enterprise compliance rules.12 | Reject requests violating active safety constraints. | Safety Clear Code. |
-| **4\. State Init** | Instantiate task state tracking objects.4 | Goal object; Security Token. | Initialize tracking tables using immutable data patterns.13 | Active Task State.13 |
-| **5\. Plan Selection** | Generate initial execution plan steps.4 | Goal; allowed tool list. | Validate plan steps against allowed capabilities.6 | Initial Executable Plan.1 |
-| **6\. Budget Assign** | Allocate loop, token, and monetary cost budgets.8 | Tenant quotas; task risk profile. | Map deterministic ceilings to the task run.7 | Budget Tracking Token.8 |
-| **7\. Tool Eligibility** | Verify tool registration and active user permissions.6 | Tool registry; active Plan Step. | Intercept and block unauthorized tool calls.11 | Authorized Tool List.11 |
-| **8\. Action Selection** | Select tool and populate parameter arguments.4 | Plan step; context history.4 | Match generated arguments against target tool schemas.5 | Proposed Action Event.5 |
-| **9\. Tool Invocation** | Execute the tool call and capture raw payload.4 | Proposed Action; system secrets.11 | Enforce execution timeouts and catch runtime errors.4 | Raw Tool Output Payload.5 |
-| **10\. Obs Grounding** | Ingest tool outputs and verify factual grounding.4 | Raw Tool Payload; system state. | Reject model-hallucinated or assumed tool outcomes.5 | Grounded Observation.5 |
-| **11\. State Update** | Commit observation to the task state.4 | Grounded Observation; Active State.13 | Commit updates to the versioned state database.13 | Updated Task State.13 |
-| **12\. Validation Check** | Evaluate step quality against acceptance criteria.5 | Updated Task State; criteria list.7 | Score outputs for compliance and semantic accuracy.5 | Validation Score Card.5 |
-| **13\. Reflection Trigger** | Diagnose failures and trigger corrections if needed.7 | Validation Score Card; state logs. | Limit repair attempts to prevent looping.7 | Diagnostic Repair Plan.7 |
-| **14\. Termination Check** | Evaluate stopping and completion criteria.7 | Active Task State; Budget Status.8 | Match progress against termination conditions.7 | Stop / Continue Code. |
-| **15\. Escalation Check** | Pause loop and escalate to supervisor if triggered.5 | Validation failures; budget alarms. | Verify if state warrants immediate human review.5 | Escalation Event Payload.6 |
-| **16\. Final Response** | Compile, format, and return final output. | Validated Task State; target goal. | Ensure output is grounded in recorded observations.1 | Verified User Response.1 |
-| **17\. Memory Write** | Update long-term memory via write gates.3 | Run Trace; current Memory DB.1 | Filter out transient failures and assumptions.3 | Promoted Memory Block.3 |
-| **18\. Trace Logging** | Archive the complete execution trace for audits.1 | Versioned Task State; metric logs. | Write immutable execution records to disk.1 | Audit Trace Archive.1 |
+| **1. Goal Intake** | Capture user prompt and validate intent.4 | User query string; request headers. | Reject injections and evaluate semantic compliance. | Target goal object.4 |
+| **2. Scope Resolution** | Resolve user role, tenant permissions, and limits.1 | Tenant directory; IAM directory. | Restrict access bounds to active user credentials.1 | Session Security Token. |
+| **3. Policy Check** | Verify goal alignment with organizational safety policies. | Global enterprise compliance rules.12 | Reject requests violating active safety constraints. | Safety Clear Code. |
+| **4. State Init** | Instantiate task state tracking objects.4 | Goal object; Security Token. | Initialize tracking tables using immutable data patterns.13 | Active Task State.13 |
+| **5. Plan Selection** | Generate initial execution plan steps.4 | Goal; allowed tool list. | Validate plan steps against allowed capabilities.6 | Initial Executable Plan.1 |
+| **6. Budget Assign** | Allocate loop, token, and monetary cost budgets.8 | Tenant quotas; task risk profile. | Map deterministic ceilings to the task run.7 | Budget Tracking Token.8 |
+| **7. Tool Eligibility** | Verify tool registration and active user permissions.6 | Tool registry; active Plan Step. | Intercept and block unauthorized tool calls.11 | Authorized Tool List.11 |
+| **8. Action Selection** | Select tool and populate parameter arguments.4 | Plan step; context history.4 | Match generated arguments against target tool schemas.5 | Proposed Action Event.5 |
+| **9. Tool Invocation** | Execute the tool call and capture raw payload.4 | Proposed Action; system secrets.11 | Enforce execution timeouts and catch runtime errors.4 | Raw Tool Output Payload.5 |
+| **10. Obs Grounding** | Ingest tool outputs and verify factual grounding.4 | Raw Tool Payload; system state. | Reject model-hallucinated or assumed tool outcomes.5 | Grounded Observation.5 |
+| **11. State Update** | Commit observation to the task state.4 | Grounded Observation; Active State.13 | Commit updates to the versioned state database.13 | Updated Task State.13 |
+| **12. Validation Check** | Evaluate step quality against acceptance criteria.5 | Updated Task State; criteria list.7 | Score outputs for compliance and semantic accuracy.5 | Validation Score Card.5 |
+| **13. Reflection Trigger** | Diagnose failures and trigger corrections if needed.7 | Validation Score Card; state logs. | Limit repair attempts to prevent looping.7 | Diagnostic Repair Plan.7 |
+| **14. Termination Check** | Evaluate stopping and completion criteria.7 | Active Task State; Budget Status.8 | Match progress against termination conditions.7 | Stop / Continue Code. |
+| **15. Escalation Check** | Pause loop and escalate to supervisor if triggered.5 | Validation failures; budget alarms. | Verify if state warrants immediate human review.5 | Escalation Event Payload.6 |
+| **16. Final Response** | Compile, format, and return final output. | Validated Task State; target goal. | Ensure output is grounded in recorded observations.1 | Verified User Response.1 |
+| **17. Memory Write** | Update long-term memory via write gates.3 | Run Trace; current Memory DB.1 | Filter out transient failures and assumptions.3 | Promoted Memory Block.3 |
+| **18. Trace Logging** | Archive the complete execution trace for audits.1 | Versioned Task State; metric logs. | Write immutable execution records to disk.1 | Audit Trace Archive.1 |
 
 ### **Observation Grounding: Intended, Attempted, Observed, Verified, and Assumed Results**
 
 At the orchestration level, observation grounding is a vital guard against state contamination.5 A failure occurs when an agent treats its *intended* or *attempted* actions as *assumed* realities without waiting for the physical tool execution to return a response.5 The orchestrator must implement strict state boundaries separating execution phases:
 
-  \- Model drafts a tool call (e.g., write database record)  
+```
+  - Model drafts a tool call (e.g., write database record)  
      │  
      ▼  
- \- Orchestrator sends request to the target API endpoint  
+ - Orchestrator sends request to the target API endpoint  
      │  
      ▼  
-  \- System parses raw bytes returned from the endpoint  
+  - System parses raw bytes returned from the endpoint  
      │  
      ▼  
-  \- Validator checks if the record was successfully written
+  - Validator checks if the record was successfully written
+```
 
 The task state must only be updated using *verified* results.4 If a tool call fails, timeout errors, connection exceptions, or empty payloads must be recorded as-is.5 The model is strictly prohibited from bypassing this return parsing and assuming successful execution.5
 
@@ -156,7 +165,7 @@ Dynamic planning is valuable for complex tasks with many dependencies but can in
 | **Plan Abandonment** | Halt execution if assumptions are invalidated.7 | Compare task cost to remaining budget.8 | Stop execution and prompt the user for clarification.7 |
 | **Subtask Creation** | Break complex goals into smaller subtasks.4 | Track subtask dependencies using DAG structures.4 | Require clear completion criteria for every subtask.7 |
 | **Dependency Tracking** | Track prerequisite steps and outputs.4 | Block child steps from running until parents finish.4 | Keep a dependency map in the structured task state.4 |
-| **Recursive Depth** | Limit nested child task creation.18 | Restrict the depth of subtasks (D \<= 2).18 | Reject subtask creation if depth limits are violated.18 |
+| **Recursive Depth** | Limit nested child task creation.18 | Restrict the depth of subtasks (D <= 2).18 | Reject subtask creation if depth limits are violated.18 |
 
 ## **The Reflection Trigger Model**
 
@@ -174,6 +183,7 @@ Reflection must be used as a targeted diagnostic tool, not an automatic step app
 
 Open-ended loops are powerful but introduce high variance and unconstrained execution risk.2 To ensure enterprise-grade reliability, autonomy must be structured within the rigid skeleton of a compiled state machine or workflow graph.6
 
+```
                      ┌──────────────────────────────┐  
                      │          Goal Intake         │  
                      └──────────────┬───────────────┘  
@@ -227,37 +237,40 @@ Open-ended loops are powerful but introduce high variance and unconstrained exec
 ┌────────────────────────┐                     ┌────────────────────────┐  
 │     Ask User Node      │                     │     Terminate Node     │  
 └────────────────────────┘                     └────────────────────────┘
+```
 
 The specific graph components are modeled as follows:
 
 | Graph Component | System Role / Node Mapping | Allowable Transitions (Edges) | Guard Conditions |
 | :---- | :---- | :---- | :---- |
-| **Goal Classify** | Determine intent and assign to worker agent.6 | Classify \-\> Scope.6 | User query must be successfully parsed. |
-| **Scope Resolution** | Set resource and security parameters.1 | Scope \-\> Plan.1 | Active user session token must be valid.6 |
-| **Plan Task** | Draft step sequence for execution.4 | Plan \-\> Retrieve.14 | Step count must be within initial limits.7 |
-| **Retrieve Context** | Pull relevant vector knowledge to state.1 | Retrieve \-\> Call Tool.1 | Context window usage must be under 80%.7 |
-| **Call Tool** | Dispatch request to target API.4 | Call Tool \-\> Observe.5 | Tool must match active user permissions.6 |
-| **Observe Result** | Capture raw payload returned by the tool.4 | Observe \-\> Validate.5 | Tool response must be parsed and recorded.5 |
-| **Validate Node** | Verify outcomes against criteria.5 | Validate \-\> Finalize (if valid); Validate \-\> Repair (if invalid).5 | Evaluator must confirm factual grounding.5 |
-| **Repair Node** | Execute local code or query fixes.5 | Repair \-\> Reflect.5 | Cumulative step cost must be under limits.8 |
-| **Reflect Node** | Diagnose step errors to correct plan.7 | Reflect \-\> Plan.12 | Reflection loop count must be \<= 2\.7 |
-| **Ask User** | Prompt operator for inputs.7 | Ask User \-\> Plan.7 | System must suspend execution until input is provided. |
-| **Escalate Node** | Route state to human supervisor.5 | Escalate \-\> Human Review.6 | Triggered on policy violations or budget alarms.8 |
-| **Finalize Node** | Compile complete task outputs.13 | Finalize \-\> Terminate.13 | Validator must verify final outputs.7 |
+| **Goal Classify** | Determine intent and assign to worker agent.6 | Classify -> Scope.6 | User query must be successfully parsed. |
+| **Scope Resolution** | Set resource and security parameters.1 | Scope -> Plan.1 | Active user session token must be valid.6 |
+| **Plan Task** | Draft step sequence for execution.4 | Plan -> Retrieve.14 | Step count must be within initial limits.7 |
+| **Retrieve Context** | Pull relevant vector knowledge to state.1 | Retrieve -> Call Tool.1 | Context window usage must be under 80%.7 |
+| **Call Tool** | Dispatch request to target API.4 | Call Tool -> Observe.5 | Tool must match active user permissions.6 |
+| **Observe Result** | Capture raw payload returned by the tool.4 | Observe -> Validate.5 | Tool response must be parsed and recorded.5 |
+| **Validate Node** | Verify outcomes against criteria.5 | Validate -> Finalize (if valid); Validate -> Repair (if invalid).5 | Evaluator must confirm factual grounding.5 |
+| **Repair Node** | Execute local code or query fixes.5 | Repair -> Reflect.5 | Cumulative step cost must be under limits.8 |
+| **Reflect Node** | Diagnose step errors to correct plan.7 | Reflect -> Plan.12 | Reflection loop count must be <= 2.7 |
+| **Ask User** | Prompt operator for inputs.7 | Ask User -> Plan.7 | System must suspend execution until input is provided. |
+| **Escalate Node** | Route state to human supervisor.5 | Escalate -> Human Review.6 | Triggered on policy violations or budget alarms.8 |
+| **Finalize Node** | Compile complete task outputs.13 | Finalize -> Terminate.13 | Validator must verify final outputs.7 |
 | **Terminate Node** | Close run, write logs, release resources.4 | End of execution path.13 | Active process state is cleaned up.13 |
 
 ### **Graph Compilation and State Transitions**
 
 Before execution, the graph layout is compiled and validated to detect circular dependencies, unresolvable nodes, or deadlocks.13 Once compiled, the graph structure is immutable; the model cannot dynamically inject new states or rewrite transition rules during runtime.13
 
+```
 ┌────────────────────────────────────────────────────────┐  
 │             GRAPH COMPILATION CHECKPOINT               │  
 ├────────────────────────────────────────────────────────┤  
-│  1\. Check for circular loops without exit nodes        │  
-│  2\. Verify all edge transitions are mapped to guards    │  
-│  3\. Confirm every node has an assigned budget gate     │  
-│  4\. Ensure terminal nodes are unreachable from halts   │  
+│  1. Check for circular loops without exit nodes        │  
+│  2. Verify all edge transitions are mapped to guards   │  
+│  3. Confirm every node has an assigned budget gate     │  
+│  4. Ensure terminal nodes are unreachable from halts   │  
 └────────────────────────────────────────────────────────┘
+```
 
 At each transition, state is saved to a persistent, versioned database (such as PostgreSQL or Redis).13 This design isolates failures, prevents race conditions, and allows long-running or interrupted workflows to recover exactly where they stalled without losing context.4  
 Several common multi-agent topology patterns present distinct operational characteristics:
@@ -271,15 +284,15 @@ Several common multi-agent topology patterns present distinct operational charac
 Operational budget enforcement is the single most critical line of defense against runaway agentic behavior.8 Real-world incidents demonstrate that unconstrained agentic loops can enter high-frequency retry cycles when encountering minor API failures, generating tens of thousands of dollars in model invoice costs in a matter of hours.8  
 The orchestrator must implement a formal Loop Budget Framework that treats budget metrics as active control signals rather than post-hoc reports.8  
 Let an agent A operate on a task T within an environment E.8 The total computational budget B allocated to the run is defined as:  
-B \= B\_internal \+ B\_external  
-where B\_internal is the internal cognitive budget consumed by model inference (measured in input and output tokens), and B\_external is the external execution budget consumed by environmental actions (measured in tool executions, database transactions, or monetary cost).8  
-The remaining budget R\_t at any discrete execution step t is formulated as:  
-R\_t \= B \- sum(C\_i for i \= 1 to t)  
-where C\_i represents the verified cost incurred at step i.8  
+B = B_internal + B_external  
+where B_internal is the internal cognitive budget consumed by model inference (measured in input and output tokens), and B_external is the external execution budget consumed by environmental actions (measured in tool executions, database transactions, or monetary cost).8  
+The remaining budget R_t at any discrete execution step t is formulated as:  
+R_t = B - sum(C_i for i = 1 to t)  
+where C_i represents the verified cost incurred at step i.8  
 To prevent agents from spending resources on hopeless execution trajectories, the orchestrator should run a Progressive Interval Estimation (PIE) protocol.8 At each step t of the execution plan, the system queries the agent (or a specialized budget-estimator model) to predict a confidence-aware interval representing the lower (L) and upper (U) bounds of remaining cost-to-completion 8:  
-PIE\_t \= \[L\_t, U\_t\]  
-The orchestrator triggers a priority alert and initiates early termination (A\_t \= 1\) the moment the remaining budget is lower than the projected lower bound of completion cost 8:  
-A\_t \= 1 if R\_t \< L\_t  
+PIE_t = [L_t, U_t]  
+The orchestrator triggers a priority alert and initiates early termination (A_t = 1) the moment the remaining budget is lower than the projected lower bound of completion cost 8:  
+A_t = 1 if R_t < L_t  
 This proactive halting mechanism saves between 28% and 64% of total token and execution expenditures on failed trajectories.8  
 Every agentic loop must be subjected to a multi-tiered budget cap matrix, with default thresholds adapted to the task risk profile:
 
@@ -302,17 +315,19 @@ To enforce these budgets at the systems level, SREs must configure the serving g
 
 Uncontrolled state growth is a primary driver of agentic degradation.7 As an agent loop executes, the accumulation of raw tool outputs, intermediate planning drafts, and validation critiques causes context bloat.7 This context accumulation degrades the model's performance, increases latency, and elevates the risk of retrieval-related omissions. Systems must implement a rigorous state governance model that separates and manages memory along strict lines of tenure and authority.
 
+```
 ┌────────────────────────────────────────────────────────────────────────┐  
 │                       STATE GOVERNANCE PLATFORM                        │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│                     │  
-│  \- Temporal working memory      \- Machine-readable tracking table      │  
-│  \- Discarded on step change     \- Persists over entire active run      │  
+│                                                                        │  
+│  - Temporal working memory      - Machine-readable tracking table      │  
+│  - Discarded on step change     - Persists over entire active run      │  
 ├─────────────────────────────────┴──────────────────────────────────────┤  
-│  \[ Persistent Memory \]                                 │  
-│  \- Promoted via write gates     \- Immutable execution record           │  
-│  \- Long-term storage (DB)       \- Read-only; SRE / Auditor access      │  
+│  [ Persistent Memory ]                                                 │  
+│  - Promoted via write gates     - Immutable execution record           │  
+│  - Long-term storage (DB)       - Read-only; SRE / Auditor access      │  
 └────────────────────────────────────────────────────────────────────────┘
+```
 
 The specific properties of each state component are defined as follows:
 
@@ -334,26 +349,27 @@ State contamination occurs when an agent references stale observations or unveri
 
 The orchestrator, not the model, is the ultimate authority governing tool dispatch.6 To prevent tool overreach and uncontrolled executions, the system must apply a rigorous selection and validation policy.11
 
+```
 ┌────────────────────────────────────────────────────────────────────────┐  
 │                        TOOL SELECTION PLATFORM                         │  
 ├────────────────────────────────────────────────────────────────────────┤  
-│                          1\. Model Suggestion                           │  
-│     \- Model requests tool call with parameter arguments                │  
+│                          1. Model Suggestion                           │  
+│     - Model requests tool call with parameter arguments                │  
 └───────────────────────────────────┬────────────────────────────────────┘  
                                     ▼  
 ┌────────────────────────────────────────────────────────────────────────┐  
-│                        2\. Schema Serialization                         │  
-│     \- Validates types, ranges, and structures of parameters            │  
+│                        2. Schema Serialization                         │  
+│     - Validates types, ranges, and structures of parameters            │  
 └───────────────────────────────────┬────────────────────────────────────┘  
                                     ▼  
 ┌────────────────────────────────────────────────────────────────────────┐  
-│                         3\. Security Validation                         │  
-│     \- Verifies session tokens, user boundaries, and sanitizes strings  │  
+│                         3. Security Validation                         │  
+│     - Verifies session tokens, user boundaries, and sanitizes strings  │  
 └───────────────────────────────────┬────────────────────────────────────┘  
                                     ▼  
 ┌────────────────────────────────────────────────────────────────────────┐  
-│                          4\. Policy Interceptor                         │  
-│     \- Evaluates write-safety and budget checks                         │  
+│                          4. Policy Interceptor                         │  
+│     - Evaluates write-safety and budget checks                         │  
 └───────────────────────────────────┬────────────────────────────────────┘  
                                     ▼  
                             ┌───────┴───────┐  
@@ -363,8 +379,9 @@ The orchestrator, not the model, is the ultimate authority governing tool dispat
                  ▼          └───────────────┘          ▼  
 ┌─────────────────────────────┐            ┌─────────────────────────────┐  
 │       TOOL DISPATCH         │            │      BLOCK & RETRY/HALT     │  
-│  \- System executes action   │            │  \- Drops request immediately│  
+│  - System executes action   │            │  - Drops request immediately│  
 └─────────────────────────────┘            └─────────────────────────────┘
+```
 
 The system evaluates the eligibility of a tool using several criteria:
 
@@ -392,38 +409,40 @@ Every agentic workflow must explicitly configure and monitor conditions across a
 | Termination Code | System Classification | Underlying Root Cause / Trigger | Required Orchestrator Action |
 | :---- | :---- | :---- | :---- |
 | **SUCCESS** | Normal | Output meets all validation and safety criteria.7 | Closes task state, writes trace logs, and returns output.4 |
-| **PARTIAL\_SUCCESS** | Graceful Degradation | Primary goal achieved, but secondary actions timed out.5 | Compiles completed steps and returns partial output.11 |
+| **PARTIAL_SUCCESS** | Graceful Degradation | Primary goal achieved, but secondary actions timed out.5 | Compiles completed steps and returns partial output.11 |
 | **IMPOSSIBLE** | Explicit Handback | Model determines required input fields are missing.7 | Stops execution and prompts user for missing inputs.7 |
-| **BUDGET\_EXHAUSTED** | System Intercept | Accumulated run costs exceed step or monetary caps.7 | Terminates active execution threads and logs budget breach.5 |
+| **BUDGET_EXHAUSTED** | System Intercept | Accumulated run costs exceed step or monetary caps.7 | Terminates active execution threads and logs budget breach.5 |
 | **TIMEOUT** | System Intercept | Execution duration exceeds wall-clock bounds.4 | Drops container execution and alerts active SRE teams.4 |
-| **UNSAFE\_DETECTION** | Safety Guard | Content scanner flags injection or policy violation. | Halts execution, blocks the session, and triggers security alarm. |
-| **MISSING\_INFO** | Explicit Handback | System detects missing parameters during planning.7 | Switches node to Ask User state and awaits input.7 |
-| **AMBIGUOUS\_INTENT** | Explicit Handback | User query maps to multiple conflicting plans.7 | Stops execution and requests plan verification.1 |
-| **LOW\_CONFIDENCE** | Quality Scorer Halt | Verification score drops below safety threshold.5 | Suspends task state and routes to supervisor queue.22 |
-| **REPEATED\_FAILURE** | Resilience Failure | Tool calls return exceptions after maximum retries.5 | Trips the circuit breaker and triggers escalation.5 |
-| **SOURCE\_CONFLICT** | Validation Scorer Halt | Retrieved document facts directly contradict. | Freezes progress and logs the discrepancy for review.5 |
-| **VALIDATION\_FAIL** | Quality Scorer Halt | Output fails format or schema compliance checks.5 | Runs 1 repair pass; escalates if failure persists.5 |
-| **PERMISSION\_DENIED** | Security Guard | Model attempts to access an unauthorized tool.24 | Blocks the active run and registers a security ticket.24 |
-| **UNAVAILABLE\_DEP** | System Intercept | Vital external API endpoint is offline.5 | Switches system to degraded mode using static fallbacks.5 |
-| **CONFIRM\_REQUIRED** | Human-in-the-Loop | Model proposes executing a write-capable tool.6 | Suspends execution and presents parameters to operator.4 |
-| **REVIEW\_REQUIRED** | Human-in-the-Loop | Task outcome falls under compliance auditing.22 | Routes final plan and outputs to asynchronous audit queue.22 |
-| **USER\_CANCEL** | Explicit Handback | Operator manually aborts the execution run.7 | Halts container and archives the execution history.4 |
+| **UNSAFE_DETECTION** | Safety Guard | Content scanner flags injection or policy violation. | Halts execution, blocks the session, and triggers security alarm. |
+| **MISSING_INFO** | Explicit Handback | System detects missing parameters during planning.7 | Switches node to Ask User state and awaits input.7 |
+| **AMBIGUOUS_INTENT** | Explicit Handback | User query maps to multiple conflicting plans.7 | Stops execution and requests plan verification.1 |
+| **LOW_CONFIDENCE** | Quality Scorer Halt | Verification score drops below safety threshold.5 | Suspends task state and routes to supervisor queue.22 |
+| **REPEATED_FAILURE** | Resilience Failure | Tool calls return exceptions after maximum retries.5 | Trips the circuit breaker and triggers escalation.5 |
+| **SOURCE_CONFLICT** | Validation Scorer Halt | Retrieved document facts directly contradict. | Freezes progress and logs the discrepancy for review.5 |
+| **VALIDATION_FAIL** | Quality Scorer Halt | Output fails format or schema compliance checks.5 | Runs 1 repair pass; escalates if failure persists.5 |
+| **PERMISSION_DENIED** | Security Guard | Model attempts to access an unauthorized tool.24 | Blocks the active run and registers a security ticket.24 |
+| **UNAVAILABLE_DEP** | System Intercept | Vital external API endpoint is offline.5 | Switches system to degraded mode using static fallbacks.5 |
+| **CONFIRM_REQUIRED** | Human-in-the-Loop | Model proposes executing a write-capable tool.6 | Suspends execution and presents parameters to operator.4 |
+| **REVIEW_REQUIRED** | Human-in-the-Loop | Task outcome falls under compliance auditing.22 | Routes final plan and outputs to asynchronous audit queue.22 |
+| **USER_CANCEL** | Explicit Handback | Operator manually aborts the execution run.7 | Halts container and archives the execution history.4 |
 
 When these termination parameters are triggered, or when high-risk operations are requested, the orchestrator maps the current state to the appropriate remediation path using an Escalation Trigger Matrix:
 
+```
                           ┌────────────────────────┐  
                           │    TRIGGER DETECTED    │  
                           └───────────┬────────────┘  
                                       │  
             ┌─────────────────────────┼─────────────────────────┐  
             ▼                         ▼                         ▼  
-          \[ Human Intervention \]      
+          [ Human Intervention ]      
 ┌────────────────────────┐┌────────────────────────┐┌────────────────────────┐  
 │    FAIL-CLOSED STOP    ││    HUMAN-IN-THE-LOOP   ││   DEGRADED ROADMAPPING │  
-│  \- High-risk security  ││  \- Plan confirmation   ││  \- Temporary system    │  
+│  - High-risk security  ││  - Plan confirmation   ││  - Temporary system    │  
 │    violation or cost   ││    or missing inputs   ││    timeout or service  │  
 │    cap blowout         ││    requested           ││    outage detected     │  
 └────────────────────────┘└────────────────────────┘└────────────────────────┘
+```
 
 The specific escalation triggers are mapped to their corresponding system actions:
 
@@ -451,8 +470,8 @@ Agentic architectures introduce emergent system-level failure surfaces that do n
 | **Hallucinated Obs** | Model claims tool ran and succeeded.3 | Model bypasses return parsers to output answers.5 | Tool registry reports zero actual invocations.5 | Halt active loop and trigger quality score failure. | Enforce schema parsing on returned payloads.5 |
 | **Premature Term** | Loop halts before completing the goal.7 | Broad or missing plan validation checks.7 | Validation node returns false after stop command.7 | Return status to active and resume execution steps.7 | Require verified physical evidence before termination.7 |
 | **Refusal to Stop** | Loop continues despite goal validation.7 | Over-reflection loops ignore success states.7 | Step counter exceeds initial plan bounds.11 | Force state change to final and return response.11 | Build independent validation nodes into the graph.7 |
-| **Over-Reflection** | High token spend on minor formatting checks.7 | Prompts force continuous self-criticism passes.7 | High token consumption with zero state changes.7 | Skip reflection and continue to next plan step.7 | Limit sequential reflection steps to \<= 2 passes.7 |
-| **Redundant Decomp** | Model breaks tasks into duplicate subtasks.18 | Weak plan tracking; missing dependency trees.18 | Identical subtask signatures in the active plan.18 | Consolidate tasks and clear duplicate plan entries. | Restrict recursive task decomposition depth to D \<= 2\.18 |
+| **Over-Reflection** | High token spend on minor formatting checks.7 | Prompts force continuous self-criticism passes.7 | High token consumption with zero state changes.7 | Skip reflection and continue to next plan step.7 | Limit sequential reflection steps to <= 2 passes.7 |
+| **Redundant Decomp** | Model breaks tasks into duplicate subtasks.18 | Weak plan tracking; missing dependency trees.18 | Identical subtask signatures in the active plan.18 | Consolidate tasks and clear duplicate plan entries. | Restrict recursive task decomposition depth to D <= 2.18 |
 | **Duplicate Actions** | Identical API requests sent to target.18 | Parsing errors; missing transaction locks.5 | High-frequency matching API call signatures.18 | Block API requests and run recovery logic.5 | Enforce client-side transaction locks on dispatches.5 |
 | **Budget Blowout** | Invoice spikes over a short duration.8 | Unconstrained loops run without active caps.8 | Monetary cost exceeds target threshold.8 | Kill active execution and revoke tenant access.18 | Enforce loop and token budget controls on runs.8 |
 | **Stale State** | Model plans based on outdated observations.3 | Missing cache invalidation; state update gaps.6 | Active state timestamps lag tool executions.5 | Invalidate active state caches and rerun lookups.5 | Implement state tenure rules and validation steps.6 |
@@ -467,23 +486,23 @@ To support comprehensive auditing, every run must compile an immutable Agent Run
 
 | Target Metric | Measurement Unit | Ideal Target Score | Evaluation Collection Method |
 | :---- | :---- | :---- | :---- |
-| **Task Success Rate** | Percentage | \>= 98.0%.5 | Offline regression testing on golden validation sets.12 |
-| **Trajectory Quality** | Path variance score | \<= 1.15 variance. | Compute path alignment against reference paths. |
+| **Task Success Rate** | Percentage | >= 98.0%.5 | Offline regression testing on golden validation sets.12 |
+| **Trajectory Quality** | Path variance score | <= 1.15 variance. | Compute path alignment against reference paths. |
 | **Correct Termination** | Match accuracy | 100% accuracy.7 | Verify runs halt with correct catalog status codes.7 |
-| **Escalation Accuracy** | Precision/Recall | \>= 95.0% precision.5 | Inject validation anomalies to test human routes.5 |
-| **Step Count Efficiency** | Average integer count | \<= 8 steps per task. | Monitor telemetry logs for average steps completed.3 |
-| **Loop Depth Limit** | Integer count | Max depth \<= 2\.18 | Track parent-child spawning limits in tracing logs.18 |
-| **Tool-Call Count** | Average integer count | \<= 12 calls per task. | Monitor api gateway logs for invocation counts.12 |
-| **Failed Tool Calls** | Count per session | \<= 1 call per session.5 | Track returned exceptions and 4xx/5xx API codes.5 |
-| **Retry Count Rate** | Percentage | \<= 5.0% of dispatches. | Track total retries vs first-time tool successes.5 |
-| **Timeout Rate** | Percentage | \<= 1.0% of runs.5 | Monitor SRE runtime alerts for wall-clock drops.4 |
+| **Escalation Accuracy** | Precision/Recall | >= 95.0% precision.5 | Inject validation anomalies to test human routes.5 |
+| **Step Count Efficiency** | Average integer count | <= 8 steps per task. | Monitor telemetry logs for average steps completed.3 |
+| **Loop Depth Limit** | Integer count | Max depth <= 2.18 | Track parent-child spawning limits in tracing logs.18 |
+| **Tool-Call Count** | Average integer count | <= 12 calls per task. | Monitor api gateway logs for invocation counts.12 |
+| **Failed Tool Calls** | Count per session | <= 1 call per session.5 | Track returned exceptions and 4xx/5xx API codes.5 |
+| **Retry Count Rate** | Percentage | <= 5.0% of dispatches. | Track total retries vs first-time tool successes.5 |
+| **Timeout Rate** | Percentage | <= 1.0% of runs.5 | Monitor SRE runtime alerts for wall-clock drops.4 |
 | **Budget Adherence** | Percentage | 100% adherence.8 | Track budget overrun exceptions at the gateway level.8 |
 | **Cost per Success** | Monetary USD | Within plan budget.8 | Compare average successful cost vs total project margins.8 |
-| **System Latency** | Milliseconds | \<= 15,000 ms (p95).21 | Track overall time-to-first-token and task finish.21 |
-| **Repair Success Rate** | Percentage | \>= 90.0% recovery.5 | Track runs that complete after executing repair states.5 |
+| **System Latency** | Milliseconds | <= 15,000 ms (p95).21 | Track overall time-to-first-token and task finish.21 |
+| **Repair Success Rate** | Percentage | >= 90.0% recovery.5 | Track runs that complete after executing repair states.5 |
 | **Memory Write Quality** | Grounding score | 100% grounding.3 | Verify memory blocks are supported by observations.3 |
-| **Human Override Rate** | Percentage | \<= 2.0% of approvals. | Track operator rejection rates in review queues.6 |
-| **User Correction Rate** | Percentage | \<= 5.0% of sessions. | Monitor session context for user revision loops.7 |
+| **Human Override Rate** | Percentage | <= 2.0% of approvals. | Track operator rejection rates in review queues.6 |
+| **User Correction Rate** | Percentage | <= 5.0% of sessions. | Monitor session context for user revision loops.7 |
 | **Trace Completeness** | Telemetry coverage | 100% coverage.1 | Audit trace files for missing state steps.1 |
 
 ### **Trajectory Evaluation vs. End-State Scans**
@@ -543,31 +562,31 @@ An agentic workflow must terminate and escalate based on explicit, programmatic 
 
 #### **Works cited**
 
-1. Governance by Design: Architecting Agentic AI for Organizational Learning and Scalable Autonomy \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2605.20210v1](https://arxiv.org/html/2605.20210v1)  
+1. Governance by Design: Architecting Agentic AI for Organizational Learning and Scalable Autonomy - arXiv, accessed June 9, 2026, [https://arxiv.org/html/2605.20210v1](https://arxiv.org/html/2605.20210v1)  
 2. Bounded Autonomy: Behavioral Specification Languages and ..., accessed June 9, 2026, [https://www.authorea.com/doi/full/10.22541/au.177083908.89981049/v1](https://www.authorea.com/doi/full/10.22541/au.177083908.89981049/v1)  
 3. A Developer's Guide to Building Scalable AI: Workflows vs Agents | Towards Data Science, accessed June 9, 2026, [https://towardsdatascience.com/a-developers-guide-to-building-scalable-ai-workflows-vs-agents/](https://towardsdatascience.com/a-developers-guide-to-building-scalable-ai-workflows-vs-agents/)  
-4. Agentic Automation \- Grid Dynamics, accessed June 9, 2026, [https://www.griddynamics.com/glossary/agentic-automation](https://www.griddynamics.com/glossary/agentic-automation)  
-5. Self-Healing Agentic Orchestrators for Reliable Tool-Augmented Large Language Model Systems \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2606.01416v1](https://arxiv.org/html/2606.01416v1)  
-6. AI agent orchestration: In-depth guide to coordinating autonomous systems \- N-iX, accessed June 9, 2026, [https://www.n-ix.com/ai-agent-orchestration/](https://www.n-ix.com/ai-agent-orchestration/)  
-7. Stopping Conditions That Actually Stop Multi-Agent Loops \- DEV Community, accessed June 9, 2026, [https://dev.to/dowhatmatters/stopping-conditions-that-actually-stop-multi-agent-loops-bnb](https://dev.to/dowhatmatters/stopping-conditions-that-actually-stop-multi-agent-loops-bnb)  
-8. Budget-Aware LLM Agents. Evaluation, Failure Modes, and Trainable Cost Control, accessed June 9, 2026, [https://www.researchgate.net/publication/405474946\_Budget-Aware\_LLM\_Agents\_Evaluation\_Failure\_Modes\_and\_Trainable\_Cost\_Control](https://www.researchgate.net/publication/405474946_Budget-Aware_LLM_Agents_Evaluation_Failure_Modes_and_Trainable_Cost_Control)  
+4. Agentic Automation - Grid Dynamics, accessed June 9, 2026, [https://www.griddynamics.com/glossary/agentic-automation](https://www.griddynamics.com/glossary/agentic-automation)  
+5. Self-Healing Agentic Orchestrators for Reliable Tool-Augmented Large Language Model Systems - arXiv, accessed June 9, 2026, [https://arxiv.org/html/2606.01416v1](https://arxiv.org/html/2606.01416v1)  
+6. AI agent orchestration: In-depth guide to coordinating autonomous systems - N-iX, accessed June 9, 2026, [https://www.n-ix.com/ai-agent-orchestration/](https://www.n-ix.com/ai-agent-orchestration/)  
+7. Stopping Conditions That Actually Stop Multi-Agent Loops - DEV Community, accessed June 9, 2026, [https://dev.to/dowhatmatters/stopping-conditions-that-actually-stop-multi-agent-loops-bnb](https://dev.to/dowhatmatters/stopping-conditions-that-actually-stop-multi-agent-loops-bnb)  
+8. Budget-Aware LLM Agents. Evaluation, Failure Modes, and Trainable Cost Control, accessed June 9, 2026, [https://www.researchgate.net/publication/405474946_Budget-Aware_LLM_Agents_Evaluation_Failure_Modes_and_Trainable_Cost_Control](https://www.researchgate.net/publication/405474946_Budget-Aware_LLM_Agents_Evaluation_Failure_Modes_and_Trainable_Cost_Control)  
 9. Open-Source LLMs in 2026: What Teams Actually Trust | by Thinking Loop | Medium, accessed June 9, 2026, [https://medium.com/@ThinkingLoop/open-source-llms-in-2026-what-teams-actually-trust-1f2e0ebbbda9](https://medium.com/@ThinkingLoop/open-source-llms-in-2026-what-teams-actually-trust-1f2e0ebbbda9)  
-10. \[2606.01416\] Self-Healing Agentic Orchestrators for Reliable Tool-Augmented Large Language Model Systems \- arXiv, accessed June 9, 2026, [https://arxiv.org/abs/2606.01416](https://arxiv.org/abs/2606.01416)  
+10. [2606.01416] Self-Healing Agentic Orchestrators for Reliable Tool-Augmented Large Language Model Systems - arXiv, accessed June 9, 2026, [https://arxiv.org/abs/2606.01416](https://arxiv.org/abs/2606.01416)  
 11. How to Build Agentic AI: Core Steps, Key Risks, and Smart Solutions | by Designveloper, accessed June 9, 2026, [https://dsvgroup.medium.com/how-to-build-agentic-ai-core-steps-key-risks-and-smart-solutions-04ff809d0200?source=rss-------1](https://dsvgroup.medium.com/how-to-build-agentic-ai-core-steps-key-risks-and-smart-solutions-04ff809d0200?source=rss-------1)  
-12. 20 Agentic AI Workflow Patterns That Actually Work in 2025 \- Skywork, accessed June 9, 2026, [https://skywork.ai/blog/agentic-ai-examples-workflow-patterns-2025/](https://skywork.ai/blog/agentic-ai-examples-workflow-patterns-2025/)  
-13. LangGraph Multi-Agent Orchestration: Complete Framework Guide \+ Architecture Analysis 2025 \- Latenode Blog, accessed June 9, 2026, [https://latenode.com/blog/ai-frameworks-technical-infrastructure/langgraph-multi-agent-orchestration/langgraph-multi-agent-orchestration-complete-framework-guide-architecture-analysis-2025](https://latenode.com/blog/ai-frameworks-technical-infrastructure/langgraph-multi-agent-orchestration/langgraph-multi-agent-orchestration-complete-framework-guide-architecture-analysis-2025)  
-14. Teaching LangChain Agents to Plan & Run Multi-Step, Multi-Tool Workflows \- Medium, accessed June 9, 2026, [https://medium.com/@avigoldfinger/teaching-langchain-agents-to-plan-run-multi-step-multi-tool-workflows-82ac908fd56e](https://medium.com/@avigoldfinger/teaching-langchain-agents-to-plan-run-multi-step-multi-tool-workflows-82ac908fd56e)  
-15. Multi-Agent Orchestration and Architecture \- Runpod, accessed June 9, 2026, [https://www.runpod.io/articles/guides/multi-agent-orchestration-and-architecture](https://www.runpod.io/articles/guides/multi-agent-orchestration-and-architecture)  
-16. I spent a long time thinking about how to build good AI agents. This is the simplest way I can explain it. : r/ClaudeCode \- Reddit, accessed June 9, 2026, [https://www.reddit.com/r/ClaudeCode/comments/1rt37um/i\_spent\_a\_long\_time\_thinking\_about\_how\_to\_build/](https://www.reddit.com/r/ClaudeCode/comments/1rt37um/i_spent_a_long_time_thinking_about_how_to_build/)  
-17. \[2606.00198\] BAGEN: Are LLM Agents Budget-Aware? \- arXiv, accessed June 9, 2026, [https://arxiv.org/abs/2606.00198](https://arxiv.org/abs/2606.00198)  
-18. Sudden spike in GitHub Copilot usage after running background\_task \#418, accessed June 9, 2026, [https://github.com/code-yeongyu/oh-my-openagent/issues/418](https://github.com/code-yeongyu/oh-my-openagent/issues/418)  
+12. 20 Agentic AI Workflow Patterns That Actually Work in 2025 - Skywork, accessed June 9, 2026, [https://skywork.ai/blog/agentic-ai-examples-workflow-patterns-2025/](https://skywork.ai/blog/agentic-ai-examples-workflow-patterns-2025/)  
+13. LangGraph Multi-Agent Orchestration: Complete Framework Guide + Architecture Analysis 2025 - Latenode Blog, accessed June 9, 2026, [https://latenode.com/blog/ai-frameworks-technical-infrastructure/langgraph-multi-agent-orchestration/langgraph-multi-agent-orchestration-complete-framework-guide-architecture-analysis-2025](https://latenode.com/blog/ai-frameworks-technical-infrastructure/langgraph-multi-agent-orchestration/langgraph-multi-agent-orchestration-complete-framework-guide-architecture-analysis-2025)  
+14. Teaching LangChain Agents to Plan & Run Multi-Step, Multi-Tool Workflows - Medium, accessed June 9, 2026, [https://medium.com/@avigoldfinger/teaching-langchain-agents-to-plan-run-multi-step-multi-tool-workflows-82ac908fd56e](https://medium.com/@avigoldfinger/teaching-langchain-agents-to-plan-run-multi-step-multi-tool-workflows-82ac908fd56e)  
+15. Multi-Agent Orchestration and Architecture - Runpod, accessed June 9, 2026, [https://www.runpod.io/articles/guides/multi-agent-orchestration-and-architecture](https://www.runpod.io/articles/guides/multi-agent-orchestration-and-architecture)  
+16. I spent a long time thinking about how to build good AI agents. This is the simplest way I can explain it. : r/ClaudeCode - Reddit, accessed June 9, 2026, [https://www.reddit.com/r/ClaudeCode/comments/1rt37um/i_spent_a_long_time_thinking_about_how_to_build/](https://www.reddit.com/r/ClaudeCode/comments/1rt37um/i_spent_a_long_time_thinking_about_how_to_build/)  
+17. [2606.00198] BAGEN: Are LLM Agents Budget-Aware? - arXiv, accessed June 9, 2026, [https://arxiv.org/abs/2606.00198](https://arxiv.org/abs/2606.00198)  
+18. Sudden spike in GitHub Copilot usage after running background_task #418, accessed June 9, 2026, [https://github.com/code-yeongyu/oh-my-openagent/issues/418](https://github.com/code-yeongyu/oh-my-openagent/issues/418)  
 19. Five techniques to reach the efficient frontier of LLM inference | Google Cloud Blog, accessed June 9, 2026, [https://cloud.google.com/blog/topics/developers-practitioners/five-techniques-to-reach-the-efficient-frontier-of-llm-inference](https://cloud.google.com/blog/topics/developers-practitioners/five-techniques-to-reach-the-efficient-frontier-of-llm-inference)  
-20. Why Inference Systems Are the New AI Bottleneck \- Newline.co, accessed June 9, 2026, [https://www.newline.co/@Dipen/why-inference-systems-are-the-new-ai-bottleneck--a9bc0631](https://www.newline.co/@Dipen/why-inference-systems-are-the-new-ai-bottleneck--a9bc0631)  
-21. Training to Inference: Why AI Cloud Must Catch Up \- DigitalOcean, accessed June 9, 2026, [https://www.digitalocean.com/community/conceptual-articles/training-to-inference-why-ai-cloud-must-catch-up](https://www.digitalocean.com/community/conceptual-articles/training-to-inference-why-ai-cloud-must-catch-up)  
-22. Human in the loop (HITL) AI Agents with LangGraph & Elastic \- Elasticsearch Labs, accessed June 9, 2026, [https://www.elastic.co/search-labs/blog/human-in-the-loop-hitllanggraph-elasticsearch](https://www.elastic.co/search-labs/blog/human-in-the-loop-hitllanggraph-elasticsearch)  
+20. Why Inference Systems Are the New AI Bottleneck - Newline.co, accessed June 9, 2026, [https://www.newline.co/@Dipen/why-inference-systems-are-the-new-ai-bottleneck--a9bc0631](https://www.newline.co/@Dipen/why-inference-systems-are-the-new-ai-bottleneck--a9bc0631)  
+21. Training to Inference: Why AI Cloud Must Catch Up - DigitalOcean, accessed June 9, 2026, [https://www.digitalocean.com/community/conceptual-articles/training-to-inference-why-ai-cloud-must-catch-up](https://www.digitalocean.com/community/conceptual-articles/training-to-inference-why-ai-cloud-must-catch-up)  
+22. Human in the loop (HITL) AI Agents with LangGraph & Elastic - Elasticsearch Labs, accessed June 9, 2026, [https://www.elastic.co/search-labs/blog/human-in-the-loop-hitllanggraph-elasticsearch](https://www.elastic.co/search-labs/blog/human-in-the-loop-hitllanggraph-elasticsearch)  
 23. Bounded Autonomy: Behavioral Specification Languages and Runtime Enforcement Architectures for Trustworthy Agentic AI Systems | Authorea, accessed June 9, 2026, [https://www.authorea.com/doi/full/10.22541/au.177083908.89981049](https://www.authorea.com/doi/full/10.22541/au.177083908.89981049)  
-24. I built a circuit breaker SDK for LLM agents — catches loops, budget overruns, and privilege escalations : r/LangChain \- Reddit, accessed June 9, 2026, [https://www.reddit.com/r/LangChain/comments/1tu7ite/i\_built\_a\_circuit\_breaker\_sdk\_for\_llm\_agents/](https://www.reddit.com/r/LangChain/comments/1tu7ite/i_built_a_circuit_breaker_sdk_for_llm_agents/)  
-25. BAGEN: Are LLM Agents Budget-Aware? \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2606.00198v1](https://arxiv.org/html/2606.00198v1)
+24. I built a circuit breaker SDK for LLM agents — catches loops, budget overruns, and privilege escalations : r/LangChain - Reddit, accessed June 9, 2026, [https://www.reddit.com/r/LangChain/comments/1tu7ite/i_built_a_circuit_breaker_sdk_for_llm_agents/](https://www.reddit.com/r/LangChain/comments/1tu7ite/i_built_a_circuit_breaker_sdk_for_llm_agents/)  
+25. BAGEN: Are LLM Agents Budget-Aware? - arXiv, accessed June 9, 2026, [https://arxiv.org/html/2606.00198v1](https://arxiv.org/html/2606.00198v1)
 
 ---
 

@@ -1,4 +1,4 @@
-# **AI-ENG-O — Action Verification \- Planning, Execution, Observation & Recovery**
+# AI-ENG-O — Action Verification - Planning, Execution, Observation & Recovery
 
 The integration of generative artificial intelligence models into distributed computing environments introduces a significant architectural mismatch: the interface between probabilistic, non-deterministic decision engines and rigid, deterministic state machines. In agentic workflows, this mismatch manifests as a systemic vulnerability at the point of action execution. Historically, distributed systems have relied on transport-level or database-level execution acknowledgments (such as an HTTP 200 OK or a write-ahead log commit) as proof of successful state mutation. However, in high-dimensional agentic architectures, an action cannot be deemed complete when the model asserts its completion, or even when the invoking tool returns a successful execution response.  
 **An action is not complete when the model says it is complete, or even when the tool returns success. An action is complete only when the system verifies the resulting state against the intended outcome and reconciles any discrepancy.**  
@@ -13,30 +13,32 @@ To maintain structural durability within the *AI Engineering Systems Canon*, thi
 * **AI-ENG-N (Tool Contracts)** owns the execution gateway. It determines whether a proposed tool call is syntactically valid, authorized, safe, and idempotent prior to execution. It manages deterministic wrappers, validation schemas, and structural output contracts.  
 * **AI-ENG-O (Action Verification)** owns the post-action truth. It determines what actually occurred after execution, whether the agent’s task state can be updated, whether the user can be notified of completion, and the exact recovery path that must execute if reality diverges from the model’s belief.
 
-  \+---------------------------------------------------------------------------------+  
-  |                            Volume 5 Architectural Boundaries                     |  
-  \+---------------------------------------------------------------------------------+  
+```
+  +---------------------------------------------------------------------------------+  
+  |                            Volume 5 Architectural Boundaries                    |  
+  +---------------------------------------------------------------------------------+  
   |  AI-ENG-M: Agentic Orchestration                                                |  
-  |  \- Decision-making loop                                                         |  
-  |  \- Plan generation and sub-goal management                                      |  
-  |  \- Autonomy boundaries and loop budgets                                         |  
-  \+---------------------------------------------------------------------------------+  
+  |  - Decision-making loop                                                         | 
+  |  - Plan generation and sub-goal management                                      |  
+  |  - Autonomy boundaries and loop budgets                                         |  
+  +---------------------------------------------------------------------------------+  
                                          |  
                                          v  
-  \+---------------------------------------------------------------------------------+  
+  +---------------------------------------------------------------------------------+  
   |  AI-ENG-N: Tool Contracts                                                       |  
-  |  \- Parameter validation and deterministic wrappers                              |  
-  |  \- Security mapping and credentials injection                                   |  
-  |  \- Idempotency key generation and confirmation gates                            |  
-  \+---------------------------------------------------------------------------------+  
+  |  - Parameter validation and deterministic wrappers                              |  
+  |  - Security mapping and credentials injection                                   |  
+  |  - Idempotency key generation and confirmation gates                            |  
+  +---------------------------------------------------------------------------------+  
                                          |  
                                          v  
-  \+---------------------------------------------------------------------------------+  
+  +---------------------------------------------------------------------------------+  
   |  AI-ENG-O: Action Verification (Truth-Management Layer)                         |  
-  |  \- Post-execution state verification and readbacks                              |  
-  |  \- Discrepancy classification and state reconciliation                          |  
-  |  \- Rollback, compensation sagas, and forward recovery                           |  
-  \+---------------------------------------------------------------------------------+
+  |  - Post-execution state verification and readbacks                              |  
+  |  - Discrepancy classification and state reconciliation                          |  
+  |  - Rollback, compensation sagas, and forward recovery                           |  
+  +---------------------------------------------------------------------------------+
+```
 
 Furthermore, this report inherits and extends doctrines from across the broader canon:
 
@@ -73,19 +75,21 @@ To establish a uniform vocabulary for platform architects, agent engineers, and 
 ## **The Core Doctrine of Post-Execution Truth**
 
 The architectural foundation of action verification is post-execution truth management. To maintain consistency in distributed systems, platform architects must distinguish between several distinct representations of state. These layers must not be conflated, as each represents a different phase of the execution lifecycle:  
-Planned \-\> Proposed \-\> Validated \-\> Executed \-\> Observed \-\> Verified \-\> Reconciled \-\> Reported
+Planned -> Proposed -> Validated -> Executed -> Observed -> Verified -> Reconciled -> Reported
 
 ### **Why Every Transition Matters**
 
-  Planned   \---\>   Proposed   \---\>   Validated   \---\>   Executed  
+```
+  Planned   --->   Proposed   --->   Validated   --->   Executed  
      |                |                  |                 |  
 (Plan may be     (Proposal may     (Validated call    (Execution may  
  wrong/stale)     be malformed)     may still fail)    time out/abort)  
                                                            |  
-  Reported  \<---  Reconciled  \<---   Verified    \<---   Observed  
+  Reported  <---  Reconciled  <---   Verified    <---   Observed  
      |                |                  |                 |  
 (User report     (Authoritative     (Observation is    (Success returned  
  can't outrun)    state may lag)     only evidence)     may be premature)
+```
 
 1. **Planned to Proposed:** A plan may be syntactically correct but semantically flawed, or it may be based on outdated information.  
 2. **Proposed to Validated:** A proposal generated by a probabilistic model may contain malformed parameters, invalid types, or unauthorized scopes that must be caught by schema checks.  
@@ -102,7 +106,7 @@ For example:
 
 * An email service tool may return { "status": "sent" } upon accepting a payload, but the message may still be blocked downstream by a spam filter.  
 * A database write tool may return { "status": "success" }, but the transaction may have hit a database read replica rather than the primary writer node, resulting in a stale read on subsequent queries.  
-* A container creation tool may return { "id": "container\_123" }, but the container may crash-loop immediately after startup.
+* A container creation tool may return { "id": "container_123" }, but the container may crash-loop immediately after startup.
 
 Therefore, a robust system must treat all initial tool observations as unverified claims. The task state must remain locked until an active verification check confirms the change against the authoritative system of record.
 
@@ -130,38 +134,40 @@ From an operational and security standpoint, hallucinated success is highly seri
 
 The core engine of action verification is the State Reconciliation Model. This model compares five distinct layers of state to guarantee consistency across the agentic boundary.
 
-  \+--------------------------------------------------------------+  
+```
+  +--------------------------------------------------------------+  
   |                        Intended State                        |  
   |             (User goal: "Increase credit line")              |  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
                                 |  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                       Requested State                        |  
-  |           (API parameters: "requested\_amount": 5000\)         |  
-  \+--------------------------------------------------------------+  
+  |           (API parameters: "requested_amount": 5000)         |  
+  +--------------------------------------------------------------+  
                                 |  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                        Observed State                        |  
   |        (Tool response: HTTP 202 Accepted, "status": "pending")|  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
                                 |  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                     Authoritative State                      |  
-  |         (Database read: "credit\_limit": 5000, LSN: 240892\)   |  
-  \+--------------------------------------------------------------+  
+  |         (Database read: "credit_limit": 5000, LSN: 240892)   |  
+  +--------------------------------------------------------------+  
                                 |  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                     Believed Task State                      |  
   |          (Orchestrator log: "Credit update reconciled")      |  
-  \+--------------------------------------------------------------+
+  +--------------------------------------------------------------+
+```
 
 To ensure system integrity, these state layers must reconcile according to strict mathematical and logical invariants. Let SI be the Intended State, SR be the Requested State, SO be the Observed State, SA be the Authoritative State, and SB be the Believed Task State.  
 An action is considered legally and operationally reconciled if and only if:  
-SA \== SI AND SB is updated with the value of SA  
+SA == SI AND SB is updated with the value of SA  
 If SO returns success but SA does not match SI, a state discrepancy exists. To manage these discrepancies across different operations, systems must apply specific alignment requirements:
 
 | State Layer | Source of Truth | Trust Level | Alignment Requirement |
@@ -176,15 +182,17 @@ If SO returns success but SA does not match SI, a state discrepancy exists. To m
 
 To safely process tool outputs, the orchestrator must pass the returned observation through a progressive security and truth verification ladder.
 
-   \<-- Bypasses replicas, logged to immutable ledger  
+```
+   <-- Bypasses replicas, logged to immutable ledger  
                  ^  
-        \<-- Divergence checked, parameters match intent  
+        <-- Divergence checked, parameters match intent  
                  ^  
-  \[ Level 2: Verified Observation \]   \<-- Confirmed via independent API readback  
+  [ Level 2: Verified Observation ]   <-- Confirmed via independent API readback  
                  ^  
-  \[ Level 1: Normalized Observation \] \<-- Raw error codes/JSON mapped to schemas  
+  [ Level 1: Normalized Observation ] <-- Raw error codes/JSON mapped to schemas  
                  ^  
-   \<-- Unstructured terminal streams/unfiltered API
+   <-- Unstructured terminal streams/unfiltered API
+```
 
 * **Level 0: Raw Tool Prose/Output:** Unstructured text, standard output/error streams, or unfiltered API error objects directly from the run environment. *Security Posture:* Extremely unsafe. Subject to tool-use hallucinations, prompt injection, or parsing failures.  
 * **Level 1: Normalized Observation:** Standardized observation schema mapping raw results into typed properties (such as text, JSON, or resource references), isolating raw stack traces. *Security Posture:* Syntactically safe for model consumption but unverified against the physical state.  
@@ -212,72 +220,72 @@ Not all actions carry the same operational risk, financial exposure, or legal co
 
 | Side-Effect Class | Required Post-Action Check | Authoritative Verification Source | Permitted Fallback Routing | Latency Tolerance | Human-Review Trigger Threshold |
 | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Read-Only Observation** | Verify TLS certificates, request-response integrity, query parameters echo. | Read-only replica database. | Fallback to primary writer on replica timeout. | \< 100 ms | Never triggered for read operations. |
-| **Ephemeral Write** | Verify file existence, absolute path normalization, write sandboxing, file size. | Sandboxed filesystem monitor. | Abort task and raise execution exception. | \< 500 ms | Triggered only on security sandbox violations. |
-| **Low-Risk Internal Write** | Read-after-write key lookup, verify row count \= 1, assert matching version number. | Primary database writer node. | Fallback to lagging replica with warning log. | \< 1.5 s | Triggered on persistent write conflicts after retries. |
-| **Medium-Risk Operational Write** | Verify object status, diff before/after state properties, check message delivery status. | Application service API or distributed state cache. | Queue for asynchronous verification retries. | \< 5.0 s | Triggered on verification failures exceeding 3 retries. |
-| **High-Risk External Write** | Poll delivery service API, fetch unique tracking ID, verify email DKIM/DMARC signatures. | Third-party partner system API or gateway ledger. | None. Hold transaction in pending state. | \< 30.0 s | Triggered on status declines or payment mismatches. |
-| **Critical Mutation** | Multi-source ledger reconciliation, confirm cryptographic signature, run compliance checks. | Immutable audit ledger or consensus database. | None. Fail closed and lock the transaction. | Asynchronous (\< 10 min) | **Always triggered.** Requires explicit operator sign-off before commit. |
+| **Read-Only Observation** | Verify TLS certificates, request-response integrity, query parameters echo. | Read-only replica database. | Fallback to primary writer on replica timeout. | < 100 ms | Never triggered for read operations. |
+| **Ephemeral Write** | Verify file existence, absolute path normalization, write sandboxing, file size. | Sandboxed filesystem monitor. | Abort task and raise execution exception. | < 500 ms | Triggered only on security sandbox violations. |
+| **Low-Risk Internal Write** | Read-after-write key lookup, verify row count = 1, assert matching version number. | Primary database writer node. | Fallback to lagging replica with warning log. | < 1.5 s | Triggered on persistent write conflicts after retries. |
+| **Medium-Risk Operational Write** | Verify object status, diff before/after state properties, check message delivery status. | Application service API or distributed state cache. | Queue for asynchronous verification retries. | < 5.0 s | Triggered on verification failures exceeding 3 retries. |
+| **High-Risk External Write** | Poll delivery service API, fetch unique tracking ID, verify email DKIM/DMARC signatures. | Third-party partner system API or gateway ledger. | None. Hold transaction in pending state. | < 30.0 s | Triggered on status declines or payment mismatches. |
+| **Critical Mutation** | Multi-source ledger reconciliation, confirm cryptographic signature, run compliance checks. | Immutable audit ledger or consensus database. | None. Fail closed and lock the transaction. | Asynchronous (< 10 min) | **Always triggered.** Requires explicit operator sign-off before commit. |
 
 ## **Post-Action Check Pattern Library**
 
 To operationalize verification across diverse system types, platform designers must implement specific, deterministic post-action validation checks. The following patterns define how these checks are executed for common tool families.
 
-### **1\. Databases**
+### **1. Databases**
 
 * *Validation Action:* Issue a read-after-write query directly to the database writer node, using snapshot isolation to bypass replica lag.  
 * *Verification Parameters:* Verify that the target row exists, the Log Sequence Number (LSN) or row version has incremented, the modified field values match the requested state, and the tenant ID is correct.  
 * *Failure Indicator:* The row count is zero, the row version is stale, or the transaction is blocked by a database lock timeout.
 
-### **2\. Filesystems**
+### **2. Filesystems**
 
 * *Validation Action:* Run a path normalization check to prevent directory traversal attacks. Resolve the target file path outside the local execution sandbox.  
 * *Verification Parameters:* Verify that the file exists, the file size matches the write buffer, the file extension is on the allowlist, and the SHA-256 cryptographic hash matches the source payload.  
 * *Failure Indicator:* The file is not found on the host system (sandboxed write illusion), or the calculated hash does not match the expected value.
 
-### **3\. Email Services**
+### **3. Email Services**
 
 * *Validation Action:* Poll the email delivery service API using the returned unique message ID.  
 * *Verification Parameters:* Verify that the recipient's address is resolved, the status is delivered or queued, and the message has passed SPF, DKIM, and DMARC alignment checks.  
 * *Failure Indicator:* The message is flagged as bounced, rejected by the gateway, or quarantined by spam filters.
 
-### **4\. Calendar Systems**
+### **4. Calendar Systems**
 
 * *Validation Action:* Read the target user's calendar event details using the unique event ID.  
 * *Verification Parameters:* Verify that the event ID exists, the meeting time and timezone are correct, the attendee guest list matches, and the organizer ID is verified.  
 * *Failure Indicator:* The event conflicts with an existing booking, the attendee invitation bounces, or a duplicate event ID is detected.
 
-### **5\. Payments and Refunds**
+### **5. Payments and Refunds**
 
 * *Validation Action:* Query the payment processor ledger using a stable business idempotency key.  
 * *Verification Parameters:* Verify that the transaction status is captured or authorized, the settled amount and currency match the purchase order, and a unique transaction ID is committed.  
 * *Failure Indicator:* The transaction is declined, a duplicate charge is detected under the same idempotency key, or the settled amount diverges.
 
-### **6\. CRM and Ticketing**
+### **6. CRM and Ticketing**
 
 * *Validation Action:* Fetch the updated CRM object or ticket record using the returned unique ID.  
 * *Verification Parameters:* Verify that the ticket status is updated or created, the assignee matches the routing logic, and the change history logs the correct actor ID and workflow ID.  
 * *Failure Indicator:* The field changes are missing, the assignee remains unresolved, or the database write times out due to record locking.
 
-### **7\. Deployment Pipelines**
+### **7. Deployment Pipelines**
 
 * *Validation Action:* Query the deployment orchestrator API to monitor container health metrics and rollout progress.  
 * *Verification Parameters:* Verify that the active rollout stage reaches 100%, all container health checks pass, and the error budget is unaffected.  
 * *Failure Indicator:* An automated rollback is triggered, container crash loops are detected, or the error budget is exceeded.
 
-### **8\. Procurement Systems**
+### **8. Procurement Systems**
 
 * *Validation Action:* Query the procurement register to match the purchase order (PO) details against the approved schema.  
 * *Verification Parameters:* Verify that the PO status is approved, the vendor SKU matches the catalog, and the transaction cost falls within the allocated system margin.  
 * *Failure Indicator:* An unauthorized SKU is detected, the PO is rejected due to spend limits, or a pricing mismatch occurs.
 
-### **9\. Browser and Web Automations**
+### **9. Browser and Web Automations**
 
 * *Validation Action:* Inspect the page state, execute target selector assertions, and verify DOM elements after interaction.  
 * *Verification Parameters:* Verify that the confirmation element is present, the target URL matches the success path, and the downloaded file hash matches.  
 * *Failure Indicator:* The target selector times out, the navigation is blocked by a CAPTCHA challenge, or form validation fails.
 
-### **10\. Security and Infrastructure**
+### **10. Security and Infrastructure**
 
 * *Validation Action:* Query the directory access controls or run a live token assertion check.  
 * *Verification Parameters:* Verify that the subject token lacks excluded scopes, the target policy matches the updated IAM schema, and the change is logged to the security audit trail.  
@@ -289,79 +297,83 @@ In complex, distributed systems, operations rarely succeed or fail in a simple b
 
 ### **Real-World Partial Failure Scenarios**
 
-  \+---------------------------------------------------------------------------------+  
+```
+  +---------------------------------------------------------------------------------+  
   |                            Partial Failure Examples                             |  
-  \+---------------------------------------------------------------------------------+  
+  +---------------------------------------------------------------------------------+  
           |  
-          \+---\> CRM ticket is created, but assignee email notification bounces.  
+          +---> CRM ticket is created, but assignee email notification bounces.  
           |  
-          \+---\> Calendar event is scheduled, but one attendee invitation fails.  
+          +---> Calendar event is scheduled, but one attendee invitation fails.  
           |  
-          \+---\> Credit card payment is authorized, but downstream capture times out.  
+          +---> Credit card payment is authorized, but downstream capture times out.  
           |  
-          \+---\> Refund is initiated on a ledger, but bank settlement is delayed.  
+          +---> Refund is initiated on a ledger, but bank settlement is delayed.  
           |  
-          \+---\> File is uploaded to storage, but downstream vector indexing fails.  
+          +---> File is uploaded to storage, but downstream vector indexing fails.  
           |  
-          \+---\> Database write is committed, but cache invalidation times out.  
+          +---> Database write is committed, but cache invalidation times out.  
           |  
-          \+---\> Deployment rolls out to region US-East, but fails in region EU-West.  
+          +---> Deployment rolls out to region US-East, but fails in region EU-West.  
           |  
-          \+---\> CRM update is accepted, but downstream sync is delayed.  
+          +---> CRM update is accepted, but downstream sync is delayed.  
           |  
-          \+---\> Email is queued at the SMTP gateway, but rejected by recipient server.  
+          +---> Email is queued at the SMTP gateway, but rejected by recipient server.  
           |  
-          \+---\> Write commits on primary node, but verification read hits stale replica.
+          +---> Write commits on primary node, but verification read hits stale replica.
+```
 
 To manage these scenarios without corrupting the agent's belief system, the system state machine must represent the following lifecycle states:
 
-                 \+-----------+  
+```
+                 +-----------+  
                  | Proposed  |  
-                 \+-----------+  
+                 +-----------+  
                        |  
                        v  
-                 \+-----------+  
+                 +-----------+  
                  | Validated |  
-                 \+-----------+  
+                 +-----------+  
                        |  
                        v  
-                 \+-----------+  
+                 +-----------+  
                  | Executing |  
-                 \+-----------+  
+                 +-----------+  
                        |  
-        \+--------------+--------------+  
+        +--------------+--------------+  
         |                             |  
         v                             v  
-  \+-----------+                 \+-----------+  
+  +-----------+                 +-----------+  
   | Accepted  |                 |  Failed   |  
-  \+-----------+                 \+-----------+  
+  +-----------+                 +-----------+  
         |                             |  
         v                             v  
-  \+-----------+                 \+-----------+  
+  +-----------+                 +-----------+  
   |  Pending  |                 |   Error   |  
-  \+-----------+                 \+-----------+  
+  +-----------+                 +-----------+  
         |                             |  
         v                             v  
-  \+-----------+                 \+-----------+  
+  +-----------+                 +-----------+  
   | Committed |                 | Escalated |  
-  \+-----------+                 \+-----------+  
+  +-----------+                 +-----------+  
         |                             |  
         v                             v  
-  \+-----------------------+     \+-----------+  
+  +-----------------------+     +-----------+  
   |  Partially Committed  |     | Abandoned |  
-  \+-----------------------+     \+-----------+  
+  +-----------------------+     +-----------+  
         |  
-        \+------------+  
+        +------------+  
         |            |  
         v            v  
-  \+--------------+ \+-------------+  
+  +--------------+ +-------------+  
   | Compensating | | Rolled Back |  
-  \+--------------+ \+-------------+  
+  +--------------+ +-------------+  
         |  
         v  
-  \+--------------+  
+  +--------------+  
   | Compensated  |  
-  \+--------------+
+  +--------------+
+```
 
 ### **Technical System States and Transitions**
 
@@ -383,12 +395,14 @@ To manage these scenarios without corrupting the agent's belief system, the syst
 
 When a discrepancy is detected during verification, the system must choose an appropriate recovery path based on the transactional semantics of the target systems.
 
+```
                                       Pivot Transaction  
                                               |  
                                               v  
-  \---\> \---\> \---\>  
+  ---> ---> --->  
            |                          |                         |                        |  
      (Compensable)              (Compensable)              (Idempotent)             (Idempotent)
+```
 
 ### **Rollback**
 
@@ -427,8 +441,8 @@ To handle verification failures deterministically, the system applies a set of r
 
 | Discrepancy Type | Verification Finding | Active Operational Condition | Target Recovery Action | Technical Rationale |
 | :---- | :---- | :---- | :---- | :---- |
-| **Observation / Authority Mismatch** | Tool returned success, but readback shows old state. | Seconds behind source \<= 5.0 s. | **Retry Verification** | The replica is likely lagging; a brief delay before retrying allows replication to catch up. |
-| **Observation / Authority Mismatch** | Tool returned success, but readback shows old state. | Seconds behind source \> 5.0 s. | **Force Master Read** | Significant replication lag detected; bypass the replica and query the master database directly. |
+| **Observation / Authority Mismatch** | Tool returned success, but readback shows old state. | Seconds behind source <= 5.0 s. | **Retry Verification** | The replica is likely lagging; a brief delay before retrying allows replication to catch up. |
+| **Observation / Authority Mismatch** | Tool returned success, but readback shows old state. | Seconds behind source > 5.0 s. | **Force Master Read** | Significant replication lag detected; bypass the replica and query the master database directly. |
 | **Observation / Authority Mismatch** | Tool returned success, but readback shows old state. | Target system lacks a read API or verification endpoint. | **Escalate and Hold** | Verification is impossible; freeze the workflow and route the task to manual operator review. |
 | **Verification Timeout** | Verification polling timed out during check. | Action is classed as reversible. | **Compensate and Stop** | Prevent the system from hanging; run compensating actions to clean up and report a failure. |
 | **Verification Timeout** | Verification polling timed out during check. | Action is irreversible. | **Hold and Escalate** | Reversing is impossible; freeze the workflow and route the task to manual operator review. |
@@ -445,92 +459,93 @@ To handle verification failures deterministically, the system applies a set of r
 
 To support security audits, automated replays, and forensic investigations, the system must log every action transition within a structured, append-only Action Ledger. Unlike runtime traces (which track raw execution paths and latency), the Action Ledger records the logical state changes and verification proof for each transaction.
 
-JSON  
+```JSON  
 {  
   "$schema": "https://json-schema.org/draft/2020-12/schema",  
   "title": "ActionLedgerEntry",  
   "type": "object",  
-  "required": \[  
-    "action\_id",  
-    "workflow\_run\_id",  
-    "tenant\_id",  
-    "user\_id",  
-    "idempotency\_key",  
-    "side\_effect\_class",  
-    "intended\_outcome",  
-    "execution\_status",  
+  "required": [  
+    "action_id",  
+    "workflow_run_id",  
+    "tenant_id",  
+    "user_id",  
+    "idempotency_key",  
+    "side_effect_class",  
+    "intended_outcome",  
+    "execution_status",  
     "timestamps"  
-  \],  
+  ],  
   "properties": {  
-    "action\_id": { "type": "string", "format": "uuid" },  
-    "workflow\_run\_id": { "type": "string", "format": "uuid" },  
-    "tenant\_id": { "type": "string" },  
-    "user\_id": { "type": "string" },  
-    "idempotency\_key": { "type": "string" },  
-    "side\_effect\_class": {   
+    "action_id": { "type": "string", "format": "uuid" },  
+    "workflow_run_id": { "type": "string", "format": "uuid" },  
+    "tenant_id": { "type": "string" },  
+    "user_id": { "type": "string" },  
+    "idempotency_key": { "type": "string" },  
+    "side_effect_class": {   
       "type": "string",   
-      "enum": \["read-only", "ephemeral-write", "low-risk-write", "medium-risk-write", "high-risk-write", "critical-mutation"\]   
+      "enum": ["read-only", "ephemeral-write", "low-risk-write", "medium-risk-write", "high-risk-write", "critical-mutation"]   
     },  
-    "intended\_outcome": {  
+    "intended_outcome": {  
       "type": "object",  
-      "required": \["target\_resource", "expected\_state"\],  
+      "required": ["target_resource", "expected_state"],  
       "properties": {  
-        "target\_resource": { "type": "string" },  
-        "expected\_state": { "type": "object" }  
+        "target_resource": { "type": "string" },  
+        "expected_state": { "type": "object" }  
       }  
     },  
-    "validated\_payload\_hash": { "type": "string" },  
-    "execution\_status": {   
+    "validated_payload_hash": { "type": "string" },  
+    "execution_status": {   
       "type": "string",   
-      "enum": \["proposed", "validated", "executing", "accepted", "pending", "committed", "partially-committed", "failed", "compensating", "compensated", "rolled-back", "review-required", "abandoned"\]   
+      "enum": ["proposed", "validated", "executing", "accepted", "pending", "committed", "partially-committed", "failed", "compensating", "compensated", "rolled-back", "review-required", "abandoned"]   
     },  
-    "observation\_object": {  
+    "observation_object": {  
       "type": "object",  
-      "required": \["status\_code", "payload"\],  
+      "required": ["status_code", "payload"],  
       "properties": {  
-        "status\_code": { "type": "integer" },  
+        "status_code": { "type": "integer" },  
         "payload": { "type": "object" }  
       }  
     },  
-    "verification\_query": {  
+    "verification_query": {  
       "type": "object",  
-      "required": \["query\_endpoint", "parameters"\],  
+      "required": ["query_endpoint", "parameters"],  
       "properties": {  
-        "query\_endpoint": { "type": "string" },  
+        "query_endpoint": { "type": "string" },  
         "parameters": { "type": "object" }  
       }  
     },  
-    "verification\_result": {  
+    "verification_result": {  
       "type": "object",  
-      "required": \["verified\_state", "mismatch\_detected"\],  
+      "required": ["verified_state", "mismatch_detected"],  
       "properties": {  
-        "verified\_state": { "type": "object" },  
-        "mismatch\_detected": { "type": "boolean" },  
-        "discrepancy\_classification": { "type": "string" }  
+        "verified_state": { "type": "object" },  
+        "mismatch_detected": { "type": "boolean" },  
+        "discrepancy_classification": { "type": "string" }  
       }  
     },  
     "recovery": {  
       "type": "object",  
       "properties": {  
-        "recovery\_decision": { "type": "string" },  
-        "compensation\_action\_id": { "type": "string", "format": "uuid" },  
-        "rollback\_action\_id": { "type": "string", "format": "uuid" },  
-        "escalated\_to\_user\_id": { "type": "string" }  
+        "recovery_decision": { "type": "string" },  
+        "compensation_action_id": { "type": "string", "format": "uuid" },  
+        "rollback_action_id": { "type": "string", "format": "uuid" },  
+        "escalated_to_user_id": { "type": "string" }  
       }  
     },  
     "timestamps": {  
       "type": "object",  
-      "required": \["proposed\_at"\],  
+      "required": ["proposed_at"],  
       "properties": {  
-        "proposed\_at": { "type": "string", "format": "date-time" },  
-        "executed\_at": { "type": "string", "format": "date-time" },  
-        "verified\_at": { "type": "string", "format": "date-time" },  
-        "reconciled\_at": { "type": "string", "format": "date-time" }  
+        "proposed_at": { "type": "string", "format": "date-time" },  
+        "executed_at": { "type": "string", "format": "date-time" },  
+        "verified_at": { "type": "string", "format": "date-time" },  
+        "reconciled_at": { "type": "string", "format": "date-time" }  
       }  
     },  
-    "trace\_parent\_id": { "type": "string" }  
+    "trace_parent_id": { "type": "string" }  
   }  
 }
+```
 
 The difference between a trace and an action ledger is operational and qualitative:
 
@@ -541,32 +556,34 @@ The difference between a trace and an action ledger is operational and qualitati
 
 To prevent model belief drift—where a model plans subsequent steps based on assumptions about its own execution success—the orchestrator must enforce a strict separation between the model's generation context and the verified task state.
 
-  \+--------------------------------------------------------------+  
+```
+  +--------------------------------------------------------------+  
   |                   Model Execution Context                    |  
-  |   Model: "I will call charge\_card() for $100."              |  
-  \+--------------------------------------------------------------+  
+  |   Model: "I will call charge_card() for $100."              |  
+  +--------------------------------------------------------------+  
                                 |  
                                 | (API call initiated)  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                Deterministic Execution Layer                 |  
   |   Returns: HTTP 202, "status": "pending"                     |  
   |   (Task state remains locked at "unpaid")                    |  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
                                 |  
                                 | (Asynchronous Verification)  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                     Authoritative Ledger                     |  
   |   Confirms: Charge settled on bank register                  |  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
                                 |  
                                 | (State updated & grounding context injected)  
                                 v  
-  \+--------------------------------------------------------------+  
+  +--------------------------------------------------------------+  
   |                   Model Evaluation Context                   |  
   |   Model: "Verification confirmed. The order is paid."        |  
-  \+--------------------------------------------------------------+
+  +--------------------------------------------------------------+
+```
 
 1. **Read-Only Orchestrator State:** The orchestrator maintains the structured task state outside the model's context window. This state cannot be modified by the model's output text. It is updated only via structured verification events.  
 2. **State-Grounding Context Injection:** When the model is invoked for its next planning step, the orchestrator injects the verified task state directly into the system prompt context. The model is forced to evaluate its next steps based on this grounded truth, rather than relying on its historical generation logs.  

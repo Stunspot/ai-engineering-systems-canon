@@ -232,24 +232,68 @@ Highly optimized production systems rarely rely on a single model. Instead, they
 This architecture maps tasks across a distributed portfolio, routing queries dynamically based on difficulty, risk, and structural needs.
 
 ```
-                                  Incoming Request  
-                                         |  
-                                         v  
-                  ---------------------\ (Bypasses cheap model if complex)   
-                         |                                                       |  
-                         +---> (Qwen 3.5 9B)        |  
-                         |        | (Success)                                    |  
-                         |        v                                              |  
-                         |                                |  
-                         |        | (Schema Failure)                             |  
-                         |        v                                              v  
-                         +---------------------------------------------> (Claude Opus 4.7)   
-                                                                                 |  
-                                                                                 v  
-                                                                       
-                                                                                 | (Semantic Failure)  
-                                                                                 v  
-                                                                     
++----------------------------------------------------------------------------------------+
+|                            MODEL PORTFOLIO AND ROUTING MAP                             |
++----------------------------------------------------------------------------------------+
+|                                                                                        |
+|  [ Incoming Request ]                                                                  |
+|          |                                                                             |
+|          v                                                                             |
+|  +----------------------------------------------------------------------------------+  |
+|  |                       Pre-Generation Diagnostic Router                           |  |
+|  |                                                                                  |  |
+|  |  Classifies: task type, difficulty, risk, modality, schema needs, latency, cost  |  |
+|  +----------------------+----------------------+----------------------+-------------+  |
+|                         |                      |                      |                |
+|                         |                      |                      |                |
+|                         v                      v                      v                |
+|            [ Simple / Low-Risk ]     [ Complex / High-Risk ]     [ Specialized Need ]  |
+|                         |                      |                      |                |
+|                         v                      v                      v                |
+|            +-------------------+      +-------------------+      +------------------+  |
+|            | Economy Model     |      | Premium Model     |      | Specialist Model |  |
+|            | e.g. Qwen 3.5 9B  |      | e.g. Claude Opus  |      | Code / Math /    |  |
+|            | extraction, light |      | 4.7, GPT-class,   |      | Vision / Schema  |  |
+|            | classification,   |      | deep-context,     |      | / Embedding /    |  |
+|            | low-risk drafting |      | high-reliability  |      | Reranker model   |  |
+|            +---------+---------+      +---------+---------+      +---------+--------+  |
+|                      |                          |                          |           |
+|                      v                          v                          v           |
+|              +----------------+         +----------------+         +----------------+  |
+|              | Validation Gate|         | Validation Gate|         | Validation Gate|  |
+|              +-------+--------+         +-------+--------+         +-------+--------+  |
+|                      |                          |                          |           |
+|          +-----------+-----------+  +-----------+-----------+  +-----------+--------+  |
+|          |                       |  |                       |  |                    |  |
+|          v                       v  v                       v  v                    v  |
+|     [ Success ]          [ Schema / Confidence / Semantic Failure ]          [Success] |
+|          |                       |                                                  |  |
+|          |                       v                                                  |  |
+|          |            +-----------------------+                                     |  |
+|          |            | Escalation Controller |                                     |  |
+|          |            +----------+------------+                                     |  |
+|          |                       |                                                  |  |
+|          |                       v                                                  |  |
+|          |              [ Premium Retry ]                                           |  |
+|          |                       |                                                  |  |
+|          |                       v                                                  |  |
+|          |              +----------------+                                          |  |
+|          |              | Validation Gate|                                          |  |
+|          |              +-------+--------+                                          |  |
+|          |                      |                                                   |  |
+|          |          +-----------+-----------+                                       |  |
+|          |          |                       |                                       |  |
+|          v          v                       v                                       v  |
+|  +-------------------------+       +-------------------------+         +-------------+ |
+|  | Return Valid Response   |       | Human Review / Fail-    |         | Return Valid| |
+|  | with telemetry trace    |       | Closed Recovery Path    |         | Response    | |
+|  +-------------------------+       +-------------------------+         +-------------+ |
+|                                                                                        |
++----------------------------------------------------------------------------------------+
+| Routing doctrine: route before generation when possible; cascade only when cheap       |
+| execution is likely to succeed. Escalation is economical only when failure rates stay  |
+| below the premium-direct cost threshold.                                               |
++----------------------------------------------------------------------------------------+
 ```
 
 ### **Cascade Optimization and Routing Economics**

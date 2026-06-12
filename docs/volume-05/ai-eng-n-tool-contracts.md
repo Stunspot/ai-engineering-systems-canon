@@ -3,9 +3,13 @@
 ## **Architectural Foundations: Probabilistic Proposals and Deterministic Edges**
 
 In the engineering of production-grade agentic AI systems, a critical transition occurs at the boundary where generative models interface with the surrounding runtime environment. Generative language models are inherently probabilistic engines that operate on statistical token distributions. Because their outputs are non-deterministic, treating them as direct execution actors with unmediated access to databases, file systems, network sockets, or external transactional APIs introduces unacceptable systemic risks.1 This report establishes the architectural and engineering doctrine of tool contract engineering:  
-**Probabilistic actors need deterministic edges. A model may propose an action, but the system must validate, constrain, serialize, authorize, execute, and record that action through explicit contracts before anything touches real state.**  
+
+> **Probabilistic actors need deterministic edges. A model may propose an action, but the system must validate, constrain, serialize, authorize, execute, and record that action through explicit contracts before anything touches real state.**  
+
 This core principle organizes the design of the execution boundary. The foundational question in systems design is not "Can the model call tools?" but "What exact operation is being proposed, what arguments are valid, what permissions apply, what side effects may occur, what confirmation is required, what happens on retry, what transaction boundary governs execution, and what structured observation returns to the agent loop?"  
+
 Architecturally, tool integration must not be treated as a simple model capability toggle or an inference-time prompt formatting detail. Instead, it must be governed as a highly structured, bidirectional interface discipline.2 While primitive function-calling APIs simply shape model output into JSON payloads, they fail to provide the safety, isolation, authentication, idempotency, or consistency guarantees required by enterprise software.4 The model generates a proposed action; the system must intercept, parse, validate, authorize, execute, and record that proposal inside a deterministic wrapper.2  
+
 This boundary is bidirectional: inputs require strict schemas, semantic validation, credential injection, and transaction isolation, while outputs require structured status, typed results, and normalized observation parameters to prevent models from processing raw, unparsed system exceptions or ambiguous natural language.2
 
 ## **Canon Placement and Continuity**
@@ -56,13 +60,13 @@ AI-ENG-N inherits critical principles from earlier canon modules:
 
 A mature tool contract is a declarative schema. It defines not just how to call a tool, but the entire operational, security, resource, and transactional posture of the interaction.4
 
-JSON  
+```JSON  
 {  
   "$schema": "https://json-schema.org/draft/2020-12/schema",  
   "id": "https://canon.ai-eng.org/v5/tool-contract.schema.json",  
   "title": "ToolContract",  
   "type": "object",  
-  "required": \[  
+  "required": [  
     "identity",  
     "affordance",  
     "runtime",  
@@ -70,127 +74,129 @@ JSON
     "transactional",  
     "idempotency",  
     "observability"  
-  \],  
+  ],  
   "additionalProperties": false,  
   "properties": {  
     "identity": {  
       "type": "object",  
-      "required": \["name", "version", "owner", "deprecation"\],  
+      "required": ["name", "version", "owner", "deprecation"],  
       "additionalProperties": false,  
       "properties": {  
         "name": {   
           "type": "string",   
-          "pattern": "^\[a-zA-Z0-9\_.-\]{1,128}$"   
+          "pattern": "^[a-zA-Z0-9_.-]{1,128}$"   
         },  
         "version": { "type": "string" },  
         "owner": { "type": "string" },  
         "deprecation": {  
           "type": "object",  
-          "required": \["status", "sunset\_date"\],  
+          "required": ["status", "sunset_date"],  
           "additionalProperties": false,  
           "properties": {  
-            "status": { "type": "string", "enum": \["active", "deprecated", "sunsetted"\] },  
-            "sunset\_date": { "type": \["string", "null"\], "format": "date" }  
+            "status": { "type": "string", "enum": ["active", "deprecated", "sunsetted"] },  
+            "sunset_date": { "type": ["string", "null"], "format": "date" }  
           }  
         }  
       }  
     },  
     "affordance": {  
       "type": "object",  
-      "required": \["model\_description", "allowed\_use\_cases", "forbidden\_use\_cases", "input\_schema", "output\_schema"\],  
+      "required": ["model_description", "allowed_use_cases", "forbidden_use_cases", "input_schema", "output_schema"],  
       "additionalProperties": false,  
       "properties": {  
-        "model\_description": { "type": "string" },  
-        "allowed\_use\_cases": { "type": "array", "items": { "type": "string" } },  
-        "forbidden\_use\_cases": { "type": "array", "items": { "type": "string" } },  
-        "input\_schema": { "type": "object" },  
-        "output\_schema": { "type": "object" }  
+        "model_description": { "type": "string" },  
+        "allowed_use_cases": { "type": "array", "items": { "type": "string" } },  
+        "forbidden_use_cases": { "type": "array", "items": { "type": "string" } },  
+        "input_schema": { "type": "object" },  
+        "output_schema": { "type": "object" }  
       }  
     },  
     "runtime": {  
       "type": "object",  
-      "required": \["timeout\_ms", "rate\_limits", "cost\_profile", "sandbox\_isolated"\],  
+      "required": ["timeout_ms", "rate_limits", "cost_profile", "sandbox_isolated"],  
       "additionalProperties": false,  
       "properties": {  
-        "timeout\_ms": { "type": "integer", "minimum": 1 },  
-        "rate\_limits": {  
+        "timeout_ms": { "type": "integer", "minimum": 1 },  
+        "rate_limits": {  
           "type": "object",  
-          "required": \["window\_sec", "max\_requests"\],  
+          "required": ["window_sec", "max_requests"],  
           "additionalProperties": false,  
           "properties": {  
-            "window\_sec": { "type": "integer" },  
-            "max\_requests": { "type": "integer" }  
+            "window_sec": { "type": "integer" },  
+            "max_requests": { "type": "integer" }  
           }  
         },  
-        "cost\_profile": {  
+        "cost_profile": {  
           "type": "object",  
-          "required": \["currency", "cost\_per\_call"\],  
+          "required": ["currency", "cost_per_call"],  
           "additionalProperties": false,  
           "properties": {  
             "currency": { "type": "string" },  
-            "cost\_per\_call": { "type": "number" }  
+            "cost_per_call": { "type": "number" }  
           }  
         },  
-        "sandbox\_isolated": { "type": "boolean" }  
+        "sandbox_isolated": { "type": "boolean" }  
       }  
     },  
     "security": {  
       "type": "object",  
-      "required": \["required\_scopes", "tenant\_scoped", "secrets\_boundary"\],  
+      "required": ["required_scopes", "tenant_scoped", "secrets_boundary"],  
       "additionalProperties": false,  
       "properties": {  
-        "required\_scopes": { "type": "array", "items": { "type": "string" } },  
-        "tenant\_scoped": { "type": "boolean" },  
-        "secrets\_boundary": {  
+        "required_scopes": { "type": "array", "items": { "type": "string" } },  
+        "tenant_scoped": { "type": "boolean" },  
+        "secrets_boundary": {  
           "type": "string",  
-          "enum": \["gateway\_injected", "execution\_sandbox", "none"\]  
+          "enum": ["gateway_injected", "execution_sandbox", "none"]  
         }  
       }  
     },  
     "transactional": {  
       "type": "object",  
-      "required": \["side\_effect\_class", "confirmation\_required", "semantics", "compensation\_tool"\],  
+      "required": ["side_effect_class", "confirmation_required", "semantics", "compensation_tool"],  
       "additionalProperties": false,  
       "properties": {  
-        "side\_effect\_class": {  
+        "side_effect_class": {  
           "type": "string",  
           "enum":  
         },  
-        "confirmation\_required": { "type": "boolean" },  
+        "confirmation_required": { "type": "boolean" },  
         "semantics": {  
           "type": "string",  
           "enum":  
         },  
-        "compensation\_tool": { "type": \["string", "null"\] }  
+        "compensation_tool": { "type": ["string", "null"] }  
       }  
     },  
     "idempotency": {  
       "type": "object",  
-      "required": \["supported", "key\_header", "ttl\_seconds"\],  
+      "required": ["supported", "key_header", "ttl_seconds"],  
       "additionalProperties": false,  
       "properties": {  
         "supported": { "type": "boolean" },  
-        "key\_header": { "type": "string" },  
-        "ttl\_seconds": { "type": "integer" }  
+        "key_header": { "type": "string" },  
+        "ttl_seconds": { "type": "integer" }  
       }  
     },  
     "observability": {  
       "type": "object",  
-      "required": \["trace\_attributes", "error\_taxonomy\_mapping"\],  
+      "required": ["trace_attributes", "error_taxonomy_mapping"],  
       "additionalProperties": false,  
       "properties": {  
-        "trace\_attributes": { "type": "array", "items": { "type": "string" } },  
-        "error\_taxonomy\_mapping": { "type": "object", "additionalProperties": { "type": "string" } }  
+        "trace_attributes": { "type": "array", "items": { "type": "string" } },  
+        "error_taxonomy_mapping": { "type": "object", "additionalProperties": { "type": "string" } }  
       }  
     }  
   }  
 }
+```
 
 ### **Model-Facing Affordances versus System-Facing Contracts**
 
 A common architectural error is using the same representation for two distinct targets: the generative model and the execution system.
 
 * **Model-Facing Affordances:** These are designed solely to guide model behavior during tool selection and token generation.4 They are written in natural language descriptions engineered for high semantic clarity, instructing the model on *when* to choose a tool, *what* arguments are required, and the logical boundaries of those parameters.4 This is an advisory layer.  
+
 * **System-Facing Contracts:** These are rigid, programmatically enforced boundaries executed by the host application's deterministic wrapper.2 They perform physical schema checks, authorization validations, cost tracking, and transaction safety controls. The system-facing contract does not negotiate with the model; it enforces the invariants of the runtime environment to protect it from incorrect model behavior.
 
 ### **Tool Versioning and Behavior Drift**
@@ -206,9 +212,9 @@ To achieve predictable tool selection and argument generation, tool description 
 
 | Design Dimension | Pattern | Anti-Pattern | Operational Reason |
 | :---- | :---- | :---- | :---- |
-| **Tool Naming** | fetch\_account\_v1, charge\_invoice\_v2.4 | do\_stuff, handle\_billing, update.4 | Prevent tool selection confusion when model choices overlap.4 |
+| **Tool Naming** | fetch_account_v1, charge_invoice_v2.4 | do_stuff, handle_billing, update.4 | Prevent tool selection confusion when model choices overlap.4 |
 | **Tool Descriptions** | "EXECUTE ONLY to permanently void an invoice. Requester MUST have verified billing access.".4 | "Voids invoices or updates metadata on client files." | Narrow the model's action space by defining strict preconditions.4 |
-| **Parameter Mapping** | "invoice\_id": "The UUID of the invoice to void, matching 'inv\_.\*'." | "id": "The identifier." | Guide the model to extract and map exact parameters from context.14 |
+| **Parameter Mapping** | "invoice_id": "The UUID of the invoice to void, matching 'inv_.*'." | "id": "The identifier." | Guide the model to extract and map exact parameters from context.14 |
 | **Enum Boundary Definition** | "reason":.14 | "reason": "Why the invoice was voided (free text)." | Eliminate free-text generation at the boundary of a system transaction.14 |
 
 ### **Schema Design Guide for Model-Callable Tools**
@@ -216,7 +222,7 @@ To achieve predictable tool selection and argument generation, tool description 
 To achieve high schema adherence, schemas must be designed as strict behavioral control surfaces.14 When using strict schema parsing (such as OpenAI's Structured Outputs with strict: true or equivalent frameworks), several key constraints must be built directly into the schema 15:
 
 1. **Mandatory Field Declarations:** Optional keys are not supported in strict validation schemas.13 All properties listed under properties must be declared in the required array.15  
-2. **Optional Property Emulation:** To define an optional property, developers must construct a JSON Schema union type with null (e.g., "type": \["string", "null"\]), and explicitly provide null as the default value.14  
+2. **Optional Property Emulation:** To define an optional property, developers must construct a JSON Schema union type with null (e.g., "type": ["string", "null"]), and explicitly provide null as the default value.14  
 3. **Strict Object Constraints:** Every object definition must include "additionalProperties": false recursively to prevent the model from injecting parameters outside the schema.15  
 4. **Schema Keyword Limitations:** Specific JSON Schema constraints, such as minLength, maxLength, pattern, format, minimum, and maximum are completely unsupported under strict parsing modes in certain primary provider SDKs.15 Consequently, physical range validations must be managed by the application validation layer rather than relying on logit-level restrictions during inference.23
 
@@ -226,73 +232,75 @@ To achieve high schema adherence, schemas must be designed as strict behavioral 
 
 Before a model's proposed tool invocation is sent to the execution engine, it must pass through a multi-stage validation pipeline.4
 
+```
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 1\. Syntactic Parse Gate     │ ──► \[Failure\] ──► Emit SYNTACTIC\_PARSE\_FAIL  
+│ 1. Syntactic Parse Gate     │ ──► [Failure] ──► Emit SYNTACTIC_PARSE_FAIL  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 2\. Structural Schema Gate   │ ──► \[Failure\] ──► Emit STRUCTURAL\_VIOLATION  
+│ 2. Structural Schema Gate   │ ──► [Failure] ──► Emit STRUCTURAL_VIOLATION  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 3\. Type Checking Gate       │ ──► \[Failure\] ──► Emit TYPE\_MISMATCH  
+│ 3. Type Checking Gate       │ ──► [Failure] ──► Emit TYPE_MISMATCH  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 4\. Range Validation Gate    │ ──► \[Failure\] ──► Emit OUT\_OF\_BOUNDS  
+│ 4. Range Validation Gate    │ ──► [Failure] ──► Emit OUT_OF_BOUNDS  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 5\. Semantic Logic Gate      │ ──► \[Failure\] ──► Emit SEMANTIC\_INVALIDITY  
+│ 5. Semantic Logic Gate      │ ──► [Failure] ──► Emit SEMANTIC_INVALIDITY  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 6\. IAM Scope Check Gate     │ ──► \[Failure\] ──► Emit PERMISSION\_DENIED  
+│ 6. IAM Scope Check Gate     │ ──► [Failure] ──► Emit PERMISSION_DENIED  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 7\. Policy Compliance Gate   │ ──► \[Failure\] ──► Emit POLICY\_VIOLATION  
+│ 7. Policy Compliance Gate   │ ──► [Failure] ──► Emit POLICY_VIOLATION  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 8\. State Consistency Gate   │ ──► \[Failure\] ──► Emit STALE\_STATE  
+│ 8. State Consistency Gate   │ ──► [Failure] ──► Emit STALE_STATE  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 9\. Confirmation Logic Gate  │ ──► \[Pending\] ──► Emit CONFIRMATION\_MISSING  
+│ 9. Confirmation Logic Gate  │ ──► [Pending] ──► Emit CONFIRMATION_MISSING  
 └─────────────────────────────┘  
                │  
                ▼  
 ┌─────────────────────────────┐  
-│ 10\. Loop Budget Gate        │ ──► \[Failure\] ──► Emit BUDGET\_EXHAUSTED  
+│ 10. Loop Budget Gate        │ ──► [Failure] ──► Emit BUDGET_EXHAUSTED  
 └─────────────────────────────┘  
                │  
                ▼
+```
 
 The table below defines the operation, error output, and error response strategy for each validation stage:
 
 | Pipeline Gate | Execution Activity | Target Exception | Recovery Strategy |
 | :---- | :---- | :---- | :---- |
-| **Syntactic** | Parse raw generated text into structured JSON; catch format errors.4 | SYNTACTIC\_PARSE\_FAIL | Reject execution. Route raw error details to the model's repair loop.7 |
-| **Structural** | Match parsed JSON against the JSON Schema schema; check for unexpected parameters.4 | STRUCTURAL\_VIOLATION | Fail request. Prompt the model with missing or extra properties.7 |
-| **Type** | Validate parameter types (e.g., ensure strings are not integers and booleans are not text strings).4 | TYPE\_MISMATCH | Reject execution. Provide explicit type requirements to the model.7 |
-| **Range** | Enforce numerical boundaries, array item counts, and string lengths.4 | OUT\_OF\_BOUNDS | Fail request. Enforce range parameters and prompt model for corrective values.7 |
-| **Semantic** | Evaluate cross-field logic (e.g., ensure transaction amount is positive, or start date precedes end date).14 | SEMANTIC\_INVALIDITY | Reject request. Map the business logic violation and instruct the agent.7 |
-| **Permission** | Verify active IAM scopes, tenant bounds, and user session permissions for the tool.2 | PERMISSION\_DENIED | Halt execution. Escalate to system logs, log security events, and notify user.2 |
-| **Policy** | Validate corporate risk metrics, compliance rules, and security boundaries.3 | POLICY\_VIOLATION | Terminate loop. Log policy failure to security dashboards.2 |
-| **State** | Verify the target resource exists, is unlocked, and is in a valid state for update.17 | STALE\_STATE | Return the actual database state of the object, prompting the agent to recheck intent.17 |
-| **Confirmation** | Check if risk profile mandates human review; verify active approval token.2 | CONFIRMATION\_MISSING | Pause loop execution. Yield control to user interface, emitting a confirmation card.4 |
-| **Budget** | Monitor session token consumption, clock limits, and total monetary budgets.8 | BUDGET\_EXHAUSTED | Terminate the run trace immediately, escalating to platform operations.8 |
+| **Syntactic** | Parse raw generated text into structured JSON; catch format errors.4 | SYNTACTIC_PARSE_FAIL | Reject execution. Route raw error details to the model's repair loop.7 |
+| **Structural** | Match parsed JSON against the JSON Schema schema; check for unexpected parameters.4 | STRUCTURAL_VIOLATION | Fail request. Prompt the model with missing or extra properties.7 |
+| **Type** | Validate parameter types (e.g., ensure strings are not integers and booleans are not text strings).4 | TYPE_MISMATCH | Reject execution. Provide explicit type requirements to the model.7 |
+| **Range** | Enforce numerical boundaries, array item counts, and string lengths.4 | OUT_OF_BOUNDS | Fail request. Enforce range parameters and prompt model for corrective values.7 |
+| **Semantic** | Evaluate cross-field logic (e.g., ensure transaction amount is positive, or start date precedes end date).14 | SEMANTIC_INVALIDITY | Reject request. Map the business logic violation and instruct the agent.7 |
+| **Permission** | Verify active IAM scopes, tenant bounds, and user session permissions for the tool.2 | PERMISSION_DENIED | Halt execution. Escalate to system logs, log security events, and notify user.2 |
+| **Policy** | Validate corporate risk metrics, compliance rules, and security boundaries.3 | POLICY_VIOLATION | Terminate loop. Log policy failure to security dashboards.2 |
+| **State** | Verify the target resource exists, is unlocked, and is in a valid state for update.17 | STALE_STATE | Return the actual database state of the object, prompting the agent to recheck intent.17 |
+| **Confirmation** | Check if risk profile mandates human review; verify active approval token.2 | CONFIRMATION_MISSING | Pause loop execution. Yield control to user interface, emitting a confirmation card.4 |
+| **Budget** | Monitor session token consumption, clock limits, and total monetary budgets.8 | BUDGET_EXHAUSTED | Terminate the run trace immediately, escalating to platform operations.8 |
 
 ## **Deterministic Wrapper Architecture**
 
@@ -300,40 +308,42 @@ The table below defines the operation, error output, and error response strategy
 
 The deterministic wrapper acts as the secure boundary layer protecting internal environments from raw, model-driven tool execution requests.2 It intercepts the model's proposed action, parses it, validates it, injects credentials outside the model's view, manages state, and returns a structured observation object.2
 
-                \[ Probabilistic Model Loop \]  
+```
+                [ Probabilistic Model Loop ]  
                              │  
                              ▼ (Proposes Tool Call)  
 ┌────────────────────────────────────────────────────────────┐  
 │                  DETERMINISTIC WRAPPER                     │  
 ├────────────────────────────────────────────────────────────┤  
-│ 1\. Parser: Converts raw generated token text to JSON    │  
+│ 1. Parser: Converts raw generated token text to JSON    │  
 ├────────────────────────────────────────────────────────────┤  
-│ 2\. Schema & Semantic Validator: Checks types & bounds  │  
+│ 2. Schema & Semantic Validator: Checks types & bounds  │  
 ├────────────────────────────────────────────────────────────┤  
-│ 3\. IAM Checker: Validates OAuth scopes & tokens \[27\]       │  
+│ 3. IAM Checker: Validates OAuth scopes & tokens [27]       │  
 ├────────────────────────────────────────────────────────────┤  
-│ 4\. Policy Interceptor: Enforces compliance & limits    │  
+│ 4. Policy Interceptor: Enforces compliance & limits    │  
 ├────────────────────────────────────────────────────────────┤  
-│ 5\. Confirmation Gate: Pauses for operator review        │  
+│ 5. Confirmation Gate: Pauses for operator review        │  
 ├────────────────────────────────────────────────────────────┤  
-│ 6\. Idempotency Mgr: Deduplicates repeating requests     │  
+│ 6. Idempotency Mgr: Deduplicates repeating requests     │  
 ├────────────────────────────────────────────────────────────┤  
-│ 7\. Transaction Mgr: Starts transaction or saga         │  
+│ 7. Transaction Mgr: Starts transaction or saga         │  
 ├────────────────────────────────────────────────────────────┤  
-│ 8\. Executor: Runs isolated code in sandbox           │  
+│ 8. Executor: Runs isolated code in sandbox           │  
 ├────────────────────────────────────────────────────────────┤  
-│ 9\. Output Normalizer: Normalizes observation JSON       │  
+│ 9. Output Normalizer: Normalizes observation JSON       │  
 ├────────────────────────────────────────────────────────────┤  
-│ 10\. Trace Logger: Emits OpenTelemetry span telemetry   │  
+│ 10. Trace Logger: Emits OpenTelemetry span telemetry   │  
 └────────────────────────────────────────────────────────────┘  
                              │  
                              ▼ (Emits Structured Payload)  
-                \[ Normalized Observation \]
+                [ Normalized Observation ]
+```
 
 ### **Credentials and Token Isolation**
 
 Under no circumstances should raw secrets, API keys, OAuth tokens, database passwords, or private certificates be loaded directly into model context windows or defined in tool argument parameters.2 This is a critical security vulnerability.  
-The model should only generate symbolic arguments, such as account\_id or workspace\_id.2 The deterministic wrapper intercepts these symbolic values, retrieves the corresponding credentials from a secure secrets vault, and injects those credentials during the execution phase, keeping sensitive tokens entirely hidden from the model's view.2
+The model should only generate symbolic arguments, such as account_id or workspace_id.2 The deterministic wrapper intercepts these symbolic values, retrieves the corresponding credentials from a secure secrets vault, and injects those credentials during the execution phase, keeping sensitive tokens entirely hidden from the model's view.2
 
 ## **Side-Effect Classification and Control**
 
@@ -343,12 +353,12 @@ Tools must be cataloged based on their risk profile and the difficulty of revers
 
 | Side-Effect Class | Definition | Target System Gates | Idempotency Posture | Confirmation Policy |
 | :---- | :---- | :---- | :---- | :---- |
-| **READ\_ONLY** | Retrieves data, performs calculations, or queries databases without modifying state.17 | Syntactic, Structural, Type, Range, Permission, State, Budget. | Exempt (assumed safe to retry by default).17 | No confirmation required. |
-| **EPHEMERAL\_WRITE** | Modifies temporary workspace objects, such as writing to scratch directory or code sandbox memory.2 | Syntactic, Structural, Type, Range, Permission, Budget. | Highly Recommended on state-mutating steps.18 | No confirmation required. |
-| **LOW\_RISK\_INTERNAL** | Updates non-customer-visible database records, such as modifying internal ticket tags.17 | Syntactic, Structural, Type, Range, Permission, State, Budget. | Mandatory (low-latency key tracking).17 | No confirmation required. |
-| **MEDIUM\_RISK\_WRITE** | Modifies operational database state, such as creating ticket drafts or internal comments.4 | All gates except full compliance checks. | Mandatory (24-hour persistent key).18 | Optional (managed by orchestrator rules).25 |
-| **HIGH\_RISK\_EXTERNAL** | Sends emails, alters client profile data, or schedules system calendar updates.18 | All gates including user permission checks.6 | Strictly Mandatory (durable relational persistence).17 | Mandatory user confirmation required.2 |
-| **CRITICAL\_MUTATION** | Executes financial transfers, modifies access controls, or deploys codebase updates.3 | All gates including dual-control and compliance reviews.2 | Strictly Mandatory (distributed saga tracking).10 | Mandatory multi-party or operator gate.2 |
+| **READ_ONLY** | Retrieves data, performs calculations, or queries databases without modifying state.17 | Syntactic, Structural, Type, Range, Permission, State, Budget. | Exempt (assumed safe to retry by default).17 | No confirmation required. |
+| **EPHEMERAL_WRITE** | Modifies temporary workspace objects, such as writing to scratch directory or code sandbox memory.2 | Syntactic, Structural, Type, Range, Permission, Budget. | Highly Recommended on state-mutating steps.18 | No confirmation required. |
+| **LOW_RISK_INTERNAL** | Updates non-customer-visible database records, such as modifying internal ticket tags.17 | Syntactic, Structural, Type, Range, Permission, State, Budget. | Mandatory (low-latency key tracking).17 | No confirmation required. |
+| **MEDIUM_RISK_WRITE** | Modifies operational database state, such as creating ticket drafts or internal comments.4 | All gates except full compliance checks. | Mandatory (24-hour persistent key).18 | Optional (managed by orchestrator rules).25 |
+| **HIGH_RISK_EXTERNAL** | Sends emails, alters client profile data, or schedules system calendar updates.18 | All gates including user permission checks.6 | Strictly Mandatory (durable relational persistence).17 | Mandatory user confirmation required.2 |
+| **CRITICAL_MUTATION** | Executes financial transfers, modifies access controls, or deploys codebase updates.3 | All gates including dual-control and compliance reviews.2 | Strictly Mandatory (distributed saga tracking).10 | Mandatory multi-party or operator gate.2 |
 
 ### **Side-Effect and Loop Budgets**
 
@@ -361,7 +371,7 @@ The system must track token-consumption rates, clock time, tool invocation count
 
 Because at-least-once delivery is the only mathematically viable model over unreliable network transports, engineering for idempotency is a non-negotiable requirement for all side-effecting operations.17  
 An idempotency key must be unique, stable across retries, and bound strictly to the logical scope of the operation.9 Keys must be generated deterministically on the client or wrapper side using the SHA-256 hash of the parameters and the logical coordinates of the task:  
-Key \= SHA-256(Workflow ID |  
+Key = SHA-256(Workflow ID |  
 | Tenant ID |  
 | User ID |  
 | Payload Hash)  
@@ -372,106 +382,107 @@ This formulation prevents key-reuse exploits and accidental collisions.9
 A common systemic failure is the Time-of-Check to Time-of-Use (TOCTOU) vulnerability.17 Using high-performance distributed key-value caches like Redis for idempotency checks (e.g., executing a SETNX lock, performing the payment API call, and then writing the result) introduces a race condition.17 Two concurrent retries can both check the cache, see that the key does not exist, and proceed to execute the payment twice.17  
 The only safe implementation for critical mutation workflows is to co-locate the idempotency record and the business transaction in the same relational database transaction.17 The unique database constraint on the idempotency key column serves as the atomic locking mechanism 9:
 
-SQL  
-\-- Production Idempotency Table Schema  
-CREATE TABLE idempotency\_keys (  
-    tenant\_id BIGINT NOT NULL,  
-    idempotency\_key TEXT NOT NULL,  
-    request\_hash BYTEA NOT NULL,  
+```SQL  
+-- Production Idempotency Table Schema  
+CREATE TABLE idempotency_keys (  
+    tenant_id BIGINT NOT NULL,  
+    idempotency_key TEXT NOT NULL,  
+    request_hash BYTEA NOT NULL,  
     status TEXT NOT NULL CHECK (status IN ('PENDING', 'COMPLETED', 'FAILED')),  
-    response\_status INTEGER,  
-    response\_body JSONB,  
-    created\_at TIMESTAMPTZ NOT NULL DEFAULT now(),  
-    completed\_at TIMESTAMPTZ,  
-    expires\_at TIMESTAMPTZ NOT NULL,  
-    PRIMARY KEY (tenant\_id, idempotency\_key)  
+    response_status INTEGER,  
+    response_body JSONB,  
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),  
+    completed_at TIMESTAMPTZ,  
+    expires_at TIMESTAMPTZ NOT NULL,  
+    PRIMARY KEY (tenant_id, idempotency_key)  
 );
 
-CREATE INDEX idempotency\_expires\_idx ON idempotency\_keys (expires\_at)   
+CREATE INDEX idempotency_expires_idx ON idempotency_keys (expires_at)   
 WHERE status IN ('PENDING', 'COMPLETED');
 
 Go  
 // Example of Relational Co-location of State and Intent  
-func ExecuteIdempotentAction(ctx context.Context, db \*sql.DB, tenantID int64, key string, hashbyte, action func() (int,byte, error)) (int,byte, error) {  
+func ExecuteIdempotentAction(ctx context.Context, db *sql.DB, tenantID int64, key string, hashbyte, action func() (int,byte, error)) (int,byte, error) {  
     tx, err := db.BeginTx(ctx, nil)  
-    if err\!= nil {  
+    if err!= nil {  
         return 0, nil, err  
     }  
     defer tx.Rollback()
 
-    // 1\. Attempt to claim the key atomically  
+    // 1. Attempt to claim the key atomically  
     var status string  
     var cachedStatus int  
     var cachedBodybyte  
     var storedHashbyte  
       
-    err \= tx.QueryRowContext(ctx,   
-        \`SELECT status, response\_status, response\_body, request\_hash   
-         FROM idempotency\_keys WHERE tenant\_id \= $1 AND idempotency\_key \= $2 FOR UPDATE\`,   
-        tenantID, key).Scan(\&status, \&cachedStatus, \&cachedBody, \&storedHash)
+    err = tx.QueryRowContext(ctx,   
+        `SELECT status, response_status, response_body, request_hash   
+         FROM idempotency_keys WHERE tenant_id = $1 AND idempotency_key = $2 FOR UPDATE`,   
+        tenantID, key).Scan(&status, &cachedStatus, &cachedBody, &storedHash)
 
-    if err \== nil {  
+    if err == nil {  
         // Key exists: handle duplicate request  
-        if\!bytes.Equal(storedHash, hash) {  
-            return 422, nil, fmt.Errorf("REQUEST\_SIGNATURE\_MISMATCH")  
+        if!bytes.Equal(storedHash, hash) {  
+            return 422, nil, fmt.Errorf("REQUEST_SIGNATURE_MISMATCH")  
         }  
-        if status \== "PENDING" {  
-            return 409, nil, fmt.Errorf("CONCURRENT\_REQUEST\_IN\_PROGRESS")  
+        if status == "PENDING" {  
+            return 409, nil, fmt.Errorf("CONCURRENT_REQUEST_IN_PROGRESS")  
         }  
         return cachedStatus, cachedBody, nil  
-    } else if err\!= sql.ErrNoRows {  
+    } else if err!= sql.ErrNoRows {  
         return 0, nil, err  
     }
 
     // Key does not exist: reserve it  
-    \_, err \= tx.ExecContext(ctx,   
-        \`INSERT INTO idempotency\_keys (tenant\_id, idempotency\_key, request\_hash, status, expires\_at)   
-         VALUES ($1, $2, $3, 'PENDING', now() \+ INTERVAL '24 hours')\`,   
+    _, err = tx.ExecContext(ctx,   
+        `INSERT INTO idempotency_keys (tenant_id, idempotency_key, request_hash, status, expires_at)   
+         VALUES ($1, $2, $3, 'PENDING', now() + INTERVAL '24 hours')`,   
         tenantID, key, hash)  
-    if err\!= nil {  
+    if err!= nil {  
         return 0, nil, err  
     }
 
-    if err := tx.Commit(); err\!= nil {  
+    if err := tx.Commit(); err!= nil {  
         return 0, nil, err  
     }
 
-    // 2\. Execute the actual side-effect outside the locking transaction  
+    // 2. Execute the actual side-effect outside the locking transaction  
     respCode, respBody, execErr := action()  
       
     txUpdate, err := db.BeginTx(ctx, nil)  
-    if err\!= nil {  
+    if err!= nil {  
         return 0, nil, err  
     }  
     defer txUpdate.Rollback()
 
-    if execErr\!= nil {  
+    if execErr!= nil {  
         // Mark as failed to allow subsequent retries  
-        \_, \_ \= txUpdate.ExecContext(ctx,   
-            \`UPDATE idempotency\_keys SET status \= 'FAILED'   
-             WHERE tenant\_id \= $1 AND idempotency\_key \= $2\`, tenantID, key)  
-        \_ \= txUpdate.Commit()  
+        _, _ = txUpdate.ExecContext(ctx,   
+            `UPDATE idempotency_keys SET status = 'FAILED'   
+             WHERE tenant_id = $1 AND idempotency_key = $2`, tenantID, key)  
+        _ = txUpdate.Commit()  
         return respCode, respBody, execErr  
     }
 
-    // 3\. Complete the reservation with the execution response  
-    \_, err \= txUpdate.ExecContext(ctx,   
-        \`UPDATE idempotency\_keys   
-         SET status \= 'COMPLETED', response\_status \= $3, response\_body \= $4, completed\_at \= now()   
-         WHERE tenant\_id \= $1 AND idempotency\_key \= $2\`,   
+    // 3. Complete the reservation with the execution response  
+    _, err = txUpdate.ExecContext(ctx,   
+        `UPDATE idempotency_keys   
+         SET status = 'COMPLETED', response_status = $3, response_body = $4, completed_at = now()   
+         WHERE tenant_id = $1 AND idempotency_key = $2`,   
         tenantID, key, respCode, respBody)  
-    if err\!= nil {  
+    if err!= nil {  
         return 0, nil, err  
     }
 
     return respCode, respBody, txUpdate.Commit()  
 }
+```
 
 ### **Distinguishing Retries from Repair Loops**
 
 * **Retry Dynamics:** Retries address transient, environmental failures (e.g., 503 Server Error, network timeouts).4 The request remains unchanged, and the execution wrapper retries using exponential backoff with random jitter 19:
 
-wait\_time \= base\_time \* 2^n \+/- jitter
+wait_time = base_time * 2^n +/- jitter
 
 * **Repair Loops:** Repair loops address semantic or structural failures where the model's payload is invalid.7 The client does not repeat the request. Instead, the validation error is formatted and returned to the model.7 The model corrects the parameters, creates a new execution proposal, and submits it to the validation pipeline.7
 
@@ -513,20 +524,21 @@ Confirmation gates must map directly to the risk level of the tool's side effect
 
 ### **Anti-Patterns: Consent Theater versus Payload Inspection**
 
-Many agentic systems suffer from "consent theater," where the user is presented with a generic, uninformative prompt such as: *"The agent wishes to run tool charge\_card. Do you want to proceed?"* This fails to provide meaningful security.4  
+Many agentic systems suffer from "consent theater," where the user is presented with a generic, uninformative prompt such as: *"The agent wishes to run tool charge_card. Do you want to proceed?"* This fails to provide meaningful security.4  
 A secure confirmation gate must present the **concrete payload** and the **expected consequences** of the execution.2 It must show the exact parameters (such as the target account, amount, and fee) and highlight any potential anomalies (e.g., if the recipient address has changed).2
 
+```
 ┌──────────────────────────────────────────────────────────┐  
 │              CONFIRMATION REQUEST REQUIRED               │  
 ├──────────────────────────────────────────────────────────┤  
 │ Action: Charge Customer Card                             │  
-│ Target Account ID: cust\_9921\_beta                        │  
+│ Target Account ID: cust_9921_beta                        │  
 │ Amount: $4,999.00 USD                                    │  
 │ Idempotency Fingerprint: f2a8...3b1a                     │  
 │ Target Gateway: Stripe Production                        │  
 │                                                          │  
-│           │  
 └──────────────────────────────────────────────────────────┘
+```
 
 ## **Output Contracts and Observation Quality**
 
@@ -534,57 +546,57 @@ A secure confirmation gate must present the **concrete payload** and the **expec
 
 To ensure the agent receives reliable data, the output returned by the execution wrapper must match a normalized contract.4 Tool executions must never return unstructured, raw logs or database exception traces directly to the model context.2
 
-JSON  
+```JSON  
 {  
   "$schema": "https://json-schema.org/draft/2020-12/schema",  
   "id": "https://canon.ai-eng.org/v5/observation.schema.json",  
   "title": "ObservationObject",  
   "type": "object",  
-  "required": \[  
-    "tool\_identity",  
-    "execution\_metadata",  
+  "required": [  
+    "tool_identity",  
+    "execution_metadata",  
     "status",  
-    "result\_payload"  
-  \],  
+    "result_payload"  
+  ],  
   "additionalProperties": false,  
   "properties": {  
-    "tool\_identity": {  
+    "tool_identity": {  
       "type": "object",  
-      "required": \["name", "version", "call\_id"\],  
+      "required": ["name", "version", "call_id"],  
       "additionalProperties": false,  
       "properties": {  
         "name": { "type": "string" },  
         "version": { "type": "string" },  
-        "call\_id": { "type": "string", "format": "uuid" }  
+        "call_id": { "type": "string", "format": "uuid" }  
       }  
     },  
-    "execution\_metadata": {  
+    "execution_metadata": {  
       "type": "object",  
-      "required": \["timestamp", "latency\_ms", "idempotency\_hit", "trace\_id"\],  
+      "required": ["timestamp", "latency_ms", "idempotency_hit", "trace_id"],  
       "additionalProperties": false,  
       "properties": {  
         "timestamp": { "type": "string", "format": "date-time" },  
-        "latency\_ms": { "type": "integer" },  
-        "idempotency\_hit": { "type": "boolean" },  
-        "trace\_id": { "type": "string" }  
+        "latency_ms": { "type": "integer" },  
+        "idempotency_hit": { "type": "boolean" },  
+        "trace_id": { "type": "string" }  
       }  
     },  
     "status": {  
       "type": "object",  
-      "required": \["code", "is\_error", "taxonomy\_class"\],  
+      "required": ["code", "is_error", "taxonomy_class"],  
       "additionalProperties": false,  
       "properties": {  
         "code": { "type": "integer" },  
-        "is\_error": { "type": "boolean" },  
-        "taxonomy\_class": {   
+        "is_error": { "type": "boolean" },  
+        "taxonomy_class": {   
           "type": "string",  
           "enum":  
         }  
       }  
     },  
-    "result\_payload": {  
+    "result_payload": {  
       "type": "object",  
-      "required": \["data", "errors", "warnings", "verification\_hints"\],  
+      "required": ["data", "errors", "warnings", "verification_hints"],  
       "additionalProperties": false,  
       "properties": {  
         "data": { "type": "object" },  
@@ -592,7 +604,7 @@ JSON
           "type": "array",  
           "items": {  
             "type": "object",  
-            "required": \["field", "message", "retryable"\],  
+            "required": ["field", "message", "retryable"],  
             "additionalProperties": false,  
             "properties": {  
               "field": { "type": "string" },  
@@ -602,19 +614,20 @@ JSON
           }  
         },  
         "warnings": { "type": "array", "items": { "type": "string" } },  
-        "verification\_hints": {  
+        "verification_hints": {  
           "type": "object",  
-          "required": \["target\_state\_endpoint", "delay\_seconds"\],  
+          "required": ["target_state_endpoint", "delay_seconds"],  
           "additionalProperties": false,  
           "properties": {  
-            "target\_state\_endpoint": { "type": \["string", "null"\] },  
-            "delay\_seconds": { "type": "integer" }  
+            "target_state_endpoint": { "type": ["string", "null"] },  
+            "delay_seconds": { "type": "integer" }  
           }  
         }  
       }  
     }  
   }  
 }
+```
 
 ## **Safe Execution Pattern Library**
 
@@ -632,20 +645,20 @@ When a tool execution fails, the wrapper must map the technical response to a st
 
 | Technical Error Code | Systemic Definition | Is Retryable? | Standard System Response Vector |
 | :---- | :---- | :---- | :---- |
-| SYNTACTIC\_PARSE\_FAIL | The model's generated output could not be parsed as valid JSON.4 | Yes (via repair) | Forward parsing details to the model's repair loop.7 |
-| STRUCTURAL\_VIOLATION | The parsed JSON fails to adhere to the input schema.4 | Yes (via repair) | Return the schema requirements to the repair loop.7 |
-| TYPE\_MISMATCH | A parameter's type differs from the schema definition.4 | Yes (via repair) | Map types and prompt the repair engine.7 |
-| OUT\_OF\_BOUNDS | A parameter falls outside allowed numeric or range limits.4 | Yes (via repair) | Specify range boundaries and prompt repair.7 |
-| SEMANTIC\_INVALIDITY | The parameters violate application business rules.14 | No | Halt execution. Prompt agent to recheck inputs.14 |
-| PERMISSION\_DENIED | The user, tenant, or agent lacks the required authorization scopes.6 | No | Terminate transaction. Route trace to security logs.2 |
-| POLICY\_VIOLATION | The requested action violates system safety or compliance guidelines.3 | No | Halt execution. Trigger alert to compliance team.25 |
-| STALE\_STATE | The target resource state has changed since the action was proposed.17 | Yes (on refresh) | Update context with the new state; prompt model to re-evaluate.17 |
-| CONFIRMATION\_MISSING | The tool requires explicit approval, but no valid token was found.2 | No | Pause loop execution. Emit a card to the operator.4 |
-| BUDGET\_EXHAUSTED | The session cost, latency, or token limit has been exceeded.8 | No | Terminate the run trace and notify operations.8 |
-| RATE\_LIMITED | The tool endpoint has hit its execution limits.4 | Yes | Back off and retry using jittered intervals.4 |
+| SYNTACTIC_PARSE_FAIL | The model's generated output could not be parsed as valid JSON.4 | Yes (via repair) | Forward parsing details to the model's repair loop.7 |
+| STRUCTURAL_VIOLATION | The parsed JSON fails to adhere to the input schema.4 | Yes (via repair) | Return the schema requirements to the repair loop.7 |
+| TYPE_MISMATCH | A parameter's type differs from the schema definition.4 | Yes (via repair) | Map types and prompt the repair engine.7 |
+| OUT_OF_BOUNDS | A parameter falls outside allowed numeric or range limits.4 | Yes (via repair) | Specify range boundaries and prompt repair.7 |
+| SEMANTIC_INVALIDITY | The parameters violate application business rules.14 | No | Halt execution. Prompt agent to recheck inputs.14 |
+| PERMISSION_DENIED | The user, tenant, or agent lacks the required authorization scopes.6 | No | Terminate transaction. Route trace to security logs.2 |
+| POLICY_VIOLATION | The requested action violates system safety or compliance guidelines.3 | No | Halt execution. Trigger alert to compliance team.25 |
+| STALE_STATE | The target resource state has changed since the action was proposed.17 | Yes (on refresh) | Update context with the new state; prompt model to re-evaluate.17 |
+| CONFIRMATION_MISSING | The tool requires explicit approval, but no valid token was found.2 | No | Pause loop execution. Emit a card to the operator.4 |
+| BUDGET_EXHAUSTED | The session cost, latency, or token limit has been exceeded.8 | No | Terminate the run trace and notify operations.8 |
+| RATE_LIMITED | The tool endpoint has hit its execution limits.4 | Yes | Back off and retry using jittered intervals.4 |
 | TIMEOUT | The tool execution failed to complete within the timeout window.4 | Yes | Apply retry logic or escalate if failures persist.4 |
-| IDEMPOTENCY\_CONFLICT | An execution attempt with this key is currently in progress.17 | Yes (later) | Return 409 Conflict with a suggested retry delay.17 |
-| SIGNATURE\_MISMATCH | A duplicate key was received, but the payload hash does not match.9 | No | Reject the request immediately to prevent payload tampering.17 |
+| IDEMPOTENCY_CONFLICT | An execution attempt with this key is currently in progress.17 | Yes (later) | Return 409 Conflict with a suggested retry delay.17 |
+| SIGNATURE_MISMATCH | A duplicate key was received, but the payload hash does not match.9 | No | Reject the request immediately to prevent payload tampering.17 |
 
 ## **Tool Contract Failure Mode Map**
 
@@ -670,28 +683,28 @@ To run reliable agentic systems, SRE teams must track specific operational metri
 
 * **Schema-Valid Call Rate (SVCR):** The ratio of tool execution proposals that successfully pass structural JSON schema checks on the first attempt:
 
-SVCR \= Successful Structural Checks / Total Tool Call Proposals
+SVCR = Successful Structural Checks / Total Tool Call Proposals
 
 * **Validation Failure Rate (VFR):** The frequency of semantic, permission, and state validation checks that fail before execution:
 
-VFR \= Rejected Execution Attempts / Total Tool Call Proposals
+VFR = Rejected Execution Attempts / Total Tool Call Proposals
 
 * **Repair Success Rate (RSR):** The percentage of validation failures that are successfully corrected by the model's repair loop within the allocated budget:
 
-RSR \= Successfully Repaired Calls / Total Triggered Repair Loops
+RSR = Successfully Repaired Calls / Total Triggered Repair Loops
 
 * **Idempotency Key Collision Rate (IKCR):** The rate of duplicate request attempts blocked or replayed by the idempotency layer:
 
-IKCR \= Idempotency Key Matches / Total Mutating Requests
+IKCR = Idempotency Key Matches / Total Mutating Requests
 
 ### **OpenTelemetry and Context Propagation**
 
 System operators must integrate tool execution spans with distributed tracing standards.28 Every tool call must generate a tracing span conforming to OpenTelemetry GenAI semantic conventions, propagating context through the Model Context Protocol (MCP) metadata layer 28:
 
-1. **Context Propagation:** Inject W3C Trace Context parameters (traceparent and tracestate) directly into the \_meta property bag of JSON-RPC requests.28  
+1. **Context Propagation:** Inject W3C Trace Context parameters (traceparent and tracestate) directly into the _meta property bag of JSON-RPC requests.28  
 2. **Span Linkage:** Ensure the outer model inference span is linked directly to the tool execution wrapper span.28  
-3. **Domain Mapping:** Set gen\_ai.operation.name to execute\_tool, and map the low-cardinality target parameter to the exact tool contract name.28  
-4. **Error Recording:** If a tool execution fails with isError: true, the span status must be marked as an error, and the error.type attribute must be set to tool\_error.4
+3. **Domain Mapping:** Set gen_ai.operation.name to execute_tool, and map the low-cardinality target parameter to the exact tool contract name.28  
+4. **Error Recording:** If a tool execution fails with isError: true, the span status must be marked as an error, and the error.type attribute must be set to tool_error.4
 
 ## **Cross-Canon Handoff Map**
 
@@ -738,42 +751,42 @@ Tool outputs must be cleaned, typed, and structured before they are returned to 
 
 #### **Works cited**
 
-1. Specification \- Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/specification/2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25)  
-2. Security Best Practices \- Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/docs/tutorials/security/security\_best\_practices](https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices)  
-3. mcp-security-best-practices-2025.md \- GitHub, accessed June 9, 2026, [https://github.com/microsoft/mcp-for-beginners/blob/main/02-Security/mcp-security-best-practices-2025.md](https://github.com/microsoft/mcp-for-beginners/blob/main/02-Security/mcp-security-best-practices-2025.md)  
-4. Tools \- Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/specification/2025-11-25/server/tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)  
+1. Specification - Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/specification/2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25)  
+2. Security Best Practices - Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices](https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices)  
+3. mcp-security-best-practices-2025.md - GitHub, accessed June 9, 2026, [https://github.com/microsoft/mcp-for-beginners/blob/main/02-Security/mcp-security-best-practices-2025.md](https://github.com/microsoft/mcp-for-beginners/blob/main/02-Security/mcp-security-best-practices-2025.md)  
+4. Tools - Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/specification/2025-11-25/server/tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools)  
 5. Structured model outputs | OpenAI API, accessed June 9, 2026, [https://developers.openai.com/api/docs/guides/structured-outputs](https://developers.openai.com/api/docs/guides/structured-outputs)  
-6. MCP Server Security Best Practices to Prevent Risk \- Descope, accessed June 9, 2026, [https://www.descope.com/blog/post/mcp-server-security-best-practices](https://www.descope.com/blog/post/mcp-server-security-best-practices)  
-7. Postmortem: How a runaway LLM loop burned through tokens for 40 minutes before I caught it : r/SaaS \- Reddit, accessed June 9, 2026, [https://www.reddit.com/r/SaaS/comments/1s5jff7/postmortem\_how\_a\_runaway\_llm\_loop\_burned\_through/](https://www.reddit.com/r/SaaS/comments/1s5jff7/postmortem_how_a_runaway_llm_loop_burned_through/)  
+6. MCP Server Security Best Practices to Prevent Risk - Descope, accessed June 9, 2026, [https://www.descope.com/blog/post/mcp-server-security-best-practices](https://www.descope.com/blog/post/mcp-server-security-best-practices)  
+7. Postmortem: How a runaway LLM loop burned through tokens for 40 minutes before I caught it : r/SaaS - Reddit, accessed June 9, 2026, [https://www.reddit.com/r/SaaS/comments/1s5jff7/postmortem_how_a_runaway_llm_loop_burned_through/](https://www.reddit.com/r/SaaS/comments/1s5jff7/postmortem_how_a_runaway_llm_loop_burned_through/)  
 8. ai-eng-m-agentic-orchestration.md  
 9. Idempotency in Distributed Systems: Design Patterns Beyond 'Retry ..., accessed June 9, 2026, [https://aloknecessary.github.io/blogs/idempotency-distributed-systems/](https://aloknecessary.github.io/blogs/idempotency-distributed-systems/)  
-10. How to Implement the Saga Pattern for Distributed Transactions \- OneUptime, accessed June 9, 2026, [https://oneuptime.com/blog/post/2026-02-20-microservices-saga-pattern/view](https://oneuptime.com/blog/post/2026-02-20-microservices-saga-pattern/view)  
-11. Saga Design Pattern \- Azure Architecture Center | Microsoft Learn, accessed June 9, 2026, [https://learn.microsoft.com/en-us/azure/architecture/patterns/saga](https://learn.microsoft.com/en-us/azure/architecture/patterns/saga)  
-12. LLM Failover & Load Balancing for Provider Outages \- Truefoundry, accessed June 9, 2026, [https://www.truefoundry.com/blog/llm-failover-load-balancing-provider-outages](https://www.truefoundry.com/blog/llm-failover-load-balancing-provider-outages)  
-13. Codex provider: output\_format schemas fail OpenAI Structured Outputs strict-mode (missing additionalProperties:false) · Issue \#1843 · coleam00/Archon \- GitHub, accessed June 9, 2026, [https://github.com/coleam00/Archon/issues/1843](https://github.com/coleam00/Archon/issues/1843)  
-14. OpenAI Structured Outputs: Complete Developer Guide \- Digital Applied, accessed June 9, 2026, [https://www.digitalapplied.com/blog/openai-structured-outputs-complete-guide](https://www.digitalapplied.com/blog/openai-structured-outputs-complete-guide)  
+10. How to Implement the Saga Pattern for Distributed Transactions - OneUptime, accessed June 9, 2026, [https://oneuptime.com/blog/post/2026-02-20-microservices-saga-pattern/view](https://oneuptime.com/blog/post/2026-02-20-microservices-saga-pattern/view)  
+11. Saga Design Pattern - Azure Architecture Center | Microsoft Learn, accessed June 9, 2026, [https://learn.microsoft.com/en-us/azure/architecture/patterns/saga](https://learn.microsoft.com/en-us/azure/architecture/patterns/saga)  
+12. LLM Failover & Load Balancing for Provider Outages - Truefoundry, accessed June 9, 2026, [https://www.truefoundry.com/blog/llm-failover-load-balancing-provider-outages](https://www.truefoundry.com/blog/llm-failover-load-balancing-provider-outages)  
+13. Codex provider: output_format schemas fail OpenAI Structured Outputs strict-mode (missing additionalProperties:false) · Issue #1843 · coleam00/Archon - GitHub, accessed June 9, 2026, [https://github.com/coleam00/Archon/issues/1843](https://github.com/coleam00/Archon/issues/1843)  
+14. OpenAI Structured Outputs: Complete Developer Guide - Digital Applied, accessed June 9, 2026, [https://www.digitalapplied.com/blog/openai-structured-outputs-complete-guide](https://www.digitalapplied.com/blog/openai-structured-outputs-complete-guide)  
 15. How to use structured outputs with Azure OpenAI in Microsoft Foundry Models, accessed June 9, 2026, [https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/structured-outputs](https://learn.microsoft.com/en-us/azure/foundry/openai/how-to/structured-outputs)  
-16. OpenAPI additionalProperties \- APIMatic, accessed June 9, 2026, [https://www.apimatic.io/openapi/additionalproperties](https://www.apimatic.io/openapi/additionalproperties)  
+16. OpenAPI additionalProperties - APIMatic, accessed June 9, 2026, [https://www.apimatic.io/openapi/additionalproperties](https://www.apimatic.io/openapi/additionalproperties)  
 17. Idempotency Patterns: Building Retry-Safe Distributed Systems ..., accessed June 9, 2026, [https://backendbytes.com/articles/idempotency-patterns-distributed-systems/](https://backendbytes.com/articles/idempotency-patterns-distributed-systems/)  
-18. Idempotency Keys: The API Pattern That Saves You From Duplicate Payments and Phantom Records \- DEV Community, accessed June 9, 2026, [https://dev.to/apikumo/idempotency-keys-the-api-pattern-that-saves-you-from-duplicate-payments-and-phantom-records-51b2](https://dev.to/apikumo/idempotency-keys-the-api-pattern-that-saves-you-from-duplicate-payments-and-phantom-records-51b2)  
-19. Designing robust and predictable APIs with idempotency \- Stripe, accessed June 9, 2026, [https://stripe.com/blog/idempotency](https://stripe.com/blog/idempotency)  
-20. Idempotent requests | Stripe API Reference, accessed June 9, 2026, [https://docs.stripe.com/api/idempotent\_requests](https://docs.stripe.com/api/idempotent_requests)  
+18. Idempotency Keys: The API Pattern That Saves You From Duplicate Payments and Phantom Records - DEV Community, accessed June 9, 2026, [https://dev.to/apikumo/idempotency-keys-the-api-pattern-that-saves-you-from-duplicate-payments-and-phantom-records-51b2](https://dev.to/apikumo/idempotency-keys-the-api-pattern-that-saves-you-from-duplicate-payments-and-phantom-records-51b2)  
+19. Designing robust and predictable APIs with idempotency - Stripe, accessed June 9, 2026, [https://stripe.com/blog/idempotency](https://stripe.com/blog/idempotency)  
+20. Idempotent requests | Stripe API Reference, accessed June 9, 2026, [https://docs.stripe.com/api/idempotent_requests](https://docs.stripe.com/api/idempotent_requests)  
 21. Idempotency in Distributed Transaction Systems | The ByteDoodle Blog, accessed June 9, 2026, [https://blog.bytedoodle.com/idempotency-in-distributed-transaction-systems/](https://blog.bytedoodle.com/idempotency-in-distributed-transaction-systems/)  
-22. Navigating OpenAI's JSON-Structured Outputs: Limitations and Solutions \- Daniel Saiz, accessed June 9, 2026, [https://dsaiztc.com/blog/posts/navigating-openai-json-structured-outputs.html](https://dsaiztc.com/blog/posts/navigating-openai-json-structured-outputs.html)  
-23. I got tired of digging through Structured Outputs docs for every provider, so I tested what JSON Schema constraints actually work : r/LLMDevs \- Reddit, accessed June 9, 2026, [https://www.reddit.com/r/LLMDevs/comments/1tarfl4/i\_got\_tired\_of\_digging\_through\_structured\_outputs/](https://www.reddit.com/r/LLMDevs/comments/1tarfl4/i_got_tired_of_digging_through_structured_outputs/)  
-24. Why structured outputs / strict JSON schema became non-negotiable in production agents : r/AI\_Agents \- Reddit, accessed June 9, 2026, [https://www.reddit.com/r/AI\_Agents/comments/1qeetme/why\_structured\_outputs\_strict\_json\_schema\_became/](https://www.reddit.com/r/AI_Agents/comments/1qeetme/why_structured_outputs_strict_json_schema_became/)  
+22. Navigating OpenAI's JSON-Structured Outputs: Limitations and Solutions - Daniel Saiz, accessed June 9, 2026, [https://dsaiztc.com/blog/posts/navigating-openai-json-structured-outputs.html](https://dsaiztc.com/blog/posts/navigating-openai-json-structured-outputs.html)  
+23. I got tired of digging through Structured Outputs docs for every provider, so I tested what JSON Schema constraints actually work : r/LLMDevs - Reddit, accessed June 9, 2026, [https://www.reddit.com/r/LLMDevs/comments/1tarfl4/i_got_tired_of_digging_through_structured_outputs/](https://www.reddit.com/r/LLMDevs/comments/1tarfl4/i_got_tired_of_digging_through_structured_outputs/)  
+24. Why structured outputs / strict JSON schema became non-negotiable in production agents : r/AI_Agents - Reddit, accessed June 9, 2026, [https://www.reddit.com/r/AI_Agents/comments/1qeetme/why_structured_outputs_strict_json_schema_became/](https://www.reddit.com/r/AI_Agents/comments/1qeetme/why_structured_outputs_strict_json_schema_became/)  
 25. MCP security: Risks, MCP server exposure, and best practices for the AI agent era, accessed June 9, 2026, [https://www.nudgesecurity.com/post/mcp-security-risks-mcp-server-exposure-and-best-practices-for-the-ai-agent-era](https://www.nudgesecurity.com/post/mcp-security-risks-mcp-server-exposure-and-best-practices-for-the-ai-agent-era)  
-26. Understanding Authorization in MCP \- Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/docs/tutorials/security/authorization](https://modelcontextprotocol.io/docs/tutorials/security/authorization)  
-27. Is that allowed? Authentication and authorization in Model Context Protocol \- Stack Overflow, accessed June 9, 2026, [https://stackoverflow.blog/2026/01/21/is-that-allowed-authentication-and-authorization-in-model-context-protocol/](https://stackoverflow.blog/2026/01/21/is-that-allowed-authentication-and-authorization-in-model-context-protocol/)  
-28. Semantic conventions for Model Context Protocol (MCP) \- OpenTelemetry, accessed June 9, 2026, [https://opentelemetry.io/docs/specs/semconv/gen-ai/mcp/](https://opentelemetry.io/docs/specs/semconv/gen-ai/mcp/)  
-29. Idempotency | System Design \- AlgoMaster.io, accessed June 9, 2026, [https://algomaster.io/learn/system-design/idempotency](https://algomaster.io/learn/system-design/idempotency)  
-30. Model Context Protocol \- MLOps Community, accessed June 9, 2026, [https://mlops.community/blog/model-context-protocol](https://mlops.community/blog/model-context-protocol)  
-31. How Consistent Are LLM Agents? Measuring Behavioral Reproducibility in Multi-Step Tool-Calling Pipelines \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2605.28840v1](https://arxiv.org/html/2605.28840v1)  
-32. The Agent That Spent $47K on Itself: An Autonomous-Loop Postmortem \- DEV Community, accessed June 9, 2026, [https://dev.to/gabrielanhaia/the-agent-that-spent-47k-on-itself-an-autonomous-loop-postmortem-3313](https://dev.to/gabrielanhaia/the-agent-that-spent-47k-on-itself-an-autonomous-loop-postmortem-3313)  
-33. Saga patterns \- AWS Prescriptive Guidance, accessed June 9, 2026, [https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga.html](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga.html)  
+26. Understanding Authorization in MCP - Model Context Protocol, accessed June 9, 2026, [https://modelcontextprotocol.io/docs/tutorials/security/authorization](https://modelcontextprotocol.io/docs/tutorials/security/authorization)  
+27. Is that allowed? Authentication and authorization in Model Context Protocol - Stack Overflow, accessed June 9, 2026, [https://stackoverflow.blog/2026/01/21/is-that-allowed-authentication-and-authorization-in-model-context-protocol/](https://stackoverflow.blog/2026/01/21/is-that-allowed-authentication-and-authorization-in-model-context-protocol/)  
+28. Semantic conventions for Model Context Protocol (MCP) - OpenTelemetry, accessed June 9, 2026, [https://opentelemetry.io/docs/specs/semconv/gen-ai/mcp/](https://opentelemetry.io/docs/specs/semconv/gen-ai/mcp/)  
+29. Idempotency | System Design - AlgoMaster.io, accessed June 9, 2026, [https://algomaster.io/learn/system-design/idempotency](https://algomaster.io/learn/system-design/idempotency)  
+30. Model Context Protocol - MLOps Community, accessed June 9, 2026, [https://mlops.community/blog/model-context-protocol](https://mlops.community/blog/model-context-protocol)  
+31. How Consistent Are LLM Agents? Measuring Behavioral Reproducibility in Multi-Step Tool-Calling Pipelines - arXiv, accessed June 9, 2026, [https://arxiv.org/html/2605.28840v1](https://arxiv.org/html/2605.28840v1)  
+32. The Agent That Spent $47K on Itself: An Autonomous-Loop Postmortem - DEV Community, accessed June 9, 2026, [https://dev.to/gabrielanhaia/the-agent-that-spent-47k-on-itself-an-autonomous-loop-postmortem-3313](https://dev.to/gabrielanhaia/the-agent-that-spent-47k-on-itself-an-autonomous-loop-postmortem-3313)  
+33. Saga patterns - AWS Prescriptive Guidance, accessed June 9, 2026, [https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga.html](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga.html)  
 34. What is Model Context Protocol (MCP)? A guide | Google Cloud, accessed June 9, 2026, [https://cloud.google.com/discover/what-is-model-context-protocol](https://cloud.google.com/discover/what-is-model-context-protocol)  
-35. Specification (Draft) \- Model Context Protocol （MCP）, accessed June 9, 2026, [https://modelcontextprotocol.info/specification/draft/](https://modelcontextprotocol.info/specification/draft/)  
-36. The best providers for MCP server authentication in 2026 \- WorkOS, accessed June 9, 2026, [https://workos.com/blog/best-mcp-server-authentication-providers](https://workos.com/blog/best-mcp-server-authentication-providers)
+35. Specification (Draft) - Model Context Protocol （MCP）, accessed June 9, 2026, [https://modelcontextprotocol.info/specification/draft/](https://modelcontextprotocol.info/specification/draft/)  
+36. The best providers for MCP server authentication in 2026 - WorkOS, accessed June 9, 2026, [https://workos.com/blog/best-mcp-server-authentication-providers](https://workos.com/blog/best-mcp-server-authentication-providers)
 
 ---
 

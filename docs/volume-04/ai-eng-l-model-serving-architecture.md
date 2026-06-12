@@ -3,16 +3,22 @@
 ## **Doctrinal Paradigm: Traffic Governance for Probabilistic Compute**
 
 Model serving in production enterprise systems represents a paradigm shift from hosting deterministic microservices to governing traffic across probabilistic compute pipelines.1 Traditional web serving assumes static request-response lifetimes, uniform resource footprints, and simple CPU or system memory bottlenecks.1 In contrast, serving architecture for large language models (LLMs) and foundation models must manage highly variable request processing times, dynamic memory footprints inside the High-Bandwidth Memory (HBM) of graphics processing units (GPUs), and complex operational dependencies.1  
+
 The core operational doctrine of this report dictates that:  
-Serving architecture is traffic governance for probabilistic compute: route each request to the cheapest sufficient, authorized, available, latency-appropriate model path while preserving isolation, reliability, observability, and rollback.4  
+
+> *Serving architecture is traffic governance for probabilistic compute: route each request to the cheapest sufficient, authorized, available, latency-appropriate model path while preserving isolation, reliability, observability, and rollback.4*  
+
 Treating model serving as merely hosting a weight checkpoint behind an endpoint ignores the operational realities of hardware scarcity, variable context lengths, and tenant-level resource contention.1 The useful question is not "Where is the model hosted?" but "How does each request move through gateway, authentication, tenant policy, routing, queueing, cache, inference execution, validation, fallback, telemetry, and rollback under real production constraints?".4  
 This architectural paradigm requires a decoupled design divided into a control plane and a data plane:
 
 * **The Control Plane:** Manages configuration states, release pipelines, routing topologies, tenant quota definitions, scale targets, safety policies, and model metadata registries. It handles the declarative definition of model-serving environments, enabling operators to modify routing rules or adjust capacity allocations without rebuilding execution containers or disrupting live connections.  
+
 * **The Data Plane:** Executes in the direct path of user requests. It performs request admission, tokenizes incoming prompts, extracts routing keys, queries cache states, schedules iteration-level batches, coordinates KV cache transfers, executes model inference on raw hardware, validates output structures, streams responses, and pumps telemetry events to collectors.2
 
 By segregating these concerns, platform engineers can update routing heuristics, hot-swap model versions, scale capacity pools dynamically, and isolate tenant-level anomalies without introducing downtime or risking structural regressions inside the physical execution layer.2  
+
 This report closes Volume 4: Runtime Architecture and Inference Mechanics, whose concern is how AI systems execute under physical, computational, and operational constraints. AI-ENG-J established throughput mechanics: prefill, decode, KV cache, batching, queueing, cache pressure, memory pressure, and capacity margins. AI-ENG-K established weight dynamics and decoding strategy: quantization, compression, speculative decoding, constrained decoding, sampling policies, kernel compatibility, and behavior-preserving optimization. AI-ENG-L now defines how inference capacity is deployed, exposed, routed, scaled, protected, and recovered in production.  
+
 This report draws clean boundaries. AI-ENG-J owns the physical mechanics inside inference execution. AI-ENG-K owns numerical representation, compression, and decoding optimization. AI-ENG-L owns the serving topology around those engines: gateways, routers, load balancers, inference servers, model residency, local, edge, or cloud deployment, tenant-aware capacity, queues, autoscaling, cold starts, rate limits, backpressure, failover, high availability, and degraded serving patterns.4
 
 ## **Conceptual Glossary**
@@ -48,45 +54,47 @@ To ensure structural durability for retrieval-augmented generation (RAG) and est
 
 A robust serving platform must orchestrate multiple software and hardware layers to deliver deterministic SLAs on top of non-deterministic model engines. The reference architecture diagram below traces the path of a client request down to physical GPU clusters.
 
-\+---------------------------------------------------------------------------------+  
+```
++---------------------------------------------------------------------------------+  
 |                                 CLIENT CLIENT                                   |  
-\+---------------------------------------------------------------------------------+  
++---------------------------------------------------------------------------------+  
                                          |  
                                          v  
-\+---------------------------------------------------------------------------------+  
++---------------------------------------------------------------------------------+  
 |                     API GATEWAY / INGRESS (SSL, Global Auth)                    |  
-\+---------------------------------------------------------------------------------+  
++---------------------------------------------------------------------------------+  
                                          |  
                                          v  
-\+---------------------------------------------------------------------------------+  
++---------------------------------------------------------------------------------+  
 |               TENANT POLICY ENGINE & RATE LIMITER (Redis, Quotas)               |  
-\+---------------------------------------------------------------------------------+  
++---------------------------------------------------------------------------------+  
                                          |  
                                          v  
-\+---------------------------------------------------------------------------------+  
++---------------------------------------------------------------------------------+  
 |          MODEL ROUTER / CLASSIFIER (RouteLLM, Semantic Cache Lookup)            |  
-\+---------------------------------------------------------------------------------+  
++---------------------------------------------------------------------------------+  
                                          |  
                                          v  
-\+---------------------------------------------------------------------------------+  
-|        LOAD BALANCER & DISPATCH LAYER (EPP, Late-Binding Flow Control)         |  
-\+---------------------------------------------------------------------------------+  
-                         /               |               \\  
-                        /                |                \\  
++---------------------------------------------------------------------------------+  
+|        LOAD BALANCER & DISPATCH LAYER (EPP, Late-Binding Flow Control)          |  
++---------------------------------------------------------------------------------+  
+                /               |                                                         
+                        /                |                \  
                        v                 v                 v  
-\+---------------------------------------------------------------------------------+  
-|            QUEUES & ADMISSION CONTROLLERS (Priority Queuing, Headroom)           |  
-\+---------------------------------------------------------------------------------+  
++---------------------------------------------------------------------------------+  
+|            QUEUES & ADMISSION CONTROLLERS (Priority Queuing, Headroom)          |  
++---------------------------------------------------------------------------------+  
                          |               |               |  
-                         v                 v                 v  
-\+---------------------------------------------------------------------------------+  
+                         v               v               v  
++---------------------------------------------------------------------------------+  
 |                  INFERENCE SERVERS (vLLM, SGLang, Triton, Ray)                  |  
-\+---------------------------------------------------------------------------------+  
++---------------------------------------------------------------------------------+  
                          |               |               |  
-                         v                 v                 v  
-\+---------------------------------------------------------------------------------+  
+                         v               v               v  
++---------------------------------------------------------------------------------+  
 |            ACCELERATED HARDWARE (GPUs, HBM, PCIe Topology, NUMA Nodes)          |  
-\+---------------------------------------------------------------------------------+
++---------------------------------------------------------------------------------+
+```
 
 ### **Serving Stack Reference Architecture**
 
@@ -148,60 +156,64 @@ Before any model checkpoint or adapter is promoted to active serving, it must pa
 
 ### **Serving Compatibility Gate Model**
 
+```
         |  
         v  
-\+-----------------------+  
++-----------------------+  
 |  Model Architecture   |  Check model configuration files against compiled engine runtimes.  
-\+-----------------------+  
++-----------------------+  
         | Passed  
         v  
-\+-----------------------+  
++-----------------------+  
 |  Tokenizer Integrity  |  Verify vocabulary matches and check input prompt template configurations.  
-\+-----------------------+  
++-----------------------+  
         | Passed  
         v  
-\+-----------------------+  
++-----------------------+  
 | Quantization Format   |  Validate quantization scheme (FP8, INT4) against target GPU architecture.  
-\+-----------------------+  
++-----------------------+  
         | Passed  
         v  
-\+-----------------------+  
++-----------------------+  
 | Adapter Compatibility |  Verify dynamic adapter target matches parent model structure.  
-\+-----------------------+  
++-----------------------+  
         | Passed  
         v  
-\+-----------------------+  
-| Kernel Compatibility  |  Verify target hardware supports optimized FlashAttention and DeepEP kernels.\[16, 42\]  
-\+-----------------------+  
++-----------------------+  
+| Kernel Compatibility  |  Verify target hardware supports optimized FlashAttention and DeepEP kernels.[16, 42]  
++-----------------------+  
         | Passed  
         v  
-\+-----------------------+  
++-----------------------+  
 | Compilation & Capture |  Run test compilation to generate and cache CUDA graph templates.  
-\+-----------------------+  
++-----------------------+  
         | Passed  
         v
+```
 
 ## **Routing Architecture & Multi-Model Orchestration**
 
 A multi-model routing layer transforms an expensive, fragile model cluster into a resilient, cost-efficient utility.4 Most production routing architectures implement a hybrid design: static routing rules process explicit identifiers, semantic routing evaluates prompt intents, and cascading pipelines handle failure recovery.4
 
+```
                   
                               |  
-                              \+---------------------------------------+  
+                              +---------------------------------------+  
                               | Prompt Context Analysis                |  
                               v                                       v  
-                     \[ Intent Match? \]                         
-                       /           \\                             /           \\  
-                 Yes  /             \\  No                  Yes  /             \\  No  
+                     [ Intent Match? ]                         
+                       /           \                             /           \  
+                 Yes  /             \  No                  Yes  /             \  No  
                      v               v                         v               v  
-               \[ Capability Evaluator \]    
+               [ Capability Evaluator ]    
                      |               |                         |               |  
-                     |               \+-------------------------+               |  
+                     |               +-------------------------+               |  
                      v                                                         v  
                                                      
                      |  
                      v  
             
+```
 
 Task-based and capability-based routing map straightforward requests to low-parameter models, while routing reasoning-heavy tasks to frontier networks.4 Risk-based routing automatically redirects high-stakes workflows (e.g., financial transactions or patient-facing diagnostic requests) to secure, pre-validated local models or human review queues.4  
 Modality-based, language-based, and context-length routing evaluate prompt characteristics to match requests to hardware optimized for those targets.4 For example, prompts exceeding 32,000 tokens are routed away from memory-constrained local nodes to high-capacity cloud clusters.11 Tenant-tier and region routing enforce data residency requirements, guaranteeing that sensitive enterprise records remain within compliant geographic boundaries.2  
@@ -212,12 +224,12 @@ Evaluating routing strategies requires analyzing their performance and latency o
 
 | Routing Method | Average Latency | Cost Impact | Typical Task | Typical Target Model |
 | :---- | :---- | :---- | :---- | :---- |
-| **Static Rules** | \< 1ms | Fully predictable; zero routing overhead.4 | Structured classification with explicit tags.4 | Quantized 8B parameter model hosted locally.9 |
+| **Static Rules** | < 1ms | Fully predictable; zero routing overhead.4 | Structured classification with explicit tags.4 | Quantized 8B parameter model hosted locally.9 |
 | **Semantic Routing** | 5-15ms 22 | High savings (60%+) by hitting local cache.28 | Near-duplicate customer support queries.28 | Local embedding similarity lookup with Redis.22 |
 | **BERT Classifier** | 10-50ms 22 | Up to 85% cost reduction vs. using GPT-4 alone.29 | General conversational chats on public forums.44 | Fine-tuned 0.5B model classifying prompt difficulty.22 |
 | **LLM Classifier** | 200-800ms 22 | Variable; high overhead can negate routing savings.22 | Complex code generation and analysis.44 | Claude Haiku evaluating prompt complexity.4 |
 | **Cascading Fallback** | Variable 22 | High latency tax; adds roundtrips on escalations.22 | Multi-step agentic execution workflows.22 | Escalate to Sonnet if Haiku fails validation.4 |
-| **Router-R1** | \> 1000ms 22 | High; uses extensive reasoning step tokens.22 | Complex mathematical reasoning and proofs.22 | Specialized reasoning model with explicit thinking traces.22 |
+| **Router-R1** | > 1000ms 22 | High; uses extensive reasoning step tokens.22 | Complex mathematical reasoning and proofs.22 | Specialized reasoning model with explicit thinking traces.22 |
 
 A routing decision must be logged with its full context, capturing why alternative paths were rejected.4 If weak routing misclassifies hard tasks or overuses premium models, it can cause cost spikes or degrade system accuracy.4
 
@@ -228,22 +240,23 @@ To prevent these conditions, modern balancers implement memory-, cache-, and ada
 
 ### **Load Balancing Model for LLM Serving**
 
+```
                             
                                     |  
                                     v  
-                         \<-- Extract model \+ strict char budget   
+                         <-- Extract model + strict char budget   
                                     |  
                                     v  
-                         \<-- Blake2b hash on 256-token window   
+                         <-- Blake2b hash on 256-token window   
                                     |  
                                     v  
-                       \[ Prefix Overlap Lookup \]   \<-- Score prefix match against nodes   
+                       [ Prefix Overlap Lookup ]   <-- Score prefix match against nodes   
                                     |  
                                     v  
-                       \[ Load-Aware Evaluator \]    \<-- Adjust scores based on active queues   
+                       [ Load-Aware Evaluator ]    <-- Adjust scores based on active queues   
                                     |  
                                     v  
-                       
+```                       
 
 * **Consistent Hashing:** Hashes request parameters (e.g., Tenant ID) to route sequential requests from the same user to the same replica, preserving localized cache affinity.7  
 * **Prefix Affinity:** Dynamically routes requests with similar prompt prefixes to the same replica, allowing the engine to reuse prefilled KV states.5  
@@ -256,17 +269,17 @@ To prevent these conditions, modern balancers implement memory-, cache-, and ada
 
 Prefix-aware load balancing leverages the fact that many LLM workloads share identical system instructions, few-shot examples, or conversation histories.16 Runtimes like SGLang and vLLM organize active physical blocks into a global radix tree or hash table, caching the activations of previously computed prompts.16 If a request lands on a replica containing matching cached blocks, it can skip the expensive, compute-bound prefill phase entirely, reducing Time to First Token (TTFT) by multiple orders of magnitude.5  
 The radix tree minimizes memory footprints by ensuring that memory consumption scales with unique content rather than total processed tokens.36  
-Without Caching: 3 requests x 1000 tokens \= 3000 tokens in HBM 36  
-With Caching: 800 shared tokens \+ (3 requests x 200 unique tokens) \= 1400 tokens (approximately 53% savings) 36
+Without Caching: 3 requests x 1000 tokens = 3000 tokens in HBM 36  
+With Caching: 800 shared tokens + (3 requests x 200 unique tokens) = 1400 tokens (approximately 53% savings) 36
 
 #### **Hashing and Key Extraction**
 
-To achieve high-efficiency caching, load balancers must route requests sharing prefixes to the exact same GPU replica.30 SGLang implements the prefix\_match load balancing strategy, which tokenizes input sequences and computes a blake2b hash across a 256-token window, routing the request to a specific data-parallel (DP) rank 30:  
-Target DP Rank \= hash(head) % dp\_size 30  
+To achieve high-efficiency caching, load balancers must route requests sharing prefixes to the exact same GPU replica.30 SGLang implements the prefix_match load balancing strategy, which tokenizes input sequences and computes a blake2b hash across a 256-token window, routing the request to a specific data-parallel (DP) rank 30:  
+Target DP Rank = hash(head) % dp_size 30  
 This mathematical mapping delivers a 5.7x reduction in TTFT under sequential multi-turn workloads compared to default round-robin policies.30  
 To extract a stable routing key without evaluating the entire dynamic conversation history, which shifts on every turn and would route follow-up turns to cold nodes, proxies employ a fast, probabilistic heuristic.5 The proxy extracts the target model name, allocates a strict character budget, and parses only the **system prompt** and the **first user turn** 5:  
-Routing Key \= Extract(System Prompt\[0..256\] |  
-| User Turn 1\[0..256\]) 5  
+Routing Key = Extract(System Prompt[0..256] |  
+| User Turn 1[0..256]) 5  
 By ignoring subsequent turns, the routing key remains perfectly stable across the entire lifetime of the session, pinning the conversation to the GPU holding the warm KV cache blocks.5
 
 #### **Prefill-Decode Disaggregation**
@@ -274,13 +287,15 @@ By ignoring subsequent turns, the routing key remains perfectly stable across th
 When serving heavy workloads, processing prompts (prefills) and generating tokens (decodes) on the same GPU can degrade performance.21 Prefills are compute-bound, saturating FLOPS; decodes are memory-bound, bottlenecked by memory bandwidth.11 Interleaving them on a single node causes head-of-line blocking and latency spikes.21  
 Disaggregating these phases onto dedicated prefill and decode pools isolates execution.11 In a disaggregated deployment, a proxy coordinates the multi-step request flow: it dispatches the prompt to a prefill worker, waits for completion, transfers the resulting KV cache to a decode worker, and streams the generated tokens back to the client.21
 
-Client Request \-\> \[ Proxy \]  
+```
+Client Request -> [ Proxy ]  
                      |  
-                     \+---\> (Prefill Request) \-\> \[ Prefill Node \] \-- (Generate KV Cache)  
+                     +---> (Prefill Request) -> [ Prefill Node ] -- (Generate KV Cache)  
                      |                                 |  
-                     |                        (RDMA / NVLink) \[12, 21\]  
+                     |                        (RDMA / NVLink) [12, 21]  
                      |                                 v  
-                     \+---\> (Decode Request)  \-\> \-- (Generate Tokens) \-\> Client \[45\]
+                     +---> (Decode Request)  -> -- (Generate Tokens) -> Client [45]
+```
 
 To support disaggregated execution, SGLang manages specialized queues across prefill and decode instances.12
 
@@ -296,17 +311,19 @@ Multi-tenant enterprise serving architectures must protect hardware pools from t
 
 ### **Tenant-Aware Capacity Model**
 
- \-\> \[ API Key Lookup \] \-\>  
+```
+ -> [ API Key Lookup ] ->  
                                                     |  
                                                     v  
-                                      \[ Limit Exceeded? \]  
-                                        /             \\  
-                                  Yes  /               \\ No  
+                                      [ Limit Exceeded? ]  
+                                        /             \  
+                                  Yes  /               \ No  
                                       v                 v  
                                
-                                                   \- MIG Partitioning   
-                                                   \- CUDA MPS SM Allocation   
-                                                   \- PCIe-Aware Placement 
+                                                   - MIG Partitioning   
+                                                   - CUDA MPS SM Allocation   
+                                                   - PCIe-Aware Placement 
+```
 
 * **Opaque Key Verification:** Resolves tenant identity at the gateway using hashed keys, matching requests to billing plans and routing tables.  
 * **Token-Bucket Limits:** Enforces usage limits using Redis-backed sorted sets, preventing extreme token or request spikes.  
@@ -319,22 +336,23 @@ Multi-tenant enterprise serving architectures must protect hardware pools from t
 
 To prevent Time-of-Check to Time-of-Use (TOCTOU) race conditions in high-concurrency environments, where multiple parallel requests might read a tenant’s active slot count before the database writes the increment, systems utilize atomic Redis Lua scripts :
 
-Lua  
-\-- Lua script for acquiring a concurrency slot  
-local key \= KEYS  
-local limit \= tonumber(ARGV)  
-local ttl \= tonumber(ARGV)
+```Lua  
+-- Lua script for acquiring a concurrency slot  
+local key = KEYS  
+local limit = tonumber(ARGV)  
+local ttl = tonumber(ARGV)
 
-local current \= tonumber(redis.call('get', key) or "0")  
-if current \< limit then  
+local current = tonumber(redis.call('get', key) or "0")  
+if current < limit then  
     redis.call('incr', key)  
-    if current \== 0 then  
+    if current == 0 then  
         redis.call('expire', key, ttl)  
     end  
-    return 1 \-- Slot acquired  
+    return 1 -- Slot acquired  
 else  
-    return 0 \-- Limit exceeded  
+    return 0 -- Limit exceeded  
 end
+```
 
 By packaging the check and the increment into a single atomic operation, the proxy guarantees that no tenant can bypass concurrency limits during burst events.
 
@@ -366,22 +384,23 @@ To enforce usage policies, platforms deploy rate limiters that track requests an
 
 ### **Rate Limit and Quota Model**
 
+```
                      
                                |  
                                v  
                       
                                |  
-         \+---------------------+---------------------+  
+         +---------------------+---------------------+  
          |                     |                     |  
          v                     v                     v  
-                       \[ Concurrency \]  
-\- Tracks RPM via       \- Tracks input/output \- Tracks in-flight  
+                       [ Concurrency ]  
+- Tracks RPM via       - Tracks input/output - Tracks in-flight  
   sorted sets.    limits per user.      active slots.  
          |                     |                     |  
-         \+---------------------+---------------------+  
+         +---------------------+---------------------+  
                                |  
                                v  
-                 
+```                 
 
 * **Requests Per Minute (RPM):** Monitored per tenant using sliding-window Redis sorted sets, rejecting bursts exceeding plans.  
 * **Tokens Per Minute (TPM):** Tracks processed input and generated output tokens, soft-rejecting requests when limits are hit.  
@@ -400,28 +419,28 @@ Autoscalers must evaluate GPU-native signals to scale capacity proactively.
 
 | Scaling Phase | Primary Metrics | Technical Execution | Latency Impact |
 | :---- | :---- | :---- | :---- |
-| **Metric Extraction** | vllm:num\_requests\_waiting and gpu\_cache\_usage\_perc.9 | Scrapes Prometheus-format endpoints via DCGM and engine monitors.9 | Proactively triggers scale actions before queue saturation degrades TTFT.9 |
-| **Node Provisioning** | Compute resource requests and pending replica counts.7 | Karpenter on EKS provisions new GPU nodes in \~60 seconds.9 | Introduces structural lag; requires pre-allocated warm pools to buffer spikes.9 |
+| **Metric Extraction** | vllm:num_requests_waiting and gpu_cache_usage_perc.9 | Scrapes Prometheus-format endpoints via DCGM and engine monitors.9 | Proactively triggers scale actions before queue saturation degrades TTFT.9 |
+| **Node Provisioning** | Compute resource requests and pending replica counts.7 | Karpenter on EKS provisions new GPU nodes in ~60 seconds.9 | Introduces structural lag; requires pre-allocated warm pools to buffer spikes.9 |
 | **Weight Loading** | Weights size and network bandwidth availability.8 | Fetches model files from local registries; skips remote CDN retrievals.8 | Eliminates variable WAN download latencies; guarantees fast weight transfers.8 |
 | **Runtime Init** | CUDA memory allocation and library load states.43 | Mounts images, loads models, and initializes the CUDA runtime.43 | Takes 10–30 seconds to initialize complex libraries. |
-| **Optimized Capture** | Kernel compilation and CUDA graph capture steps.26 | Skip compilation with \--enforce-eager or load templates via Foundry.26 | Cuts cold-start compilation overhead from minutes to under 4 seconds.26 |
+| **Optimized Capture** | Kernel compilation and CUDA graph capture steps.26 | Skip compilation with --enforce-eager or load templates via Foundry.26 | Cuts cold-start compilation overhead from minutes to under 4 seconds.26 |
 | **Route Registration** | Host-level health-check passing states.6 | Verifies server readiness via mock runs before updating router tables.6 | Verifies node health before exposing it to active traffic.8 |
 
 To protect users from cold-start latencies, architectures implement model residency strategies that map models to warm, on-demand, or batch tiers.
 
 ### **Model Residency Strategy**
 
-\[ Active GPU Pool \]  
-  |-- Warm Masters (Frontier models kept resident in HBM; captured CUDA graphs) \[3, 43\]  
+```
+[ Active GPU Pool ]  
+  |-- Warm Masters (Frontier models kept resident in HBM; captured CUDA graphs) [3, 43]  
   |-- Dynamic LoRA Cache (Parent model warm in HBM; loads dynamic adapters on demand)   
   |
-
   |-- On-Demand Specialists (Quantized models loaded to HBM on first call)   
   |
+  |-- Async Batch Lanes (Offline models loaded only for scheduled batch tasks) [3, 8, 19]
+```
 
-  |-- Async Batch Lanes (Offline models loaded only for scheduled batch tasks) \[3, 8, 19\]
-
-To optimize serverless cold starts, runtimes trade peak execution performance for fast startup times.43 For example, launching vLLM with the \--enforce-eager flag skips time-consuming compiler optimizations and CUDA graph captures, reducing cold starts from 460 seconds to 219 seconds.43  
+To optimize serverless cold starts, runtimes trade peak execution performance for fast startup times.43 For example, launching vLLM with the --enforce-eager flag skips time-consuming compiler optimizations and CUDA graph captures, reducing cold starts from 460 seconds to 219 seconds.43  
 For massive deployments, context materialization platforms (such as Foundry) persist compiled execution templates and GPU state layouts offline, restoring them during scale-up to cut the initialization time of a 235B parameter MoE model from 10 minutes to 3.9 seconds.26 Some platforms also utilize snapshot-restore features, freezing a warmed GPU instance to disk and restoring its memory state on demand to bypass the initialization path entirely.43
 
 ## **Deployment Topologies: Cloud, On-Prem, Edge, Local, and Hybrid**
@@ -443,26 +462,21 @@ Selecting a deployment topology requires balancing tradeoffs across compliance, 
 
 Architectures must isolate failures proactively to preserve user-facing SLAs.8 If a component degrades, the serving platform must transition traffic immediately to healthy backups.27
 
-                     
+```
                                |  
-                   
                                |  
-              \+----------------+----------------+  
+              +----------------+----------------+  
               |                                 |  
               v                                 v  
-           
               |                                 |  
               v                                 v  
-                  
               |                                 |  
               v                                 v  
-                 
                                                 |  
-                               \+----------------+----------------+  
+                               +----------------+----------------+  
                                |                                 |  
                                v                                 v  
-                                 
-                               
+```
 
 ### **High-Availability and Failover Model**
 
@@ -479,24 +493,29 @@ When capacity is severely constrained, platforms transition to degraded serving 
 
 ### **Degraded-Mode Serving Pattern Library**
 
-\[ Active Capacity Constraints \]  
-  |-- Primary Route Saturated \-\> Model Downgrade (Diverts 70B queries to 8B parameter replicas)   
-  |-- Local GPU Outages       \-\> Provider Fallback (Redirects local tasks to external hosted API)   
-  |-- Dynamic Storage Drops   \-\> Cached-Safe (Returns cached responses for identical context queries)   
-  |-- Queue Saturation Peaks  \-\> Async Deferral (Pushes interactive requests to scheduled batch queues) 
+```
+[ Active Capacity Constraints ]  
+  |-- Primary Route Saturated -> Model Downgrade (Diverts 70B queries to 8B parameter replicas)   
+  |-- Local GPU Outages       -> Provider Fallback (Redirects local tasks to external hosted API)   
+  |-- Dynamic Storage Drops   -> Cached-Safe (Returns cached responses for identical context queries)   
+  |-- Queue Saturation Peaks  -> Async Deferral (Pushes interactive requests to scheduled batch queues) 
+```
 
 ## **Serving Observability and Operations**
 
 Observability in model serving must look beyond host-level CPU and memory footprints.3 Trace records must connect physical hardware performance back to active model versions and tenant identities, allowing SREs to isolate regressions instantly.1
 
+```
                   
                                |  
-          \+--------------------+--------------------+  
+          +--------------------+--------------------+  
           |                    |                    |  
           v                    v                    v  
-  \[ Gateway Headers \]  \[ Model Metadata \]    
-  \- Tenant ID   \- Model Version SHA  \- TTFT / ITL   
-  \- Priority Tier      \- Decoders    \- Preemptions \[14\]
+  [ Gateway Headers ]  [ Model Metadata ]    
+  - Tenant ID   - Model Version SHA  - TTFT / ITL   
+  - Priority Tier      - Decoders    - Preemptions [14]
+```
+
 
 This tracking model maps failures to their root causes, identifying bottlenecks across the stack.
 
@@ -504,8 +523,8 @@ This tracking model maps failures to their root causes, identifying bottlenecks 
 
 | Failure Scenario | Root Cause Mechanism | Immediate System Metric Impact | Operational Remediation |
 | :---- | :---- | :---- | :---- |
-| **Cold-Start Storm** | Concurrent node scale-ups download heavy weights.26 | Karpenter provisioning spike; TTFT \> 60s.9 | Restores from warm snapshots or Foundry templates.26 |
-| **GPU OOM Crash** | Processing prompts with long context outliers.8 | gpu\_memory\_utilization\_perc drops to 0%.9 | Restarts container; lowers static cache fraction.27 |
+| **Cold-Start Storm** | Concurrent node scale-ups download heavy weights.26 | Karpenter provisioning spike; TTFT > 60s.9 | Restores from warm snapshots or Foundry templates.26 |
+| **GPU OOM Crash** | Processing prompts with long context outliers.8 | gpu_memory_utilization_perc drops to 0%.9 | Restarts container; lowers static cache fraction.27 |
 | **Cache Leakage** | Shared memory addresses leak data across sessions. | High cross-tenant request metrics on identical nodes. | Isolates and partitions cache keys per tenant. |
 | **Queue Saturation** | Traffic spikes exceed target execution slots.24 | Waiting request count spikes on prometheus endpoints.9 | Enforces rate limits; sheds low-priority traffic.3 |
 | **Telemetry Drop** | Intensive logging saturates network buffers.15 | Packet loss; missing clickhouse database records.15 | Limits tracing overhead; decouples collection threads. |
@@ -515,9 +534,9 @@ To maintain system reliability, SREs deploy automated runbooks to detect and res
 
 ### **Operational Runbook Execution Guidance**
 
-                        
+```                        
                                   |  
-                      \+-----------+-----------+  
+                      +-----------+-----------+  
                       |                       |  
                       v                       v  
              
@@ -525,39 +544,42 @@ To maintain system reliability, SREs deploy automated runbooks to detect and res
                       v                       v  
                ( Check Grafana )       ( Verify Logs )  
                       |                       |  
-            Wait count waiting \> 10?   OOM / SIGSEGV exit codes?  
-                    /     \\                 /     \\  
-              Yes  /       \\ No       Yes  /       \\ No  
+            Wait count waiting > 10?   OOM / SIGSEGV exit codes?  
+                    /     \                 /     \  
+              Yes  /       \ No       Yes  /       \ No  
                   v         v             v         v  
-         \[ Provision GPUs \]\[ Check \]   \[ Verify \]  
-         \[ via Karpenter  \]\[ NVLink\]  \[ Container\]\[ Hardware\]
+         [ Provision GPUs ][ Check ]   [ Verify ]  
+         [ via Karpenter  ][ NVLink]  [ Container][ Hardware]
+```
 
 ## **Cross-Canon Handoff Map**
 
 The serving topologies, load balancers, and traffic governance policies established in AI-ENG-L provide the runtime foundation for downstream systems in the canon.
 
-\+-----------------------------------------------------------------------------------------+  
+```
++-----------------------------------------------------------------------------------------+  
 |                  AI-ENG-L: Serving Architecture, Routing & Load Balancing                |  
-\+-----------------------------------------------------------------------------------------+  
++-----------------------------------------------------------------------------------------+  
        |                               |                               |  
        | Context Isolation             | Dynamic Tool Routing          | Telemetry & Tracing  
        v                               v                               v  
-\+-----------------------+       \+-----------------------+       \+-----------------------+  
++-----------------------+       +-----------------------+       +-----------------------+  
 |  AI-ENG-T: Tenant     |       |  AI-ENG-M: Agent      |       |  AI-ENG-Z: Telemetry, |  
 |  Isolation & Leakage  |       |  Loops & Budgets      |       |  Evals & Auditing     |  
-\+-----------------------+       \+-----------------------+       \+-----------------------+  
++-----------------------+       +-----------------------+       +-----------------------+  
        |                               |                               |  
        v                               v                               v  
-\+-----------------------+       \+-----------------------+       \+-----------------------+  
++-----------------------+       +-----------------------+       +-----------------------+  
 |  AI-ENG-V: Resource   |       |  AI-ENG-N: Tool       |       |  AI-ENG-AB: Replayable|  
 |  Abuse & Wallet Denial|       |  Contract Boundaries  |       |  Traces               |  
-\+-----------------------+       \+-----------------------+       \+-----------------------+  
++-----------------------+       +-----------------------+       +-----------------------+  
                                        |                               |  
                                        v                               v  
-                                \+-----------------------+       \+-----------------------+  
+                                +-----------------------+       +-----------------------+  
                                 |  AI-ENG-O: Action     |       |  AI-ENG-AC: Incident  |  
                                 |  Verification Paths   |       |  Response & Playbooks |  
-                                \+-----------------------+       \+-----------------------+
+                                +-----------------------+       +-----------------------+
+```
 
 ### **Cross-Canon Handoff Map**
 
@@ -611,57 +633,57 @@ In high-dimensional serving environments, network drops, hardware faults, and bu
 
 #### **Works cited**
 
-1. Load Balancing for AI Inference: Distributing Requests Across 1000+ GPUs \- Introl, accessed June 9, 2026, [https://introl.com/blog/load-balancing-ai-inference-distributing-requests-1000-gpus](https://introl.com/blog/load-balancing-ai-inference-distributing-requests-1000-gpus)  
+1. Load Balancing for AI Inference: Distributing Requests Across 1000+ GPUs - Introl, accessed June 9, 2026, [https://introl.com/blog/load-balancing-ai-inference-distributing-requests-1000-gpus](https://introl.com/blog/load-balancing-ai-inference-distributing-requests-1000-gpus)  
 2. Multi-Tenant LLM Serving on GPU Cloud: Per-Customer Isolation ..., accessed June 9, 2026, [https://www.spheron.network/blog/multi-tenant-llm-serving-gpu-cloud/](https://www.spheron.network/blog/multi-tenant-llm-serving-gpu-cloud/)  
-3. Monitor LLM routing with the Kubernetes Inference Extension \- Datadog, accessed June 9, 2026, [https://www.datadoghq.com/blog/llm-routing-kubernetes-inference-extension/](https://www.datadoghq.com/blog/llm-routing-kubernetes-inference-extension/)  
-4. Intelligent LLM Routing: Cost & Quality-Aware Selection \- Truefoundry, accessed June 9, 2026, [https://www.truefoundry.com/blog/llm-routing-cost-quality-aware-model-selection](https://www.truefoundry.com/blog/llm-routing-cost-quality-aware-model-selection)  
+3. Monitor LLM routing with the Kubernetes Inference Extension - Datadog, accessed June 9, 2026, [https://www.datadoghq.com/blog/llm-routing-kubernetes-inference-extension/](https://www.datadoghq.com/blog/llm-routing-kubernetes-inference-extension/)  
+4. Intelligent LLM Routing: Cost & Quality-Aware Selection - Truefoundry, accessed June 9, 2026, [https://www.truefoundry.com/blog/llm-routing-cost-quality-aware-model-selection](https://www.truefoundry.com/blog/llm-routing-cost-quality-aware-model-selection)  
 5. How we fight GPU scarcity without compromise | Equixly, accessed June 9, 2026, [https://equixly.com/blog/2026/06/05/how-we-fight-gpu-scarcity-without-compromise/](https://equixly.com/blog/2026/06/05/how-we-fight-gpu-scarcity-without-compromise/)  
-6. SGLang Model Gateway, accessed June 9, 2026, [https://sgl-project.github.io/advanced\_features/sgl\_model\_gateway.html](https://sgl-project.github.io/advanced_features/sgl_model_gateway.html)  
+6. SGLang Model Gateway, accessed June 9, 2026, [https://sgl-project.github.io/advanced_features/sgl_model_gateway.html](https://sgl-project.github.io/advanced_features/sgl_model_gateway.html)  
 7. Deploy Ray Serve on GPU Cloud: Production LLM Serving with Python-Native Orchestration (2026 Guide) | Spheron Blog, accessed June 9, 2026, [https://www.spheron.network/blog/ray-serve-gpu-cloud-llm-deployment/](https://www.spheron.network/blog/ray-serve-gpu-cloud-llm-deployment/)  
-8. Self-Hosted LLM: The Operator's Checklist for Enterprise Production \- Allganize, accessed June 9, 2026, [https://www.allganize.ai/en/blog/self-hosted-llm-operator-checklist](https://www.allganize.ai/en/blog/self-hosted-llm-operator-checklist)  
-9. Scaling LLM Workloads on Kubernetes: A Production Engineer's Guide \- Zartis, accessed June 9, 2026, [https://www.zartis.com/scaling-llm-workloads-on-kubernetes-a-production-engineers-guide/](https://www.zartis.com/scaling-llm-workloads-on-kubernetes-a-production-engineers-guide/)  
-10. Predictable LLM Serving on GPU Clusters \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2508.20274v1](https://arxiv.org/html/2508.20274v1)  
+8. Self-Hosted LLM: The Operator's Checklist for Enterprise Production - Allganize, accessed June 9, 2026, [https://www.allganize.ai/en/blog/self-hosted-llm-operator-checklist](https://www.allganize.ai/en/blog/self-hosted-llm-operator-checklist)  
+9. Scaling LLM Workloads on Kubernetes: A Production Engineer's Guide - Zartis, accessed June 9, 2026, [https://www.zartis.com/scaling-llm-workloads-on-kubernetes-a-production-engineers-guide/](https://www.zartis.com/scaling-llm-workloads-on-kubernetes-a-production-engineers-guide/)  
+10. Predictable LLM Serving on GPU Clusters - arXiv, accessed June 9, 2026, [https://arxiv.org/html/2508.20274v1](https://arxiv.org/html/2508.20274v1)  
 11. Prefill-Decode Disaggregation on GPU Cloud: Split LLM Inference for 2x Throughput (2026 Guide) | Spheron Blog, accessed June 9, 2026, [https://www.spheron.network/blog/prefill-decode-disaggregation-gpu-cloud/](https://www.spheron.network/blog/prefill-decode-disaggregation-gpu-cloud/)  
-12. Prefill-Decode Disaggregation \- SGLang, accessed June 9, 2026, [https://sgl-project-sglang-93.mintlify.app/distributed/prefill-decode-disaggregation](https://sgl-project-sglang-93.mintlify.app/distributed/prefill-decode-disaggregation)  
+12. Prefill-Decode Disaggregation - SGLang, accessed June 9, 2026, [https://sgl-project-sglang-93.mintlify.app/distributed/prefill-decode-disaggregation](https://sgl-project-sglang-93.mintlify.app/distributed/prefill-decode-disaggregation)  
 13. NVIDIA Inference Reference Architecture | NVIDIA DSX Documentation, accessed June 9, 2026, [https://docs.nvidia.com/dsx/guides/inference-ra/home](https://docs.nvidia.com/dsx/guides/inference-ra/home)  
-14. Optimization and Tuning \- vLLM Documentation, accessed June 9, 2026, [https://docs.vllm.ai/en/stable/configuration/optimization/](https://docs.vllm.ai/en/stable/configuration/optimization/)  
-15. Enabling Performant and Flexible Model-Internal Observability for LLM Inference \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2605.11093v1](https://arxiv.org/html/2605.11093v1)  
+14. Optimization and Tuning - vLLM Documentation, accessed June 9, 2026, [https://docs.vllm.ai/en/stable/configuration/optimization/](https://docs.vllm.ai/en/stable/configuration/optimization/)  
+15. Enabling Performant and Flexible Model-Internal Observability for LLM Inference - arXiv, accessed June 9, 2026, [https://arxiv.org/html/2605.11093v1](https://arxiv.org/html/2605.11093v1)  
 16. SGLang Production Deployment Guide: RadixAttention and Multi-Turn Inference on GPU Cloud (2026) | Spheron Blog, accessed June 9, 2026, [https://www.spheron.network/blog/sglang-production-deployment-guide/](https://www.spheron.network/blog/sglang-production-deployment-guide/)  
-17. Automatic Prefix Caching \- vLLM Documentation, accessed June 9, 2026, [https://docs.vllm.ai/en/v0.7.0/design/automatic\_prefix\_caching.html](https://docs.vllm.ai/en/v0.7.0/design/automatic_prefix_caching.html)  
-18. Roadmap: SGLang Router · Issue \#10341 \- GitHub, accessed June 9, 2026, [https://github.com/sgl-project/sglang/issues/10341](https://github.com/sgl-project/sglang/issues/10341)  
+17. Automatic Prefix Caching - vLLM Documentation, accessed June 9, 2026, [https://docs.vllm.ai/en/v0.7.0/design/automatic_prefix_caching.html](https://docs.vllm.ai/en/v0.7.0/design/automatic_prefix_caching.html)  
+18. Roadmap: SGLang Router · Issue #10341 - GitHub, accessed June 9, 2026, [https://github.com/sgl-project/sglang/issues/10341](https://github.com/sgl-project/sglang/issues/10341)  
 19. KServe vs Seldon Core vs BentoML on GPU Cloud: Kubernetes ML Serving Guide (2026), accessed June 9, 2026, [https://www.spheron.network/blog/kserve-vs-seldon-core-vs-bentoml-kubernetes-ml-serving-guide/](https://www.spheron.network/blog/kserve-vs-seldon-core-vs-bentoml-kubernetes-ml-serving-guide/)  
 20. How Mixpeek runs distributed multimodal ML on Ray: architecture, patterns, and production lessons, accessed June 9, 2026, [https://blog.mixpeek.com/ray-distributed-ml-pipeline-architecture/](https://blog.mixpeek.com/ray-distributed-ml-pipeline-architecture/)  
 21. Next-Level Inference: Why Your Single-Node vLLM Setup Needs Prefill-Decode Disaggregation, accessed June 9, 2026, [https://vllm.ai/blog/2026-04-07-moriio-kv-connector](https://vllm.ai/blog/2026-04-07-moriio-kv-connector)  
 22. AI Agent Model Routing and Dynamic Model Selection Strategies | Zylos Research, accessed June 9, 2026, [https://zylos.ai/research/2026-03-02-ai-agent-model-routing/](https://zylos.ai/research/2026-03-02-ai-agent-model-routing/)  
-23. Inference routing | LLM Inference Handbook \- BentoML, accessed June 9, 2026, [https://bentoml.com/llm/inference-optimization/inference-routing](https://bentoml.com/llm/inference-optimization/inference-routing)  
-24. Flow Control \- Kubernetes Gateway API Inference Extension, accessed June 9, 2026, [https://gateway-api-inference-extension.sigs.k8s.io/guides/flow-control/](https://gateway-api-inference-extension.sigs.k8s.io/guides/flow-control/)  
-25. \[Literature Review\] Predictable LLM Serving on GPU Clusters \- Moonlight, accessed June 9, 2026, [https://www.themoonlight.io/en/review/predictable-llm-serving-on-gpu-clusters](https://www.themoonlight.io/en/review/predictable-llm-serving-on-gpu-clusters)  
-26. Foundry: Template-Based CUDA Graph Context Materialization for Fast LLM Serving Cold Start \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2604.06664v1](https://arxiv.org/html/2604.06664v1)  
-27. AI Deployment Incident Runbook: The First 30 Minutes \- GIGAGPU, accessed June 9, 2026, [https://gigagpu.com/ai-deployment-incident-runbook/](https://gigagpu.com/ai-deployment-incident-runbook/)  
+23. Inference routing | LLM Inference Handbook - BentoML, accessed June 9, 2026, [https://bentoml.com/llm/inference-optimization/inference-routing](https://bentoml.com/llm/inference-optimization/inference-routing)  
+24. Flow Control - Kubernetes Gateway API Inference Extension, accessed June 9, 2026, [https://gateway-api-inference-extension.sigs.k8s.io/guides/flow-control/](https://gateway-api-inference-extension.sigs.k8s.io/guides/flow-control/)  
+25. [Literature Review] Predictable LLM Serving on GPU Clusters - Moonlight, accessed June 9, 2026, [https://www.themoonlight.io/en/review/predictable-llm-serving-on-gpu-clusters](https://www.themoonlight.io/en/review/predictable-llm-serving-on-gpu-clusters)  
+26. Foundry: Template-Based CUDA Graph Context Materialization for Fast LLM Serving Cold Start - arXiv, accessed June 9, 2026, [https://arxiv.org/html/2604.06664v1](https://arxiv.org/html/2604.06664v1)  
+27. AI Deployment Incident Runbook: The First 30 Minutes - GIGAGPU, accessed June 9, 2026, [https://gigagpu.com/ai-deployment-incident-runbook/](https://gigagpu.com/ai-deployment-incident-runbook/)  
 28. LLM Routing and Model Cascades: How to Cut AI Costs Without Sacrificing Quality, accessed June 9, 2026, [https://tianpan.co/blog/2025-11-03-llm-routing-model-cascades](https://tianpan.co/blog/2025-11-03-llm-routing-model-cascades)  
 29. 5 Best Model Routing Platforms for AI Agent Systems | Augment Code, accessed June 9, 2026, [https://www.augmentcode.com/tools/model-routing-platforms-ai-agent-systems](https://www.augmentcode.com/tools/model-routing-platforms-ai-agent-systems)  
-30. DP-attention: add prefix\_match load balance for in-instance cache ..., accessed June 9, 2026, [https://github.com/sgl-project/sglang/issues/26611](https://github.com/sgl-project/sglang/issues/26611)  
-31. SGLang Router Architecture Improvement Proposal · Issue \#7532 \- GitHub, accessed June 9, 2026, [https://github.com/sgl-project/sglang/issues/7532](https://github.com/sgl-project/sglang/issues/7532)  
-32. vLLM in Production: Ranked Configuration Decisions, Failure Modes, and the Architecture That Makes Them Work \- DEV Community, accessed June 9, 2026, [https://dev.to/damasosanoja/vllm-in-production-ranked-configuration-decisions-failure-modes-and-the-architecture-that-makes-2g7p](https://dev.to/damasosanoja/vllm-in-production-ranked-configuration-decisions-failure-modes-and-the-architecture-that-makes-2g7p)  
-33. GitHub \- sgl-project/sglang: SGLang is a high-performance serving framework for large language models and multimodal models., accessed June 9, 2026, [https://github.com/sgl-project/sglang](https://github.com/sgl-project/sglang)  
-34. Databricks \- Certified-Machine-Learning-Associate Practice Paper, accessed June 9, 2026, [https://interview.quicktechie.com/certifications/practice-paper/4/12/Databricks/Certified-Machine-Learning-Associate/Practice-Paper-2](https://interview.quicktechie.com/certifications/practice-paper/4/12/Databricks/Certified-Machine-Learning-Associate/Practice-Paper-2)  
+30. DP-attention: add prefix_match load balance for in-instance cache ..., accessed June 9, 2026, [https://github.com/sgl-project/sglang/issues/26611](https://github.com/sgl-project/sglang/issues/26611)  
+31. SGLang Router Architecture Improvement Proposal · Issue #7532 - GitHub, accessed June 9, 2026, [https://github.com/sgl-project/sglang/issues/7532](https://github.com/sgl-project/sglang/issues/7532)  
+32. vLLM in Production: Ranked Configuration Decisions, Failure Modes, and the Architecture That Makes Them Work - DEV Community, accessed June 9, 2026, [https://dev.to/damasosanoja/vllm-in-production-ranked-configuration-decisions-failure-modes-and-the-architecture-that-makes-2g7p](https://dev.to/damasosanoja/vllm-in-production-ranked-configuration-decisions-failure-modes-and-the-architecture-that-makes-2g7p)  
+33. GitHub - sgl-project/sglang: SGLang is a high-performance serving framework for large language models and multimodal models., accessed June 9, 2026, [https://github.com/sgl-project/sglang](https://github.com/sgl-project/sglang)  
+34. Databricks - Certified-Machine-Learning-Associate Practice Paper, accessed June 9, 2026, [https://interview.quicktechie.com/certifications/practice-paper/4/12/Databricks/Certified-Machine-Learning-Associate/Practice-Paper-2](https://interview.quicktechie.com/certifications/practice-paper/4/12/Databricks/Certified-Machine-Learning-Associate/Practice-Paper-2)  
 35. AI agents on Ray Serve: Single to multi-agent architecture | Anyscale, accessed June 9, 2026, [https://www.anyscale.com/blog/ai-agents-on-ray-serve-single-to-multi-agent-architecture](https://www.anyscale.com/blog/ai-agents-on-ray-serve-single-to-multi-agent-architecture)  
-36. RadixAttention \- SGLang, accessed June 9, 2026, [https://sgl-project-sglang-93.mintlify.app/concepts/radix-attention](https://sgl-project-sglang-93.mintlify.app/concepts/radix-attention)  
-37. Secure Deployment Considerations — NVIDIA Triton Inference Server, accessed June 9, 2026, [https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/customization\_guide/deploy.html](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/customization_guide/deploy.html)  
-38. Metrics — NVIDIA Triton Inference Server, accessed June 9, 2026, [https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user\_guide/metrics.html](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/metrics.html)  
-39. Serve PyTorch models at scale with Ray Serve, accessed June 9, 2026, [https://docs.pytorch.org/tutorials/beginner/serving\_tutorial.html](https://docs.pytorch.org/tutorials/beginner/serving_tutorial.html)  
-40. Develop a Ray Serve application \- Anyscale Docs, accessed June 9, 2026, [https://docs.anyscale.com/runtime/serve/develop](https://docs.anyscale.com/runtime/serve/develop)  
-41. Architecture overview \- Ray Serve, accessed June 9, 2026, [https://docs.ray.io/en/latest/serve/llm/architecture/overview.html](https://docs.ray.io/en/latest/serve/llm/architecture/overview.html)  
+36. RadixAttention - SGLang, accessed June 9, 2026, [https://sgl-project-sglang-93.mintlify.app/concepts/radix-attention](https://sgl-project-sglang-93.mintlify.app/concepts/radix-attention)  
+37. Secure Deployment Considerations — NVIDIA Triton Inference Server, accessed June 9, 2026, [https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/customization_guide/deploy.html](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/customization_guide/deploy.html)  
+38. Metrics — NVIDIA Triton Inference Server, accessed June 9, 2026, [https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/metrics.html](https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/metrics.html)  
+39. Serve PyTorch models at scale with Ray Serve, accessed June 9, 2026, [https://docs.pytorch.org/tutorials/beginner/serving_tutorial.html](https://docs.pytorch.org/tutorials/beginner/serving_tutorial.html)  
+40. Develop a Ray Serve application - Anyscale Docs, accessed June 9, 2026, [https://docs.anyscale.com/runtime/serve/develop](https://docs.anyscale.com/runtime/serve/develop)  
+41. Architecture overview - Ray Serve, accessed June 9, 2026, [https://docs.ray.io/en/latest/serve/llm/architecture/overview.html](https://docs.ray.io/en/latest/serve/llm/architecture/overview.html)  
 42. vLLM Large Scale Serving: DeepSeek @ 2.2k tok/s/H200 with Wide ..., accessed June 9, 2026, [https://vllm.ai/blog/2025-12-17-large-scale-serving](https://vllm.ai/blog/2025-12-17-large-scale-serving)  
 43. Can serverless GPU replace local LLMs? I reduced vLLM cold start 6.5x to find out, accessed June 9, 2026, [https://logeshumapathi.com/blog/2026/05/17/vllm-serverless.html](https://logeshumapathi.com/blog/2026/05/17/vllm-serverless.html)  
-44. RouteLLM: Learning to Route LLMs with Preference Data \- arXiv, accessed June 9, 2026, [https://arxiv.org/html/2406.18665v4](https://arxiv.org/html/2406.18665v4)  
-45. Why LLM Inference Needs a New Kind of Router \- Part 1 \- Modular, accessed June 9, 2026, [https://www.modular.com/blog/why-llm-inference-needs-a-new-kind-of-router-part-1](https://www.modular.com/blog/why-llm-inference-needs-a-new-kind-of-router-part-1)  
+44. RouteLLM: Learning to Route LLMs with Preference Data - arXiv, accessed June 9, 2026, [https://arxiv.org/html/2406.18665v4](https://arxiv.org/html/2406.18665v4)  
+45. Why LLM Inference Needs a New Kind of Router - Part 1 - Modular, accessed June 9, 2026, [https://www.modular.com/blog/why-llm-inference-needs-a-new-kind-of-router-part-1](https://www.modular.com/blog/why-llm-inference-needs-a-new-kind-of-router-part-1)  
 46. Removing the Guesswork from Disaggregated Serving | NVIDIA Technical Blog, accessed June 9, 2026, [https://developer.nvidia.com/blog/removing-the-guesswork-from-disaggregated-serving/](https://developer.nvidia.com/blog/removing-the-guesswork-from-disaggregated-serving/)  
 47. Ray Serve LLM on Anyscale: APIs for Wide-EP and Disaggregated Serving with vLLM, accessed June 9, 2026, [https://www.anyscale.com/blog/ray-serve-llm-anyscale-apis-wide-ep-disaggregated-serving-vllm](https://www.anyscale.com/blog/ray-serve-llm-anyscale-apis-wide-ep-disaggregated-serving-vllm)  
-48. \[2508.20274\] Predictable LLM Serving on GPU Clusters \- arXiv, accessed June 9, 2026, [https://arxiv.org/abs/2508.20274](https://arxiv.org/abs/2508.20274)  
-49. HydraServe: Minimizing Cold Start Latency for Serverless LLM Serving in Public Clouds \- USENIX, accessed June 9, 2026, [https://www.usenix.org/system/files/conference/nsdi26/nsdi26spring\_lou\_prepub.pdf](https://www.usenix.org/system/files/conference/nsdi26/nsdi26spring_lou_prepub.pdf)  
-50. \[2604.06664\] Foundry: Template-Based CUDA Graph Context Materialization for Fast LLM Serving Cold Start \- arXiv, accessed June 9, 2026, [https://arxiv.org/abs/2604.06664](https://arxiv.org/abs/2604.06664)  
-51. PCIe Bandwidth-Aware Scheduling for Multi-Instance GPUs | Request PDF \- ResearchGate, accessed June 9, 2026, [https://www.researchgate.net/publication/390241224\_PCIe\_Bandwidth-Aware\_Scheduling\_for\_Multi-Instance\_GPUs](https://www.researchgate.net/publication/390241224_PCIe_Bandwidth-Aware_Scheduling_for_Multi-Instance_GPUs)
+48. [2508.20274] Predictable LLM Serving on GPU Clusters - arXiv, accessed June 9, 2026, [https://arxiv.org/abs/2508.20274](https://arxiv.org/abs/2508.20274)  
+49. HydraServe: Minimizing Cold Start Latency for Serverless LLM Serving in Public Clouds - USENIX, accessed June 9, 2026, [https://www.usenix.org/system/files/conference/nsdi26/nsdi26spring_lou_prepub.pdf](https://www.usenix.org/system/files/conference/nsdi26/nsdi26spring_lou_prepub.pdf)  
+50. [2604.06664] Foundry: Template-Based CUDA Graph Context Materialization for Fast LLM Serving Cold Start - arXiv, accessed June 9, 2026, [https://arxiv.org/abs/2604.06664](https://arxiv.org/abs/2604.06664)  
+51. PCIe Bandwidth-Aware Scheduling for Multi-Instance GPUs | Request PDF - ResearchGate, accessed June 9, 2026, [https://www.researchgate.net/publication/390241224_PCIe_Bandwidth-Aware_Scheduling_for_Multi-Instance_GPUs](https://www.researchgate.net/publication/390241224_PCIe_Bandwidth-Aware_Scheduling_for_Multi-Instance_GPUs)
 
 ---
 
