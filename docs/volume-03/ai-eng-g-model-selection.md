@@ -108,7 +108,7 @@ A model's context window cannot be evaluated solely on its maximum advertised to
 
 Architects must mathematically determine when to stuff entire document sets into high-context windows (e.g., Gemini 3 Pro's 10M token window) 25 versus when to build RAG pipelines.  
 The cost-benefit analysis of context stuffing is governed by the relation:  
-Cost_stuffing = (C_corpus / 1000 * P_input  
+Cost_stuffing = (C_corpus / 1000) * P_input  
 where C_corpus is the total corpus token size, and P_input is the price per 1,000 input tokens.8 For a corpus of 400,000 tokens evaluated on a premium model costing $0.005 per 1,000 input tokens, the input cost is $2.00 per query.8  
 The cost of a managed RAG query is formulated as:  
 Cost_RAG = C_embed + C_search + C_generation  
@@ -232,68 +232,103 @@ Highly optimized production systems rarely rely on a single model. Instead, they
 This architecture maps tasks across a distributed portfolio, routing queries dynamically based on difficulty, risk, and structural needs.
 
 ```
-+----------------------------------------------------------------------------------------+
-|                            MODEL PORTFOLIO AND ROUTING MAP                             |
-+----------------------------------------------------------------------------------------+
-|                                                                                        |
-|  [ Incoming Request ]                                                                  |
-|          |                                                                             |
-|          v                                                                             |
-|  +----------------------------------------------------------------------------------+  |
-|  |                       Pre-Generation Diagnostic Router                           |  |
-|  |                                                                                  |  |
-|  |  Classifies: task type, difficulty, risk, modality, schema needs, latency, cost  |  |
-|  +----------------------+----------------------+----------------------+-------------+  |
-|                         |                      |                      |                |
-|                         |                      |                      |                |
-|                         v                      v                      v                |
-|            [ Simple / Low-Risk ]     [ Complex / High-Risk ]     [ Specialized Need ]  |
-|                         |                      |                      |                |
-|                         v                      v                      v                |
-|            +-------------------+      +-------------------+      +------------------+  |
-|            | Economy Model     |      | Premium Model     |      | Specialist Model |  |
-|            | e.g. Qwen 3.5 9B  |      | e.g. Claude Opus  |      | Code / Math /    |  |
-|            | extraction, light |      | 4.7, GPT-class,   |      | Vision / Schema  |  |
-|            | classification,   |      | deep-context,     |      | / Embedding /    |  |
-|            | low-risk drafting |      | high-reliability  |      | Reranker model   |  |
-|            +---------+---------+      +---------+---------+      +---------+--------+  |
-|                      |                          |                          |           |
-|                      v                          v                          v           |
-|              +----------------+         +----------------+         +----------------+  |
-|              | Validation Gate|         | Validation Gate|         | Validation Gate|  |
-|              +-------+--------+         +-------+--------+         +-------+--------+  |
-|                      |                          |                          |           |
-|          +-----------+-----------+  +-----------+-----------+  +-----------+--------+  |
-|          |                       |  |                       |  |                    |  |
-|          v                       v  v                       v  v                    v  |
-|     [ Success ]          [ Schema / Confidence / Semantic Failure ]          [Success] |
-|          |                       |                                                  |  |
-|          |                       v                                                  |  |
-|          |            +-----------------------+                                     |  |
-|          |            | Escalation Controller |                                     |  |
-|          |            +----------+------------+                                     |  |
-|          |                       |                                                  |  |
-|          |                       v                                                  |  |
-|          |              [ Premium Retry ]                                           |  |
-|          |                       |                                                  |  |
-|          |                       v                                                  |  |
-|          |              +----------------+                                          |  |
-|          |              | Validation Gate|                                          |  |
-|          |              +-------+--------+                                          |  |
-|          |                      |                                                   |  |
-|          |          +-----------+-----------+                                       |  |
-|          |          |                       |                                       |  |
-|          v          v                       v                                       v  |
-|  +-------------------------+       +-------------------------+         +-------------+ |
-|  | Return Valid Response   |       | Human Review / Fail-    |         | Return Valid| |
-|  | with telemetry trace    |       | Closed Recovery Path    |         | Response    | |
-|  +-------------------------+       +-------------------------+         +-------------+ |
-|                                                                                        |
-+----------------------------------------------------------------------------------------+
-| Routing doctrine: route before generation when possible; cascade only when cheap       |
-| execution is likely to succeed. Escalation is economical only when failure rates stay  |
-| below the premium-direct cost threshold.                                               |
-+----------------------------------------------------------------------------------------+
++----------------------------------------------------------------------------------------------------+
+|                              MODEL PORTFOLIO AND ROUTING MAP                                       |
++----------------------------------------------------------------------------------------------------+
+|                                                                                                    
+|  Goal: route each request to the cheapest model that can satisfy capability, latency,              
+|  governance, and failure-tolerance requirements without creating avoidable retries.                
+|                                                                                                    
+|  [ Incoming Request ]                                                                              
+|        |                                                                                           
+|        v                                                                                           
+|  +------------------------------------------------------------------------------------------+      
+|  |                              Task Profile Interpreter                                    |      
+|  |                                                                                          |      
+|  |  Identify: task class | risk level | modality | context length | schema needs            |      
+|  |            tool-use complexity | latency SLA | cost ceiling | privacy constraints        |      
+|  +---------------------------------------------+--------------------------------------------+      
+|                                                |                                                   
+|                                                v                                                   
+|  +------------------------------------------------------------------------------------------+      
+|  |                              Pre-Generation Diagnostic Router                            |      
+|  |                                                                                          |      
+|  |  Decide route before expensive generation whenever possible.                             |      
+|  |                                                                                          |      
+|  |  Signals: semantic difficulty | required capability | failure tolerance | budget fit     |      
+|  |           deployment fit | data-residency fit | workload class                           |      
+|  +----------------------+----------------------+----------------------+---------------------+      
+|                         |                      |                      |                            
+|                         v                      v                      v                            
+|          +-------------------------+  +-----------------------+  +-----------------------------+   
+|          | Economy Route           |  | Premium Route         |  | Specialist Route            |   
+|          |                         |  |                       |  |                             |   
+|          | low-risk classification |  | research synthesis    |  | code / math / multimodal    |   
+|          | extraction              |  | complex reasoning     |  | structured output / tools   |   
+|          | simple drafting         |  | high-risk generation  |  | embedding / reranking       |   
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   
+|                      |                            |                            |                   
+|                      +----------------------------+----------------------------+                   
+|                                                   |                                                
+|                                                   v                                                
+|  +------------------------------------------------------------------------------------------+      
+|  |                              First-Pass Execution                                        |      
+|  |                                                                                          |      
+|  |  Execute selected route with its assigned model and effort tier.                         |      
+|  +---------------------------------------------+--------------------------------------------+      
+|                                                |                                                   
+|                                                v                                                   
+|  +------------------------------------------------------------------------------------------+      
+|  |                              Validation Gate                                             |      
+|  |                                                                                          |      
+|  |  Check: schema validity | tool arguments | citation grounding | confidence signals       |      
+|  |         refusal behavior | policy compliance | semantic adequacy                         |      
+|  +---------------------------------------------+--------------------------------------------+      
+|                                                |                                                   
+|                                      [ Validation Pass? ]                                          
+|                                         /                 \                                        
+|                                  Yes   /                   \   No                                  
+|                                       v                     v                                      
+|  +-----------------------------------------+   +--------------------------------------------+      
+|  | Return Valid Response                   |   | Failure Classifier                         |      
+|  | with trace, route ID, and model ID      |   |                                            |      
+|  +--------------------+--------------------+   | schema failure | low confidence            |      
+|                       |                        | semantic failure | tool error              |      
+|                       |                        | policy issue     | unsupported modality    |      
+|                       |                        +------------------+-------------------------+      
+|                       |                                           |                                
+|                       |                                           v                                
+|                       |                        +--------------------------------------------+      
+|                       |                        | Recovery Policy                            |      
+|                       |                        |                                            |      
+|                       |                        | fail-open  -> log and continue if low-risk |      
+|                       |                        | fail-closed -> escalate if high-risk       |      
+|                       |                        +------------------+-------------------------+      
+|                       |                                           |                                
+|                       |                              +------------+-------------+                  
+|                       |                              |                          |                  
+|                       |                              v                          v                  
+|                       |                 [ Stronger Model Retry ]      [ Human Review Queue ]       
+|                       |                              |                          |                  
+|                       |                              v                          v                  
+|                       |                 [ Re-validate output ]      [ Fail-Closed Resolution ]     
+|                       |                              |                           |                 
+|                       +------------------------------+---------------------------+                 
+|                                                      |                                             
+|                                                      v                                             
+|  +------------------------------------------------------------------------------------------+      
+|  |                              Telemetry and Economics Loop                                |      
+|  |                                                                                          |      
+|  |  Track: route hit rate | escalation rate | cost per success | latency | failure mode     |      
+|  |         schema adherence | tool success | human escalation frequency                     |      
+|  |                                                                                          |      
+|  |  Feed results back into routing thresholds, portfolio design, and MDR updates.           |      
+|  +------------------------------------------------------------------------------------------+      
+|                                                                                                    
++----------------------------------------------------------------------------------------------------+
+| Doctrine: route before generation when possible, validate after generation always, and only        |
+| cascade when the failure rate is low enough to beat premium-direct economics.                      |
++----------------------------------------------------------------------------------------------------+
 ```
 
 ### **Cascade Optimization and Routing Economics**
@@ -398,6 +433,7 @@ Architects must complete this standardized record for every production model tra
 
 # **Model Decision Record (MDR):**
 
+```
 ## **1. Context and Problem Statement**
 
 * Describe the specific task graph node and its cognitive requirements.  
@@ -444,13 +480,14 @@ Architects must complete this standardized record for every production model tra
 * Rollout Strategy: Shadow route 1% of live traffic for 72 hours, scaling to 10% canary.  
 * Rollback Trigger: Error rate > 0.5%, P95 latency > 1.2s, or security injection detection.  
 * Reconsideration Conditions: Release of decontaminated open-weight models in the same size class.
+```
 
 ### **Selection Failure Modes and Anti-Patterns**
 
 * **Leaderboard Shopping:** Selecting a model based solely on headline scores on saturated, contaminated benchmarks (e.g., MMLU), ignoring task-specific performance and deployment constraints.1  
 * **The Single Model Monolith:** Forcing one general-purpose model to execute every node in a complex task graph, leading to high latencies and excessive costs.1  
 * **The Speculative Concurrency Trap:** Enabling speculative decoding in high-throughput production environments (batch size > 16 without verifying if the GPU has transitioned to a compute-bound state, resulting in performance regressions.26  
-* **Unverified Long-Context StuffING:** Assuming a model's long-context window maintains high retrieval accuracy near the middle of the window without running needle-in-a-haystack or citation tests.1  
+* **Unverified Long-Context Stuffing:** Assuming a model's long-context window maintains high retrieval accuracy near the middle of the window without running needle-in-a-haystack or citation tests.1  
 * **FSM Cold-Start Latency:** Deploying Outlines-style FSM schemas in latency-sensitive APIs without pre-compiling and caching the target schema, causing latency spikes.11  
 * **Unintentional Tokenizer Drift:** Swapping models without verifying if the new tokenizer maps the same input text to a larger number of tokens, which can increase nominal token costs by 10% to 35% under the same pricing tier.2
 
@@ -472,38 +509,51 @@ To maintain system margins and detect performance drift, production systems must
 Model selection does not exist in isolation. It serves as the bridge between model training, adaptation, serving, and system orchestration.
 
 ```
-                                    +--------------------------------------------------------------+  
-                                    | AI-ENG-G: Model Selection (This Report)                      |  
-                                    | Establishes capability, deployment, and risk fit.            |  
-                                    +------------------------------+-------------------------------+  
-                                                                   |  
-                                            +----------------------+----------------------+  
-                                            |                                             |  
-                                            v                                             v  
-                                    +------------------------------+             +------------------------------+  
-                                    | AI-ENG-H: Model Adaptation   |             | AI-ENG-I: Lifecycle Control  |  
-                                    | Triggered when model choice  |             | Manages registries, canaries,|  
-                                    | is insufficient; uses LoRA,  |             | rollouts, and regression     |  
-                                    | fine-tuning, or distillation |             | tracking.                    |  
-                                    | to align capabilities.       |             +------------------------------+  
-                                    +------------------------------+  
-                                            |  
-                                            v  
-                                    +------------------------------+  
-                                    | AI-ENG-J/K/L: Runtime Serving|  
-                                    | Executes the physical serving|  
-                                    | configuration, optimizing    |  
-                                    | PagedAttention and VRAM.     |  
-                                    +------------------------------+  
-                                            |  
-                                            +----------------------+----------------------+  
-                                            |                      |                      |  
-                                            v                      v                      v  
-                                    +--------------+        +--------------+        +--------------+  
-                                    | AI-ENG-M:    |        | AI-ENG-N:    |        | AI-ENG-W:    |  
-                                    | Agentic      |        | Tool         |        | Fallback     |  
-                                    | Orchestration|        | Contracts    |        | Chains       |  
-                                    +--------------+        +--------------+        +--------------+
++------------------------------------------------------------------------------------------------+
+|                                CROSS-CANON HANDOFF MAP                                         |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|                     +------------------------------------------------------+                   
+|                     | AI-ENG-G: MODEL SELECTION (THIS REPORT)              |                   
+|                     | capability fit | deployment fit | failure tolerance  |                   
+|                     | routing doctrine | portfolio design | MDR evidence   |                  
+|                     +-------------------------------+----------------------+                   
+|                                                     |                                          
+|          +------------------------------------------+---------------------------------------+  
+|          |                                          |                                       |  
+|          v                                          v                                       v  
+|  +-------------------------------+      +-------------------------------+      +-------------------------------+
+|  | AI-ENG-H: MODEL ADAPTATION    |      | AI-ENG-I: LIFECYCLE CONTROL   |      | AI-ENG-J / K / L: RUNTIME     |
+|  | fine-tuning | LoRA |          |      | registries | canaries |       |      | throughput | memory |         |
+|  | distillation decisions        |      | rollback / promotion logic    |      | serving topology | routing    |
+|  +---------------+---------------+      +---------------+---------------+      +---------------+---------------+
+|                  |                                      |                                      |
+|                  |                                      |                                      |
+|                  v                                      v                                      v
+|  +-------------------------------+      +-------------------------------+      +-------------------------------+
+|  | AI-ENG-M: AGENTIC             |      | AI-ENG-N: TOOL CONTRACTS      |      | AI-ENG-W: FALLBACK CHAINS     |
+|  | ORCHESTRATION                 |      | schemas | argument structure  |      | retries | recovery paths |    |
+|  | task-model assignment         |      | tool-use reliability          |      | human escalation              |
+|  +---------------+---------------+      +---------------+---------------+      +---------------+---------------+
+|                  \                                      |                                      /
+|                   \                                     |                                     /
+|                    \                                    |                                    /
+|                     \                                   |                                   /
+|                      \                                  |                                  /
+|                       +---------------------------------+---------------------------------+
+|                                                         |
+|                                                         v
+|                                        +----------------------------------+
+|                                        | AI-ENG-Z: TELEMETRY              |
+|                                        | evals | observability | drift    |
+|                                        | cost per success | routing traces|
+|                                        +----------------------------------+
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Handoff doctrine: model selection is the decision layer that exports deployment choices,       |
+| routing policy, risk assumptions, MDR evidence, and operating targets to adaptation, lifecycle,|
+| serving, tooling, fallback, and observability systems.                                         |
++------------------------------------------------------------------------------------------------+
 ```
 
 | Downstream Canon Report | Ownership Intersection | Technical Input | Functional Dependency |

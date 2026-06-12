@@ -39,109 +39,109 @@ An incoming production request moves through a sequence of hardware-constrained 
 +--------------------------------------------------------------------------------------+
 |                         PHYSICAL INFERENCE LIFECYCLE                                 |
 +--------------------------------------------------------------------------------------+
-|                                                                                      |
-|  [Incoming Request]                                                                  |
-|          |                                                                           |
-|          v                                                                           |
-|  [Request Router / Model Gateway]                                                    |
-|          |                                                                           |
-|          +--> Route by tenant, model target, priority, and prefix-cache locality     |
-|          |                                                                           |
-|          v                                                                           |
-|  [Ingestion Queue]                                                                   |
-|          |                                                                           |
-|          +--> Schedule via FCFS, Priority, VLT, deadline, or workload lane policy    |
-|          |                                                                           |
-|          v                                                                           |
-|  [Context Compiler Assembly]                                                         |
-|          |                                                                           |
-|          +--> Merge system prompt, user input, history, tools, memory, evidence      |
-|          |                                                                           |
-|          v                                                                           |
-|  [Tokenization]                                                                      |
-|          |                                                                           |
-|          +--> Serialize compiled strings into integer token arrays                   |
-|          |                                                                           |
-|          v                                                                           |
-|  [Prefix / Radix Cache Lookup]                                                       |
-|          |                                                                           |
-|          +--> Match token prefix against existing KV-cache block paths               |
-|          |                                                                           |
-|          v                                                                           |
-|     +----+---------------------------------------------+                             |
-|     |                                                  |                             |
-|     v                                                  v                             |
-|  [Prefix Miss]                                  [Prefix Hit / Partial Hit]           |
-|     |                                                  |                             |
-|     |                                                  +--> Lock matched radix nodes |
-|     |                                                  +--> Increment ref counts     |
-|     |                                                  +--> Reuse matched KV blocks  |
-|     |                                                  +--> Prefill only suffix      |
-|     |                                                  |                             |
-|     v                                                  |                             |
-|  [Prefill Engine Execution] <--------------------------+                             |
-|          |                                                                           |
-|          +--> Run parallel prompt-token forward pass                                 |
-|          +--> Generate initial K/V tensors for uncached tokens                       |
-|          |                                                                           |
-|          v                                                                           |
-|  [KV Cache Allocation]                                                               |
-|          |                                                                           |
-|          +--> Map logical token blocks to physical PagedAttention blocks             |
-|          +--> Register block-table entries in the serving runtime                    |
-|          |                                                                           |
-|          v                                                                           |
-|  [Continuous Batching Scheduler]                                                     |
-|          |                                                                           |
-|          +--> Admit, drop, and reorder active sequences at token boundaries          |
-|          |                                                                           |
-|          v                                                                           |
-|     +----+---------------------------------------------+                             |
-|     |                                                  |                             |
-|     v                                                  v                             |
-|  [Free Blocks Available]                       [VRAM / KV Block Pressure]            |
-|     |                                                  |                             |
-|     |                                                  v                             |
-|     |                                       [Iteration-Level Preemption]             |
-|     |                                                  |                             |
-|     |                                                  +--> Evict victim sequence    |
-|     |                                                  +--> Recompute later, or      |
-|     |                                                  +--> Swap KV blocks to DRAM   |
-|     |                                                  +--> Return victim to queue   |
-|     |                                                  |                             |
-|     +---------------------------+----------------------+                             |
-|                                 |                                                    |
-|                                 v                                                    |
-|  [Decode Engine Execution]                                                           |
-|          |                                                                           |
-|          +--> Generate one output token per autoregressive iteration                 |
-|          +--> Read model weights and active KV cache from HBM each step              |
-|          +--> Apply constrained decoding / compressed FSM checks when required       |
-|          |                                                                           |
-|          v                                                                           |
-|  [Streaming / Response Emission]                                                     |
-|          |                                                                           |
-|          +--> Serialize token deltas and stream chunks to client socket              |
-|          +--> Track TTFT, ITL, TPOT, throughput, and delivery stalls                 |
-|          |                                                                           |
-|          v                                                                           |
-|  [Completion Detection]                                                              |
-|          |                                                                           |
-|          +--> Stop on EOS token, max-token limit, schema boundary, or cancellation   |
-|          |                                                                           |
-|          v                                                                           |
-|  [KV Cache Release / Retention Policy]                                               |
-|          |                                                                           |
-|          +--> Decrement active reference counts                                      |
-|          +--> Reclaim unreferenced physical blocks                                   |
-|          +--> Retain reusable prefix nodes if cache policy allows                    |
-|          |                                                                           |
-|          v                                                                           |
-|  [Telemetry Persistence]                                                             |
-|          |                                                                           |
-|          +--> Persist queue depth, cache hits, free blocks, preemptions, OOM risk    |
-|          +--> Export latency spans, memory metrics, bandwidth use, and cost traces   |
-|                                                                                      |
+|                                                                                      
+|  [Incoming Request]                                                                  
+|          |                                                                           
+|          v                                                                           
+|  [Request Router / Model Gateway]                                                    
+|          |                                                                           
+|          +--> Route by tenant, model target, priority, and prefix-cache locality     
+|          |                                                                           
+|          v                                                                           
+|  [Ingestion Queue]                                                                   
+|          |                                                                           
+|          +--> Schedule via FCFS, Priority, VLT, deadline, or workload lane policy    
+|          |                                                                           
+|          v                                                                           
+|  [Context Compiler Assembly]                                                         
+|          |                                                                           
+|          +--> Merge system prompt, user input, history, tools, memory, evidence      
+|          |                                                                           
+|          v                                                                           
+|  [Tokenization]                                                                      
+|          |                                                                           
+|          +--> Serialize compiled strings into integer token arrays                   
+|          |                                                                           
+|          v                                                                           
+|  [Prefix / Radix Cache Lookup]                                                       
+|          |                                                                           
+|          +--> Match token prefix against existing KV-cache block paths               
+|          |                                                                           
+|          v                                                                           
+|     +----+---------------------------------------------+                             
+|     |                                                  |                             
+|     v                                                  v                             
+|  [Prefix Miss]                                  [Prefix Hit / Partial Hit]           
+|     |                                                  |                             
+|     |                                                  +--> Lock matched radix nodes 
+|     |                                                  +--> Increment ref counts     
+|     |                                                  +--> Reuse matched KV blocks  
+|     |                                                  +--> Prefill only suffix      
+|     |                                                  |                             
+|     v                                                  |                             
+|  [Prefill Engine Execution] <--------------------------+                             
+|          |                                                                           
+|          +--> Run parallel prompt-token forward pass                                 
+|          +--> Generate initial K/V tensors for uncached tokens                       
+|          |                                                                           
+|          v                                                                           
+|  [KV Cache Allocation]                                                               
+|          |                                                                           
+|          +--> Map logical token blocks to physical PagedAttention blocks             
+|          +--> Register block-table entries in the serving runtime                    
+|          |                                                                           
+|          v                                                                           
+|  [Continuous Batching Scheduler]                                                     
+|          |                                                                           
+|          +--> Admit, drop, and reorder active sequences at token boundaries          
+|          |                                                                           
+|          v                                                                           
+|     +----+---------------------------------------------+                             
+|     |                                                  |                             
+|     v                                                  v                             
+|  [Free Blocks Available]                       [VRAM / KV Block Pressure]            
+|     |                                                  |                             
+|     |                                                  v                             
+|     |                                       [Iteration-Level Preemption]             
+|     |                                                  |                             
+|     |                                                  +--> Evict victim sequence    
+|     |                                                  +--> Recompute later, or      
+|     |                                                  +--> Swap KV blocks to DRAM   
+|     |                                                  +--> Return victim to queue   
+|     |                                                  |                             
+|     +---------------------------+----------------------+                             
+|                                 |                                                    
+|                                 v                                                    
+|  [Decode Engine Execution]                                                           
+|          |                                                                           
+|          +--> Generate one output token per autoregressive iteration                 
+|          +--> Read model weights and active KV cache from HBM each step              
+|          +--> Apply constrained decoding / compressed FSM checks when required       
+|          |                                                                           
+|          v                                                                           
+|  [Streaming / Response Emission]                                                     
+|          |                                                                           
+|          +--> Serialize token deltas and stream chunks to client socket              
+|          +--> Track TTFT, ITL, TPOT, throughput, and delivery stalls                 
+|          |                                                                           
+|          v                                                                           
+|  [Completion Detection]                                                              
+|          |                                                                           
+|          +--> Stop on EOS token, max-token limit, schema boundary, or cancellation   
+|          |                                                                           
+|          v                                                                           
+|  [KV Cache Release / Retention Policy]                                               
+|          |                                                                           
+|          +--> Decrement active reference counts                                      
+|          +--> Reclaim unreferenced physical blocks                                   
+|          +--> Retain reusable prefix nodes if cache policy allows                    
+|          |                                                                           
+|          v                                                                           
+|  [Telemetry Persistence]                                                             
+|          |                                                                           
+|          +--> Persist queue depth, cache hits, free blocks, preemptions, OOM risk    
+|          +--> Export latency spans, memory metrics, bandwidth use, and cost traces   
+|                                                                                      
 +--------------------------------------------------------------------------------------+
 ```
 
@@ -322,33 +322,33 @@ SGLang organizes prefix-cache metadata on the host CPU using a radix tree, also 
 +--------------------------------------------------------------------------------------+
 |                              RADIXATTENTION PREFIX CACHE                             |
 +--------------------------------------------------------------------------------------+
-|                                                                                      |
-|  Stable prompt root                                                                  |
-|  [System Instructions + Tool Schemas + Shared Template Prefix]                       |
-|          |                                                                           |
-|          |  KV blocks for this prefix are reused across matching requests            |
-|          v                                                                           |
-|  +------------------------------+                                                    |
-|  | Root / Shared Prefix Node    |                                                    |
-|  | token span: T0...Tn          |                                                    |
-|  | KV refs: block_ids[...]      |                                                    |
-|  | ref_count: active users      |                                                    |
-|  +--------------+---------------+                                                    |
-|                 |                                                                    |
-|        +--------+-------------------------------+                                    |
-|        |                                        |                                    |
-|        v                                        v                                    |
-|  +------------------------+              +------------------------+                  |
-|  | Branch A: Shared Path  |              | Branch B: Shared Path  |                  |
-|  | e.g. workflow/tool A   |              | e.g. workflow/tool B   |                  |
-|  +-----------+------------+              +-----------+------------+                  |
-|              |                                       |                               |
-|       +------+-------+                       +-------+------+                        |
-|       |              |                       |              |                        |
-|       v              v                       v              v                        |
-|  [User A1 suffix] [User A2 suffix]      [User B1 suffix] [User B2 suffix]            |
-|  unique leaf     unique leaf            unique leaf     unique leaf                  |
-|                                                                                      |
+|                                                                                      
+|  Stable prompt root                                                                  
+|  [System Instructions + Tool Schemas + Shared Template Prefix]                       
+|          |                                                                           
+|          |  KV blocks for this prefix are reused across matching requests            
+|          v                                                                           
+|  +------------------------------+                                                    
+|  | Root / Shared Prefix Node    |                                                    
+|  | token span: T0...Tn          |                                                    
+|  | KV refs: block_ids[...]      |                                                    
+|  | ref_count: active users      |                                                    
+|  +--------------+---------------+                                                    
+|                 |                                                                    
+|        +--------+-------------------------------+                                    
+|        |                                        |                                    
+|        v                                        v                                    
+|  +------------------------+              +------------------------+                  
+|  | Branch A: Shared Path  |              | Branch B: Shared Path  |                  
+|  | e.g. workflow/tool A   |              | e.g. workflow/tool B   |                  
+|  +-----------+------------+              +-----------+------------+                  
+|              |                                       |                               
+|       +------+-------+                       +-------+------+                        
+|       |              |                       |              |                        
+|       v              v                       v              v                        
+|  [User A1 suffix] [User A2 suffix]      [User B1 suffix] [User B2 suffix]            
+|  unique leaf     unique leaf            unique leaf     unique leaf                  
+|                                                                                      
 +--------------------------------------------------------------------------------------+
 ```
 
@@ -385,21 +385,21 @@ The radix tree is ultimately bounded by the same HBM pool that stores active KV-
 +--------------------------------------------------------------------------------------+
 |                             RADIX CACHE EVICTION LOGIC                               |
 +--------------------------------------------------------------------------------------+
-|                                                                                      |
-|  Prefer to retain:                                                                    |
-|      Root system prefix                                                               |
-|      Shared tool schemas                                                              |
-|      High-frequency workflow templates                                                |
-|      Nodes with active reference counts                                               |
-|                                                                                      |
-|  Prefer to evict first:                                                               |
-|      Unique user-query leaves                                                        |
-|      Rare branches                                                                    |
-|      Old low-access suffixes                                                          |
-|      Unreferenced nodes after completion                                              |
-|                                                                                      |
-|  Practical rule: keep the trunk, shed the twigs.                                      |
-|                                                                                      |
+|                                                                                      
+|  Prefer to retain:                                                                   
+|      Root system prefix                                                               
+|      Shared tool schemas                                                              
+|      High-frequency workflow templates                                                
+|      Nodes with active reference counts                                               
+|                                                                                      
+|  Prefer to evict first:                                                               
+|      Unique user-query leaves                                                        
+|      Rare branches                                                                    
+|      Old low-access suffixes                                                          
+|      Unreferenced nodes after completion                                              
+|                                                                                      
+|  Practical rule: keep the trunk, shed the twigs.                                      
+|                                                                                      
 +--------------------------------------------------------------------------------------+
 ```
 

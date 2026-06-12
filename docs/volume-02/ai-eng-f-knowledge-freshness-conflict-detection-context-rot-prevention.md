@@ -28,12 +28,14 @@ O(L * b_level)
 where L is the number of hierarchical layers and b_level is the restricted branching factor within a specific level.5 This optimization reduces the number of node visits for a representative query from hundreds of thousands to mere dozens, though it requires a structured cold start to map the topology and is not suited for pure unstructured similarity searches.5
 
 Flat Graph Traversal (GraphRAG):  
+```
 validateTkn ---> refreshTkn ---> sessionCheck ---> userLookup ---> permissionVerify ---> apiGateway ---> chargeInit  
 (Combinatorial explosion of intermediate nodes visited: O(b^H))
 
 Topological Traversal (Topology RAG - The Wormhole Effect):  
 validateTkn --[ascend]--> AuthSystem ===[component edge]===> PaymentPlatform --[descend]--> chargeInit  
 (Traverses high-level components to bypass intermediate node overhead: O(L * b_level))
+```
 
 Engineers must balance these paradigms against database capabilities.6 A common architectural question is whether to adopt a "just use pgvector" approach within an existing PostgreSQL instance or deploy dedicated vector engines such as Qdrant or Milvus.8 The decision to use pgvector is governed by six strict criteria.8 If any of these conditions are violated, systems must migrate to purpose-built stores to avoid operational degradation under load.8
 
@@ -164,13 +166,18 @@ The DualTrack framework executes parallel generation tracking, producing two syn
 Furthermore, production systems must implement automated fallback mechanisms to resolve "citation rot" or broken URL links in retrieved sources.10 If a retrieved URL is flagged as stale or unreachable, the system automatically queries archive APIs (such as the Wayback Machine) to resolve historical snapshots.31  
 This ensures that inline citations remain resolvable and auditable, maintaining link integrity over time.10
 
-| Citation Metric | Mathematical Formulation / System Setup | Target Objective | Empirical Observations |
-| :---- | :---- | :---- | :---- |
-| **Jaccard Stability** | Stability = | C_t intersect C_t+1 | / |
-| **Drift Rate** | Drift Rate = | C_t delta C_t+1 | . 29 |
-| **Fabrication Rate** | Fabrication Rate = | Fabricated Citations | / |
-| **DualTrack Alignment** | Aligns target-language user answers with original source-language representations. | Prevents citation drift during cross-lingual retrieval. | Minimizes translation-induced citation alignment failures. |
-| **Wayback Resolution** | Queries archived URL snapshots if the primary URI returns non-resolving codes. 31 | Resolves link rot and preserves verifiable inline references. 10 | Resolves natural link rot to maintain audit trail integrity. 31 |
+| Citation Metric                       | Mathematical Formulation / System Setup                                                  | Target Objective                                                                                                  | Diagnostic Use                                                                                                               |
+| :------------------------------------ | :--------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| **Jaccard Stability**                 | `Stability = cardinality(C_t ∩ C_{t+1}) / cardinality(C_t ∪ C_{t+1})`                    | Measures whether valid citations persist across sequential turns.                                                 | Low stability indicates citation loss, mutation, source swapping, or evidence drift during multi-turn interaction.           |
+| **Citation Drift Rate**               | `Drift Rate = cardinality(C_t △ C_{t+1})`                                                | Quantifies how many citation references changed between turn `t` and turn `t+1`.                                  | High drift rate signals unstable attribution chains, especially in long conversations or iterative research workflows.       |
+| **Citation Retention Rate**           | `Retention = cardinality(C_t ∩ C_{t+1}) / cardinality(C_t)`                              | Measures how many previously valid citations remain active in the next turn.                                      | Useful for detecting citation loss when the answer still discusses the same evidence set.                                    |
+| **Citation Fabrication Rate**         | `Fabrication Rate = fabricated_citations / total_citations_generated`                    | Measures the share of citations that do not resolve to a real, retrievable, or authorized source.                 | Flags hallucinated references, malformed source IDs, invented URLs, or unsupported document claims.                          |
+| **Citation Mutation Rate**            | `Mutation Rate = mutated_citation_fields / tracked_citation_fields`                      | Measures whether source attributes change across turns: title, author, URL, version, page, section, or timestamp. | Detects subtle attribution corruption where the citation still exists but no longer points to the same evidence coordinates. |
+| **Citation Support Rate**             | `Support Rate = supported_generated_claims / total_generated_claims`                     | Measures whether generated claims are backed by at least one retrieved evidence packet.                           | Separates citation presence from actual evidentiary support; prevents decorative citation laundering.                        |
+| **Claim-Citation Entailment**         | `Entailment Score = NLI(claim, cited_span)`                                              | Validates whether the cited span logically supports, contradicts, or is neutral toward the generated claim.       | Detects overclaiming, scope inflation, causal exaggeration, and numeric specificity errors.                                  |
+| **DualTrack Alignment**               | Compare target-language answer claims against original-language evidence representation. | Preserves citation integrity in cross-lingual RAG.                                                                | Detects translation-induced attribution drift, mistranslated claims, and mismatched source spans.                            |
+| **Wayback / Archive Resolution Rate** | `Archive Resolution = archived_links_recovered / broken_links_detected`                  | Measures whether stale or broken citation URLs can be resolved through archive snapshots.                         | Helps prevent citation rot from destroying auditability after original URLs decay.                                           |
+| **Version-Aware Citation Validity**   | `Valid Citations = citations_resolving_to_active_or_requested_version / total_citations` | Ensures cited sources match the active, requested, or historically appropriate version.                           | Prevents current answers from citing superseded policies, expired documents, or stale source snapshots.                      |
 
 ## **Section 8: Synthesized Systemic Architecture of a Doctrinal RAG Pipeline**
 
@@ -178,58 +185,143 @@ An industrial-grade RAG pipeline must integrate context pruning, conflict detect
 Every chunk, vector embedding, extracted assertion, or summary is derived from a primary Corpus Object, which carries comprehensive compliance, security, provenance, and temporal metadata to enable precise upstream filtering.32
 
 ```
-                     +---------------------------------------+  
-                     |         Unstructured Ingest           |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |      Canonical Corpus Ingestion       |  
-                     |  - Assign Unique object_id (UUID)     |  
-                     |  - Evaluate Source Authority Score    |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |       Hierarchical Chunking           |  
-                     |  - Parse along Semantic Boundaries    |  
-                     |  - Generate Derived Embeddings        |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |    Bi-Temporal Database Write         |  
-                     |  - Track Valid vs Transaction Time    |  
-                     |  - Write to SlotVec Arena Allocator   |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |     Multi-Stage Query Processing      |  
-                     |  - Query Complexity Classification    |  
-                     |  - Dynamic Token Budget Assignment    |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |      Conflict Detection Module        |  
-                     |  - Stage 1: Fast MLP Classifier       |  
-                     |  - Stage 2: Selective LLM Refine      |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |     Entropy-TOPSIS Resolution         |  
-                     |  - Compute Source Credibility Scores  |  
-                     |  - Filter & Rank Retrieved Evidence   |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |      Conflict-Aware Generation        |  
-                     |  - Execute DualTrack Representation   |  
-                     |  - Resolve Stale URL Fallbacks        |  
-                     +---------------------------------------+
++------------------------------------------------------------------------------------------------+
+|                    SYNTHESIZED SYSTEMIC ARCHITECTURE OF A DOCTRINAL RAG PIPELINE               |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Goal: integrate corpus governance, freshness control, conflict detection, context pruning,    
+|  bi-temporal state, belief revision, citation integrity, and conflict-aware generation.        
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                                  SOURCE INGESTION LAYER                                  |  
+|  |                                                                                          |  
+|  |  unstructured files | wikis | APIs | databases | tickets | logs | policies | user uploads|  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              CANONICAL CORPUS INGESTION                                  |  
+|  |                                                                                          |  
+|  |  assign object_id | capture source_uri | hydrate ACLs | evaluate source authority        |  
+|  |  normalize format | redact sensitive data | preserve provenance | record lineage         |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              DERIVATIVE KNOWLEDGE ASSETS                                 |  
+|  |                                                                                          |  
+|  |  structure-aware chunks | proposition claims | summaries | embeddings | citation anchors |  
+|  |  entity records | graph edges | parent-child links | table coordinates | code references |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              BI-TEMPORAL STORAGE LAYER                                   |  
+|  |                                                                                          |  
+|  |  Valid Time:       when the fact is true in the real world                               |  
+|  |  Transaction Time: when the system recorded or believed the fact                         |  
+|  |                                                                                          |  
+|  |  Store active facts, historical versions, supersession links, invalidated claims,        |  
+|  |  audit records, source authority, retention state, and legal-hold metadata.              |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              FRESHNESS AND ROT PREVENTION LOOP                           |  
+|  |                                                                                          |  
+|  |  triggers: source update | factual correction | stale cache | embedding drift | URL rot  |  
+|  |                                                                                          |  
+|  |  actions: re-embed document | expire stale vectors | invalidate prompt cache | refresh   |  
+|  |  summaries | close old valid-time windows | update citation anchors | queue review       |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              QUERY-TIME ELIGIBILITY GATES                                |  
+|  |  Before retrieval, filter by: tenant | ACL | source authority | active version           |  
+|  |  valid time | jurisdiction | product scope | retention state | redaction status          |  
+|  |  legal hold                                                                              |   
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              RETRIEVAL AND CONTEXT OPTIMIZATION                          |  
+|  |                                                                                          |  
+|  |  hybrid search | graph traversal | temporal lookup | parent-child expansion              |  
+|  |  reranking | semantic deduplication | token budget assignment | context pruning          |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              CONFLICT DETECTION MODULE                                   |  
+|  |                                                                                          |  
+|  |  Detect: inter-document factual conflict | temporal conflict | opinion divergence        |  
+|  |          parametric-contextual conflict | supersession conflict | scoped variation       |  
+|  |                                                                                          |  
+|  |  Output: clean evidence set, scoped-variation packet, or explicit conflict packet.       |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                  [ Conflict or Belief Revision Needed? ]                       
+|                                                /       \                                       
+|                                         No    /         \   Yes                                
+|                                              v           v                                     
+|                         [ Evidence Packaging ]     +--------------------------------------+    
+|                                                  | BELIEF REVISION / RESOLUTION ENGINE    |    
+|                                                  |                                        |    
+|                                                  | authority ranking | temporal ordering  |    
+|                                                  | Entropy-TOPSIS | AGM-style revision    |    
+|                                                  | dependency propagation | quarantine    |    
+|                                                  | abstain / escalate when unresolved     |    
+|                                                  +------------------+---------------------+    
+|                                                                     |                          
+|                                                                     v                          
+|  +------------------------------------------------------------------------------------------+  
+|  |                              EVIDENCE PACKAGING AND SEMANTIC INJECTION                   |  
+|  |                                                                                          |  
+|  |  Package approved material into isolated evidence packets with:                          |  
+|  |                                                                                          |  
+|  |  source coordinates | citation IDs | version hashes | authority scores | conflict status |  
+|  |  validity windows | permissions | retrieval rationale | task relevance | token cost      |  
+|  |                                                                                          |  
+|  |  Retrieved data remains data, not executable instruction.                                |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              CONFLICT-AWARE GENERATION                                   |  
+|  |                                                                                          |  
+|  |  Generate answer using smallest sufficient evidence set.                                 |  
+|  |                                                                                          |  
+|  |  If clean: answer directly with citations.                                               |  
+|  |  If scoped: answer conditionally by time, region, product, tenant, or source domain.     |  
+|  |  If conflicting: expose dispute, cite competing sources, and avoid false synthesis.      |  
+|  |  If unresolved: abstain, escalate, or request verification.                              |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              CITATION INTEGRITY AND DRIFT TRACKING                       |  
+|  |  Track: citation stability | drift rate | retention rate | fabrication rate              |  
+|  |  mutation rate | support rate | claim-citation entailment | broken-link recovery         |  
+|  |  version validity                                                                        |  
+|  |                                                                                          |  
+|  |  DualTrack generation preserves source-language evidence alignment in cross-lingual RAG. |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              TELEMETRY AND FEEDBACK LOOP                                 |  
+|  |  Log: retrieved objects | omitted objects | stale candidates | conflict packets          |  
+|  |   citations | context token budget | pruning decisions | user corrections                |  
+|  |   cache invalidations                                                                    |  
+|  |                                                                                          |  
+|  | Feed corrections back into corpus refresh, embedding updates, belief revision, and evals.|  
+|  +------------------------------------------------------------------------------------------+  
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Doctrine: a production RAG pipeline is not just retrieval plus generation. It is a governed,   |
+| temporal, conflict-aware, citation-stable knowledge system with active decay prevention.       |
++------------------------------------------------------------------------------------------------+
 ```
 
 To maintain architectural integrity across this lifecycle, the Corpus Object must enforce a strict metadata schema across nine administrative segments:

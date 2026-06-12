@@ -38,115 +38,115 @@ The retrieval pipeline must handle queries through a deterministic sequence of p
 +------------------------------------------------------------------------------------------------+
 |                                  RETRIEVAL PIPELINE ARCHITECTURE                               |
 +------------------------------------------------------------------------------------------------+
-|                                                                                                |
-|  Rule: retrieve the smallest sufficient set of authorized, current, source-grounded evidence   |
-|  needed to answer the actual task. Permission and scope gates constrain search before scoring. |
-|                                                                                                |
-|  [ Incoming User Query ]                                                                       |
-|            |                                                                                   |
-|            v                                                                                   |
-|  +------------------------------------------------------------------------------------------+  |
-|  |  1. Query Interpretation                                                                  |  |
-|  |                                                                                          |  |
-|  |  intent classification | entity resolution | alias expansion | temporal normalization      |
-|  |  query decomposition | metadata inference | rewrite validation                         |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |  2. Authenticated Retrieval Context                                                       |  |
-|  |                                                                                          |  |
-|  |  user_id | tenant_id | SIDs/groups | roles | jurisdiction | clearance | active project   |
-|  |  session references | tool permissions | budget / latency constraints                  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |  3. Pre-Retrieval Eligibility Plan                                                       |  |
-|  |                                                                                          |  |
-|  |  Build native index filters before candidate generation:                                 |  |
-|  |                                                                                          |  |
-|  |  - tenant and organization boundaries                                                    |  |
-|  |  - ACL / SID / group intersections                                                       |  |
-|  |  - jurisdiction and product scope                                                        |  |
-|  |  - active version and freshness status                                                   |  |
-|  |  - archival, legal-hold, and redaction eligibility                                       |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |  4. Constrained Candidate Generation                                                     |  |
-|  |                                                                                          |  |
-|  |  Search only inside authorized, current, eligible partitions.                            |  |
-|  |                                                                                          |  |
-|  |  +--------------------+   +--------------------+   +--------------------+   +-----------+|  |
-|  |  | Lexical Channel    |   | Dense Channel      |   | Graph Channel      |   | SQL / API ||  |
-|  |  | BM25 / keywords    |   | vector / embedding |   | entity traversal   |   | lookups   ||  |
-|  |  +--------------------+   +--------------------+   +--------------------+   +-----------+|  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |  5. Hybrid Fusion                                                                        |  |
-|  |                                                                                          |  |
-|  |  normalize scores or fuse ranks: RRF | RSF | Bayesian BM25 blending | channel weights    |  |
-|  |  preserve source IDs, rank provenance, matched subquery, and channel-specific evidence   |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |  6. Reranking and Answerability Scoring                                                  |  |
-|  |                                                                                          |  |
-|  |  cross-encoder rerank | LLM utility grading | diversity pruning | authority adjustment   |  |
-|  |  freshness adjustment | citation-coordinate preference | answerability evaluation        |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |  7. Evidence Gating and Selection                                                        |  |
-|  |                                                                                          |  |
-|  |  Verify each candidate before context assembly:                                          |  |
-|  |                                                                                          |  |
-|  |  - still authorized                                                                      |  |
-|  |  - active / not superseded                                                               |  |
-|  |  - high enough source authority                                                          |  |
-|  |  - non-redundant with selected evidence                                                  |  |
-|  |  - citation coordinates available                                                        |  |
-|  |  - supports at least one required subquestion                                            |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                      [ Conflicts Detected? ]                                   |
-|                                           /                  \                                 |
-|                                    No    /                    \   Yes                          |
-|                                         v                      v                               |
-|                         [ Approved Evidence Set ]      +-----------------------------------+   |
-|                                                        | Conflict Packet                   |   |
-|                                                        |                                   |   |
-|                                                        | group contradictory candidates    |   |
-|                                                        | preserve source authority,        |   |
-|                                                        | freshness, version, scope, and    |   |
-|                                                        | citation coordinates              |   |
-|                                                        +----------------+------------------+   |
-|                                                                         |                      |
-|                                                                         v                      |
-|  +------------------------------------------------------------------------------------------+  |
-|  |  8. Evidence Packaging                                                                   |  |
-|  |                                                                                          |  |
-|  |  Build standard Evidence Packets: content, provenance, governance, epistemic metadata,   |  |
-|  |  citation coordinates, matched subquery, retrieval rationale, and conflict annotations.  |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |  9. Semantic Injection and Context Assembly                                              |  |
-|  |                                                                                          |  |
-|  |  Render evidence into isolated XML / structured packets. Keep retrieved content separated|  |
-|  |  from system instructions. Order packets by utility, authority, freshness, and token cost|  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|                                   [ Target LLM Context Window ]                                |
-|                                                                                                |
+|                                                                                                
+|  Rule: retrieve the smallest sufficient set of authorized, current, source-grounded evidence   
+|  needed to answer the actual task. Permission and scope gates constrain search before scoring. 
+|                                                                                                
+|  [ Incoming User Query ]                                                                       
+|            |                                                                                   
+|            v                                                                                   
+|  +------------------------------------------------------------------------------------------+  
+|  |  1. Query Interpretation                                                                 |  
+|  |                                                                                          |  
+|  |  intent classification | entity resolution | alias expansion | temporal normalization    |  
+|  |  query decomposition | metadata inference | rewrite validation                           |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  2. Authenticated Retrieval Context                                                      |  
+|  |                                                                                          |  
+|  |  user_id | tenant_id | SIDs/groups | roles | jurisdiction | clearance | active project   |  
+|  |  session references | tool permissions | budget / latency constraints                    |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  3. Pre-Retrieval Eligibility Plan                                                       |  
+|  |                                                                                          |  
+|  |  Build native index filters before candidate generation:                                 |  
+|  |                                                                                          |  
+|  |  - tenant and organization boundaries                                                    |  
+|  |  - ACL / SID / group intersections                                                       |  
+|  |  - jurisdiction and product scope                                                        |  
+|  |  - active version and freshness status                                                   |  
+|  |  - archival, legal-hold, and redaction eligibility                                       |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  4. Constrained Candidate Generation                                                     |  
+|  |                                                                                          |  
+|  |  Search only inside authorized, current, eligible partitions.                            |  
+|  |                                                                                          |  
+|  |  +--------------------+   +--------------------+   +--------------------+   +-----------+|  
+|  |  | Lexical Channel    |   | Dense Channel      |   | Graph Channel      |   | SQL / API ||  
+|  |  | BM25 / keywords    |   | vector / embedding |   | entity traversal   |   | lookups   ||  
+|  |  +--------------------+   +--------------------+   +--------------------+   +-----------+|  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  5. Hybrid Fusion                                                                        |  
+|  |                                                                                          |  
+|  |  normalize scores or fuse ranks: RRF | RSF | Bayesian BM25 blending | channel weights    |  
+|  |  preserve source IDs, rank provenance, matched subquery, and channel-specific evidence   |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  6. Reranking and Answerability Scoring                                                  |  
+|  |                                                                                          |  
+|  |  cross-encoder rerank | LLM utility grading | diversity pruning | authority adjustment   |  
+|  |  freshness adjustment | citation-coordinate preference | answerability evaluation        |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  7. Evidence Gating and Selection                                                        |  
+|  |                                                                                          |  
+|  |  Verify each candidate before context assembly:                                          |  
+|  |                                                                                          |  
+|  |  - still authorized                                                                      |  
+|  |  - active / not superseded                                                               |  
+|  |  - high enough source authority                                                          |  
+|  |  - non-redundant with selected evidence                                                  |  
+|  |  - citation coordinates available                                                        |  
+|  |  - supports at least one required subquestion                                            |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Conflicts Detected? ]                                   
+|                                           /                  \                                 
+|                                    No    /                    \   Yes                          
+|                                         v                      v                               
+|                         [ Approved Evidence Set ]      +-----------------------------------+   
+|                                                        | Conflict Packet                   |   
+|                                                        |                                   |   
+|                                                        | group contradictory candidates    |   
+|                                                        | preserve source authority,        |   
+|                                                        | freshness, version, scope, and    |   
+|                                                        | citation coordinates              |   
+|                                                        +----------------+------------------+   
+|                                                                         |                      
+|                                                                         v                      
+|  +------------------------------------------------------------------------------------------+  
+|  |  8. Evidence Packaging                                                                   |  
+|  |                                                                                          |  
+|  |  Build standard Evidence Packets: content, provenance, governance, epistemic metadata,   |  
+|  |  citation coordinates, matched subquery, retrieval rationale, and conflict annotations.  |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  9. Semantic Injection and Context Assembly                                              |  
+|  |                                                                                          |  
+|  |  Render evidence into isolated XML / structured packets. Keep retrieved content separated|  
+|  |  from system instructions. Order packets by utility, authority, freshness, and token cost|  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|                                   [ Target LLM Context Window ]                                
+|                                                                                                
 +------------------------------------------------------------------------------------------------+
 | Retrieval doctrine: candidate generation is high-recall, but only inside an authorized search  |
 | space. Final context is high-precision, source-grounded, citation-ready, and conflict-aware.   |
@@ -360,33 +360,75 @@ Pre-retrieval filtering restricts the search space *before* candidate generation
 To secure data and maintain relevance, the retrieval pipeline enforces three tiers of metadata-driven validation gates before candidates are selected for reranking:
 
 ```
-            User Query & Authenticated Context (SIDs, Tenant ID)  
-                                     |  
-                                     v  
-+--------------------------------------------------------------------------+  
-|  Tier 1: SECURITY GATE (Pre-Retrieval Filter)                            |  
-|  - Enforces: `tenant_id == "TENANT-A"`                                   |  
-|  - Enforces: `user_groups INTERSECT document_acl_groups`                 |  
-|  - Blocks unauthorized vector matches before scoring or logging          |  
-+--------------------------------------------------------------------------+  
-                                     |  
-                                     v  
-+--------------------------------------------------------------------------+  
-|  Tier 2: FRESHNESS & VERSION GATE (Retrieval-Time Gate)                  |  
-|  - Enforces: `document_status == "active"`                               |  
-|  - Diverts queries targeting superseded files to replacement versions    |  
-|  - Matches dates against the user's temporal parameters                  |  
-+--------------------------------------------------------------------------+  
-                                     |  
-                                     v  
-+--------------------------------------------------------------------------+  
-|  Tier 3: COMPLIANCE & SCOPE GATE (Dynamic Filter)                        |  
-|  - Enforces: `jurisdiction == "EU"`, `product_version == "V3"`           |  
-|  - Redaction Propagation: Scrubs sensitive variables and PII             |  
-+--------------------------------------------------------------------------+  
-                                     |  
-                                     v  
-                     Clean, Approved Candidate List
++------------------------------------------------------------------------------------------------+
+|                         METADATA FILTERING AND PERMISSION GATE MODEL                           |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Rule: security filters constrain the searchable index before ANN, vector scoring, reranking,  
+|  logging, or GPU exposure. Post-retrieval filtering is too late.                               
+|                                                                                                
+|  [ User Query + Authenticated Context ]                                                        
+|       |                                                                                        
+|       |  JWT / session token | user_id | tenant_id | roles | SIDs | groups | jurisdiction      
+|       v                                                                                        
+|  +------------------------------------------------------------------------------------------+  
+|  |  Identity and Policy Hydration                                                           |  
+|  |                                                                                          |  
+|  |  Resolve: tenant scope, allowed principals, clearance level, active project, geography,  |  
+|  |  product scope, legal/compliance boundary, and tool/data permissions.                    |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  Native Filter Plan                                                                      |  
+|  |                                                                                          |  
+|  |  Compile metadata constraints into database-native filters:                              |  
+|  |                                                                                          |  
+|  |  tenant_id == active tenant                                                              |  
+|  |  user_SIDs INTERSECT document_acl_groups != empty                                        |  
+|  |  classification <= user_clearance                                                        |  
+|  |  jurisdiction/product/version match active query scope                                   |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  Tier 1: Security Gate                                                                   |  
+|  |                                                                                          |  
+|  |  Exclude unauthorized vectors, documents, graph nodes, SQL rows, and API records before  |  
+|  |  similarity scoring or candidate logging.                                                |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  Tier 2: Freshness and Version Gate                                                      |  
+|  |                                                                                          |  
+|  |  Enforce active version status, valid time, supersession links, archival state, and      |  
+|  |  temporal constraints extracted from the user query.                                     |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  Tier 3: Compliance and Scope Gate                                                       |  
+|  |                                                                                          |  
+|  |  Enforce jurisdiction, product tier, customer class, retention status, redaction state,  |  
+|  |  legal hold, and dynamic ABAC/RBAC policy rules.                                         |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  Constrained Search Space                                                                |  
+|  |                                                                                          |  
+|  |  Only eligible objects enter lexical search, dense vector ANN, graph traversal, SQL/API  |  
+|  |  lookup, fusion, reranking, and evidence selection.                                      |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|                              [ Clean, Approved Candidate List ]                                
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Security doctrine: the retrieval system should never fetch, score, rerank, cache, or expose    |
+| content that the authenticated caller is not allowed to access.                                |
++------------------------------------------------------------------------------------------------+
 ```
 
 The system coordinates these validation gates using structured metadata constraints:
@@ -582,13 +624,28 @@ The context compiler translates approved Evidence Packets into structured prompt
 * **Format**: Renders data as Markdown tables, keeping row headers and column headers intact.28
 
 ```XML  
-<evidence-packet id="EP-TAB-09" source="Q3-FINANCIALS">  
-  <table-data name="Revenue Summary" coordinates="Table 2, Rows 3-5">  
-    | Region | Q3 Revenue | YoY Growth |  
-    | :--- | :--- | :--- |  
-    | EMEA | $14.2M | +12% |  
-    | APAC | $18.9M | +18% |  
-  </table-data>  
+<evidence-packet id="EP-TAB-09" source="Q3-FINANCIALS" version="2026-Q3-final">
+  <citation-coordinates
+    uri="s3://finance/reports/q3-financials.xlsx"
+    sheet="Revenue Summary"
+    table="Table 2"
+    rows="3-5"
+    columns="Region,Q3 Revenue,YoY Growth" />
+
+  <table-data name="Revenue Summary" format="markdown-literal">
+    <![CDATA[
+| Region | Q3 Revenue | YoY Growth |
+| :---   | :---       | :---       |
+| EMEA   | $14.2M     | +12%       |
+| APAC   | $18.9M     | +18%       |
+    ]]>
+  </table-data>
+
+  <table-semantics>
+    <row-headers>Region</row-headers>
+    <column-headers>Q3 Revenue, YoY Growth</column-headers>
+    <unit-notes>Revenue values are in USD millions.</unit-notes>
+  </table-semantics>
 </evidence-packet>
 ```
 
@@ -660,6 +717,33 @@ The context compiler translates approved Evidence Packets into structured prompt
 <evidence-brief topic="Acme Security SLA">  
   - Acme requires 99.9% uptime for API services.  
   - Incident response times must not exceed 15 minutes.  
+</evidence-brief>
+```
+
+Or, for a more robust case:
+
+```XML
+<evidence-brief topic="Acme Security SLA" task="executive_summary">
+  <brief-purpose>
+    Provide a compact, citation-addressable summary of the SLA obligations relevant to the active query.
+  </brief-purpose>
+
+  <evidence-point id="BULLET-01" packet-ref="EP-ACME-SLA-04" citation-span="section 2.1">
+    Acme requires 99.9% monthly uptime for public API services.
+  </evidence-point>
+
+  <evidence-point id="BULLET-02" packet-ref="EP-ACME-SLA-07" citation-span="section 3.4">
+    Priority-1 incident response must begin within 15 minutes of confirmed detection.
+  </evidence-point>
+
+  <evidence-point id="BULLET-03" packet-ref="EP-ACME-SLA-09" citation-span="section 5.2">
+    Scheduled maintenance windows must be announced at least 72 hours in advance.
+  </evidence-point>
+
+  <scope-note>
+    This brief only summarizes active Acme SLA obligations. Superseded drafts and unrelated customer
+    support policies were excluded from the evidence set.
+  </scope-note>
 </evidence-brief>
 ```
 

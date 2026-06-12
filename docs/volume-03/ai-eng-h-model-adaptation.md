@@ -116,9 +116,25 @@ Preference tuning shifts the optimization target from imitating a target corpus 
 Standard preference tuning assumes a dataset of prompt-response pairs D = {(x, y_w, y_l)}, where y_w represents the preferred (chosen) response and y_l represents the dispreferred (rejected) response.2 Traditionally, this was executed via Reinforcement Learning from Human Feedback (RLHF), which requires:
 
 1. Training a binary classification Reward Model r_phi(x, y) on pairwise preferences using the Bradley-Terry objective 2: L_R(r_phi) = -E_(x, y_w, y_l) ~ D [ log sigma( r_phi(x, y_w) - r_phi(x, y_l) ) ]  
-2. Optimizing the active policy pi_theta(y | x) against the frozen reward model r_phi using Actor-Critic PPO, while applying a Kullback-Leibler (KL) divergence penalty against a frozen reference policy pi_ref to prevent policy collapse 2: Objective(theta) = E_(x ~ D, y ~ pi_theta) [ r_phi(x, y) ] - beta * DKL( pi_theta(y | x) |
+2. Optimizing the active policy pi_theta(y | x) against the frozen reward model r_phi using Actor-Critic PPO, while applying a Kullback-Leibler (KL) divergence penalty against a frozen reference policy pi_ref to prevent policy collapse 2: 
 
-| pi_ref(y | x) )  
+```
+Objective(theta) =
+  E_{x ~ D, y ~ pi_theta}
+  [
+    r_phi(x, y)
+    - beta * D_KL(
+        pi_theta(y | x) || pi_ref(y | x)
+      )
+  ]
+
+Where:
+  pi_theta = active policy being optimized
+  pi_ref   = frozen reference policy
+  r_phi    = learned reward model
+  beta     = KL penalty coefficient preventing policy collapse
+```
+
 PPO requires maintaining four distinct models in memory (Actor pi_theta, Critic, Reward r_phi, Reference pi_ref), leading to high training instability, complex hyperparameter tuning, and massive GPU infrastructure requirements.2  
 To eliminate this complexity, Direct Preference Optimization (DPO) mathematically reparameterizes the Bradley-Terry reward function directly in terms of the policy's log-probabilities, bypassing the reward model and reinforcement learning loop entirely.2 The DPO loss is defined as 2:  
 L_DPO(pi_theta; pi_ref) = -E_(x, y_w, y_l) ~ D [ log sigma( beta * log(pi_theta(y_w | x) / pi_ref(y_w | x)) - beta * log(pi_theta(y_l | x) / pi_ref(y_l | x)) ) ]  
@@ -192,10 +208,35 @@ where s is a segment vector defining which rows of the batched activation tensor
 SGMV gathers non-contiguous adapter weights directly from the unified memory pool, performs the segmented low-rank projection X * B and the subsequent expansion X * B * A, and accumulates the residual delta directly into the output tensor Y.43 This eliminates padding overhead and enables highly concurrent, heterogeneous multi-adapter decoding batches with millisecond-level execution penalties.45
 
 vLLM Multi-Adapter Serving Engine Parameters:  
-  --enable-lora : Activates the scheduler's LoRAManager node.  
-  --max-loras : Restricts the active concurrent adapter slot count in GPU HBM.  
-  --max-lora-rank : Allocates pre-formatted memory buffers sized to this rank limit.  
-  --max-cpu-loras : Manages the intermediate LRU cache tier in system DRAM.
+```
+# vLLM Multi-Adapter Serving Engine Parameters
+# Purpose: serve many LoRA adapters against one frozen base model while bounding GPU memory use.
+
+--enable-lora
+# Activates the serving engine's LoRA / adapter manager.
+
+--max-loras <N>
+# Maximum number of concurrently active LoRA adapters resident in GPU HBM.
+
+--max-lora-rank <R>
+# Maximum supported LoRA rank. Pre-allocates adapter buffers sized to this ceiling.
+# Requests requiring rank > R must be rejected or routed to a compatible serving pool.
+
+--max-cpu-loras <N>
+# Maximum number of adapters staged in CPU DRAM as an intermediate cache tier.
+
+--lora-modules <adapter_name>=<adapter_path> [...]
+# Registers named adapter artifacts and their storage paths for route-time selection.
+
+--fully-sharded-loras
+# Optional. Shards adapter computation across tensor-parallel workers for larger adapters.
+
+--max-model-len <TOKENS>
+# Bounds context length so KV cache and adapter paging remain within the memory envelope.
+
+--gpu-memory-utilization <0.0-1.0>
+# Reserves a safe fraction of GPU memory for model weights, KV cache, adapter pages, and overhead.
+```
 
 ### **Adapter Management Model**
 
@@ -274,8 +315,12 @@ Model distillation is an architectural and economic intervention designed to tra
 
 ### **Distillation Scaling Laws**
 
-The performance of a distilled student model is governed by rigorous scaling laws parameterized by the student size (N_S), distillation token volume (D_S), and the teacher's capability represented by its cross-entropy loss (L_T).51 Research by Busbridge et al. (2025) models the student's cross-entropy loss (L_S) through a broken power law 33:  
-L_S(N_S, D_S, L_T) = + phi(L_T, N_S)  
+The performance of a distilled student model is governed by rigorous scaling laws parameterized by the student size (N_S), distillation token volume (D_S), and the teacher's capability represented by its cross-entropy loss (L_T).51 Research by Busbridge et al. models the student's cross-entropy loss as a scaling-law function of student size, distillation token volume, and teacher quality:
+
+`L_S(N_S, D_S, L_T) = L_infinity + A * N_S^(-alpha) + B * D_S^(-beta) + phi(L_T, N_S)`
+
+The term `phi(L_T, N_S)` represents the capacity-gap penalty. Under ordinary conditions, a stronger teacher lowers student loss. However, when the teacher's distribution is too complex for the student's parameter budget, the student cannot represent the teacher's behavior faithfully, producing a U-shaped degradation curve rather than monotonic improvement.
+
 The term phi(L_T, N_S) models the **Capacity Gap**.32 Under standard scaling, a stronger teacher (lower L_T) yields a stronger student (lower L_S).51 However, if the teacher's capacity is excessively high relative to the student's parameter limit N_S, a representation mismatch occurs.32 The student model lacks the representational hypothesis space required to model the highly complex, multi-modal logit distributions of the teacher, resulting in optimization instability and an actual degradation of student performance (forming a U-shaped capacity gap curve).32  
 Furthermore:
 
@@ -312,36 +357,140 @@ Distillation Break-Even Volumetric Equation:
 Every model adaptation pipeline must pass through a multi-stage validation suite prior to staging or production deployment to protect against negative transfer, capability regression, and safety decay.
 
 ```
-                   ┌────────────────────────────────────────┐  
-                   │    Adaptive Model Candidate Check      │  
-                   └───────────────────┬────────────────────┘  
-                                       │  
-            ┌──────────────────────────┴──────────────────────────┐  
-            ▼                                                     ▼  
-┌───────────────────────┐                               ┌───────────────────────┐  
-│ Target Behavior Evals │                               │ Alignment Evals       │  
-│ - Exact Match Accuracy│                               │ - Refusal Accuracy    │  
-│ - Syntax & Schema Adh.│                               │ - Jailbreak Resistance│  
-│ - Tool-Call Success   │                               │ - Privacy Leak Check  │  
-└───────────┬───────────┘                               └───────────┬───────────┘  
-            │                                                       │  
-            └──────────────────────────┬────────────────────────────┘  
-                                       │  Pass All Verification Criteria  
-                                       ▼  
-                        ┌─────────────────────────────┐  
-                        │      Regression Evals       │  
-                        │ - MMLU / GSM8K Track        │  
-                        │ - Perplexity Drift Tracking │  
-                        │ - Negative Transfer Check   │  
-                        └──────────────┬──────────────┘  
-                                       │  Pass Threshold (Max 2% Decay)  
-                                       ▼  
-                        ┌─────────────────────────────┐  
-                        │      Shadow Deployment      │  
-                        │ - Live Mirror Traffic Run   │  
-                        │ - Latency SLA Assessment    │  
-                        │ - Error Budget Tracking     │  
-                        └─────────────────────────────┘
++------------------------------------------------------------------------------------------------+
+|                       ADAPTATION REGRESSION AND SAFETY EVALUATION PLAN                         |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Goal: prove that an adapted checkpoint or adapter improves the target behavior without        
+|  degrading general capability, safety, privacy, schema reliability, or serving stability.      
+|                                                                                                
+|  [ Adaptation Candidate: SFT checkpoint / LoRA adapter / preference-tuned model / student ]    
+|                                      |                                                                                               v                                                         |
+|  +------------------------------------------------------------------------------------------+  
+|  |  1. Baseline Calibration Sweep                                                           |  
+|  |                                                                                          |  
+|  |  Run the frozen base model through the same target, safety, schema, retrieval, and tool  |  
+|  |  tests. Establish baseline accuracy, latency, refusal behavior, and failure profile.     |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  2. Artifact Compatibility Gate                                                          |  
+|  |                                                                                          |  
+|  |  Verify base checkpoint hash, tokenizer version, adapter rank, target modules, schema    |  
+|  |  config, serving engine version, merge policy, tenant scope, and rollback path.          |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Compatible? ]                                           
+|                                      /            \                                            
+|                               Yes   /              \   No                                      
+|                                    v                v                                          
+|                      [ Continue Evaluation ]     [ Reject Artifact / Repair Registry ]         
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  3. Held-Out Target Behavior Evaluation                                                  |  
+|  |                                                                                          |  
+|  |  Test unseen target examples. Measure exact-match accuracy, task success rate, schema    |  
+|  |  validity, tool-call correctness, output style, and domain-specific acceptance criteria. |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Target Gain >= Threshold? ]                             
+|                                      /                      \                                  
+|                               Yes   /                        \   No                            
+|                                    v                          v                                
+|                      [ Continue Evaluation ]        [ Reject / Re-train / Re-scope Dataset ]   
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  4. Structured Output and Tool-Use Verification                                          |  
+|  |                                                                                          |  
+|  |  Run high-volume parser tests, tool simulations, constrained decoding checks, sandboxed  |  
+|  |  compiler runs, API argument validation, and malformed-input recovery tests.             |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Boundary Valid? ]                                       
+|                                      /            \                                            
+|                               Yes   /              \   No                                      
+|                                    v                v                                          
+|                      [ Continue Evaluation ]     [ Enable Constraints / Fix Training Data ]    
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  5. General Capability Preservation                                                      |  
+|  |                                                                                          |  
+|  |  Run general reasoning, math, coding, instruction-following, multilingual, and retrieval |  
+|  |  tests. Compare against baseline. Maximum tolerated decay: usually <= 2%.                |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Regression Within Limit? ]                              
+|                                      /                      \                                  
+|                               Yes   /                        \   No                            
+|                                    v                          v                                
+|                      [ Continue Evaluation ]        [ Reject / Lower Rank / Add Rehearsal Set] 
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  6. Safety, Refusal, and Adversarial Red-Team Sweep                                      |  
+|  |                                                                                          |  
+|  |  Test jailbreak resistance, unsafe capability shift, refusal accuracy, benign false      |  
+|  |  refusals, prompt injection exposure, and policy-boundary preservation.                  |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Safety Preserved? ]                                     
+|                                      /            \                                            
+|                               Yes   /              \   No                                      
+|                                    v                v                                          
+|                      [ Continue Evaluation ]     [ Immediate Rejection / Safety Review ]       
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  7. Privacy Leakage and Memorization Audit                                               |  
+|  |                                                                                          |  
+|  |  Probe for memorized training records, PII, secrets, tenant schemas, proprietary code,   |  
+|  |  benchmark contamination, and exact-sequence reproduction.                               |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Leakage Detected? ]                                     
+|                                      /            \                                            
+|                                No   /              \   Yes                                     
+|                                    v                v                                          
+|                      [ Continue Evaluation ]     [ Reject / Redact / Deduplicate / Retrain ]   
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  8. Shadow Deployment                                                                    |  
+|  |                                                                                          |  
+|  |  Mirror live traffic to baseline and adapted artifact. Do not expose users to candidate  |  
+|  |  outputs. Log divergence, latency, cost, tool errors, refusals, and operator overrides.  |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Shadow Metrics Pass? ]                                  
+|                                      /                    \                                    
+|                               Yes   /                      \   No                              
+|                                    v                        v                                  
+|                      [ Continue to Canary ]        [ Hold Release / Investigate Drift ]        
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  9. Canary Rollout and Automated Rollback                                                |  
+|  |                                                                                          |  
+|  |  Roll out progressively: 1% -> 10% -> 50% -> 100%. Roll back automatically on SLA breach,|  
+|  |  exception spike, safety incident, schema failure, latency regression, or quality decay. |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  10. Production Registration and Monitoring                                              |  
+|  |                                                                                          |  
+|  |  Register signed Adaptation Card, dataset hashes, eval results, artifact URI, rollback   |  
+|  |  target, monitoring thresholds, and reconsideration conditions.                          |  
+|  +------------------------------------------------------------------------------------------+  
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Rule: no adapted model enters production merely because target-task accuracy improved. It must |
+| also preserve safety, privacy, general capability, serving stability, and rollback readiness.  |
++------------------------------------------------------------------------------------------------+
 ```
 
 1. **Baseline Calibration Sweep**: Prior to fine-tuning, run the base model through prompt-engineered, context-grounded, and validation scenarios to establish a performance baseline.  
@@ -358,14 +507,98 @@ Every model adaptation pipeline must pass through a multi-stage validation suite
 
 Weight optimization carries severe operational and systemic risks that can compromise downstream behavior.
 
-Supervised Fine-Tuning (SFT) Weight Shifts  
-  │  
-  ├─► Over-optimization of surface tokens  ──►  (Model repeats boilerplate length/format)
-  │                                                  
-  ├─► Overwriting deep parameter coordinates ──► [Catastrophic Forgetting]  (General reasoning/MMLU collapses)
-  │                                                  
-  └─► Over-sensitization of safety data     ──►  (Benign queries trigger false refusals)
-                                                   
+```
++------------------------------------------------------------------------------------------------+
+|                                  ADAPTATION FAILURE MODE MAP                                   | 
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Weight optimization changes behavior by altering parameters or logit preferences. Every gain  
+|  can create an adjacent failure unless regression, safety, and privacy boundaries are tested.  
+|                                                                                                
+|  [ Adaptation Intervention ]                                                                   
+|       |                                                                                        
+|       |  SFT | LoRA | QLoRA | Preference Tuning | Domain Adaptation | Distillation             
+|       v                                                                                        
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Training Data and Objective Risks                           |
+|  +----------------------+----------------------+----------------------+---------------------+
+|                         |                      |                      |                      
+|                         v                      v                      v                      
+|          +-------------------------+  +-----------------------+  +-----------------------------+
+|          | Label-Noise Amplif.     |  | Synthetic Monoculture |  | Benchmark Contamination     |
+|          |                         |  |                       |  |                             |
+|          | inconsistent labels     |  | repetitive teacher    |  | eval leakage inflates       |
+|          | become model behavior   |  | style collapses       |  | apparent performance        |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+
+|                      |                            |                            |                
+|                      v                            v                            v                
+|          [ stricter annotation ]      [ teacher diversity ]       [ contamination sweep ]       
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Parameter and Capability Risks                              |
+|  +----------------------+----------------------+----------------------+---------------------+
+|                         |                      |                      |                      
+|                         v                      v                      v                      
+|          +-------------------------+  +-----------------------+  +-----------------------------+
+|          | Catastrophic Forgetting |  | Domain Tunnel Vision  |  | Overconfident Hallucination |
+|          |                         |  |                       |  |                             |
+|          | general reasoning, math |  | narrow task success   |  | false labels become high-   |
+|          | or world knowledge drops|  | but brittle transfer  |  | confidence completions      |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+
+|                      |                            |                            |                
+|                      v                            v                            v                
+|          [ rehearsal sets ]          [ prompt diversity tests ]    [ data validation + abstain ]   
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Format, Tool, and Interface Risks                           |
+|  +----------------------+----------------------+----------------------+---------------------+
+|                         |                      |                      |                      
+|                         v                      v                      v                      
+|          +-------------------------+  +-----------------------+  +-----------------------------+
+|          | Format Regression       |  | Tool-Use Regression   |  | Prompt-Template Dependence  |
+|          |                         |  |                       |  |                             |
+|          | JSON/XML/schema drift   |  | wrong tool args, API  |  | only works with training    |
+|          | after adaptation        |  | misuse, state errors  |  | prompt syntax               |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+
+|                      |                            |                            |                
+|                      v                            v                            v                
+|          [ constrained decoding ]     [ tool harness tests ]       [ template perturbation ]    
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Safety and Privacy Risks                                    |
+|  +----------------------+----------------------+----------------------+---------------------+
+|                         |                      |                      |                      
+|                         v                      v                      v                           
+|          +-------------------------+  +-----------------------+  +-----------------------------+  
+|          | Refusal Drift           |  | Unsafe Capability     |  | Privacy / Tenant Leakage    |
+|          |                         |  | Shift                 |  |                             |
+|          | benign requests refused |  | safety barriers decay |  | PII, secrets, tenant data   |
+|          | from over-alignment     |  | after tuning          |  | memorized into weights      |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+
+|                      |                            |                            |                
+|                      v                            v                            v                
+|          [ contrastive safety ]       [ red-team retention ]       [ redaction + isolation ]    
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Serving and Artifact Risks                                  |
+|  +----------------------+----------------------+----------------------+---------------------+
+|                         |                      |                      |                      
+|                         v                      v                      v                      
+|          +-------------------------+  +-----------------------+  +-----------------------------+
+|          | Adapter Incompatibility |  | Stale-Knowledge       |  | Merge / Stack Conflict      |
+|          |                         |  | Fossilization         |  |                             |
+|          | rank, tokenizer, base   |  | dynamic facts encoded |  | incompatible adapters       |
+|          | hash, module mismatch   |  | into weights          |  | combined at runtime         |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+
+|                      |                            |                            |                
+|                      v                            v                            v                
+|          [ registry verification ]    [ keep facts in RAG ]       [ merge/stack policy gate ]   
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Doctrine: adaptation should specialize stable behavior, not smuggle volatile knowledge, private|
+| data, or unvalidated preferences into weights. Every adapter needs a rollback path.            |
++------------------------------------------------------------------------------------------------+
+```                                                   
 
 ### **Style Overfit**
 

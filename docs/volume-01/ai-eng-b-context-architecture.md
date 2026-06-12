@@ -266,85 +266,85 @@ The system must run a continuous Named Entity Resolution (NER) pipeline that map
 +------------------------------------------------------------------------------------------------+
 |                                  NAMED ENTITY RESOLUTION MODEL                                 |
 +------------------------------------------------------------------------------------------------+
-|                                                                                                |
-|  Goal: map aliases, partial names, document labels, and ambiguous references to one canonical  |
-|  enterprise entity without false merges or duplicate graph nodes.                              |
-|                                                                                                |
-|  [ Incoming Text / Tool Trace / Retrieved Document / User Utterance ]                          |
-|                                      |                                                         |
-|                                      v                                                         |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           1. Entity Mention Extraction                                   |  |
-|  |                                                                                          |  |
-|  |  Detect candidate mentions: people, projects, documents, systems, tenants, tools, roles. |  |
-|  |                                                                                          |  |
-|  |  Examples: "Sam", "Nova", "AI-ENG-A", "the prompt repo", "Chicago office"                |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           2. Candidate Generation                                        |  |
-|  |                                                                                          |  |
-|  |  Query bounded vocabularies, alias tables, graph neighborhoods, and scoped registries.   |  |
-|  |                                                                                          |  |
-|  |  Candidate set includes:                                                                 |  |
-|  |  - exact canonical-name matches                                                          |  |
-|  |  - alias matches                                                                         |  |
-|  |  - scoped project / tenant matches                                                       |  |
-|  |  - nearby graph nodes                                                                    |  |
-|  |  - prior session references                                                              |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           3. Attribute Similarity Scoring                                |  |
-|  |                                                                                          |  |
-|  |  Compute SimilarityScore using:                                                          |  |
-|  |                                                                                          |  |
-|  |  - lexical alias match                                                                   |  |
-|  |  - entity type compatibility                                                             |  |
-|  |  - active tenant / project / session scope                                               |  |
-|  |  - role, email domain, path, document ID, or system-of-record metadata                   |  |
-|  |  - graph-neighborhood consistency                                                        |  |
-|  |  - source authority and confidence                                                       |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|                                  [ Similarity Score Decision ]                                 |
-|                                      /             |             \                             |
-|                                     /              |              \                            |
-|                                    v               v               v                           |
-|                      Score >= 0.95        0.70 < Score < 0.95       Score <= 0.70              |
-|                             |                    |                         |                   |
-|                             v                    v                         v                   |
-|  +-------------------------------+  +------------------------------+  +----------------------+ |
-|  |          Auto-Merge           |  |        Manual Review         |  |        New Entity    | |
-|  |                               |  |                              |  |                      | |
-|  |  Bind mention to existing     |  |  Create temporary pending    |  |  Create new canonical| |
-|  |  canonical_entity_id.         |  |  node. Route ambiguity to    |  |  entity with fresh   | |
-|  |                               |  |  human or system resolver.   |  |  UUID. Store observed| |
-|  |  Consolidate relationship     |  |                              |  |  aliases,scope, and  | |
-|  |  edges and update aliases.    |  |  Prevent premature merge.    |  |  provenance.         | |
-|  +---------------+---------------+  +--------------+---------------+  +-------------+--------+ |
-|                  |                                 |                                |          |
-|                  +---------------------------------+--------------------------------+          |
-|                                                    |                                           |
-|                                                    v                                           |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           Canonical Entity Registry Update                               |  |
-|  |                                                                                          |  |
-|  |  Store / update: canonical_entity_id, canonical_name, entity_type, aliases, scopes,      |  |
-|  |  source provenance, confidence score, merge/split history, and audit trail.              |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           Context Compiler Output                                        |  |
-|  |  All compiled Context Objects reference canonical_entity_ids rather than loose names.    |  |
-|  |  Ambiguous pending nodes are excluded                                                    |  |
-|  |  from high-authority prompt constraints until resolved.                                  |  |
-|  +------------------------------------------------------------------------------------------+  |
-|                                                                                                |
+|                                                                                                
+|  Goal: map aliases, partial names, document labels, and ambiguous references to one canonical  
+|  enterprise entity without false merges or duplicate graph nodes.                              
+|                                                                                                
+|  [ Incoming Text / Tool Trace / Retrieved Document / User Utterance ]                          
+|                                      |                                                         
+|                                      v                                                         
+|  +------------------------------------------------------------------------------------------+  
+|  |                           1. Entity Mention Extraction                                   |  
+|  |                                                                                          |  
+|  |  Detect candidate mentions: people, projects, documents, systems, tenants, tools, roles. |  
+|  |                                                                                          |  
+|  |  Examples: "Sam", "Nova", "AI-ENG-A", "the prompt repo", "Chicago office"                |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           2. Candidate Generation                                        |  
+|  |                                                                                          |  
+|  |  Query bounded vocabularies, alias tables, graph neighborhoods, and scoped registries.   |  
+|  |                                                                                          |  
+|  |  Candidate set includes:                                                                 |  
+|  |  - exact canonical-name matches                                                          |  
+|  |  - alias matches                                                                         |  
+|  |  - scoped project / tenant matches                                                       |  
+|  |  - nearby graph nodes                                                                    |  
+|  |  - prior session references                                                              |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           3. Attribute Similarity Scoring                                |  
+|  |                                                                                          |  
+|  |  Compute SimilarityScore using:                                                          |  
+|  |                                                                                          |  
+|  |  - lexical alias match                                                                   |  
+|  |  - entity type compatibility                                                             |  
+|  |  - active tenant / project / session scope                                               |  
+|  |  - role, email domain, path, document ID, or system-of-record metadata                   |  
+|  |  - graph-neighborhood consistency                                                        |  
+|  |  - source authority and confidence                                                       |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|                                  [ Similarity Score Decision ]                                 
+|                                      /             |             \                             
+|                                     /              |              \                            
+|                                    v               v               v                           
+|                      Score >= 0.95        0.70 < Score < 0.95       Score <= 0.70              
+|                             |                    |                         |                   
+|                             v                    v                         v                   
+|  +-------------------------------+  +------------------------------+  +----------------------+ 
+|  |          Auto-Merge           |  |        Manual Review         |  |        New Entity    | 
+|  |                               |  |                              |  |                      | 
+|  |  Bind mention to existing     |  |  Create temporary pending    |  |  Create new canonical| 
+|  |  canonical_entity_id.         |  |  node. Route ambiguity to    |  |  entity with fresh   | 
+|  |                               |  |  human or system resolver.   |  |  UUID. Store observed| 
+|  |  Consolidate relationship     |  |                              |  |  aliases,scope, and  | 
+|  |  edges and update aliases.    |  |  Prevent premature merge.    |  |  provenance.         | 
+|  +---------------+---------------+  +--------------+---------------+  +-------------+--------+ 
+|                  |                                 |                                |          
+|                  +---------------------------------+--------------------------------+          
+|                                                    |                                           
+|                                                    v                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |                           Canonical Entity Registry Update                               |  
+|  |                                                                                          |  
+|  |  Store / update: canonical_entity_id, canonical_name, entity_type, aliases, scopes,      |  
+|  |  source provenance, confidence score, merge/split history, and audit trail.              |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           Context Compiler Output                                        |  
+|  |  All compiled Context Objects reference canonical_entity_ids rather than loose names.    |  
+|  |  Ambiguous pending nodes are excluded                                                    |  
+|  |  from high-authority prompt constraints until resolved.                                  |  
+|  +------------------------------------------------------------------------------------------+  
+|                                                                                                
 +------------------------------------------------------------------------------------------------+
 | Rule: entity resolution must happen before memory writes. False merges contaminate the graph;  |
 | missed merges fragment it. Both failure modes degrade retrieval, reasoning, and auditability.  |
@@ -397,67 +397,67 @@ To maintain a mathematically precise and audit-ready representation of historica
 +------------------------------------------------------------------------------------------------+
 |                                  BITEMPORAL VALIDITY MODEL                                     |
 +------------------------------------------------------------------------------------------------+
-|                                                                                                |
-|  Bitemporal records track two independent timelines for every Context Object.                  |
-|                                                                                                |
-|      VALID TIME (VT)       = when the fact is true in the real world                           |
-|      TRANSACTION TIME (TT) = when the system recorded, believed, or superseded that fact       |
-|                                                                                                |
-|                                                                                                |
-|  Example claim: "User is based in the Chicago office."                                         |
-|                                                                                                |
-|  Real-world truth timeline:                                                                    |
-|                                                                                                |
-|        Jan 01                        Jun 06                         Dec 31                     |
-|          |                             |                              |                        |
-|          v                             v                              v                        |
-|    ------+-----------------------------+------------------------------+------                  |
-|          |                             |                                     |                 |
-|          |     Previous office true    |      Chicago office true            |                 |
-|          |                             |                                     |                 |
-|    ------+-----------------------------+-------------------------------------+------           |
-|                                      valid_from                         valid_until = NULL     |
-|                                                                                                |
-|                                                                                                |
-|  System transaction timeline:                                                                  |
-|                                                                                                |
-|        Jan 01                        Jun 06 12:15                    Audit replay time         |
-|          |                             |                              |                        |
-|          v                             v                              v                        |
-|    ------+-----------------------------+------------------------------+------                  |
-|          |                             |                              |                        |
-|          |   System stored old record  |  System inserted new version |                        |
-|          |                             |  and closed old tx window    |                        |
-|    ------+-----------------------------+------------------------------+-------------           |
-|                                  tx_start(new)                       tx_end = NULL             |
-|                                                                                                |
-|                                                                                                |
-|  Immutable versioning pattern:                                                                 |
-|                                                                                                |
-|      Old Record                                                                                |
-|      +----------------------+----------------------+----------------------+------------------+ |
-|      | content              | valid_from           | tx_start             | tx_end           | |
-|      | "User in old office" | previous VT start    | previous TT start    | 2026-06-06 12:15 | |
-|      +----------------------+----------------------+----------------------+------------------+ |
-|                                                                                                |
-|      New Record                                                                                |
-|      +--------------------------+----------------------+----------------------+--------------+ |
-|      | content                  | valid_from           | tx_start             | tx_end       | |
-|      | "User in Chicago office" | 2026-06-06 12:00     | 2026-06-06 12:15     | NULL         | |
-|      +--------------------------+----------------------+----------------------+--------------+ |
-|                                                                                                |
-|                                                                                                |
-|  Compiler query modes:                                                                         |
-|                                                                                                |
-|      "What is true now?"                                                                       |
-|          -> select record with active Valid Time and active Transaction Time.                  |
-|                                                                                                |
-|      "What did the system believe at time T?"                                                  |
-|          -> select record whose Transaction Time covered T, even if later corrected.           |
-|                                                                                                |
-|      "What was true in the real world at time T?"                                              |
-|          -> select record whose Valid Time covered T, using latest non-superseded transaction. |
-|                                                                                                |
+|                                                                                                
+|  Bitemporal records track two independent timelines for every Context Object.                  
+|                                                                                                
+|      VALID TIME (VT)       = when the fact is true in the real world                           
+|      TRANSACTION TIME (TT) = when the system recorded, believed, or superseded that fact       
+|                                                                                                
+|                                                                                                
+|  Example claim: "User is based in the Chicago office."                                         
+|                                                                                                
+|  Real-world truth timeline:                                                                    
+|                                                                                                
+|        Jan 01                        Jun 06                         Dec 31                     
+|          |                             |                              |                        
+|          v                             v                              v                        
+|    ------+-----------------------------+------------------------------+------                  
+|          |                             |                                     |                 
+|          |     Previous office true    |      Chicago office true            |                 
+|          |                             |                                     |                 
+|    ------+-----------------------------+-------------------------------------+------           
+|                                      valid_from                         valid_until = NULL     
+|                                                                                                
+|                                                                                                
+|  System transaction timeline:                                                                  
+|                                                                                                
+|        Jan 01                        Jun 06 12:15                    Audit replay time         
+|          |                             |                              |                        
+|          v                             v                              v                        
+|    ------+-----------------------------+------------------------------+------                  
+|          |                             |                              |                        
+|          |   System stored old record  |  System inserted new version |                        
+|          |                             |  and closed old tx window    |                        
+|    ------+-----------------------------+------------------------------+-------------           
+|                                  tx_start(new)                       tx_end = NULL             
+|                                                                                                
+|                                                                                                
+|  Immutable versioning pattern:                                                                 
+|                                                                                                
+|      Old Record                                                                                
+|      +----------------------+----------------------+----------------------+------------------+ 
+|      | content              | valid_from           | tx_start             | tx_end           | 
+|      | "User in old office" | previous VT start    | previous TT start    | 2026-06-06 12:15 | 
+|      +----------------------+----------------------+----------------------+------------------+ 
+|                                                                                                
+|      New Record                                                                                
+|      +--------------------------+----------------------+----------------------+--------------+ 
+|      | content                  | valid_from           | tx_start             | tx_end       | 
+|      | "User in Chicago office" | 2026-06-06 12:00     | 2026-06-06 12:15     | NULL         | 
+|      +--------------------------+----------------------+----------------------+--------------+ 
+|                                                                                                
+|                                                                                                
+|  Compiler query modes:                                                                         
+|                                                                                                
+|      "What is true now?"                                                                       
+|          -> select record with active Valid Time and active Transaction Time.                  
+|                                                                                                
+|      "What did the system believe at time T?"                                                  
+|          -> select record whose Transaction Time covered T, even if later corrected.           
+|                                                                                                
+|      "What was true in the real world at time T?"                                              
+|          -> select record whose Valid Time covered T, using latest non-superseded transaction. 
+|                                                                                                
 +------------------------------------------------------------------------------------------------+
 | Rule: updates do not overwrite context history. They close the prior transaction window, insert|
 | a new immutable version, and preserve enough evidence to replay past system beliefs.           |
@@ -526,82 +526,82 @@ When a conflict is detected during the state compilation process, the context co
 +---------------------------------------------------------------------------------------------------------+
 |                                      RECONCILIATION PROTOCOLS                                           |
 +---------------------------------------------------------------------------------------------------------+
-|                                                                                                         |
-|  Goal: prevent contradictory Context Objects from entering the model-facing context envelope.           |
-|                                                                                                         |
-|  [ Detected Conflict: C1 and C2 make incompatible claims about the same canonical entity ]              |
-|                                      |                                                                  |
-|                                      v                                                                  |
-|  +------------------------------------------------------------------------------------------+           |
-|  |                           1. Authority Comparison                                        |           |
-|  |                                                                                          |           |
-|  |  Compare authority_level for C1 and C2.                                                  |           |
-|  |                                                                                          |           |
-|  |  Level 0 Platform Rules       > Level 1 Developer Rules                                  |           |
-|  |  Level 1 Developer Rules      > Level 2 User Constraints                                 |           |
-|  |  Level 2 User Constraints     > Level 3 Inferred Memory                                  |           |
-|  |  Level 3 Inferred Memory      > Level 4 Retrieved Data / Tool Payloads                   |           |
-|  +---------------------------------------------+--------------------------------------------+           |
-|                                                |                                                        |
-|                                  [ Authority levels different? ]                                        |
-|                                      /                         \                                        |
-|                               Yes   /                           \   No                                  |
-|                                    v                             v                                      |
-|        +---------------------------------------+       +-------------------------------------+          |
-|        | Select higher-authority object.       |       | 2. Temporal Reconciliation          |          |
-|        | Mark lower-authority object as        |       |                                     |          |
-|        | overridden or quarantined according   |       | Compare Valid Time windows.         |          |
-|        | to policy.                            |       | Prefer the claim with the newer     |          |
-|        +-------------------+-------------------+       | valid_from when both describe the   |          |
-|                            |                           | same operational slot.              |          |
-|                            |                           +------------------+------------------+          |
-|                            |                                              |                             |
-|                            |                                [ Valid Time differs? ]                     |
-|                            |                                     /                  \                   |
-|                            |                              Yes   /                    \   No             |
-|                            |                                   v                      v                 |
-|                            |          +------------------------------------+   +----------------+       |
-|                            |          | Select temporally active / newer   |   | 3. Source Trust|       |
-|                            |          | valid claim. Mark older claim      |   | Verification   |       |
-|                            |          | superseded or overridden.          |   |                |       |
-|                            |          +----------------+-------------------+   | Compare source_|       |
-|                            |                           |                       | authority and  |       |
-|                            |                           |                       | confidence.    |       |
-|                            |                           |                       +--------+-------+       |
-|                            |                           |                                |               |
-|                            |                           |                  [ Trust scores differ? ]      |
-|                            |                           |                      /              \          |
-|                            |                           |               Yes   /                \ No      |
-|                            |                           |                    v                  v        |
-|                            |          +----------------+-------------------+   +----------------------+ |
-|                            |          | Select object with higher          |   | System Quarantine    | |
-|                            |          | source_authority / confidence.     |   | Exclude both claims  | |
-|                            |          | Mark weaker source as disputed.    |   | from compiled        | |
-|                            |          +----------------+-------------------+   | context.             | |
-|                            |                           |                       | Mark both disputed.  | | 
-|                            |                           |                       | Trigger resolver.    | |
-|                            |                           |                       +----------+-----------+ |
-|                            |                           |                                  |             |
-|                            +---------------------------+----------------------------------+             |
-|                                                        |                                                |
-|                                                        v                                                |
-|  +------------------------------------------------------------------------------------------+           |
-|  |                           Context Store Update                                           |           |
-|  |                                                                                          |           |
-|  |  For selected claim:      contradiction_status = clean or active                         |           |
-|  |  For displaced claim:     contradiction_status = overridden / disputed / quarantined     |           |
-|  |  For superseded claim:    supersession_link -> selected object_id                        |           |
-|  |  For unresolved conflict: create system action for tool lookup or user confirmation.     |           |
-|  +---------------------------------------------+--------------------------------------------+           |
-|                                                |                                                        |
-|                                                v                                                        |
-|  +------------------------------------------------------------------------------------------+           |
-|  |                           Compiler Output                                                |           |
-|  |                                                                                          |           |
-|  |  Only clean, authorized, temporally valid, non-quarantined objects may enter the final   |           |
-|  |  model-facing context envelope.                                                          |           |
-|  +------------------------------------------------------------------------------------------+           |
-|                                                                                                         |
+|                                                                                                         
+|  Goal: prevent contradictory Context Objects from entering the model-facing context envelope.           
+|                                                                                                         
+|  [ Detected Conflict: C1 and C2 make incompatible claims about the same canonical entity ]              
+|                                      |                                                                  
+|                                      v                                                                  
+|  +------------------------------------------------------------------------------------------+           
+|  |                           1. Authority Comparison                                        |           
+|  |                                                                                          |           
+|  |  Compare authority_level for C1 and C2.                                                  |           
+|  |                                                                                          |           
+|  |  Level 0 Platform Rules       > Level 1 Developer Rules                                  |           
+|  |  Level 1 Developer Rules      > Level 2 User Constraints                                 |           
+|  |  Level 2 User Constraints     > Level 3 Inferred Memory                                  |           
+|  |  Level 3 Inferred Memory      > Level 4 Retrieved Data / Tool Payloads                   |           
+|  +---------------------------------------------+--------------------------------------------+           
+|                                                |                                                        
+|                                  [ Authority levels different? ]                                        
+|                                      /                         \                                        
+|                               Yes   /                           \   No                                  
+|                                    v                             v                                      
+|        +---------------------------------------+       +-------------------------------------+          
+|        | Select higher-authority object.       |       | 2. Temporal Reconciliation          |          
+|        | Mark lower-authority object as        |       |                                     |          
+|        | overridden or quarantined according   |       | Compare Valid Time windows.         |          
+|        | to policy.                            |       | Prefer the claim with the newer     |          
+|        +-------------------+-------------------+       | valid_from when both describe the   |          
+|                            |                           | same operational slot.              |          
+|                            |                           +------------------+------------------+          
+|                            |                                              |                             
+|                            |                                [ Valid Time differs? ]                     
+|                            |                                     /                  \                   
+|                            |                              Yes   /                    \   No             
+|                            |                                   v                      v                 
+|                            |          +------------------------------------+   +----------------+       
+|                            |          | Select temporally active / newer   |   | 3. Source Trust|       
+|                            |          | valid claim. Mark older claim      |   | Verification   |       
+|                            |          | superseded or overridden.          |   |                |       
+|                            |          +----------------+-------------------+   | Compare source_|       
+|                            |                           |                       | authority and  |       
+|                            |                           |                       | confidence.    |       
+|                            |                           |                       +--------+-------+       
+|                            |                           |                                |               
+|                            |                           |                  [ Trust scores differ? ]      
+|                            |                           |                      /              \          
+|                            |                           |               Yes   /                \ No      
+|                            |                           |                    v                  v        
+|                            |          +----------------+-------------------+   +----------------------+ 
+|                            |          | Select object with higher          |   | System Quarantine    | 
+|                            |          | source_authority / confidence.     |   | Exclude both claims  | 
+|                            |          | Mark weaker source as disputed.    |   | from compiled        | 
+|                            |          +----------------+-------------------+   | context.             | 
+|                            |                           |                       | Mark both disputed.  |  
+|                            |                           |                       | Trigger resolver.    | 
+|                            |                           |                       +----------+-----------+ 
+|                            |                           |                                  |             
+|                            +---------------------------+----------------------------------+             
+|                                                        |                                                
+|                                                        v                                                
+|  +------------------------------------------------------------------------------------------+           
+|  |                           Context Store Update                                           |           
+|  |                                                                                          |           
+|  |  For selected claim:      contradiction_status = clean or active                         |           
+|  |  For displaced claim:     contradiction_status = overridden / disputed / quarantined     |           
+|  |  For superseded claim:    supersession_link -> selected object_id                        |           
+|  |  For unresolved conflict: create system action for tool lookup or user confirmation.     |           
+|  +---------------------------------------------+--------------------------------------------+           
+|                                                |                                                        
+|                                                v                                                        
+|  +------------------------------------------------------------------------------------------+           
+|  |                           Compiler Output                                                |           
+|  |                                                                                          |           
+|  |  Only clean, authorized, temporally valid, non-quarantined objects may enter the final   |           
+|  |  model-facing context envelope.                                                          |           
+|  +------------------------------------------------------------------------------------------+           
+|                                                                                                         
 +---------------------------------------------------------------------------------------------------------+
 | Rule: never ask the model to reconcile unresolved contradictions inside the prompt. Resolve,            |
 | supersede, quarantine, or ask for confirmation before compilation.                                      |
@@ -632,103 +632,103 @@ The Context Compiler is the central processing unit of the state management laye
 +------------------------------------------------------------------------------------------------+
 |                                      CONTEXT COMPILER PIPELINE                                 |
 +------------------------------------------------------------------------------------------------+
-|                                                                                                |
-|  Goal: transform raw heterogeneous state into a scoped, authorized, current, high-density,     |
-|  cache-optimized model-facing context envelope.                                                |
-|                                                                                                |
-|  [ Raw Inputs ]                                                                                |
-|        |                                                                                       |
-|        |  user turns | session logs | retrieved documents | tool outputs | belief states       |
-|        |  tenant policies | project files | schemas | prior decisions | external corpora       |
-|        v                                                                                       |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           1. Normalize Into Context Objects                              |  |
-|  |                                                                                          |  |
-|  |  Wrap every candidate state item with object_id, source, authority, confidence, scope,   |  |
-|  |  entity IDs, temporal fields, security classification, and why_it_matters metadata.      |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           2. Resolve Entities and Graph Neighborhoods                    |  |
-|  |                                                                                          |  |
-|  |  Canonicalize entity mentions; collect parent, sibling, child, and cross-reference nodes |  |
-|  |  from the context graph without pulling entire unrelated source files.                   |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           3. Apply Scope, Permission, and Authority Gates                |  |
-|  |                                                                                          |  |
-|  |  Enforce tenant, user, project, role, session, and task boundaries. Remove objects the   |  |
-|  |  active caller is not allowed to see or that lack sufficient authority.                  |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           4. Check Temporal Validity and Conflicts                       |  |
-|  |                                                                                          |  |
-|  |  Evaluate valid_from / valid_until and tx_start / tx_end. Resolve supersession links,    |  |
-|  |  expired records, overlapping claims, and contradictions before prompt assembly.         |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           5. Rank Relevance and Assign Priority Tiers                    |  |
-|  |                                                                                          |  |
-|  |  Score each object against the active task and why_it_matters field. Assign:             |  |
-|  |                                                                                          |  |
-|  |      Critical -> Important -> Useful -> Minimal -> Irrelevant                            |  |
-|  |                                                                                          |  |
-|  |  Omit irrelevant objects entirely to prevent context bloat and false constraints.        |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           6. Rescue High-Value Subunits                                  |  |
-|  |                                                                                          |  |
-|  |  Use deterministic affinity scoring to attach small relevant snippets from non-selected  |  |
-|  |  files to selected core skills or documents without importing the full parent source.    |  |
-|  |                                                                                          |  |
-|  |      Aff(u, s | q) -> attach subunit u to selected source s if operationally useful.     |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           7. Compress and Convert                                        |  |
-|  |                                                                                          |  |
-|  |  Apply high-density synthesis, deduplication, and fact-to-instruction conversion.        |  |
-|  |  Passive facts become task-specific behavioral guidance or hard constraints only when    |  |
-|  |  scope, authority, and relevance justify promotion.                                      |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           8. Contain Untrusted Payloads                                  |  |
-|  |                                                                                          |  |
-|  |  Wrap Level 4 retrieved data, web text, tool outputs, and corpus fragments inside        |  |
-|  |  explicit non-executable delimiters. Prevent data from becoming instructions.            |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           9. Order for Cache and Attention                               |  |
-|  |                                                                                          |  |
-|  |  Place stable, high-authority, reusable blocks first. Place dynamic turn data last.      |  |
-|  |                                                                                          |  |
-|  |  Preferred order:                                                                        |  |
-|  |      system/developer rules -> tenant/project policy -> tools/schemas -> selected memory |  |
-|  |      -> retrieved payloads -> active task state -> current user turn                     |  |
-|  +---------------------------------------------+--------------------------------------------+  |
-|                                                |                                               |
-|                                                v                                               |
-|  +------------------------------------------------------------------------------------------+  |
-|  |                           10. Emit Model-Facing Context Envelope                         |  |
-|  |                                                                                          |  |
-|  |  Output a compact, auditable, permission-safe, cache-aligned context register for model  |  |
-|  |  prefill, with trace metadata for every compiled object and every omitted candidate.     |  |
-|  +------------------------------------------------------------------------------------------+  |
-|                                                                                                |
+|                                                                                                
+|  Goal: transform raw heterogeneous state into a scoped, authorized, current, high-density,     
+|  cache-optimized model-facing context envelope.                                                
+|                                                                                                
+|  [ Raw Inputs ]                                                                                
+|        |                                                                                       
+|        |  user turns | session logs | retrieved documents | tool outputs | belief states       
+|        |  tenant policies | project files | schemas | prior decisions | external corpora       
+|        v                                                                                       
+|  +------------------------------------------------------------------------------------------+  
+|  |                           1. Normalize Into Context Objects                              |  
+|  |                                                                                          |  
+|  |  Wrap every candidate state item with object_id, source, authority, confidence, scope,   |  
+|  |  entity IDs, temporal fields, security classification, and why_it_matters metadata.      |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           2. Resolve Entities and Graph Neighborhoods                    |  
+|  |                                                                                          |  
+|  |  Canonicalize entity mentions; collect parent, sibling, child, and cross-reference nodes |  
+|  |  from the context graph without pulling entire unrelated source files.                   |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           3. Apply Scope, Permission, and Authority Gates                |  
+|  |                                                                                          |  
+|  |  Enforce tenant, user, project, role, session, and task boundaries. Remove objects the   |  
+|  |  active caller is not allowed to see or that lack sufficient authority.                  |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           4. Check Temporal Validity and Conflicts                       |  
+|  |                                                                                          |  
+|  |  Evaluate valid_from / valid_until and tx_start / tx_end. Resolve supersession links,    |  
+|  |  expired records, overlapping claims, and contradictions before prompt assembly.         |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           5. Rank Relevance and Assign Priority Tiers                    |  
+|  |                                                                                          |  
+|  |  Score each object against the active task and why_it_matters field. Assign:             |  
+|  |                                                                                          |  
+|  |      Critical -> Important -> Useful -> Minimal -> Irrelevant                            |  
+|  |                                                                                          |  
+|  |  Omit irrelevant objects entirely to prevent context bloat and false constraints.        |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           6. Rescue High-Value Subunits                                  |  
+|  |                                                                                          |  
+|  |  Use deterministic affinity scoring to attach small relevant snippets from non-selected  |  
+|  |  files to selected core skills or documents without importing the full parent source.    |  
+|  |                                                                                          |  
+|  |      Aff(u, s | q) -> attach subunit u to selected source s if operationally useful.     |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           7. Compress and Convert                                        |  
+|  |                                                                                          |  
+|  |  Apply high-density synthesis, deduplication, and fact-to-instruction conversion.        |  
+|  |  Passive facts become task-specific behavioral guidance or hard constraints only when    |  
+|  |  scope, authority, and relevance justify promotion.                                      |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           8. Contain Untrusted Payloads                                  |  
+|  |                                                                                          |  
+|  |  Wrap Level 4 retrieved data, web text, tool outputs, and corpus fragments inside        |  
+|  |  explicit non-executable delimiters. Prevent data from becoming instructions.            |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           9. Order for Cache and Attention                               |  
+|  |                                                                                          |  
+|  |  Place stable, high-authority, reusable blocks first. Place dynamic turn data last.      |  
+|  |                                                                                          |  
+|  |  Preferred order:                                                                        |  
+|  |      system/developer rules -> tenant/project policy -> tools/schemas -> selected memory |  
+|  |      -> retrieved payloads -> active task state -> current user turn                     |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           10. Emit Model-Facing Context Envelope                         |  
+|  |                                                                                          |  
+|  |  Output a compact, auditable, permission-safe, cache-aligned context register for model  |  
+|  |  prefill, with trace metadata for every compiled object and every omitted candidate.     |  
+|  +------------------------------------------------------------------------------------------+  
+|                                                                                                
 +------------------------------------------------------------------------------------------------+
 | Compiler rule: state is compiled, not concatenated. Every token must earn residency through    |
 | scope, authority, freshness, relevance, compression value, and safety containment.             |

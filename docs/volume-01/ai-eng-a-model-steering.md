@@ -52,42 +52,42 @@ To transition from experimental prompting to production-grade AI systems, develo
 
 ```
 *-----------------------------------------------------------------------------------+  
-|                                PRODUCTION HARNESS                                 |  
-|                                                                                   |  
-|  *---------------------+   *---------------------+   *-------------------------+  |  
-|  |   State Assembly    |   | Context Retrieval   |   |   Memory Selection      |  |  
-|  | (User/Org Metadata) |   |    (Vector/RAG)     |   | (Dynamic Fact Eviction) |  |    
-|  *---------------------+   *---------------------+   *-------------------------+  |  
-|             │                         │                           │               |  
-|             └─────────────────────────┼───────────────────────────┘               |  
-|                                       ▼                                           |  
-|  *-----------------------------------------------------------------------------+  |  
-|  | Message Generation & Input Isolation                                        |  |  
-|  | - System Instruction Role Injection (Platform vs. Developer Roles)          |  |  
-|  | - Structural Delimiter Isolation (System vs. User vs. Tool Payloads)        |  |  
-|  | - Untrusted Data Wrapping (XML/Data Separators)                             |  |  
-|  *-----------------------------------------------------------------------------+  |  
-|                                       │                                           |  
-|                                       ▼                                           |  
-|  *-----------------------------------------------------------------------------+  |  
-|  | Inference Runtime & Sampling Constraints                                    |  |  
-|  | - Token Budgets & Effort Calibration (max, xhigh, high, medium, low)        |  |  
-|  | - Logit Masking & Constrained Decoding (XGrammar / Guidance)                |  |  
-|  *-----------------------------------------------------------------------------+  |  
-|                                       │                                           |  
-|                                       ▼                                           |  
-|  *-----------------------------------------------------------------------------+  |  
-|  | Post-Inference Validation                                                   |  |  
-|  | - Structured Parser Check & Regex Type Matching                             |  |  
-|  | - Evaluator Judge Call & Retry Routing Policy                               |  |  
-|  *-----------------------------------------------------------------------------+  |  
-|                                       │                                           |  
-|             ┌─────────────────────────┴───────────────────────────┐               |  
-|             ▼                                                     ▼               |  
-|  *---------------------+                                 *---------------------+  |  
-|  |     SUCCESS PATH    |                                 |    FALLBACK PATH    |  |  
-|  |  (State Sync/Save)  |                                 | (Graceful Refusal)  |  |  
-|  *---------------------+                                 *---------------------+  |  
+|                                PRODUCTION HARNESS                                 
+|                                                                                     
+|  *---------------------+   *---------------------+   *-------------------------+    
+|  |   State Assembly    |   | Context Retrieval   |   |   Memory Selection      |    
+|  | (User/Org Metadata) |   |    (Vector/RAG)     |   | (Dynamic Fact Eviction) |      
+|  *---------------------+   *---------------------+   *-------------------------+    
+|             │                         │                           │                 
+|             └─────────────────────────┼───────────────────────────┘                 
+|                                       ▼                                             
+|  *-----------------------------------------------------------------------------+    
+|  | Message Generation & Input Isolation                                        |    
+|  | - System Instruction Role Injection (Platform vs. Developer Roles)          |    
+|  | - Structural Delimiter Isolation (System vs. User vs. Tool Payloads)        |    
+|  | - Untrusted Data Wrapping (XML/Data Separators)                             |    
+|  *-----------------------------------------------------------------------------+    
+|                                       │                                             
+|                                       ▼                                             
+|  *-----------------------------------------------------------------------------+    
+|  | Inference Runtime & Sampling Constraints                                    |    
+|  | - Token Budgets & Effort Calibration (max, xhigh, high, medium, low)        |    
+|  | - Logit Masking & Constrained Decoding (XGrammar / Guidance)                |    
+|  *-----------------------------------------------------------------------------+    
+|                                       │                                             
+|                                       ▼                                             
+|  *-----------------------------------------------------------------------------+    
+|  | Post-Inference Validation                                                   |    
+|  | - Structured Parser Check & Regex Type Matching                             |    
+|  | - Evaluator Judge Call & Retry Routing Policy                               |    
+|  *-----------------------------------------------------------------------------+    
+|                                       │                                             
+|             ┌─────────────────────────┴───────────────────────────┐                 
+|             ▼                                                     ▼                 
+|  *---------------------+                                 *---------------------+    
+|  |     SUCCESS PATH    |                                 |    FALLBACK PATH    |    
+|  |  (State Sync/Save)  |                                 | (Graceful Refusal)  |    
+|  *---------------------+                                 *---------------------+    
 *-----------------------------------------------------------------------------------+
 ```
 
@@ -260,38 +260,38 @@ When a production system fails, identifying which layer of the steering architec
 
 ```
 +-----------------------------------------------------------------------------------------+
-|                              FAILURE CASCADE FLOW CHART                                 |
-|                                                                                         |
-|  Production failure appears. Diagnose the failure signature before changing the model.  |
-|                                                                                         |
-|                         +-----------------------------+                                 |
-|                         |   OBSERVED FAILURE MODE     |                                 |
-|                         +--------------+--------------+                                 |
-|                                        |                                                |
-|          +-----------------------------+-----------------------------+                  |
-|          |                             |                             |                  |
-|          v                             v                             v                  |
-|  +-------------------+       +-------------------+       +---------------------------+  |
-|  | STRUCTURE FAILURE |       | KNOWLEDGE FAILURE |       | AUTHORITY / SAFETY FAILURE|  |
-|  |                   |       |                   |       |                           |  |
-|  | Invalid JSON,     |       | Hallucinations,   |       | Prompt injection,         |  |
-|  | schema mismatch,  |       | stale facts,      |       | jailbreaks, tool/data     |  |
-|  | parser rejection  |       | missing evidence  |       | instructions overriding   |  |
-|  |                   |       |                   |       | trusted instructions      |  |
-|  +---------+---------+       +---------+---------+       +-------------+-------------+  |
-|            |                           |                               |                |
-|            v                           v                               v                |
-|  DO NOT edit prompt          DO NOT fine-tune              DO NOT rely on prompt        |
-|  semantics endlessly.        parameters to memorize        safety warnings alone.       |
-|                              volatile facts.                                            |
-|            |                           |                               |                |
-|            v                           v                               v                |
-|  FIX via constrained         FIX via RAG, metadata         FIX via instruction          |
-|  decoding, strict schema     filters, context refresh,     hierarchy, privilege         |
-|  validation, nullable        document deduplication,       separation, SecAlign,        |
-|  fields, and parser          or retrieval repair.          ISE, and harness-level       |
-|  retry handling.                                           isolation.                   |
-|                                                                                         |
+|                              FAILURE CASCADE FLOW CHART                                 
+|                                                                                         
+|  Production failure appears. Diagnose the failure signature before changing the model.  
+|                                                                                         
+|                         +-----------------------------+                                 
+|                         |   OBSERVED FAILURE MODE     |                                 
+|                         +--------------+--------------+                                 
+|                                        |                                                
+|          +-----------------------------+-----------------------------+                  
+|          |                             |                             |                  
+|          v                             v                             v                  
+|  +-------------------+       +-------------------+       +---------------------------+  
+|  | STRUCTURE FAILURE |       | KNOWLEDGE FAILURE |       | AUTHORITY / SAFETY FAILURE|  
+|  |                   |       |                   |       |                           |  
+|  | Invalid JSON,     |       | Hallucinations,   |       | Prompt injection,         |  
+|  | schema mismatch,  |       | stale facts,      |       | jailbreaks, tool/data     |  
+|  | parser rejection  |       | missing evidence  |       | instructions overriding   |  
+|  |                   |       |                   |       | trusted instructions      |  
+|  +---------+---------+       +---------+---------+       +-------------+-------------+  
+|            |                           |                               |                
+|            v                           v                               v                
+|  DO NOT edit prompt          DO NOT fine-tune              DO NOT rely on prompt        
+|  semantics endlessly.        parameters to memorize        safety warnings alone.       
+|                              volatile facts.                                            
+|            |                           |                               |                
+|            v                           v                               v                
+|  FIX via constrained         FIX via RAG, metadata         FIX via instruction          
+|  decoding, strict schema     filters, context refresh,     hierarchy, privilege         
+|  validation, nullable        document deduplication,       separation, SecAlign,        
+|  fields, and parser          or retrieval repair.          ISE, and harness-level       
+|  retry handling.                                           isolation.                   
+|                                                                                         
 +-----------------------------------------------------------------------------------------+
 | Core rule: route the symptom to the lightest robust layer capable of fixing it.         |
 +-----------------------------------------------------------------------------------------+
