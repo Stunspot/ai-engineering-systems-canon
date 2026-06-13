@@ -14,25 +14,88 @@
 The mature artificial intelligence enterprise does not treat its data as an unmanaged document landfill, a collection of flat PDFs, or a basic vector database filled with disconnected text chunks. Instead, the corpus is modeled as an engineered, governed knowledge substrate.1 This report defines the architectural discipline of **corpus engineering** as the end-to-end knowledge supply-chain management that transforms raw, unstructured organizational information into clean, versioned, deduplicated, permission-aware, canonical, conflict-aware, and lifecycle-governed knowledge assets.1 These assets are designed to support retrieval-augmented generation (RAG), multi-agent memory structures, verifiably accurate citations, and model-facing context compilation.4
 
 ```
-Raw Organizational Data (PDFs, Wikis, SQL, APIs)  
-                      │  
-                      ▼  
-         <─── Enforces: Provenance, Hygiene, ACLs  
-                      │  
-                      ▼  
-         Governed Corpus Object Store  
-                      │  
-                      ▼  
- Pre-retrieval Permission Filtering  
-                      │  
-                      ▼  
-        Approximate Nearest Neighbor (ANN)  
-                      │  
-                      ▼  
-           Context Object Assembly  
-                      │  
-                      ▼  
-         LLM Synthesizer (Context Window)
++------------------------------------------------------------------------------------------------+
+|                          KNOWLEDGE SUPPLY CHAIN CONTROL MODEL                                  |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Rule: provenance, permission, authority, hygiene, and lifecycle checks happen before semantic 
+|  retrieval. Relevance is not allowed to outrank legitimacy.                                    
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                               Raw Organizational Sources                                 |  
+|  |                                                                                          |  
+|  |  PDFs | Wikis | SQL records | APIs | tickets | emails | manuals | policies | uploads     |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                         Discovery, Registration, and Source Lock                         |  
+|  |                                                                                          |  
+|  |  discover asset -> assign canonical_source_id -> capture source_uri -> lock raw replica  |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                         Provenance and Permission Preflight                              |  
+|  |                                                                                          |  
+|  |  verify origin | hydrate ACLs | assign tenant scope | capture owner/steward/jurisdiction |  
+|  |  reject assets with missing source authority or unverifiable access boundaries           |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                         Parsing, Normalization, and Hygiene                              |  
+|  |                                                                                          |  
+|  |  parse/OCR -> normalize structure -> remove boilerplate -> redact PII -> deduplicate     |  
+|  |  preserve layout, tables, headings, timestamps, units, locale, and citation coordinates  |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                         Metadata, Authority, and Lifecycle Gates                         |  
+|  |                                                                                          |  
+|  |  source_authority | version_state | valid_from/until | retention_class | conflict_status |  
+|  |  supersession links | archival state | legal hold | lineage trail | sensitivity class    |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Governed Corpus Object Store                                |  
+|  |                                                                                          |  
+|  |  Corpus Objects become parent assets for chunks, embeddings, claims, summaries, entities,|  
+|  |  and citation anchors. All derivatives inherit provenance, permissions, and sensitivity. |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Secure Retrieval Substrate                                  |  
+|  |                                                                                          |  
+|  |  vector index | keyword index | graph index | claim store | citation map | lineage ledger|  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Pre-Retrieval Eligibility Filter                            |  
+|  |                                                                                          |  
+|  |  enforce tenant, role, group, jurisdiction, version, archival, legal-hold, and freshness |  
+|  |  constraints before ANN/vector similarity scoring.                                       |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Retrieval and Context Assembly                              |  
+|  |                                                                                          |  
+|  |  candidate search -> rerank -> citation verification -> conflict checks -> Context Object|  
+|  |  assembly -> model-facing context window                                                 |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|                                      [ LLM Synthesizer ]                                       
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Doctrine: the corpus substrate is not a pile of documents. It is a governed supply chain that  |
+| decides which knowledge is eligible to become model-facing context.                            |
++------------------------------------------------------------------------------------------------+
 ```
 
 Corpus engineering represents a distinct architectural shift from standard data ingestion, document management, RAG preprocessing, retrieval engineering, and memory architectures. The following comparative matrix outlines these structural boundaries:
@@ -56,21 +119,77 @@ Corpus engineering operates as the upstream control system that prevents retriev
 Raw organizational information is transformed through several discrete states before it is loaded into an LLM's active context window. This architectural progression is governed by the **Epistemic Hierarchy**, which maps raw source files to structured, model-ready context objects.
 
 ```
- (e.g., policy_v2.pdf)  
-       │  
-       ▼ (Parsing & Structure Normalization)  
- (Markdown representation)  
-       │  
-       ▼ (Identity & Metadata Ingestion)  
-[Corpus Object] (Canonical, metadata-anchored asset)  
-       │  
-       ├─► [Canonical Chunk] (Semantic segment with security tags)  
-       ├─► [Extracted Claim] (Atomic proposition, e.g., "Company matches 4%")  
-       ├─► (Contextual overview)  
-       ├─► (Graph node mapped to Canonical ID)  
-       │  
-       ▼ (Retrieval, Filtering & Verification)  
-[Context Object] ──►
++------------------------------------------------------------------------------------------------+
+|                              EPISTEMIC HIERARCHY OF CORPUS ARTIFACTS                           |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Goal: track how raw organizational information becomes structured, governed, retrievable,     
+|  citeable, and finally eligible for model-facing context.                                      
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |  1. Raw Source                                                                           |  
+|  |                                                                                          |  
+|  |  Native artifact: PDF, DOCX, HTML, SQL row, API payload, ticket, wiki page, scanned file.|  
+|  |  Stored in system of record; not directly trusted as model context.                      |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  2. Normalized Document                                                                  |  
+|  |                                                                                          |  
+|  |  Parsed and normalized representation: Markdown, extracted tables, OCR text, section     |  
+|  |  boundaries, page coordinates, timestamps, locale, units, and structural layout.         |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  3. Corpus Object                                                                        |  
+|  |  Canonical governed asset with object_id, source_uri, source authority, lifecycle state, |  
+|  |  ACLs, tenant scope, sensitivity class, provenance,                                      |  
+|  |  retention rules, and lineage pointers.                                                  |  
+|  +---------------------+----------------------+----------------------+----------------------+  
+|                        |                      |                      |                         
+|                        v                      v                      v                         
+|       +-------------------------+  +-----------------------+  +-----------------------------+  
+|       | 4A. Canonical Chunks    |  | 4B. Extracted Claims  |  | 4C. Embedding Records       |  
+|       |                         |  |                       |  |                             |  
+|       | Structure-aware text    |  | Atomic propositions   |  | Vector representations tied |  
+|       | segments with parent    |  | derived from source   |  | to chunk IDs, model version,|  
+|       | pointers, section IDs,  |  | material for conflict |  | source object, and ACLs.    |  
+|       | and security metadata.  |  | checks and grounding. |  |                             |  
+|       +-----------+-------------+  +-----------+-----------+  +-------------+---------------+  
+|                   |                            |                            |                  
+|                   v                            v                            v                  
+|     +-------------------------+  +-----------------------+  +-----------------------------+    
+|     | 4D. Generated Summaries |  | 4E. Entity Records    |  | 4F. Citation Anchors        |    
+|     |                         |  |                       |  |                             |    
+|     | Corpus-level or cluster |  | Canonical graph nodes |  | Stable coordinates mapping  |    
+|     | overviews used for      |  | with aliases, IDs,    |  | generated claims back to    |    
+|     | broad discovery.        |  | relationships, scope. |  | source, page, section, span.|    
+|     +-----------+-------------+  +-----------+-----------+  +-------------+---------------+    
+|                 |                            |                            |                    
+|                 +----------------------------+----------------------------+                    
+|                                              |                                                 
+|                                              v                                                 
+|  +------------------------------------------------------------------------------------------+  
+|  |  5. Retrieval Candidate Set                                                              |  
+|  |                                                                                          |  
+|  |  Permission-filtered, freshness-aware, authority-weighted candidate objects selected from|  
+|  |  vector, keyword, graph, claim, and citation indexes.                                    |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  6. Context Object                                                                       |  
+|  |                                                                                          |  
+|  |  Transient, validated, permission-safe, task-relevant model-facing block compiled into   |  
+|  |  the active context window. Deleted or archived after the generation session.            |  
+|  +------------------------------------------------------------------------------------------+  
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Rule: each lower artifact must preserve lineage to its parent. Chunks, embeddings, summaries,  |
+| claims, and citations do not get to wander off wearing fake mustaches.                         |
++------------------------------------------------------------------------------------------------+
 ```
 
 The table below defines the structural boundaries, ingestion mechanics, and operational lifespans of each artifact within the epistemic hierarchy:
@@ -355,6 +474,7 @@ The table below defines the authority tiers of enterprise knowledge sources:
 To guarantee complete auditability, the corpus platform must map every step of document discovery, parsing, translation, and chunking using the W3C Provenance Ontology (PROV-O).18 PROV-O uses a tripartite structure: **Entities** (assets, chunks, or claims), **Activities** (parser runs, chunk splits, or translation steps), and **Agents** (software systems or curators).29  
 The RDF Turtle block below illustrates a complete lineage trail from a raw PDF document to a retrieved citation 18:
 
+```
 Code snippet  
 @prefix prov: <http://www.w3.org/ns/prov#>.  
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#>.  
@@ -411,6 +531,7 @@ agent:docling_parser_engine a prov:Agent ; prov:actedOnBehalfOf agent:it_data_pl
 agent:chunking_service a prov:Agent.  
 agent:retrieval_orchestrator a prov:Agent.  
 agent:it_data_platform_steward a prov:Agent.
+```
 
 Using this structural ledger, a downstream model or auditor can perform recursive graph queries to trace a generated claim back to its raw source.18 If a model cites context_object_claim_901, the system can trace the chain back through canonical_chunk_segment_12 and normalized_hr_policy_md to confirm that the source was raw_hr_policy_pdf, which was created by hr_policy_director.18
 
@@ -419,18 +540,94 @@ Using this structural ledger, a downstream model or auditor can perform recursiv
 Unstructured enterprise information frequently contains layout differences, formatting noise, and duplicate content.20 If ignored, this noise pollutes semantic indexes and causes retrieved results to contain redundant or conflicting sections.1
 
 ```
-Raw Sources ──► Normalization (UTF-8, ISO 8601, SI units)  
-                      │  
-                      ▼  
-            MinHash LSH Indexing ──► ──► Retain higher-authority version   
-                      │  
-               
-                      │  
-                      ▼  
-             Proxy-Pointer RAG ──► Build Entity Profile ──► strict LLM reconciliation   
-                                                                        │  
-                                                                        ▼  
-                                                             Knowledge Graph update
++-------------------------------------------------------------------------------------------------+
+|                         NORMALIZATION, DEDUPLICATION, AND CANONICALIZATION                      |
++-------------------------------------------------------------------------------------------------+
+|                                                                                                 
+|  Goal: clean raw source material, remove duplicate knowledge, retain the highest-authority      
+|  version, and map entity variants to canonical graph records before retrieval.                  
+|                                                                                                 
+|  [ Raw Sources ]                                                                                
+|        |                                                                                        
+|        v                                                                                        
+|  +------------------------------------------------------------------------------------------+   
+|  |                              1. Format Normalization                                     |   
+|  |                                                                                          |   
+|  |  UTF-8 cleanup | Markdown structure | ISO 8601 timestamps | SI units | locale tags       |   
+|  |  section boundaries | table structure | citation coordinates | schema-normalized fields  |   
+|  +---------------------------------------------+--------------------------------------------+   
+|                                                |                                                
+|                                                v                                                
+|  +------------------------------------------------------------------------------------------+   
+|  |                              2. Noise and Safety Cleanup                                 |   
+|  |                                                                                          |   
+|  |  remove boilerplate | strip headers/footers/nav | redact PII/secrets | repair OCR errors |   
+|  |  preserve source coordinates and transformation lineage                                  |   
+|  +---------------------------------------------+--------------------------------------------+   
+|                                                |                                                
+|                                                v                                                
+|  +------------------------------------------------------------------------------------------+   
+|  |                              3. Duplicate Detection                                      |   
+|  |                                                                                          |   
+|  |  exact byte hash -> lexical hash -> MinHash LSH -> semantic similarity clustering        |   
+|  |                                                                                          |   
+|  |  near-duplicate threshold example: Jaccard >= 0.80                                       |   
+|  +---------------------------------------------+--------------------------------------------+   
+|                                                |                                                
+|                                      [ Duplicate or Near-Duplicate? ]                           
+|                                           /                    \                                
+|                                    No    /                      \   Yes                         
+|                                         v                        v                              
+|                         [ Continue to Entity Pass ]       +----------------------------------+  
+|                                                           | 4. Duplicate Resolution          |  
+|                                                           |                                  |  
+|                                                           | Same version/timestamp: discard  |  
+|                                                           | Minor version difference: retain |  
+|                                                           | current or higher-authority copy |  
+|                                                           | System-of-record conflict:       |  
+|                                                           | retain stronger source and flag  |  
+|                                                           | weaker source for review         |  
+|                                                           +----------------+-----------------+  
+|                                                                            |                    
+|                                                                            v                    
+|  +------------------------------------------------------------------------------------------+   
+|  |                              5. Supersession and Lineage Update                          |   
+|  |                                                                                          |   
+|  |  mark old object superseded | link superseded_by | preserve audit trail | update indexes |   
+|  |  ensure derived chunks, embeddings, summaries, and claims follow the retained parent     |   
+|  +---------------------------------------------+--------------------------------------------+   
+|                                                |                                                
+|                                                v                                                
+|  +------------------------------------------------------------------------------------------+   
+|  |                              6. Entity Extraction and Alias Matching                     |   
+|  |                                                                                          |   
+|  |  extract entity mentions -> match aliases -> compare graph neighborhoods -> score match  |   
+|  |  examples: "Sony", "Sony Interactive", "SIE" -> canonical entity candidate               |   
+|  +---------------------------------------------+--------------------------------------------+   
+|                                                |                                                
+|                                  [ Canonical Entity Match? ]                                    
+|                                      /             |             \                              
+|                                     /              |              \                             
+|                                    v               v               v                            
+|                           High Confidence   Ambiguous Match      No Match                       
+|                                 |                |                |                             
+|                                 v                v                v                             
+|                    [ Merge to Canonical ID ] [ Review Queue ] [ Create New Entity ]             
+|                                 |                |                |                             
+|                                 +----------------+----------------+                             
+|                                                  |                                              
+|                                                  v                                              
+|  +------------------------------------------------------------------------------------------+   
+|  |                              7. Governed Corpus Update                                   |   
+|  |                                                                                          |   
+|  |  write canonical IDs, aliases, parent pointers, duplicate decisions, authority choices,  |   
+|  |  redaction state, and lineage events to the corpus object store and graph index.         |   
+|  +------------------------------------------------------------------------------------------+   
+|                                                                                                 
++-------------------------------------------------------------------------------------------------+
+| Rule: normalize before splitting, deduplicate before indexing, and canonicalize entities before |
+| writing graph memory. Otherwise the retrieval system learns your filing cabinet’s bad habits.   |
++-------------------------------------------------------------------------------------------------+
 ```
 
 ### **Multi-Level Normalization Protocol**
@@ -465,25 +662,99 @@ When documents refer to a single entity using different names (e.g., *"Sony"*, *
 
 
 ```                      
-                              │  
-                     Extract Entity Profile   
-                              │  
-                    Decompose Sub-Queries:  
-       - Raw Entity Name: "Sony"  
-       - Relationship Checks: "owns PlayStation trademark"   
-                              │  
-                              ▼  
-                     Vector Database Search  
-                              │  
-                   
-                              │  
-                              v  
-                   
-                              │  
-                              v  
-                   
-                    - Merges variations to Canonical ID  
-                    - Maps localized graph neighborhood coordinates
++------------------------------------------------------------------------------------------------+
+|                               CANONICAL ENTITY AND ALIAS MODEL                                 |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Goal: prevent entity sprawl by resolving names, aliases, acronyms, and local references to    
+|  stable canonical IDs before writing chunks, claims, or graph edges.                           
+|                                                                                                
+|  [ Ingested Document / Chunk / Claim ]                                                         
+|        |                                                                                       
+|        v                                                                                       
+|  +------------------------------------------------------------------------------------------+  
+|  |                              1. Entity Profile Construction                              |  
+|  |                                                                                          |  
+|  |  Extract: surface name, entity type, local context, relationships, document section,     |  
+|  |  tenant/project scope, source authority, language, and nearby entities.                  |  
+|  |                                                                                          |  
+|  |  Example profile:                                                                        |  
+|  |      surface_name = "Sony"                                                               |  
+|  |      related_terms = ["PlayStation", "SIE", "trademark", "console division"]             |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              2. Multi-Track Query Decomposition                          |  
+|  |                                                                                          |  
+|  |  Generate targeted checks:                                                               |  
+|  |                                                                                          |  
+|  |  - raw name search: "Sony"                                                               |  
+|  |  - alias search: "Sony Interactive", "SIE"                                               |  
+|  |  - relationship search: "owns PlayStation trademark"                                     |  
+|  |  - scoped search: active tenant, project, corpus, jurisdiction                           |  
+|  |  - graph search: nearby nodes and existing canonical IDs                                 |  
+|  +----------------------+----------------------+----------------------+-------------------- +  
+|                         |                      |                      |                        
+|                         v                      v                      v                        
+|      +-------------------------+  +-----------------------+  +-----------------------------+   
+|      | Vector / Hybrid Search  |  | Alias Table Lookup    |  | Knowledge Graph Lookup      |   
+|      |                         |  |                       |  |                             |   
+|      | finds candidate chunks  |  | finds known spelling, |  | finds existing nodes,       |   
+|      | and parent sections     |  | acronym, old-name     |  | edges, parent entities,     |   
+|      |                         |  | variants              |  | and relationship patterns   |   
+|      +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   
+|                  |                            |                            |                   
+|                  +----------------------------+----------------------------+                   
+|                                               |                                                
+|                                               v                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                              3. Parent-Section Loading                                   |  
+|  |                                                                                          |  
+|  |  Do not reconcile from isolated chunks alone. Load the structurally intact parent section|  
+|  |  so the reconciler can see local definitions, headings, tables, and relationship context.|  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              4. Reconciliation Scoring                                   |  
+|  |                                                                                          |  
+|  |  Compare candidate entities using:                                                       |  
+|  |                                                                                          |  
+|  |  name similarity | alias match | entity type | relationship match | source authority     |  
+|  |  tenant/project scope | graph-neighborhood fit | temporal validity | confidence score    |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Reconciliation Decision ]                               
+|                                      /             |             \                             
+|                                     /              |              \                            
+|                                    v               v               v                           
+|                          Strong Existing     Ambiguous Existing      No Existing               
+|                              Match                Match                Match                   
+|                                |                   |                   |                       
+|                                v                   v                   v                       
+|               +-------------------------+ +--------------------+ +---------------------------+ 
+|               | Merge to Canonical ID   | | Pending Entity     | | Create Canonical Entity   | 
+|               |                         | | Review             | |                           | 
+|               | attach alias, update    | | hold graph write,  | | assign new ID, store      | 
+|               | confidence, preserve    | | request resolver,  | | aliases, provenance,      | 
+|               | lineage and source      | | avoid false merge  | | scope, and initial edges  | 
+|               +------------+------------+ +---------+----------+ +-------------+-------------+ 
+|                            |                        |                          |               
+|                            +------------------------+--------------------------+               
+|                                                     |                                          
+|                                                     v                                          
+|  +------------------------------------------------------------------------------------------+  
+|  |                              5. Graph and Corpus Write                                   |  
+|  |                                                                                          |  
+|  |  Write canonical_entity_id to chunks, claims, summaries, embeddings, citations, and      |  
+|  |  Corpus Object metadata. Store alias history and reconciliation evidence for audit.      |  
+|  +------------------------------------------------------------------------------------------+  
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Rule: entity aliases are resolved at the database layer, not left for the model to guess during|
+| answer generation. Retrieval should return canonical knowledge, not name soup.                 |
++------------------------------------------------------------------------------------------------+
 ```
 
 Under this model, the system processes entities as follows:
@@ -648,9 +919,104 @@ def execute_agent_query(db_session: Session, user: UserContext, generated_sql: s
 Enterprise document repositories are dynamic environments.6 A document's legal authority changes as laws adapt, product lines deprecate, and retention schedules expire.14
 
 ```
- ──► [Approved] ──► [Active] ──► ──► ──► [Archived] ──►  
-                                │                                            │  
-                                └───(Legal Hold Active)──────────────────────┴──►
++------------------------------------------------------------------------------------------------+
+|                  VERSIONING, RETENTION, REDACTION, AND ARCHIVAL POLICY MAP                     |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Goal: manage document authority, retrieval eligibility, retention obligations, redaction      
+|  paths, supersession links, archival movement, legal holds, and defensible deletion.           
+|                                                                                                
+|  [ New or Updated Corpus Object ]                                                              
+|        |                                                                                       
+|        v                                                                                       
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Lifecycle Classification                                    |  
+|  |                                                                                          |  
+|  |  determine version_state, retention_class, sensitivity_class, legal_hold_status,         |  
+|  |  valid_from/valid_until, owner, steward, supersession links, and retrieval eligibility.  |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Document Version States                                     |  
+|  +----------------------+----------------------+----------------------+---------------------+  
+|                         |                      |                      |                        
+|                         v                      v                      v                        
+|      +-------------------------+  +-----------------------+  +-----------------------------+   
+|      | Draft                   |  | Approved              |  | Active                      |   
+|      |                         |  |                       |  |                             |   
+|      | excluded from retrieval |  | queued for validation |  | eligible for standard       |   
+|      | stored for authors only |  | and index loading     |  | retrieval and citation      |   
+|      +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   
+|                  |                            |                            |                   
+|                  |                            v                            v                   
+|                  |                +-----------------------+  +-----------------------------+   
+|                  |                | Deprecated            |  | Superseded                  |   
+|                  |                |                       |  |                             |   
+|                  |                | valid_until expired;  |  | replaced by newer version;  |   
+|                  |                | historical retrieval  |  | active queries reroute to   |   
+|                  |                | only                  |  | superseded_by target        |   
+|                  |                +-----------+-----------+  +-------------+---------------+   
+|                  |                            |                            |                   
+|                  +----------------------------+----------------------------+                   
+|                                               |                                                
+|                                               v                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Security and Redaction Branch                               |  
+|  |                                                                                          |  
+|  |  Sensitive source?                                                                       |  
+|  |        |                                                                                 |  
+|  |        +-- No  -> retain inherited classification and continue lifecycle processing.     |  
+|  |        |                                                                                 |  
+|  |        +-- Yes -> create Redacted Derivative if lower-clearance use is allowed.          |  
+|  |                  Mask PII/secrets, assign derivative ID, preserve parent lineage,        |  
+|  |                  inherit or narrow ACLs, and mark redaction_status.                      |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Retention and Legal Hold Gate                               |  
+|  |                                                                                          |  
+|  |  Retention trigger reached?                                                              |  
+|  |        |                                                                                 |  
+|  |        +-- No  -> maintain current archival_state and schedule next review.              |  
+|  |        |                                                                                 |  
+|  |        +-- Yes -> check legal_hold_status.                                               |  
+|  |                         |                                                                |  
+|  |                         +-- Legal hold active -> freeze deletion, lock record, restrict  |  
+|  |                         |                        mutation, preserve all derivatives.     |  
+|  |                         |                                                                |  
+|  |                         +-- No legal hold -> archive or delete according to policy.      |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Archival / Disposal Outcomes                                |  
+|  +----------------------+----------------------+----------------------+---------------------+  
+|                         |                      |                      |                        
+|                         v                      v                      v                        
+|      +-------------------------+  +-----------------------+  +-----------------------------+   
+|      | Archived                |  | Legal Hold            |  | Deleted / Disposed          |   
+|      |                         |  |                       |  |                             |   
+|      | cold storage, excluded  |  | immutable preservation|  | cryptographic erasure from  |   
+|      | from standard indexes,  |  | blocks deletion and   |  | storage, vector indexes,    |   
+|      | available for audit     |  | retention expiry      |  | caches, and derivatives     |   
+|      +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   
+|                  |                            |                            |                   
+|                  +----------------------------+----------------------------+                   
+|                                               |                                                
+|                                               v                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Index and Lineage Propagation                               |  
+|  |                                                                                          |  
+|  |  Update vector index, keyword index, graph records, summaries, extracted claims, citation|  
+|  |  anchors, prompt caches, audit logs, and downstream context-eligibility filters.         |  
+|  +------------------------------------------------------------------------------------------+  
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Rule: document lifecycle is not cosmetic metadata. It determines whether a knowledge asset can |
+| be retrieved, cited, redacted, archived, frozen, superseded, or permanently destroyed.         |
++------------------------------------------------------------------------------------------------+
 ```
 
 ### **Versioning and Supersession Rules**
@@ -689,19 +1055,116 @@ The policy map below defines the retention and redaction rules for enterprise kn
 When retrieval systems ingest conflicting inputs (such as an old API manual and a newer specification, or contradictory policy guidelines), standard RAG blindly merges the text.12 This forces the model into a **Context-Compliance Regime**, where it outputs incorrect or hallucinated claims because the retrieved context dominates its parametric memory.12
 
 ```
- ──► Step 1: Contextual Extraction (a_ctx)  
-                              │  
-                       Step 2: Parametric Extraction (a_param)  
-                              │  
-                       Step 3: Divergence Check (Compare a_ctx & a_param)  
-                              │  
-                              ├──(Divergence Detected?)──> Yes ──> Step 4: Premise Isolation  
-                              │                                      │  
-                              │                                    Step 5: Resolution Loop   
-                              │                                      │  
-                              │                                    [Output resolved, audited answer]  
-                              │  
-                              └── No ──>
++------------------------------------------------------------------------------------------------+
+|                    CONFLICT RESOLUTION AND EPISTEMIC BELIEF REVISION                           |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Goal: prevent retrieval from flattening contradictory sources into a single confident answer. 
+|  Conflicts must be isolated, scoped, resolved, logged, or surfaced as unresolved.              
+|                                                                                                
+|  [ Retrieval Candidate Set ]                                                                   
+|        |                                                                                       
+|        v                                                                                       
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Step 1: Contextual Extraction                               |  
+|  |                                                                                          |  
+|  |  Extract a_ctx: the answer asserted strictly by the retrieved context.                   |  
+|  |  Ignore parametric memory and do not reconcile yet.                                      |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Step 2: Parametric Extraction                               |  
+|  |                                                                                          |  
+|  |  Extract a_param: the answer produced from model knowledge without retrieved context.    |  
+|  |  Treat this as a comparison signal, not as authoritative truth.                          |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Step 3: Divergence Check                                    |  
+|  |                                                                                          |  
+|  |  Compare a_ctx and a_param. Also compare retrieved sources against each other.           |  
+|  |                                                                                          |  
+|  |  Check: entity mismatch | date mismatch | jurisdiction mismatch | product/customer scope |  
+|  |         source authority | version state | supersession links | conflict_status          |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Divergence Detected? ]                                  
+|                                          /                    \                                
+|                                   No    /                      \   Yes                         
+|                                        v                        v                              
+|  +-------------------------------------------+   +--------------------------------------------+
+|  | Output grounded answer with normal        |   | Step 4: Premise Isolation                  | 
+|  | citations and standard confidence.        |   |                                            |
+|  |                                           |   | Extract the discrete premises causing      |
+|  | Log: no conflict detected.                |   | the conflict and bind each to source,      |
+|  +----------------------+--------------------+   | citation span, authority, scope, and time. |
+|                         |                        +-------------------+------------------------+
+|                         |                                            |                         
+|                         |                                            v                         
+|                         |                        +--------------------------------------------+
+|                         |                        | Step 5: Scoped Variation Test              |
+|                         |                        |                                            |
+|                         |                        | Are the claims both valid under different  |
+|                         |                        | temporal, jurisdictional, product, tenant, |
+|                         |                        | or customer scopes?                        |
+|                         |                        +-------------------+------------------------+
+|                         |                                            |                         
+|                         |                              +-------------+-------------+           
+|                         |                              |                           |           
+|                         |                            Yes                           No          
+|                         |                              |                           |           
+|                         |                              v                           v           
+|                         |            +-------------------------------+  +--------------------+ 
+|                         |            | Scoped Variation Resolution   |  | True Contradiction | 
+|                         |            |                               |  | Resolution         | 
+|                         |            | Preserve both claims, attach  |  |                    | 
+|                         |            | scope conditions, and answer  |  | Compare authority, | 
+|                         |            | conditionally.                |  | recency, version,  | 
+|                         |            |                               |  | provenance, and    | 
+|                         |            | Example: "For EU accounts..." |  | trust score.       | 
+|                         |            +---------------+---------------+  +----------+---------+ 
+|                         |                             |                            |           
+|                         |                             |                            v           
+|                         |                             |         +----------------------------+ 
+|                         |                             |         | Resolved?                  | 
+|                         |                             |         +-------------+--------------+ 
+|                         |                             |                      / \               
+|                         |                             |               Yes   /   \   No         
+|                         |                             |                    v     v             
+|                         |                             |    +----------------+  +-------------+ 
+|                         |                             |    | Select winning |  | Quarantine  | 
+|                         |                             |    | claim; mark    |  | conflicting | 
+|                         |                             |    | displaced claim|  | claims; do  | 
+|                         |                             |    | superseded or  |  | not compile | 
+|                         |                             |    | overridden.    |  | as truth.   | 
+|                         |                             |    +-------+--------+  +------+------+ 
+|                         |                             |                |                  |    
+|                         +-----------------------------+----------------+------------------+    
+|                                                              |                                 
+|                                                              v                                 
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Conflict-Aware Output                                       |  
+|  |                                                                                          |  
+|  |  If resolved: answer with selected claim, citation, and conflict log.                    |  
+|  |  If scoped: answer conditionally by region/time/product/customer scope.                  |  
+|  |  If unresolved: disclose uncertainty, exclude disputed claims from hard conclusions,     |  
+|  |  and trigger human review or system-of-record lookup.                                    |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Audit and Belief Store Update                               |  
+|  |                                                                                          |  
+|  |  Store: a_ctx, a_param, premises, source spans, authority comparison, scope decision,    |  
+|  |  selected claim, quarantined claim IDs, confidence, and follow-up resolver action.       |  
+|  +------------------------------------------------------------------------------------------+  
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Rule: conflict is not noise to hide. It is evidence to structure. The system must distinguish  |
+| true contradiction from scoped variation before the answer reaches the user.                   |
++------------------------------------------------------------------------------------------------+
 ```
 
 ### **Distinguishing Contradiction from Scoped Variation**
@@ -881,89 +1344,122 @@ The vocabulary of enterprise information retrieval requires rigorous definition 
 The retrieval pipeline must handle queries through a deterministic sequence of processing stages. It is designed to interpret natural language requests, enforce compliance boundaries, execute high-recall searches, and select precise evidence. The complete architectural lifecycle of a query is detailed in the data flow diagram below:
 
 ```
-                  +-----------------------------------------+  
-                  |            Incoming User Query          |  
-                  +-----------------------------------------+  
-                                       |  
-                                       v  
-                  +-----------------------------------------+  
-                  |        1. QUERY INTERPRETATION          |  
-                  |  - Intent Classification                |  
-                  |  - Entity Resolution & Alias Expansion  |  
-                  |  - Query Decomposition (Subquestions)   |  
-                  +-----------------------------------------+  
-                                       |  
-                                       | (Targeted Search Queries)  
-                                       v  
-                  +-----------------------------------------+  
-                  |         2. CANDIDATE GENERATION         |  
-                  |  +-----------------------------------+  |  
-                  |  |  Lexical Channel (BM25 Engine)    |  |  
-                  |  +-----------------------------------+  |  
-                  |  |  Dense Channel (Embedding Index)  |  |  
-                  |  +-----------------------------------+  |  
-                  |  |  Graph Channel (Knowledge Graph)  |  |  
-                  |  +-----------------------------------+  |  
-                  |  |  Relational Channel (SQL / APIs)  |  |  
-                  |  +-----------------------------------+  |  
-                  +-----------------------------------------+  
-                                       |  
-                                       | (Raw Candidates)  
-                                       v  
-                  +-----------------------------------------+  
-                  |          3. COMPLIANCE GATING           |  
-                  |  - Access Control List (ACL) Filter     |  
-                  |  - Tenant / Organization Boundaries     |  
-                  |  - Redaction Verification               |  
-                  +-----------------------------------------+  
-                                       |  
-                                       | (Authorized Candidates)  
-                                       v  
-                  +-----------------------------------------+  
-                  |         4. HYBRID SEARCH FUSION         |  
-                  |  - Score Normalization & Scaling        |  
-                  |  - Reciprocal Rank Fusion (RRF / RSF)   |  
-                  +-----------------------------------------+  
-                                       |  
-                                       | (Fused Candidate List)  
-                                       v  
-                  +-----------------------------------------+  
-                  |              5. RERANKING               |  
-                  |  - Cross-Encoder Semantic Scoring       |  
-                  |  - Answerability & Utility Evaluation   |  
-                  +-----------------------------------------+  
-                                       |  
-                                       | (Scored & Ranked Candidates)  
-                                       v  
-                  +-----------------------------------------+  
-                  |       6. EVIDENCE GATING & SELECTION    |  
-                  |  - Freshness and Supersession Gating    |  
-                  |  - Source Authority Weighting           |  
-                  |  - Diversity-Aware Context Pruning      |  
-                  +-----------------------------------------+  
-                                       |  
-                                       | (Approved Chunks)  
-                                       v  
-                  +-----------------------------------------+  
-                  |        7. EVIDENCE PACKAGING            |  
-                  |  - Lineage & Provenance Attachment      |  
-                  |  - Coordinate & Citation Map Binding    |  
-                  |  - Creation of Standard Evidence Packet |  
-                  +-----------------------------------------+  
-                                       |  
-                                       | (Evidence Packets)  
-                                       v  
-                  +-----------------------------------------+  
-                  |    8. SEMANTIC INJECTION & ASSEMBLY     |  
-                  |  - Structure-Preserving Rendering       |  
-                  |  - Delimiter Injection & Isolation      |  
-                  |  - Grounding Prompts Compile            |  
-                  +-----------------------------------------+  
-                                       |  
-                                       v  
-                  +-----------------------------------------+  
-                  |             Target LLM Context          |  
-                  +-----------------------------------------+
++------------------------------------------------------------------------------------------------+
+|                                  RETRIEVAL PIPELINE ARCHITECTURE                               |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Rule: retrieve the smallest sufficient set of authorized, current, source-grounded evidence   
+|  needed to answer the actual task. Permission and scope gates constrain search before scoring. 
+|                                                                                                
+|  [ Incoming User Query ]                                                                       
+|            |                                                                                   
+|            v                                                                                   
+|  +------------------------------------------------------------------------------------------+  
+|  |  1. Query Interpretation                                                                 |  
+|  |                                                                                          |  
+|  |  intent classification | entity resolution | alias expansion | temporal normalization    |  
+|  |  query decomposition | metadata inference | rewrite validation                           |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  2. Authenticated Retrieval Context                                                      |  
+|  |                                                                                          |  
+|  |  user_id | tenant_id | SIDs/groups | roles | jurisdiction | clearance | active project   |  
+|  |  session references | tool permissions | budget / latency constraints                    |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  3. Pre-Retrieval Eligibility Plan                                                       |  
+|  |                                                                                          |  
+|  |  Build native index filters before candidate generation:                                 |  
+|  |                                                                                          |  
+|  |  - tenant and organization boundaries                                                    |  
+|  |  - ACL / SID / group intersections                                                       |  
+|  |  - jurisdiction and product scope                                                        |  
+|  |  - active version and freshness status                                                   |  
+|  |  - archival, legal-hold, and redaction eligibility                                       |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  4. Constrained Candidate Generation                                                     |  
+|  |                                                                                          |  
+|  |  Search only inside authorized, current, eligible partitions.                            |  
+|  |                                                                                          |  
+|  |  +--------------------+   +--------------------+   +--------------------+   +-----------+|  
+|  |  | Lexical Channel    |   | Dense Channel      |   | Graph Channel      |   | SQL / API ||  
+|  |  | BM25 / keywords    |   | vector / embedding |   | entity traversal   |   | lookups   ||  
+|  |  +--------------------+   +--------------------+   +--------------------+   +-----------+|  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  5. Hybrid Fusion                                                                        |  
+|  |                                                                                          |  
+|  |  normalize scores or fuse ranks: RRF | RSF | Bayesian BM25 blending | channel weights    |  
+|  |  preserve source IDs, rank provenance, matched subquery, and channel-specific evidence   |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  6. Reranking and Answerability Scoring                                                  |  
+|  |                                                                                          |  
+|  |  cross-encoder rerank | LLM utility grading | diversity pruning | authority adjustment   |  
+|  |  freshness adjustment | citation-coordinate preference | answerability evaluation        |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  7. Evidence Gating and Selection                                                        |  
+|  |                                                                                          |  
+|  |  Verify each candidate before context assembly:                                          |  
+|  |                                                                                          |  
+|  |  - still authorized                                                                      |  
+|  |  - active / not superseded                                                               |  
+|  |  - high enough source authority                                                          |  
+|  |  - non-redundant with selected evidence                                                  |  
+|  |  - citation coordinates available                                                        |  
+|  |  - supports at least one required subquestion                                            |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Conflicts Detected? ]                                   
+|                                           /                  \                                 
+|                                    No    /                    \   Yes                          
+|                                         v                      v                               
+|                         [ Approved Evidence Set ]      +-----------------------------------+   
+|                                                        | Conflict Packet                   |   
+|                                                        |                                   |   
+|                                                        | group contradictory candidates    |   
+|                                                        | preserve source authority,        |   
+|                                                        | freshness, version, scope, and    |   
+|                                                        | citation coordinates              |   
+|                                                        +----------------+------------------+   
+|                                                                         |                      
+|                                                                         v                      
+|  +------------------------------------------------------------------------------------------+  
+|  |  8. Evidence Packaging                                                                   |  
+|  |                                                                                          |  
+|  |  Build standard Evidence Packets: content, provenance, governance, epistemic metadata,   |  
+|  |  citation coordinates, matched subquery, retrieval rationale, and conflict annotations.  |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  9. Semantic Injection and Context Assembly                                              |  
+|  |                                                                                          |  
+|  |  Render evidence into isolated XML / structured packets. Keep retrieved content separated|  
+|  |  from system instructions. Order packets by utility, authority, freshness, and token cost|  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|                                   [ Target LLM Context Window ]                                
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Retrieval doctrine: candidate generation is high-recall, but only inside an authorized search  |
+| space. Final context is high-precision, source-grounded, citation-ready, and conflict-aware.   |
++------------------------------------------------------------------------------------------------+
 ```
 
 ### **Architectural Decomposition of the Query Lifecycle**
@@ -1173,33 +1669,75 @@ Pre-retrieval filtering restricts the search space *before* candidate generation
 To secure data and maintain relevance, the retrieval pipeline enforces three tiers of metadata-driven validation gates before candidates are selected for reranking:
 
 ```
-            User Query & Authenticated Context (SIDs, Tenant ID)  
-                                     |  
-                                     v  
-+--------------------------------------------------------------------------+  
-|  Tier 1: SECURITY GATE (Pre-Retrieval Filter)                            |  
-|  - Enforces: `tenant_id == "TENANT-A"`                                   |  
-|  - Enforces: `user_groups INTERSECT document_acl_groups`                 |  
-|  - Blocks unauthorized vector matches before scoring or logging          |  
-+--------------------------------------------------------------------------+  
-                                     |  
-                                     v  
-+--------------------------------------------------------------------------+  
-|  Tier 2: FRESHNESS & VERSION GATE (Retrieval-Time Gate)                  |  
-|  - Enforces: `document_status == "active"`                               |  
-|  - Diverts queries targeting superseded files to replacement versions    |  
-|  - Matches dates against the user's temporal parameters                  |  
-+--------------------------------------------------------------------------+  
-                                     |  
-                                     v  
-+--------------------------------------------------------------------------+  
-|  Tier 3: COMPLIANCE & SCOPE GATE (Dynamic Filter)                        |  
-|  - Enforces: `jurisdiction == "EU"`, `product_version == "V3"`           |  
-|  - Redaction Propagation: Scrubs sensitive variables and PII             |  
-+--------------------------------------------------------------------------+  
-                                     |  
-                                     v  
-                     Clean, Approved Candidate List
++------------------------------------------------------------------------------------------------+
+|                         METADATA FILTERING AND PERMISSION GATE MODEL                           |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Rule: security filters constrain the searchable index before ANN, vector scoring, reranking,  
+|  logging, or GPU exposure. Post-retrieval filtering is too late.                               
+|                                                                                                
+|  [ User Query + Authenticated Context ]                                                        
+|       |                                                                                        
+|       |  JWT / session token | user_id | tenant_id | roles | SIDs | groups | jurisdiction      
+|       v                                                                                        
+|  +------------------------------------------------------------------------------------------+  
+|  |  Identity and Policy Hydration                                                           |  
+|  |                                                                                          |  
+|  |  Resolve: tenant scope, allowed principals, clearance level, active project, geography,  |  
+|  |  product scope, legal/compliance boundary, and tool/data permissions.                    |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  Native Filter Plan                                                                      |  
+|  |                                                                                          |  
+|  |  Compile metadata constraints into database-native filters:                              |  
+|  |                                                                                          |  
+|  |  tenant_id == active tenant                                                              |  
+|  |  user_SIDs INTERSECT document_acl_groups != empty                                        |  
+|  |  classification <= user_clearance                                                        |  
+|  |  jurisdiction/product/version match active query scope                                   |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  Tier 1: Security Gate                                                                   |  
+|  |                                                                                          |  
+|  |  Exclude unauthorized vectors, documents, graph nodes, SQL rows, and API records before  |  
+|  |  similarity scoring or candidate logging.                                                |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  Tier 2: Freshness and Version Gate                                                      |  
+|  |                                                                                          |  
+|  |  Enforce active version status, valid time, supersession links, archival state, and      |  
+|  |  temporal constraints extracted from the user query.                                     |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  Tier 3: Compliance and Scope Gate                                                       |  
+|  |                                                                                          |  
+|  |  Enforce jurisdiction, product tier, customer class, retention status, redaction state,  |  
+|  |  legal hold, and dynamic ABAC/RBAC policy rules.                                         |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  Constrained Search Space                                                                |  
+|  |                                                                                          |  
+|  |  Only eligible objects enter lexical search, dense vector ANN, graph traversal, SQL/API  |  
+|  |  lookup, fusion, reranking, and evidence selection.                                      |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|                              [ Clean, Approved Candidate List ]                                
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Security doctrine: the retrieval system should never fetch, score, rerank, cache, or expose    |
+| content that the authenticated caller is not allowed to access.                                |
++------------------------------------------------------------------------------------------------+
 ```
 
 The system coordinates these validation gates using structured metadata constraints:
@@ -1395,13 +1933,28 @@ The context compiler translates approved Evidence Packets into structured prompt
 * **Format**: Renders data as Markdown tables, keeping row headers and column headers intact.28
 
 ```XML  
-<evidence-packet id="EP-TAB-09" source="Q3-FINANCIALS">  
-  <table-data name="Revenue Summary" coordinates="Table 2, Rows 3-5">  
-    | Region | Q3 Revenue | YoY Growth |  
-    | :--- | :--- | :--- |  
-    | EMEA | $14.2M | +12% |  
-    | APAC | $18.9M | +18% |  
-  </table-data>  
+<evidence-packet id="EP-TAB-09" source="Q3-FINANCIALS" version="2026-Q3-final">
+  <citation-coordinates
+    uri="s3://finance/reports/q3-financials.xlsx"
+    sheet="Revenue Summary"
+    table="Table 2"
+    rows="3-5"
+    columns="Region,Q3 Revenue,YoY Growth" />
+
+  <table-data name="Revenue Summary" format="markdown-literal">
+    <![CDATA[
+| Region | Q3 Revenue | YoY Growth |
+| :---   | :---       | :---       |
+| EMEA   | $14.2M     | +12%       |
+| APAC   | $18.9M     | +18%       |
+    ]]>
+  </table-data>
+
+  <table-semantics>
+    <row-headers>Region</row-headers>
+    <column-headers>Q3 Revenue, YoY Growth</column-headers>
+    <unit-notes>Revenue values are in USD millions.</unit-notes>
+  </table-semantics>
 </evidence-packet>
 ```
 
@@ -1473,6 +2026,33 @@ The context compiler translates approved Evidence Packets into structured prompt
 <evidence-brief topic="Acme Security SLA">  
   - Acme requires 99.9% uptime for API services.  
   - Incident response times must not exceed 15 minutes.  
+</evidence-brief>
+```
+
+Or, for a more robust case:
+
+```XML
+<evidence-brief topic="Acme Security SLA" task="executive_summary">
+  <brief-purpose>
+    Provide a compact, citation-addressable summary of the SLA obligations relevant to the active query.
+  </brief-purpose>
+
+  <evidence-point id="BULLET-01" packet-ref="EP-ACME-SLA-04" citation-span="section 2.1">
+    Acme requires 99.9% monthly uptime for public API services.
+  </evidence-point>
+
+  <evidence-point id="BULLET-02" packet-ref="EP-ACME-SLA-07" citation-span="section 3.4">
+    Priority-1 incident response must begin within 15 minutes of confirmed detection.
+  </evidence-point>
+
+  <evidence-point id="BULLET-03" packet-ref="EP-ACME-SLA-09" citation-span="section 5.2">
+    Scheduled maintenance windows must be announced at least 72 hours in advance.
+  </evidence-point>
+
+  <scope-note>
+    This brief only summarizes active Acme SLA obligations. Superseded drafts and unrelated customer
+    support policies were excluded from the evidence set.
+  </scope-note>
 </evidence-brief>
 ```
 
@@ -1710,12 +2290,14 @@ O(L * b_level)
 where L is the number of hierarchical layers and b_level is the restricted branching factor within a specific level.5 This optimization reduces the number of node visits for a representative query from hundreds of thousands to mere dozens, though it requires a structured cold start to map the topology and is not suited for pure unstructured similarity searches.5
 
 Flat Graph Traversal (GraphRAG):  
+```
 validateTkn ---> refreshTkn ---> sessionCheck ---> userLookup ---> permissionVerify ---> apiGateway ---> chargeInit  
 (Combinatorial explosion of intermediate nodes visited: O(b^H))
 
 Topological Traversal (Topology RAG - The Wormhole Effect):  
 validateTkn --[ascend]--> AuthSystem ===[component edge]===> PaymentPlatform --[descend]--> chargeInit  
 (Traverses high-level components to bypass intermediate node overhead: O(L * b_level))
+```
 
 Engineers must balance these paradigms against database capabilities.6 A common architectural question is whether to adopt a "just use pgvector" approach within an existing PostgreSQL instance or deploy dedicated vector engines such as Qdrant or Milvus.8 The decision to use pgvector is governed by six strict criteria.8 If any of these conditions are violated, systems must migrate to purpose-built stores to avoid operational degradation under load.8
 
@@ -1846,13 +2428,18 @@ The DualTrack framework executes parallel generation tracking, producing two syn
 Furthermore, production systems must implement automated fallback mechanisms to resolve "citation rot" or broken URL links in retrieved sources.10 If a retrieved URL is flagged as stale or unreachable, the system automatically queries archive APIs (such as the Wayback Machine) to resolve historical snapshots.31  
 This ensures that inline citations remain resolvable and auditable, maintaining link integrity over time.10
 
-| Citation Metric | Mathematical Formulation / System Setup | Target Objective | Empirical Observations |
-| :---- | :---- | :---- | :---- |
-| **Jaccard Stability** | Stability = | C_t intersect C_t+1 | / |
-| **Drift Rate** | Drift Rate = | C_t delta C_t+1 | . 29 |
-| **Fabrication Rate** | Fabrication Rate = | Fabricated Citations | / |
-| **DualTrack Alignment** | Aligns target-language user answers with original source-language representations. | Prevents citation drift during cross-lingual retrieval. | Minimizes translation-induced citation alignment failures. |
-| **Wayback Resolution** | Queries archived URL snapshots if the primary URI returns non-resolving codes. 31 | Resolves link rot and preserves verifiable inline references. 10 | Resolves natural link rot to maintain audit trail integrity. 31 |
+| Citation Metric                       | Mathematical Formulation / System Setup                                                  | Target Objective                                                                                                  | Diagnostic Use                                                                                                               |
+| :------------------------------------ | :--------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------- |
+| **Jaccard Stability**                 | `Stability = cardinality(C_t ∩ C_{t+1}) / cardinality(C_t ∪ C_{t+1})`                    | Measures whether valid citations persist across sequential turns.                                                 | Low stability indicates citation loss, mutation, source swapping, or evidence drift during multi-turn interaction.           |
+| **Citation Drift Rate**               | `Drift Rate = cardinality(C_t △ C_{t+1})`                                                | Quantifies how many citation references changed between turn `t` and turn `t+1`.                                  | High drift rate signals unstable attribution chains, especially in long conversations or iterative research workflows.       |
+| **Citation Retention Rate**           | `Retention = cardinality(C_t ∩ C_{t+1}) / cardinality(C_t)`                              | Measures how many previously valid citations remain active in the next turn.                                      | Useful for detecting citation loss when the answer still discusses the same evidence set.                                    |
+| **Citation Fabrication Rate**         | `Fabrication Rate = fabricated_citations / total_citations_generated`                    | Measures the share of citations that do not resolve to a real, retrievable, or authorized source.                 | Flags hallucinated references, malformed source IDs, invented URLs, or unsupported document claims.                          |
+| **Citation Mutation Rate**            | `Mutation Rate = mutated_citation_fields / tracked_citation_fields`                      | Measures whether source attributes change across turns: title, author, URL, version, page, section, or timestamp. | Detects subtle attribution corruption where the citation still exists but no longer points to the same evidence coordinates. |
+| **Citation Support Rate**             | `Support Rate = supported_generated_claims / total_generated_claims`                     | Measures whether generated claims are backed by at least one retrieved evidence packet.                           | Separates citation presence from actual evidentiary support; prevents decorative citation laundering.                        |
+| **Claim-Citation Entailment**         | `Entailment Score = NLI(claim, cited_span)`                                              | Validates whether the cited span logically supports, contradicts, or is neutral toward the generated claim.       | Detects overclaiming, scope inflation, causal exaggeration, and numeric specificity errors.                                  |
+| **DualTrack Alignment**               | Compare target-language answer claims against original-language evidence representation. | Preserves citation integrity in cross-lingual RAG.                                                                | Detects translation-induced attribution drift, mistranslated claims, and mismatched source spans.                            |
+| **Wayback / Archive Resolution Rate** | `Archive Resolution = archived_links_recovered / broken_links_detected`                  | Measures whether stale or broken citation URLs can be resolved through archive snapshots.                         | Helps prevent citation rot from destroying auditability after original URLs decay.                                           |
+| **Version-Aware Citation Validity**   | `Valid Citations = citations_resolving_to_active_or_requested_version / total_citations` | Ensures cited sources match the active, requested, or historically appropriate version.                           | Prevents current answers from citing superseded policies, expired documents, or stale source snapshots.                      |
 
 ## **Section 8: Synthesized Systemic Architecture of a Doctrinal RAG Pipeline**
 
@@ -1860,58 +2447,143 @@ An industrial-grade RAG pipeline must integrate context pruning, conflict detect
 Every chunk, vector embedding, extracted assertion, or summary is derived from a primary Corpus Object, which carries comprehensive compliance, security, provenance, and temporal metadata to enable precise upstream filtering.32
 
 ```
-                     +---------------------------------------+  
-                     |         Unstructured Ingest           |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |      Canonical Corpus Ingestion       |  
-                     |  - Assign Unique object_id (UUID)     |  
-                     |  - Evaluate Source Authority Score    |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |       Hierarchical Chunking           |  
-                     |  - Parse along Semantic Boundaries    |  
-                     |  - Generate Derived Embeddings        |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |    Bi-Temporal Database Write         |  
-                     |  - Track Valid vs Transaction Time    |  
-                     |  - Write to SlotVec Arena Allocator   |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |     Multi-Stage Query Processing      |  
-                     |  - Query Complexity Classification    |  
-                     |  - Dynamic Token Budget Assignment    |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |      Conflict Detection Module        |  
-                     |  - Stage 1: Fast MLP Classifier       |  
-                     |  - Stage 2: Selective LLM Refine      |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |     Entropy-TOPSIS Resolution         |  
-                     |  - Compute Source Credibility Scores  |  
-                     |  - Filter & Rank Retrieved Evidence   |  
-                     +-------------------+-------------------+  
-                                         |  
-                                         v  
-                     +---------------------------------------+  
-                     |      Conflict-Aware Generation        |  
-                     |  - Execute DualTrack Representation   |  
-                     |  - Resolve Stale URL Fallbacks        |  
-                     +---------------------------------------+
++------------------------------------------------------------------------------------------------+
+|                    SYNTHESIZED SYSTEMIC ARCHITECTURE OF A DOCTRINAL RAG PIPELINE               |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Goal: integrate corpus governance, freshness control, conflict detection, context pruning,    
+|  bi-temporal state, belief revision, citation integrity, and conflict-aware generation.        
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                                  SOURCE INGESTION LAYER                                  |  
+|  |                                                                                          |  
+|  |  unstructured files | wikis | APIs | databases | tickets | logs | policies | user uploads|  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              CANONICAL CORPUS INGESTION                                  |  
+|  |                                                                                          |  
+|  |  assign object_id | capture source_uri | hydrate ACLs | evaluate source authority        |  
+|  |  normalize format | redact sensitive data | preserve provenance | record lineage         |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              DERIVATIVE KNOWLEDGE ASSETS                                 |  
+|  |                                                                                          |  
+|  |  structure-aware chunks | proposition claims | summaries | embeddings | citation anchors |  
+|  |  entity records | graph edges | parent-child links | table coordinates | code references |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              BI-TEMPORAL STORAGE LAYER                                   |  
+|  |                                                                                          |  
+|  |  Valid Time:       when the fact is true in the real world                               |  
+|  |  Transaction Time: when the system recorded or believed the fact                         |  
+|  |                                                                                          |  
+|  |  Store active facts, historical versions, supersession links, invalidated claims,        |  
+|  |  audit records, source authority, retention state, and legal-hold metadata.              |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              FRESHNESS AND ROT PREVENTION LOOP                           |  
+|  |                                                                                          |  
+|  |  triggers: source update | factual correction | stale cache | embedding drift | URL rot  |  
+|  |                                                                                          |  
+|  |  actions: re-embed document | expire stale vectors | invalidate prompt cache | refresh   |  
+|  |  summaries | close old valid-time windows | update citation anchors | queue review       |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              QUERY-TIME ELIGIBILITY GATES                                |  
+|  |  Before retrieval, filter by: tenant | ACL | source authority | active version           |  
+|  |  valid time | jurisdiction | product scope | retention state | redaction status          |  
+|  |  legal hold                                                                              |   
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              RETRIEVAL AND CONTEXT OPTIMIZATION                          |  
+|  |                                                                                          |  
+|  |  hybrid search | graph traversal | temporal lookup | parent-child expansion              |  
+|  |  reranking | semantic deduplication | token budget assignment | context pruning          |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              CONFLICT DETECTION MODULE                                   |  
+|  |                                                                                          |  
+|  |  Detect: inter-document factual conflict | temporal conflict | opinion divergence        |  
+|  |          parametric-contextual conflict | supersession conflict | scoped variation       |  
+|  |                                                                                          |  
+|  |  Output: clean evidence set, scoped-variation packet, or explicit conflict packet.       |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                  [ Conflict or Belief Revision Needed? ]                       
+|                                                /       \                                       
+|                                         No    /         \   Yes                                
+|                                              v           v                                     
+|                         [ Evidence Packaging ]     +--------------------------------------+    
+|                                                  | BELIEF REVISION / RESOLUTION ENGINE    |    
+|                                                  |                                        |    
+|                                                  | authority ranking | temporal ordering  |    
+|                                                  | Entropy-TOPSIS | AGM-style revision    |    
+|                                                  | dependency propagation | quarantine    |    
+|                                                  | abstain / escalate when unresolved     |    
+|                                                  +------------------+---------------------+    
+|                                                                     |                          
+|                                                                     v                          
+|  +------------------------------------------------------------------------------------------+  
+|  |                              EVIDENCE PACKAGING AND SEMANTIC INJECTION                   |  
+|  |                                                                                          |  
+|  |  Package approved material into isolated evidence packets with:                          |  
+|  |                                                                                          |  
+|  |  source coordinates | citation IDs | version hashes | authority scores | conflict status |  
+|  |  validity windows | permissions | retrieval rationale | task relevance | token cost      |  
+|  |                                                                                          |  
+|  |  Retrieved data remains data, not executable instruction.                                |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              CONFLICT-AWARE GENERATION                                   |  
+|  |                                                                                          |  
+|  |  Generate answer using smallest sufficient evidence set.                                 |  
+|  |                                                                                          |  
+|  |  If clean: answer directly with citations.                                               |  
+|  |  If scoped: answer conditionally by time, region, product, tenant, or source domain.     |  
+|  |  If conflicting: expose dispute, cite competing sources, and avoid false synthesis.      |  
+|  |  If unresolved: abstain, escalate, or request verification.                              |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              CITATION INTEGRITY AND DRIFT TRACKING                       |  
+|  |  Track: citation stability | drift rate | retention rate | fabrication rate              |  
+|  |  mutation rate | support rate | claim-citation entailment | broken-link recovery         |  
+|  |  version validity                                                                        |  
+|  |                                                                                          |  
+|  |  DualTrack generation preserves source-language evidence alignment in cross-lingual RAG. |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                              TELEMETRY AND FEEDBACK LOOP                                 |  
+|  |  Log: retrieved objects | omitted objects | stale candidates | conflict packets          |  
+|  |   citations | context token budget | pruning decisions | user corrections                |  
+|  |   cache invalidations                                                                    |  
+|  |                                                                                          |  
+|  | Feed corrections back into corpus refresh, embedding updates, belief revision, and evals.|  
+|  +------------------------------------------------------------------------------------------+  
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Doctrine: a production RAG pipeline is not just retrieval plus generation. It is a governed,   |
+| temporal, conflict-aware, citation-stable knowledge system with active decay prevention.       |
++------------------------------------------------------------------------------------------------+
 ```
 
 To maintain architectural integrity across this lifecycle, the Corpus Object must enforce a strict metadata schema across nine administrative segments:

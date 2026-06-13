@@ -158,37 +158,43 @@ A robust serving platform must orchestrate multiple software and hardware layers
 +----------------------------------------------------------------------------------------------------+
 ```
 
-### **Serving Stack Reference Architecture**
+### **Serving Stack Layer Matrix**
 
 | Layer | Primary Responsibility | Representative Technologies | Fail-Safe Behavior |
-| :---- | :---- | :---- | :---- |
-| **API Gateway / Ingress** | Handles client ingress, transport-layer security (TLS) termination, global rate-limiting, and corporate SSO integration.8 | Kong, Envoy, Istio Ingress, AWS API Gateway. | Fails closed on authentication failures; returns a static HTTP 403 response. |
-| **Tenant Policy Engine** | Validates API keys, extracts tenant contexts, and enforces quotas and RPM limits. | Custom API Proxy with Redis Cluster backend. | Strips premium headers; routes requests to the public, low-tier pool. |
-| **Request Classification** | Inspects request payloads to identify target modalities, language profiles, and expected context lengths.3 | ModernBERT classifiers, lightweight transformer sidecars.22 | Defaults to the standard text routing path if classification fails.4 |
-| **Model Router** | Evaluates the model portfolio to determine the optimal target endpoint based on task difficulty and cost limits.4 | SGLang Model Gateway, RouteLLM, Not Diamond, LiteLLM.6 | Defaults to a high-capacity frontier model if difficulty checks timeout.4 |
-| **Load Balancer** | Distributes requests based on queue depths, prefix cache affinity, and adapter residency.3 | Kubernetes Gateway API Inference Extension, llm-d, sgl-router.23 | Falls back to standard round-robin or least-loaded node routing.30 |
-| **Queue / Admission Layer** | Buffers incoming requests and enforces priority scheduling to protect backend runtimes.2 | Endpoint Proxy Plane (EPP) Flow Control, Redis-backed priority queues.2 | Rejects low-priority requests with HTTP 429 errors during peaks.2 |
-| **Cache Layers** | Performs high-speed semantic caching and tracks active physical prefix caches.5 | Redis Enterprise, Milvus, SGLang RadixCache.5 | Bypasses caching entirely, routing requests directly to execution. |
-| **Inference Servers** | Manages logical-to-physical block allocations, continuous batch schedules, and execution optimization.14 | vLLM, SGLang Runtime, Triton Inference Server, TensorRT-LLM.15 | Triggers preemption and recomputation, or falls back to swap space.3 |
-| **Model Registry** | Stores and distributes version-pinned, SHA-validated immutable weight checkpoints.8 | Unity Catalog, MLflow Registry, OCI-compliant Artifact Stores.8 | Halts deployment; rolls back to preceding SHA-validated active container.8 |
-| **Artifact Store** | Stores high-capacity weight checkpoints and dynamic LoRA adapter files.3 | AWS S3, Google Cloud Storage, MinIO, local SAN networks.8 | Halts container initialization; alerts SREs of storage timeout.8 |
-| **Retrieval / Tool Sidecars** | Coordinates real-time tool calls and fetches external document embeddings.6 | Ray Serve applications, Composio MCP Gateways.22 | Disables tool access; routes prompt to direct fallback model.8 |
-| **Validators** | Verifies structural output conformance (e.g., JSON schemas) and checks reasoning traces.6 | Guardrails AI, LlamaGuard, custom regex parsing layers.6 | Triggers fallback model routing or returns a clean validation error.8 |
-| **Telemetry** | Collects and aggregates system logs, trace records, and Prometheus metrics.6 | OpenTelemetry Collector, Prometheus, Datadog Agent, ClickHouse.6 | Continues serving traffic silently; drops metrics locally to prevent leaks.3 |
-| **Fallback** | Coordinates alternative execution paths across backup zones or external cloud providers.27 | LiteLLM Proxy, Custom Gateway Interceptor.27 | Returns a standardized "service degraded" HTTP 503 error to the client. |
-| **Rollback Controller** | Automates traffic shifts and rollbacks of model versions during regressions.6 | GitOps controllers, ArgoCD, custom Kubernetes operators.19 | Freezes active traffic routing state; locks configuration deployments.8 |
+| :--- | :--- | :--- | :--- |
+| **API Gateway / Ingress** | Handles client ingress, transport-layer security termination, global rate-limiting, request logging, and corporate SSO integration. | Kong, Envoy, Istio Ingress, AWS API Gateway. | Fails closed on authentication failures and returns a clean authorization error. |
+| **Tenant Policy Engine** | Validates API keys, extracts tenant context, resolves entitlement, and enforces quotas, RPM, TPM, concurrency, budget, and model-access limits. | Custom API proxy, Redis Cluster, durable quota ledger, policy store. | Fails closed when tenant identity or policy state cannot be verified. Downgrades only when identity is valid and policy explicitly permits a lower-tier route. |
+| **Request Classification** | Inspects request payloads to identify modality, language, task class, context length, schema needs, risk level, and latency target. | ModernBERT classifiers, lightweight transformer sidecars, rules engines. | Defaults to a conservative standard route for low-risk requests; high-risk or policy-sensitive requests fail closed or route to human review. |
+| **Model Router** | Evaluates the model portfolio to determine the optimal endpoint based on task difficulty, risk, latency, cost, tenant policy, fallback state, and route availability. | SGLang Model Gateway, RouteLLM, Not Diamond, LiteLLM, custom routers. | Defaults to a configured tenant-approved safe baseline route. High-risk or policy-sensitive requests fail closed rather than silently escalating to an unapproved frontier or external provider. |
+| **Load Balancer** | Distributes requests based on queue depth, cache warmth, adapter residency, HBM pressure, tenant fairness, and prefix affinity. | Kubernetes Gateway API Inference Extension, llm-d, sgl-router, custom dispatchers. | Falls back to least-loaded or round-robin only when cache-affinity telemetry is unavailable and route safety remains intact. |
+| **Queue / Admission Layer** | Buffers incoming requests, enforces priority scheduling, applies backpressure, and protects backend runtimes from saturation. | Endpoint Proxy Plane flow control, Redis-backed priority queues, custom admission controllers. | Rejects or defers low-priority work with clean HTTP 429/503 responses during peaks. |
+| **Cache Layers** | Performs semantic caching, prompt caching, prefix tracking, and cache telemetry while preserving tenant and permission boundaries. | Redis Enterprise, Milvus, SGLang RadixCache, vLLM prefix cache. | Bypasses caching when safety, freshness, or authorization checks fail. Never serves cross-tenant or stale cache entries. |
+| **Inference Servers** | Loads model weights, manages KV cache memory, schedules continuous batches, executes optimized kernels, streams tokens, and emits runtime metrics. | vLLM, SGLang Runtime, Triton Inference Server, TensorRT-LLM. | Triggers preemption, recomputation, swap, degraded routing, or circuit breaking depending on failure type. |
+| **Model Registry** | Stores and distributes version-pinned, SHA-validated, immutable model artifacts and metadata. | Unity Catalog, MLflow Registry, OCI artifact stores, custom registries. | Halts deployment and rolls back to the preceding SHA-validated active artifact. |
+| **Artifact Store** | Stores high-capacity weight checkpoints, quantized variants, adapter files, tokenizer bundles, templates, and startup snapshots. | AWS S3, Google Cloud Storage, MinIO, local SAN, OCI registries. | Blocks initialization on checksum mismatch or timeout; alerts operators and preserves prior active route. |
+| **Retrieval / Tool Sidecars** | Coordinates retrieval calls, MCP/API tools, embedding stores, document fetches, and external functional dependencies. | Ray Serve applications, Composio MCP gateways, vector DB clients, tool gateways. | Disables affected tools or routes to direct-answer fallback when tool dependencies are unavailable. |
+| **Validators** | Verifies structural output conformance, safety policy, tool arguments, grounding, and action readiness. | Guardrails AI, LlamaGuard, schema validators, custom policy checks. | Retries, escalates, downgrades, or fails closed depending on risk class and validation failure type. |
+| **Telemetry** | Collects logs, traces, Prometheus metrics, audit-critical execution metadata, GPU metrics, cost records, and failure signals. | OpenTelemetry Collector, Prometheus, Datadog Agent, ClickHouse, DCGM. | Continues serving only if safety and audit requirements remain satisfied; samples or drops noncritical telemetry, raises alerts, and preserves audit-critical traces. |
+| **Fallback Controller** | Coordinates backup routes, degraded modes, provider failover, model downgrade, and retry boundaries. | LiteLLM proxy, custom gateway interceptor, circuit breakers, route policy engine. | Returns standardized degraded-service responses when no safe fallback path remains. |
+| **Rollback Controller** | Automates traffic shifts, rollback of model versions, canary aborts, route freezing, and recovery verification. | GitOps controllers, ArgoCD, custom Kubernetes operators, release controllers. | Freezes routing state, blocks new deployments, and restores the last known-good release manifest. |
 
 ### **Control Plane / Data Plane Coordination Model**
 
-The control plane and data plane must coordinate synchronously on routing policies, capacity reservations, and telemetry, yet remain architecturally decoupled so that data-plane request execution is never blocked by control-plane latency or outages.
+The control plane and data plane must remain semantically synchronized through versioned snapshots while staying operationally decoupled from request execution. Routing policies, tenant quotas, release manifests, fallback states, safety policies, and autoscaling targets should propagate into the data plane through explicit configuration versions, not live blocking lookups.
+
+The data plane must be able to continue serving with the last known-good configuration if the control plane becomes slow or temporarily unavailable. Control-plane failure should never force live request execution to wait on configuration databases, registry lookups, or policy-management services.
 
 | System Aspect | Control Plane Responsibilities | Data Plane Responsibilities | Coordination & Sync Mechanisms |
-| :---- | :---- | :---- | :---- |
-| **Configuration & Routing** | Defines target models, weights, routing matrices, and canary split percentages.4 | Tokenizes prompts, extracts routing keys, and dispatches to chosen nodes.5 | Asynchronous gRPC config streaming via xDS APIs, avoiding blockages during database lookups. |
-| **Tenant Quotas** | Manages tenant priority tiers, contract budgets, and rate limits. | Enforces sliding-window RPM limits and tracks token consumption. | Distributed key-value caching (Redis) updated asynchronously by control plane. |
-| **Release Management** | Directs progressive rollouts and validates SHA-pinned image builds.8 | Executes canary splitting and routes traffic to warm instances.3 | Ingress-level weight updates synchronized across the proxy plane without dropping connections.19 |
-| **Autoscaling** | Computes scale targets and provisions new virtual machines and nodes.9 | Reports queue depths, preemption metrics, and HBM memory states.9 | Prometheus metric scrapes combined with KEDA autoscaler control loops.3 |
-| **Rollback & Failover** | Directs global rollbacks to previous stable manifests during failures.8 | Diverts requests to backup clusters or local fallback models.27 | High-speed health probes combined with automated circuit-breaker trips.6 |
+| :--- | :--- | :--- | :--- |
+| **Configuration & Routing** | Defines target models, route matrices, static rules, semantic-routing policies, fallback paths, and canary split percentages. | Tokenizes prompts, extracts routing keys, evaluates local route snapshots, and dispatches to selected nodes. | Versioned routing snapshots streamed asynchronously through xDS, config maps, or gateway control channels. |
+| **Tenant Quotas** | Manages tenant tiers, contract budgets, data residency, model entitlements, spend ceilings, and rate-limit policy. | Enforces RPM, TPM, concurrency, budget, and per-workflow execution limits during request admission. | Distributed counters and policy caches, such as Redis plus durable billing ledger reconciliation. |
+| **Release Management** | Publishes release manifests, approves canaries, validates SHA-pinned artifacts, and controls progressive rollout percentages. | Applies canary splits, selects active model versions, records manifest IDs, and routes traffic to warm instances. | Immutable release manifests synchronized to the gateway and inference-serving layers before traffic shift. |
+| **Autoscaling** | Computes desired capacity from queue depth, p95/p99 latency, HBM pressure, cache saturation, and forecasted load. | Reports queue depth, preemption, free-block count, active batch size, HBM occupancy, and cold-start readiness. | Prometheus/DCGM metrics feeding KEDA, Karpenter, Kubernetes controllers, or custom GPU autoscalers. |
+| **Rollback & Failover** | Declares unhealthy routes, freezes deployments, selects previous stable manifests, and defines recovery criteria. | Trips circuit breakers, shifts traffic, activates degraded paths, and preserves request traces during failover. | Health probes, route-state snapshots, incident runbooks, and automated rollback controllers. |
+| **Safety & Compliance** | Defines regulated-route policy, high-risk workflow rules, human-review requirements, and data-residency boundaries. | Enforces local routing decisions, fail-closed behavior, validation gates, and tenant-isolated execution boundaries. | Versioned policy bundles and audit-backed route approvals distributed to gateway and validator layers. |
+| **Telemetry & Audit** | Defines required trace fields, retention policy, audit-critical metadata, and incident evidence requirements. | Emits route decisions, model SHAs, prompt hashes, cache state, validation results, fallback events, and cost records. | OpenTelemetry traces, structured logs, metrics stores, cost ledgers, and replayable serving records. |
+
+The essential rule is simple: the control plane defines what is allowed and desired; the data plane executes what is currently authorized and safe. Configuration freshness matters, but request execution must not block on control-plane availability.
 
 ## **Inference Server Layer Mechanics & Compatibility Gates**
 
@@ -205,16 +211,18 @@ To evaluate how different platforms satisfy these core capabilities, engineers m
 
 ### **Inference Server Architectural Responsibility Comparison**
 
-| Serving Engine | Weight Loading & Lifecycle | Batch Scheduling Model | Memory Management (KV Cache) | Adapter & Multi-Model Support | Telemetry & Observability |
-| :---- | :---- | :---- | :---- | :---- | :---- |
-| **vLLM** | Pulls from local disk or Hugging Face; pins immutable SHAs.8 | Continuous, iteration-level batch scheduler with recompute/swap preemption.14 | PagedAttention mapping logical blocks to non-contiguous physical HBM.17 | Jointly manages multi-LoRA adapters using dynamic hash tables.3 | Exposes Prometheus endpoint tracking TTFT, ITL, and cache occupancy.3 |
-| **SGLang** | PyO3 Python bindings wrapping Rust; manages fast weight loading.31 | Zero-overhead CPU batch scheduler prioritizing pending decodes.14 | RadixAttention tracking and caching common prefixes in an active radix tree.16 | Native support; incorporates prefix hashing to partition different adapters.17 | Provides granular metrics on radix cache hit rates and queue statuses.5 |
-| **TensorRT-LLM** | Compiles model graphs to static engines; handles weight streaming.13 | In-flight batching with customized kernel execution schedules.15 | Paged KV cache allocation mapped to optimized tensor blocks.15 | Static engine configurations; requires predefined adapter pathways.13 | Exposes DCGM-level metrics and engine execution statistics.9 |
-| **Triton Server** | Explicit model repository control; supports polling and explicit loads.37 | Configurable dynamic, sequence, and ensemble batch schedulers.38 | Decoupled; delegates memory allocation directly to backend runtimes.3 | Supports multi-model execution pathways via custom backends.3 | Exposes execution counts, queuing latencies, and engine errors.38 |
-| **Ray Serve** | Python-native class deployment running on distributed Ray actors.7 | Custom ingress proxies that batch requests before forwarding.39 | Handled by child worker runtimes (e.g., vLLM or SGLang).35 | Manages model multiplexing via downstream worker actors.39 | Centralized dashboard tracking active actors and actor queue depths.35 |
-| **KServe** | Serverless or raw deployments pulling from storage URIs.19 | Relies on underlying runtime engine batch scheduling.19 | Handled by the target serving container runtime.19 | Supports multi-model serving through pluggable runtimes.19 | Integrates with Knative and Istio to track ingress traffic rates.19 |
+Inference servers differ in how they load model artifacts, schedule batches, manage KV cache memory, support adapters, expose telemetry, and fit into broader serving topologies. Platform teams should evaluate these engines not as interchangeable HTTP endpoints, but as runtime systems with distinct memory, scheduling, compilation, and observability behaviors.
 
-Before any model checkpoint or adapter is promoted to active serving, it must pass through a standardized compatibility gate. This gate acts as a validation pipeline, protecting physical hardware from runtime exceptions and memory failures.
+| Serving Engine | Weight Loading & Lifecycle | Batch Scheduling Model | Memory Management / KV Cache | Adapter & Multi-Model Support | Telemetry & Observability |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **vLLM** | Loads models from local disk, Hugging Face, or artifact stores; supports SHA-pinned deployment workflows. | Continuous, iteration-level batch scheduling with preemption, recompute, and swap mechanisms. | PagedAttention maps logical KV blocks to non-contiguous physical HBM blocks. | Supports LoRA and multi-LoRA serving patterns depending on runtime configuration. | Exposes Prometheus metrics for TTFT, ITL, queue state, cache usage, throughput, and runtime pressure. |
+| **SGLang** | Loads model artifacts through runtime workers; supports OpenAI-compatible serving, structured generation, distributed serving, and high-throughput execution paths. | High-performance scheduling optimized for decode-heavy workloads, prefix reuse, and structured generation. | RadixAttention tracks and caches shared prompt prefixes in an active radix tree, reducing redundant prefill work. | Supports adapters and multi-model serving patterns, with prefix-aware routing and cache-locality considerations. | Provides metrics for radix cache hit rates, queue status, serving latency, throughput, and runtime health. |
+| **TensorRT-LLM** | Compiles models into optimized engines and supports high-performance deployment on NVIDIA hardware. | Uses in-flight batching and optimized execution schedules designed for compiled inference graphs. | Supports paged KV cache and optimized tensor block layouts where configured. | Adapter support depends on engine build, model architecture, and predefined runtime pathways. | Exposes engine execution statistics, GPU metrics, and integration points through NVIDIA tooling. |
+| **Triton Inference Server** | Manages explicit model repositories, polling, versioned model loading, and backend lifecycle control. | Supports dynamic batching, sequence batching, ensembles, and backend-specific scheduling. | Delegates memory management to backend runtimes for LLM workloads. | Supports multi-model serving through repository structure and custom backends. | Exposes execution counts, queue latency, inference latency, model errors, and backend metrics. |
+| **Ray Serve** | Deploys Python-native serving classes across distributed Ray actors and worker pools. | Uses Ray-level ingress and actor scheduling; can wrap vLLM, SGLang, or custom runtimes. | Delegates KV cache and GPU memory behavior to child inference runtimes. | Manages model multiplexing, actor placement, and distributed application composition. | Provides Ray dashboard telemetry, actor health, request metrics, and application-level traces. |
+| **KServe** | Provides Kubernetes-native serving abstractions with raw deployments, serverless modes, and pluggable runtimes. | Relies on underlying serving containers for LLM-specific batching and scheduling. | Delegates KV cache and GPU memory management to target runtime containers. | Supports multi-model serving through pluggable runtimes and deployment patterns. | Integrates with Knative, Istio, Prometheus, and Kubernetes-native monitoring. |
+
+A serving engine should be selected based on the target workload’s dominant constraint: prefix reuse, structured generation, cold-start profile, quantization compatibility, distributed serving, operational simplicity, or maximum hardware efficiency. The correct engine is the one whose runtime behavior matches the workload’s memory, latency, observability, and rollback requirements.
 
 ### **Serving Compatibility Gate Model**
 
@@ -534,20 +542,76 @@ To prevent these conditions, modern balancers implement memory-, cache-, and ada
 
 #### **The Physics of Prefix Caching**
 
-Prefix-aware load balancing leverages the fact that many LLM workloads share identical system instructions, few-shot examples, or conversation histories.16 Runtimes like SGLang and vLLM organize active physical blocks into a global radix tree or hash table, caching the activations of previously computed prompts.16 If a request lands on a replica containing matching cached blocks, it can skip the expensive, compute-bound prefill phase entirely, reducing Time to First Token (TTFT) by multiple orders of magnitude.5  
-The radix tree minimizes memory footprints by ensuring that memory consumption scales with unique content rather than total processed tokens.36  
-Without Caching: 3 requests x 1000 tokens = 3000 tokens in HBM 36  
-With Caching: 800 shared tokens + (3 requests x 200 unique tokens) = 1400 tokens (approximately 53% savings) 36
+Prefix-aware load balancing leverages the fact that many LLM workloads share identical system instructions, few-shot examples, tool schemas, output contracts, or conversation-history prefixes. Runtimes such as SGLang and vLLM organize reusable prompt states through radix trees, prefix caches, or hash-indexed KV blocks.
+
+If a request lands on a replica containing matching cached prefix blocks, the runtime can skip prefill for the matched prefix and compute prefill only for the unmatched suffix. This reduces Time to First Token (TTFT), lowers redundant compute, and improves GPU utilization without pretending that dynamic user-specific content becomes free.
+
+The radix tree minimizes memory footprint by ensuring that memory consumption scales with unique content rather than total processed tokens.
+
+Example:
+
+```text
+Without prefix reuse:
+
+  Request 1: [800 shared tokens][200 unique tokens]
+  Request 2: [800 shared tokens][200 unique tokens]
+  Request 3: [800 shared tokens][200 unique tokens]
+
+  Total prefill work:
+    3 * 1000 tokens = 3000 token-units
+
+
+With prefix reuse:
+
+  Shared prefix:
+    [800 shared tokens] computed once
+
+  Unique suffixes:
+    Request 1: [200 unique tokens]
+    Request 2: [200 unique tokens]
+    Request 3: [200 unique tokens]
+
+  Total prefill work:
+    800 + (3 * 200) = 1400 token-units
+```
+
+In this example, prefix reuse reduces prefill work by approximately 53%. The actual savings depend on prompt stability, cache residency, routing affinity, eviction pressure, and whether the request lands on a replica that still holds the matched prefix blocks.
+
+The operational lesson is direct: stable prompt roots create reusable compute. Prompt churn destroys cache locality. System instructions, tool schemas, and long-lived output contracts should appear before dynamic user content whenever the application can safely structure prompts that way.
 
 #### **Hashing and Key Extraction**
 
-To achieve high-efficiency caching, load balancers must route requests sharing prefixes to the exact same GPU replica.30 SGLang implements the prefix_match load balancing strategy, which tokenizes input sequences and computes a blake2b hash across a 256-token window, routing the request to a specific data-parallel (DP) rank 30:  
-Target DP Rank = hash(head) % dp_size 30  
-This mathematical mapping delivers a 5.7x reduction in TTFT under sequential multi-turn workloads compared to default round-robin policies.30  
-To extract a stable routing key without evaluating the entire dynamic conversation history, which shifts on every turn and would route follow-up turns to cold nodes, proxies employ a fast, probabilistic heuristic.5 The proxy extracts the target model name, allocates a strict character budget, and parses only the **system prompt** and the **first user turn** 5:  
-Routing Key = Extract(System Prompt[0..256] |  
-| User Turn 1[0..256]) 5  
-By ignoring subsequent turns, the routing key remains perfectly stable across the entire lifetime of the session, pinning the conversation to the GPU holding the warm KV cache blocks.5
+To achieve high-efficiency prefix caching, load balancers should route requests with shared stable prefixes to replicas likely to hold the matching KV-cache or radix-cache state. Routing by raw request count is insufficient because two requests with identical compute cost can have very different cache value depending on prefix overlap.
+
+A cache-aware router extracts stable routing fields from the request and constructs a bounded routing key. The routing key should avoid highly volatile content that changes every turn, because over-sensitive hashing sends follow-up requests to cold replicas.
+
+A practical routing-key pattern is:
+
+```text
+RoutingKey = Hash(
+  model_id,
+  adapter_id,
+  tenant_scope,
+  system_prompt_prefix[0..256],
+  first_user_turn_prefix[0..256]
+)
+```
+
+The proxy may tokenize the selected prefix window before hashing when token-level stability matters:
+
+```text
+prefix_tokens = Tokenize(
+  system_prompt_prefix[0..256],
+  first_user_turn_prefix[0..256]
+)
+
+target_rank = Hash(model_id, adapter_id, tenant_scope, prefix_tokens) % data_parallel_size
+```
+
+By ignoring later conversation turns, the routing key remains more stable across the session lifecycle. This increases the probability that follow-up requests land on the replica holding warm prefix-cache or KV-cache state.
+
+This does not mean all dynamic content should be ignored for routing. Long-context requests, high-risk tasks, large tool schemas, tenant-isolated workloads, and region-bound data may still require routing overrides. The routing key is a locality heuristic, not a complete authorization or capacity decision.
+
 
 #### **Prefill-Decode Disaggregation**
 
@@ -753,27 +817,56 @@ Multi-tenant enterprise serving architectures must protect hardware pools from t
 
 #### **Atomic Token-Locking to Prevent TOCTOU Races**
 
-To prevent Time-of-Check to Time-of-Use (TOCTOU) race conditions in high-concurrency environments, where multiple parallel requests might read a tenant’s active slot count before the database writes the increment, systems utilize atomic Redis Lua scripts :
+To prevent Time-of-Check to Time-of-Use (TOCTOU) races in high-concurrency environments, concurrency-slot acquisition must be performed as a single atomic operation. Multiple parallel requests must not be able to read the same active slot count before any of them writes the increment.
 
-```Lua  
--- Lua script for acquiring a concurrency slot  
-local key = KEYS  
-local limit = tonumber(ARGV)  
-local ttl = tonumber(ARGV)
+A Redis Lua script can acquire a tenant concurrency slot atomically:
 
-local current = tonumber(redis.call('get', key) or "0")  
-if current < limit then  
-    redis.call('incr', key)  
-    if current == 0 then  
-        redis.call('expire', key, ttl)  
-    end  
-    return 1 -- Slot acquired  
-else  
-    return 0 -- Limit exceeded  
+```lua
+-- Acquire a tenant concurrency slot.
+-- KEYS[1] = tenant concurrency key
+-- ARGV[1] = concurrency limit
+-- ARGV[2] = slot TTL in seconds
+
+local key = KEYS[1]
+local limit = tonumber(ARGV[1])
+local ttl = tonumber(ARGV[2])
+
+local current = tonumber(redis.call("GET", key) or "0")
+
+if current < limit then
+    local next_count = redis.call("INCR", key)
+
+    -- Ensure the key eventually clears even if a worker dies before releasing.
+    if next_count == 1 then
+        redis.call("EXPIRE", key, ttl)
+    end
+
+    return 1 -- Slot acquired.
+else
+    return 0 -- Limit exceeded.
 end
 ```
 
-By packaging the check and the increment into a single atomic operation, the proxy guarantees that no tenant can bypass concurrency limits during burst events.
+The slot must also be released when the request completes, fails, times out, or is cancelled:
+
+```lua
+-- Release a tenant concurrency slot.
+-- KEYS[1] = tenant concurrency key
+
+local key = KEYS[1]
+local current = tonumber(redis.call("GET", key) or "0")
+
+if current <= 1 then
+    redis.call("DEL", key)
+    return 0
+else
+    return redis.call("DECR", key)
+end
+```
+
+The acquisition script prevents burst traffic from bypassing concurrency limits. The release script prevents completed or cancelled requests from permanently occupying slots. The TTL protects against leaked slots when workers crash before cleanup.
+
+This pattern should be paired with request IDs and idempotency keys when clients may retry. Without idempotency handling, a retry storm can acquire multiple legitimate slots for the same logical user operation.
 
 #### **Hardware Isolation: MIG, MPS, and PCIe Contention**
 
@@ -1127,15 +1220,18 @@ Architectures must isolate failures proactively to preserve user-facing SLAs.8 I
 ### **High-Availability and Failover Model**
 
 | Component | Primary Failure Mode | Immediate Detection Vector | Failover Strategy | Recovery Execution |
-| :---- | :---- | :---- | :---- | :---- |
-| **Inference Server** | GPU out-of-memory (OOM) error.8 | DCGM memory metric spikes; SIGSEGV exit codes.8 | Tripping circuit breakers on the proxy plane.6 | Restarts container; routes active queue to backup pool.27 |
-| **Model Registry** | Network timeout during weight retrieval.8 | Failed file system mounts and checksum mismatch alerts.8 | Fallback to warm snapshot images.8 | Deploys preceding stable SHA image version.8 |
-| **Model Router** | Input text classification timeout.22 | Upstream gateway request timeouts.6 | Bypasses classifier; applies default static route.4 | Restarts classifier pod; updates routing registry. |
-| **Load Balancer** | Loss of cache affinity telemetry paths.23 | Empty metrics scraped from target backends.3 | Falls back to standard round-robin or least-loaded.30 | Resyncs endpoint cache states using state files.23 |
-| **API Gateway** | Complete edge-to-cloud path disconnect.27 | Downstream connection drops; client timeout spikes.27 | Routes traffic to geo-redundant secondary region.27 | Re-establishes DNS paths once primary region is stable.27 |
-| **Telemetry Collector** | Shared buffer memory pool exhaustion.3 | Rising packet drops reported by telemetry agents.3 | Drops telemetry traces locally to protect compute.3 | Spasms collector pods; drains queued logs. |
+| :--- | :--- | :--- | :--- | :--- |
+| **Inference Server** | GPU out-of-memory, CUDA fault, kernel crash, process exit, or unrecoverable preemption loop. | DCGM memory metrics, worker exit codes, SIGSEGV logs, OOM events, health probe failure. | Trip circuit breaker; stop routing new traffic to failed worker; shift queue to backup pool. | Restart container, lower context/batch pressure if needed, run smoke test, then reopen gradually. |
+| **Model Registry** | Network timeout, checksum mismatch, stale artifact, unavailable registry, or failed mount. | Failed file-system mount, artifact checksum mismatch, missing model SHA, registry timeout. | Use warm snapshot or previous stable SHA; block new artifact promotion. | Resync registry, verify checksums, invalidate stale local cache, and restore normal promotion path. |
+| **Artifact Store** | Weight files, tokenizer bundles, adapters, templates, or snapshots unavailable during scale-up. | Startup timeout, failed download, missing adapter, corrupted cache, readiness probe failure. | Keep prior active route; use locally cached artifact if checksum-valid. | Repair store, rehydrate local caches, rerun compatibility gate, and resume autoscaling. |
+| **Model Router** | Classifier timeout, semantic-router failure, policy-table bug, or canary misrouting. | Router timeout, route-confidence collapse, validation failures, fallback spike, cost-per-success regression. | Bypass classifier; pin affected traffic to tenant-approved safe baseline route. | Roll back router policy, replay recent traces, restore canary only after validation. |
+| **Load Balancer** | Loss of cache-affinity telemetry, bad endpoint state, or dispatch imbalance. | Empty backend metrics, prefix-hit collapse, uneven queue depth, p95/p99 latency skew by replica. | Fall back to least-loaded routing while preserving tenant and policy constraints. | Resync endpoint state, restore cache telemetry, gradually re-enable prefix-aware routing. |
+| **API Gateway** | Edge-to-cloud disconnect, TLS/auth failure, regional outage, or gateway overload. | Downstream connection drops, client timeout spike, auth error surge, gateway saturation. | Route to geo-redundant secondary region or return clean 503 when no safe route exists. | Re-establish DNS and ingress paths, validate auth, then shift traffic back gradually. |
+| **Telemetry Collector** | Shared buffer memory exhaustion, collector overload, or downstream metrics-store outage. | Rising packet drops, trace export latency, missing spans, collector queue growth. | Samples or drops noncritical telemetry while preserving audit-critical traces and raising an alert. | Restarts or scales collector pods, drains queued logs, and verifies audit-critical traces before clearing incident state. |
+| **Validator / Policy Checker** | Schema validator, safety checker, grounding verifier, or action gate unavailable. | Validation timeout, retry storm, fail-closed spike, tool-call blockage. | Disable affected low-risk feature or fail closed for high-risk workflows. | Restore validator, replay held traces, confirm baseline failure rate before reopening. |
+| **External Provider Route** | Provider outage, quota exhaustion, WAN failure, region block, or silent degradation. | Provider error codes, latency spike, degraded response quality, circuit-breaker trip. | Shift to approved secondary provider, local model, or degraded mode. | Verify provider health, compare output quality, and reopen through canary. |
 
-When capacity is severely constrained, platforms transition to degraded serving states to preserve essential user-facing features.
+High availability is not merely replica count. A serving platform is highly available only when it can detect failure, isolate the failing component, preserve safe user workflows, and recover without requiring live traffic to discover whether the replacement path works.
 
 ### **Degraded-Mode Serving Pattern Library**
 
@@ -1341,15 +1437,25 @@ This tracking model maps failures to their root causes, identifying bottlenecks 
 ### **Serving Failure Mode Map**
 
 | Failure Scenario | Root Cause Mechanism | Immediate System Metric Impact | Operational Remediation |
-| :---- | :---- | :---- | :---- |
-| **Cold-Start Storm** | Concurrent node scale-ups download heavy weights.26 | Karpenter provisioning spike; TTFT > 60s.9 | Restores from warm snapshots or Foundry templates.26 |
-| **GPU OOM Crash** | Processing prompts with long context outliers.8 | gpu_memory_utilization_perc drops to 0%.9 | Restarts container; lowers static cache fraction.27 |
-| **Cache Leakage** | Shared memory addresses leak data across sessions. | High cross-tenant request metrics on identical nodes. | Isolates and partitions cache keys per tenant. |
-| **Queue Saturation** | Traffic spikes exceed target execution slots.24 | Waiting request count spikes on prometheus endpoints.9 | Enforces rate limits; sheds low-priority traffic.3 |
-| **Telemetry Drop** | Intensive logging saturates network buffers.15 | Packet loss; missing clickhouse database records.15 | Limits tracing overhead; decouples collection threads. |
-| **MIG Fragmentation** | Mismatched node profiles block scheduling.51 | GPU replicas sit in permanent pending status.7 | Re-allocates templates; reconfigures GPU groupings.25 |
+| :--- | :--- | :--- | :--- |
+| **Cold-Start Storm** | Concurrent node scale-ups download large model weights, initialize CUDA, compile kernels, or restore runtime templates at the same time. | Provisioning spike; TTFT rises sharply; readiness probes stay pending; weight-store bandwidth saturates. | Restore from warm snapshots or precompiled templates; stagger scale-ups; keep warm pools for high-SLO routes. |
+| **GPU OOM Crash** | Long-context outliers, oversized batches, adapter pressure, or underestimated KV-cache growth exceed the memory envelope. | Worker exits; GPU memory metrics drop to zero after crash; OOM or CUDA allocation errors appear in logs. | Restart container; lower max context, batch size, or KV-cache fraction; route long-context requests to larger pools. |
+| **KV Cache Exhaustion** | Active sequence count and context lengths consume all available paged KV blocks. | Free block count falls to zero; preemption/recompute spikes; ITL and TTFT degrade. | Reduce admission rate; lower active concurrency; route large-context traffic to separate lanes; add memory capacity. |
+| **Cache-Affinity Collapse** | Router loses prefix-cache telemetry or prompt-template changes invalidate shared prefixes. | Prefix cache hit rate drops; TTFT rises; prefill FLOPS spike; warm replicas behave like cold replicas. | Restore prefix-aware routing; freeze prompt-template churn; rehydrate hot prefixes; temporarily route by stable hash. |
+| **Router Regression** | Classification, semantic router, policy table, or canary split sends requests to unsuitable models. | Validation failures rise; fallback routes spike; cost per successful task increases; tenant complaints cluster by route ID. | Roll back routing policy; pin affected tenants to safe baseline route; replay recent traces against router candidates. |
+| **Validation Retry Storm** | Model outputs fail schema, tool, or safety validators and trigger repeated retries or escalations. | Retry count rises; latency grows; downstream validator CPU increases; model route churn appears in traces. | Cap retries; fail closed for high-risk workflows; route to schema-specialized model; repair prompt or validator contract. |
+| **Provider Fallback Loop** | Primary and fallback providers/routes fail or degrade in sequence, causing repeated route cycling. | Circuit breakers oscillate; external API error rates rise; latency and cost spike. | Break loop with explicit terminal degraded mode; pin to known-good route; disable failing provider until health recovers. |
+| **Quota Counter Failure** | Redis, durable counters, or billing ledger becomes stale, slow, or unavailable. | Limit checks timeout; tenants exceed budget/concurrency; false rejections may appear. | Fail closed for unknown identity or high-risk tenants; use last-known-good limits for verified tenants; reconcile ledger after recovery. |
+| **Artifact Registry Stale SHA** | Registry, artifact store, or deployment controller serves an old or mismatched model artifact. | Model SHA in traces diverges from release manifest; canary behavior does not match expected version. | Halt promotion; roll back to previous stable SHA; invalidate local artifact cache; verify checksums before reopening route. |
+| **Prompt-Template Cache Bust** | System prompts, tool schemas, or formatting wrappers change too frequently, destroying prefix reuse. | Prefix hash cardinality rises; radix cache hit rate falls; TTFT increases across otherwise stable traffic. | Version and freeze prompt roots; move dynamic content after stable prefix; promote template changes through release gates. |
+| **Prefill/Decode Transfer Backlog** | Disaggregated serving cannot move KV blocks from prefill nodes to decode nodes fast enough. | Transfer queue grows; decode pool waits idle; TTFT and ITL become unstable. | Increase transfer bandwidth; reserve decode-side KV blocks earlier; co-locate pools; fall back to mixed prefill/decode serving for affected routes. |
+| **Queue Saturation** | Arrival rate exceeds available serving capacity or low-priority work competes with interactive traffic. | Waiting request count spikes; queue wait dominates TTFT; 429/503 rates rise. | Shed low-priority work; defer batch jobs; add replicas; adjust admission control and tenant priority lanes. |
+| **Telemetry Drop** | Logging or tracing volume saturates collector buffers, network links, or metrics storage. | Packet loss; missing traces; collector queue growth; ClickHouse or metrics ingestion lag. | Sample noncritical telemetry; preserve audit-critical traces; scale collectors; decouple telemetry export from request execution. |
+| **MIG Fragmentation** | Available GPU partitions do not match requested model or tenant profiles. | GPU capacity exists but pods remain pending; scheduler cannot place replicas. | Reallocate MIG profiles; maintain standard partition templates; route workloads to compatible pools. |
+| **Tenant Noisy Neighbor** | One tenant monopolizes queue slots, KV cache, PCIe bandwidth, or adapter residency. | Tenant-skewed queue depth; p99 latency rises for unrelated tenants; GPU/HBM usage clusters by tenant. | Enforce per-tenant concurrency, TPM/RPM, and fair queues; move noisy tenant to isolated pool. |
+| **Backpressure Failure** | Gateway continues admitting traffic after backend saturation. | Queue depth grows monotonically; retry storms begin; OOM and timeout rates rise. | Trip admission control; return clean 429/503; require client backoff with jitter; preserve premium and high-priority headroom. |
 
-To maintain system reliability, SREs deploy automated runbooks to detect and resolve runtime anomalies before they violate SLAs.
+Failure-mode maps should be connected directly to operational runbooks. A failure row that does not produce a routing, rollback, scaling, or containment action is documentation confetti.
 
 ### **Operational Runbook Execution Guidance**
 
@@ -1475,7 +1581,7 @@ To maintain system reliability, SREs deploy automated runbooks to detect and res
 
 ## **Cross-Canon Handoff Map**
 
-The serving topologies, load balancers, and traffic governance policies established in AI-ENG-L provide the runtime foundation for downstream systems in the canon.
+The serving topologies, load balancers, quota policies, failover systems, and runtime traces established in AI-ENG-L provide the runtime foundation for downstream systems in the canon. AI-ENG-L does not merely describe where models run. It exports the operational contracts that other modules depend on: model routes, fallback paths, tenant identity, quota state, GPU-placement metadata, cache-affinity records, validation boundaries, telemetry traces, model SHAs, latency records, and rollback signals.
 
 ```
 +------------------------------------------------------------------------------------------------+
@@ -1545,23 +1651,26 @@ The serving topologies, load balancers, and traffic governance policies establis
 +------------------------------------------------------------------------------------------------+
 ```
 
-### **Cross-Canon Handoff Map**
+### **Cross-Canon Handoff Matrix**
 
 | Target Report | Downstream Dependency | Transferred Interface / Contract | Operational Coupling |
-| :---- | :---- | :---- | :---- |
-| **AI-ENG-M** | Agent Loops & Budgets | Dynamic tool execution step counts and dollar budgets per query. | Gateway halts recursive loops when agent execution limits are hit. |
-| **AI-ENG-N** | Tool Contract Boundaries | Dynamic model routes matched against JSON output schemas.6 | Rejects invalid model outputs before forwarding them to downstream tools.6 |
-| **AI-ENG-O** | Action Verification Paths | Interception proxies mapping outputs to validation queues.6 | Redirects high-stakes transactions to human-in-the-loop validation queues. |
-| **AI-ENG-S** | Production Pathology | Prometheus execution metrics (e.g., preemption events).3 | Isolates and diagnoses performance drops like driver miscompilations.8 |
-| **AI-ENG-T** | Tenant Isolation & Leakage | Multi-tenant cache keys and physical GPU partition mappings.2 | Prevents cross-tenant data leakage inside shared cache systems. |
-| **AI-ENG-V** | Resource Abuse Defense | Sliding-window token buckets and concurrency limits. | Defends physical GPU clusters from denial-of-wallet vectors. |
-| **AI-ENG-W** | Fallback Chains | Resilient degraded-serving maps (e.g., Model Downgrade paths).4 | Preserves core user workflows during partial cluster outages.8 |
-| **AI-ENG-Z** | Telemetry, Evals & Audits | Structured clickhouse execution traces and latency records.8 | Aggregates system metrics to verify SLA and compliance targets.3 |
-| **AI-ENG-AA** | Serving Evaluations | Dynamic model validation scores and confidence metrics.4 | Adjusts routing weights based on live model performance ratings.4 |
-| **AI-ENG-AB** | Replayable Traces | Tokenized prefix hashes and session identifier paths.5 | Reconstructs system states to investigate and audit incidents. |
-| **AI-ENG-AC** | Incident Response Playbooks | Automated circuit breakers and health check status probes.6 | Triggers container restarts and routes around degraded systems.27 |
-| **AI-ENG-AE** | Infrastructure Efficiency | Radix-tree memory use and prefix-match load distributions.30 | Maximizes prefix cache hits to optimize compute-to-watt footprints.5 |
-| **AI-ENG-AH** | Build / Buy Strategy | Operational cost matrices and latency performance profiles.1 | Evaluates pricing and speed to guide hosting decisions.4 |
+| :--- | :--- | :--- | :--- |
+| **AI-ENG-M** | Agent Loops & Budgets | Dynamic tool-execution step counts, recursion limits, model routes by step budget, and dollar budgets per query. | Gateway halts recursive loops when agent execution limits are hit. |
+| **AI-ENG-N** | Tool Contract Boundaries | Model routes matched against JSON schemas, tool-call contracts, and structured-output requirements. | Rejects invalid model outputs before forwarding them to downstream tools. |
+| **AI-ENG-O** | Action Verification Paths | Interception proxies, validation queues, action-risk classes, and human-review route metadata. | Redirects high-stakes transactions to validation gates or human-in-the-loop review. |
+| **AI-ENG-S** | Production Pathology | Prometheus execution metrics, preemption events, queue state, cache-affinity collapse, and cold-start signals. | Isolates and diagnoses performance drops, serving regressions, and runtime failures. |
+| **AI-ENG-T** | Tenant Isolation & Leakage | Multi-tenant cache keys, quota state, region constraints, GPU partition mappings, and tenant-aware routing records. | Prevents cross-tenant data leakage and noisy-neighbor behavior inside shared serving systems. |
+| **AI-ENG-V** | Resource Abuse Defense | Sliding-window token buckets, RPM/TPM/concurrency limits, retry limits, and budget ceilings. | Defends physical GPU clusters from denial-of-wallet and scheduler-exhaustion vectors. |
+| **AI-ENG-W** | Fallback Chains | Degraded-serving maps, model-downgrade paths, provider failover rules, and safe terminal routes. | Preserves core workflows during partial outages while failing closed when safe degradation is impossible. |
+| **AI-ENG-Z** | Telemetry, Evals & Audits | Structured execution traces, model SHAs, route IDs, latency records, cache hit rates, and tenant cost records. | Aggregates system metrics to verify SLA, reliability, and compliance targets. |
+| **AI-ENG-AA** | Serving Evaluations | Dynamic model validation scores, live routing quality, canary metrics, and route-confidence signals. | Adjusts routing weights and promotion gates based on live and replayed evaluation results. |
+| **AI-ENG-AB** | Replayable Traces | Tokenized prefix hashes, session identifiers, release manifests, model SHAs, routing decisions, and fallback paths. | Reconstructs serving states to investigate regressions, incidents, and audit questions. |
+| **AI-ENG-AC** | Incident Response Playbooks | Automated circuit breakers, health-check probes, containment actions, degraded modes, and recovery verification. | Triggers restarts, traffic shifts, rollback actions, and gradual route reopening after incidents. |
+| **AI-ENG-AD** | Governance, Policy, Compliance & Accountability | Tenant contracts, data-residency rules, regulated-route approvals, model-access policies, audit boundaries, and exception records. | Ensures serving routes, fallback paths, degraded modes, and tenant isolation policies comply with governance requirements before promotion. |
+| **AI-ENG-AE** | Infrastructure Efficiency | Radix-tree memory use, prefix-match distribution, GPU utilization, cache-hit optimization, and energy-per-token records. | Maximizes cache reuse and compute-to-watt efficiency across serving pools. |
+| **AI-ENG-AH** | Build / Buy Strategy | Hosting cost matrices, latency profiles, topology constraints, provider fallback records, and operating-complexity evidence. | Evaluates managed API, self-hosted, hybrid, edge, and on-prem serving tradeoffs. |
+
+The handoff rule is simple: AI-ENG-L exports the live runtime contracts that downstream systems use to govern tenants, tools, fallbacks, traces, incidents, evaluations, resource abuse, infrastructure efficiency, governance, and hosting strategy.
 
 ## **Core Doctrinal Principles**
 

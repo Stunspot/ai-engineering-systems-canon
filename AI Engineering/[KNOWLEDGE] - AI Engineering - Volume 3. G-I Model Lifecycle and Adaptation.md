@@ -5,7 +5,6 @@
   - [AI-ENG-H — Model Adaptation - Fine-Tuning, LoRA, Preference Tuning & Distillation](#ai-eng-h--model-adaptation---fine-tuning-lora-preference-tuning--distillation)
   - [AI-ENG-I — Regression Control - Model Registries, Rollouts & Behavioral Drift](#ai-eng-i--regression-control---model-registries-rollouts--behavioral-drift)
 
-
 ---
 
 # AI-ENG-G — Model Selection - Capability Fit, Deployment Fit & Failure Tolerance
@@ -118,7 +117,7 @@ A model's context window cannot be evaluated solely on its maximum advertised to
 
 Architects must mathematically determine when to stuff entire document sets into high-context windows (e.g., Gemini 3 Pro's 10M token window) 25 versus when to build RAG pipelines.  
 The cost-benefit analysis of context stuffing is governed by the relation:  
-Cost_stuffing = (C_corpus / 1000 * P_input  
+Cost_stuffing = (C_corpus / 1000) * P_input  
 where C_corpus is the total corpus token size, and P_input is the price per 1,000 input tokens.8 For a corpus of 400,000 tokens evaluated on a premium model costing $0.005 per 1,000 input tokens, the input cost is $2.00 per query.8  
 The cost of a managed RAG query is formulated as:  
 Cost_RAG = C_embed + C_search + C_generation  
@@ -242,68 +241,103 @@ Highly optimized production systems rarely rely on a single model. Instead, they
 This architecture maps tasks across a distributed portfolio, routing queries dynamically based on difficulty, risk, and structural needs.
 
 ```
-+----------------------------------------------------------------------------------------+
-|                            MODEL PORTFOLIO AND ROUTING MAP                             |
-+----------------------------------------------------------------------------------------+
-|                                                                                        |
-|  [ Incoming Request ]                                                                  |
-|          |                                                                             |
-|          v                                                                             |
-|  +----------------------------------------------------------------------------------+  |
-|  |                       Pre-Generation Diagnostic Router                           |  |
-|  |                                                                                  |  |
-|  |  Classifies: task type, difficulty, risk, modality, schema needs, latency, cost  |  |
-|  +----------------------+----------------------+----------------------+-------------+  |
-|                         |                      |                      |                |
-|                         |                      |                      |                |
-|                         v                      v                      v                |
-|            [ Simple / Low-Risk ]     [ Complex / High-Risk ]     [ Specialized Need ]  |
-|                         |                      |                      |                |
-|                         v                      v                      v                |
-|            +-------------------+      +-------------------+      +------------------+  |
-|            | Economy Model     |      | Premium Model     |      | Specialist Model |  |
-|            | e.g. Qwen 3.5 9B  |      | e.g. Claude Opus  |      | Code / Math /    |  |
-|            | extraction, light |      | 4.7, GPT-class,   |      | Vision / Schema  |  |
-|            | classification,   |      | deep-context,     |      | / Embedding /    |  |
-|            | low-risk drafting |      | high-reliability  |      | Reranker model   |  |
-|            +---------+---------+      +---------+---------+      +---------+--------+  |
-|                      |                          |                          |           |
-|                      v                          v                          v           |
-|              +----------------+         +----------------+         +----------------+  |
-|              | Validation Gate|         | Validation Gate|         | Validation Gate|  |
-|              +-------+--------+         +-------+--------+         +-------+--------+  |
-|                      |                          |                          |           |
-|          +-----------+-----------+  +-----------+-----------+  +-----------+--------+  |
-|          |                       |  |                       |  |                    |  |
-|          v                       v  v                       v  v                    v  |
-|     [ Success ]          [ Schema / Confidence / Semantic Failure ]          [Success] |
-|          |                       |                                                  |  |
-|          |                       v                                                  |  |
-|          |            +-----------------------+                                     |  |
-|          |            | Escalation Controller |                                     |  |
-|          |            +----------+------------+                                     |  |
-|          |                       |                                                  |  |
-|          |                       v                                                  |  |
-|          |              [ Premium Retry ]                                           |  |
-|          |                       |                                                  |  |
-|          |                       v                                                  |  |
-|          |              +----------------+                                          |  |
-|          |              | Validation Gate|                                          |  |
-|          |              +-------+--------+                                          |  |
-|          |                      |                                                   |  |
-|          |          +-----------+-----------+                                       |  |
-|          |          |                       |                                       |  |
-|          v          v                       v                                       v  |
-|  +-------------------------+       +-------------------------+         +-------------+ |
-|  | Return Valid Response   |       | Human Review / Fail-    |         | Return Valid| |
-|  | with telemetry trace    |       | Closed Recovery Path    |         | Response    | |
-|  +-------------------------+       +-------------------------+         +-------------+ |
-|                                                                                        |
-+----------------------------------------------------------------------------------------+
-| Routing doctrine: route before generation when possible; cascade only when cheap       |
-| execution is likely to succeed. Escalation is economical only when failure rates stay  |
-| below the premium-direct cost threshold.                                               |
-+----------------------------------------------------------------------------------------+
++----------------------------------------------------------------------------------------------------+
+|                              MODEL PORTFOLIO AND ROUTING MAP                                       |
++----------------------------------------------------------------------------------------------------+
+|                                                                                                    
+|  Goal: route each request to the cheapest model that can satisfy capability, latency,              
+|  governance, and failure-tolerance requirements without creating avoidable retries.                
+|                                                                                                    
+|  [ Incoming Request ]                                                                              
+|        |                                                                                           
+|        v                                                                                           
+|  +------------------------------------------------------------------------------------------+      
+|  |                              Task Profile Interpreter                                    |      
+|  |                                                                                          |      
+|  |  Identify: task class | risk level | modality | context length | schema needs            |      
+|  |            tool-use complexity | latency SLA | cost ceiling | privacy constraints        |      
+|  +---------------------------------------------+--------------------------------------------+      
+|                                                |                                                   
+|                                                v                                                   
+|  +------------------------------------------------------------------------------------------+      
+|  |                              Pre-Generation Diagnostic Router                            |      
+|  |                                                                                          |      
+|  |  Decide route before expensive generation whenever possible.                             |      
+|  |                                                                                          |      
+|  |  Signals: semantic difficulty | required capability | failure tolerance | budget fit     |      
+|  |           deployment fit | data-residency fit | workload class                           |      
+|  +----------------------+----------------------+----------------------+---------------------+      
+|                         |                      |                      |                            
+|                         v                      v                      v                            
+|          +-------------------------+  +-----------------------+  +-----------------------------+   
+|          | Economy Route           |  | Premium Route         |  | Specialist Route            |   
+|          |                         |  |                       |  |                             |   
+|          | low-risk classification |  | research synthesis    |  | code / math / multimodal    |   
+|          | extraction              |  | complex reasoning     |  | structured output / tools   |   
+|          | simple drafting         |  | high-risk generation  |  | embedding / reranking       |   
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+   
+|                      |                            |                            |                   
+|                      +----------------------------+----------------------------+                   
+|                                                   |                                                
+|                                                   v                                                
+|  +------------------------------------------------------------------------------------------+      
+|  |                              First-Pass Execution                                        |      
+|  |                                                                                          |      
+|  |  Execute selected route with its assigned model and effort tier.                         |      
+|  +---------------------------------------------+--------------------------------------------+      
+|                                                |                                                   
+|                                                v                                                   
+|  +------------------------------------------------------------------------------------------+      
+|  |                              Validation Gate                                             |      
+|  |                                                                                          |      
+|  |  Check: schema validity | tool arguments | citation grounding | confidence signals       |      
+|  |         refusal behavior | policy compliance | semantic adequacy                         |      
+|  +---------------------------------------------+--------------------------------------------+      
+|                                                |                                                   
+|                                      [ Validation Pass? ]                                          
+|                                         /                 \                                        
+|                                  Yes   /                   \   No                                  
+|                                       v                     v                                      
+|  +-----------------------------------------+   +--------------------------------------------+      
+|  | Return Valid Response                   |   | Failure Classifier                         |      
+|  | with trace, route ID, and model ID      |   |                                            |      
+|  +--------------------+--------------------+   | schema failure | low confidence            |      
+|                       |                        | semantic failure | tool error              |      
+|                       |                        | policy issue     | unsupported modality    |      
+|                       |                        +------------------+-------------------------+      
+|                       |                                           |                                
+|                       |                                           v                                
+|                       |                        +--------------------------------------------+      
+|                       |                        | Recovery Policy                            |      
+|                       |                        |                                            |      
+|                       |                        | fail-open  -> log and continue if low-risk |      
+|                       |                        | fail-closed -> escalate if high-risk       |      
+|                       |                        +------------------+-------------------------+      
+|                       |                                           |                                
+|                       |                              +------------+-------------+                  
+|                       |                              |                          |                  
+|                       |                              v                          v                  
+|                       |                 [ Stronger Model Retry ]      [ Human Review Queue ]       
+|                       |                              |                          |                  
+|                       |                              v                          v                  
+|                       |                 [ Re-validate output ]      [ Fail-Closed Resolution ]     
+|                       |                              |                           |                 
+|                       +------------------------------+---------------------------+                 
+|                                                      |                                             
+|                                                      v                                             
+|  +------------------------------------------------------------------------------------------+      
+|  |                              Telemetry and Economics Loop                                |      
+|  |                                                                                          |      
+|  |  Track: route hit rate | escalation rate | cost per success | latency | failure mode     |      
+|  |         schema adherence | tool success | human escalation frequency                     |      
+|  |                                                                                          |      
+|  |  Feed results back into routing thresholds, portfolio design, and MDR updates.           |      
+|  +------------------------------------------------------------------------------------------+      
+|                                                                                                    
++----------------------------------------------------------------------------------------------------+
+| Doctrine: route before generation when possible, validate after generation always, and only        |
+| cascade when the failure rate is low enough to beat premium-direct economics.                      |
++----------------------------------------------------------------------------------------------------+
 ```
 
 ### **Cascade Optimization and Routing Economics**
@@ -406,7 +440,8 @@ System choices must be formally documented to ensure long-term traceablity, comp
 
 Architects must complete this standardized record for every production model transition:
 
-## **Model Decision Record (MDR):**
+```
+# **Model Decision Record (MDR):**
 
 ## **1. Context and Problem Statement**
 
@@ -454,13 +489,14 @@ Architects must complete this standardized record for every production model tra
 * Rollout Strategy: Shadow route 1% of live traffic for 72 hours, scaling to 10% canary.  
 * Rollback Trigger: Error rate > 0.5%, P95 latency > 1.2s, or security injection detection.  
 * Reconsideration Conditions: Release of decontaminated open-weight models in the same size class.
+```
 
 ### **Selection Failure Modes and Anti-Patterns**
 
 * **Leaderboard Shopping:** Selecting a model based solely on headline scores on saturated, contaminated benchmarks (e.g., MMLU), ignoring task-specific performance and deployment constraints.1  
 * **The Single Model Monolith:** Forcing one general-purpose model to execute every node in a complex task graph, leading to high latencies and excessive costs.1  
 * **The Speculative Concurrency Trap:** Enabling speculative decoding in high-throughput production environments (batch size > 16 without verifying if the GPU has transitioned to a compute-bound state, resulting in performance regressions.26  
-* **Unverified Long-Context StuffING:** Assuming a model's long-context window maintains high retrieval accuracy near the middle of the window without running needle-in-a-haystack or citation tests.1  
+* **Unverified Long-Context Stuffing:** Assuming a model's long-context window maintains high retrieval accuracy near the middle of the window without running needle-in-a-haystack or citation tests.1  
 * **FSM Cold-Start Latency:** Deploying Outlines-style FSM schemas in latency-sensitive APIs without pre-compiling and caching the target schema, causing latency spikes.11  
 * **Unintentional Tokenizer Drift:** Swapping models without verifying if the new tokenizer maps the same input text to a larger number of tokens, which can increase nominal token costs by 10% to 35% under the same pricing tier.2
 
@@ -482,38 +518,51 @@ To maintain system margins and detect performance drift, production systems must
 Model selection does not exist in isolation. It serves as the bridge between model training, adaptation, serving, and system orchestration.
 
 ```
-                                    +--------------------------------------------------------------+  
-                                    | AI-ENG-G: Model Selection (This Report)                      |  
-                                    | Establishes capability, deployment, and risk fit.            |  
-                                    +------------------------------+-------------------------------+  
-                                                                   |  
-                                            +----------------------+----------------------+  
-                                            |                                             |  
-                                            v                                             v  
-                                    +------------------------------+             +------------------------------+  
-                                    | AI-ENG-H: Model Adaptation   |             | AI-ENG-I: Lifecycle Control  |  
-                                    | Triggered when model choice  |             | Manages registries, canaries,|  
-                                    | is insufficient; uses LoRA,  |             | rollouts, and regression     |  
-                                    | fine-tuning, or distillation |             | tracking.                    |  
-                                    | to align capabilities.       |             +------------------------------+  
-                                    +------------------------------+  
-                                            |  
-                                            v  
-                                    +------------------------------+  
-                                    | AI-ENG-J/K/L: Runtime Serving|  
-                                    | Executes the physical serving|  
-                                    | configuration, optimizing    |  
-                                    | PagedAttention and VRAM.     |  
-                                    +------------------------------+  
-                                            |  
-                                            +----------------------+----------------------+  
-                                            |                      |                      |  
-                                            v                      v                      v  
-                                    +--------------+        +--------------+        +--------------+  
-                                    | AI-ENG-M:    |        | AI-ENG-N:    |        | AI-ENG-W:    |  
-                                    | Agentic      |        | Tool         |        | Fallback     |  
-                                    | Orchestration|        | Contracts    |        | Chains       |  
-                                    +--------------+        +--------------+        +--------------+
++------------------------------------------------------------------------------------------------+
+|                                CROSS-CANON HANDOFF MAP                                         |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|                     +------------------------------------------------------+                   
+|                     | AI-ENG-G: MODEL SELECTION (THIS REPORT)              |                   
+|                     | capability fit | deployment fit | failure tolerance  |                   
+|                     | routing doctrine | portfolio design | MDR evidence   |                  
+|                     +-------------------------------+----------------------+                   
+|                                                     |                                          
+|          +------------------------------------------+---------------------------------------+  
+|          |                                          |                                       |  
+|          v                                          v                                       v  
+|  +-------------------------------+      +-------------------------------+      +-------------------------------+
+|  | AI-ENG-H: MODEL ADAPTATION    |      | AI-ENG-I: LIFECYCLE CONTROL   |      | AI-ENG-J / K / L: RUNTIME     |
+|  | fine-tuning | LoRA |          |      | registries | canaries |       |      | throughput | memory |         |
+|  | distillation decisions        |      | rollback / promotion logic    |      | serving topology | routing    |
+|  +---------------+---------------+      +---------------+---------------+      +---------------+---------------+
+|                  |                                      |                                      |
+|                  |                                      |                                      |
+|                  v                                      v                                      v
+|  +-------------------------------+      +-------------------------------+      +-------------------------------+
+|  | AI-ENG-M: AGENTIC             |      | AI-ENG-N: TOOL CONTRACTS      |      | AI-ENG-W: FALLBACK CHAINS     |
+|  | ORCHESTRATION                 |      | schemas | argument structure  |      | retries | recovery paths |    |
+|  | task-model assignment         |      | tool-use reliability          |      | human escalation              |
+|  +---------------+---------------+      +---------------+---------------+      +---------------+---------------+
+|                  \                                      |                                      /
+|                   \                                     |                                     /
+|                    \                                    |                                    /
+|                     \                                   |                                   /
+|                      \                                  |                                  /
+|                       +---------------------------------+---------------------------------+
+|                                                         |
+|                                                         v
+|                                        +----------------------------------+
+|                                        | AI-ENG-Z: TELEMETRY              |
+|                                        | evals | observability | drift    |
+|                                        | cost per success | routing traces|
+|                                        +----------------------------------+
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Handoff doctrine: model selection is the decision layer that exports deployment choices,       |
+| routing policy, risk assumptions, MDR evidence, and operating targets to adaptation, lifecycle,|
+| serving, tooling, fallback, and observability systems.                                         |
++------------------------------------------------------------------------------------------------+
 ```
 
 | Downstream Canon Report | Ownership Intersection | Technical Input | Functional Dependency |
@@ -527,7 +576,6 @@ Model selection does not exist in isolation. It serves as the bridge between mod
 | **AI-ENG-Z: Telemetry** | Observation monitoring | Selected performance targets.10 | Defines logging protocols, prompt caching ratios, and incident metrics.27 |
 
 ## **Durable Principles of Model Selection**
-
 
 This report establishes five core, durable principles for model selection:
 
@@ -573,8 +621,6 @@ This report establishes five core, durable principles for model selection:
 32. LK losses: Training speculative decoding draft models to directly maximize acceptance rate, accessed June 7, 2026, [https://nebius.com/blog/posts/lk-losses](https://nebius.com/blog/posts/lk-losses)
 
 ---
-
-[← Back to Canon Map](../canon-map.md)
 
 # AI-ENG-H — Model Adaptation - Fine-Tuning, LoRA, Preference Tuning & Distillation
 
@@ -694,9 +740,25 @@ Preference tuning shifts the optimization target from imitating a target corpus 
 Standard preference tuning assumes a dataset of prompt-response pairs D = {(x, y_w, y_l)}, where y_w represents the preferred (chosen) response and y_l represents the dispreferred (rejected) response.2 Traditionally, this was executed via Reinforcement Learning from Human Feedback (RLHF), which requires:
 
 1. Training a binary classification Reward Model r_phi(x, y) on pairwise preferences using the Bradley-Terry objective 2: L_R(r_phi) = -E_(x, y_w, y_l) ~ D [ log sigma( r_phi(x, y_w) - r_phi(x, y_l) ) ]  
-2. Optimizing the active policy pi_theta(y | x) against the frozen reward model r_phi using Actor-Critic PPO, while applying a Kullback-Leibler (KL) divergence penalty against a frozen reference policy pi_ref to prevent policy collapse 2: Objective(theta) = E_(x ~ D, y ~ pi_theta) [ r_phi(x, y) ] - beta * DKL( pi_theta(y | x) |
+2. Optimizing the active policy pi_theta(y | x) against the frozen reward model r_phi using Actor-Critic PPO, while applying a Kullback-Leibler (KL) divergence penalty against a frozen reference policy pi_ref to prevent policy collapse 2: 
 
-| pi_ref(y | x) )  
+```
+Objective(theta) =
+  E_{x ~ D, y ~ pi_theta}
+  [
+    r_phi(x, y)
+    - beta * D_KL(
+        pi_theta(y | x) || pi_ref(y | x)
+      )
+  ]
+
+Where:
+  pi_theta = active policy being optimized
+  pi_ref   = frozen reference policy
+  r_phi    = learned reward model
+  beta     = KL penalty coefficient preventing policy collapse
+```
+
 PPO requires maintaining four distinct models in memory (Actor pi_theta, Critic, Reward r_phi, Reference pi_ref), leading to high training instability, complex hyperparameter tuning, and massive GPU infrastructure requirements.2  
 To eliminate this complexity, Direct Preference Optimization (DPO) mathematically reparameterizes the Bradley-Terry reward function directly in terms of the policy's log-probabilities, bypassing the reward model and reinforcement learning loop entirely.2 The DPO loss is defined as 2:  
 L_DPO(pi_theta; pi_ref) = -E_(x, y_w, y_l) ~ D [ log sigma( beta * log(pi_theta(y_w | x) / pi_ref(y_w | x)) - beta * log(pi_theta(y_l | x) / pi_ref(y_l | x)) ) ]  
@@ -770,10 +832,35 @@ where s is a segment vector defining which rows of the batched activation tensor
 SGMV gathers non-contiguous adapter weights directly from the unified memory pool, performs the segmented low-rank projection X * B and the subsequent expansion X * B * A, and accumulates the residual delta directly into the output tensor Y.43 This eliminates padding overhead and enables highly concurrent, heterogeneous multi-adapter decoding batches with millisecond-level execution penalties.45
 
 vLLM Multi-Adapter Serving Engine Parameters:  
-  --enable-lora : Activates the scheduler's LoRAManager node.  
-  --max-loras : Restricts the active concurrent adapter slot count in GPU HBM.  
-  --max-lora-rank : Allocates pre-formatted memory buffers sized to this rank limit.  
-  --max-cpu-loras : Manages the intermediate LRU cache tier in system DRAM.
+```
+# vLLM Multi-Adapter Serving Engine Parameters
+# Purpose: serve many LoRA adapters against one frozen base model while bounding GPU memory use.
+
+--enable-lora
+# Activates the serving engine's LoRA / adapter manager.
+
+--max-loras <N>
+# Maximum number of concurrently active LoRA adapters resident in GPU HBM.
+
+--max-lora-rank <R>
+# Maximum supported LoRA rank. Pre-allocates adapter buffers sized to this ceiling.
+# Requests requiring rank > R must be rejected or routed to a compatible serving pool.
+
+--max-cpu-loras <N>
+# Maximum number of adapters staged in CPU DRAM as an intermediate cache tier.
+
+--lora-modules <adapter_name>=<adapter_path> [...]
+# Registers named adapter artifacts and their storage paths for route-time selection.
+
+--fully-sharded-loras
+# Optional. Shards adapter computation across tensor-parallel workers for larger adapters.
+
+--max-model-len <TOKENS>
+# Bounds context length so KV cache and adapter paging remain within the memory envelope.
+
+--gpu-memory-utilization <0.0-1.0>
+# Reserves a safe fraction of GPU memory for model weights, KV cache, adapter pages, and overhead.
+```
 
 ### **Adapter Management Model**
 
@@ -852,8 +939,12 @@ Model distillation is an architectural and economic intervention designed to tra
 
 ### **Distillation Scaling Laws**
 
-The performance of a distilled student model is governed by rigorous scaling laws parameterized by the student size (N_S), distillation token volume (D_S), and the teacher's capability represented by its cross-entropy loss (L_T).51 Research by Busbridge et al. (2025) models the student's cross-entropy loss (L_S) through a broken power law 33:  
-L_S(N_S, D_S, L_T) = + phi(L_T, N_S)  
+The performance of a distilled student model is governed by rigorous scaling laws parameterized by the student size (N_S), distillation token volume (D_S), and the teacher's capability represented by its cross-entropy loss (L_T).51 Research by Busbridge et al. models the student's cross-entropy loss as a scaling-law function of student size, distillation token volume, and teacher quality:
+
+`L_S(N_S, D_S, L_T) = L_infinity + A * N_S^(-alpha) + B * D_S^(-beta) + phi(L_T, N_S)`
+
+The term `phi(L_T, N_S)` represents the capacity-gap penalty. Under ordinary conditions, a stronger teacher lowers student loss. However, when the teacher's distribution is too complex for the student's parameter budget, the student cannot represent the teacher's behavior faithfully, producing a U-shaped degradation curve rather than monotonic improvement.
+
 The term phi(L_T, N_S) models the **Capacity Gap**.32 Under standard scaling, a stronger teacher (lower L_T) yields a stronger student (lower L_S).51 However, if the teacher's capacity is excessively high relative to the student's parameter limit N_S, a representation mismatch occurs.32 The student model lacks the representational hypothesis space required to model the highly complex, multi-modal logit distributions of the teacher, resulting in optimization instability and an actual degradation of student performance (forming a U-shaped capacity gap curve).32  
 Furthermore:
 
@@ -890,36 +981,140 @@ Distillation Break-Even Volumetric Equation:
 Every model adaptation pipeline must pass through a multi-stage validation suite prior to staging or production deployment to protect against negative transfer, capability regression, and safety decay.
 
 ```
-                   ┌────────────────────────────────────────┐  
-                   │    Adaptive Model Candidate Check      │  
-                   └───────────────────┬────────────────────┘  
-                                       │  
-            ┌──────────────────────────┴──────────────────────────┐  
-            ▼                                                     ▼  
-┌───────────────────────┐                               ┌───────────────────────┐  
-│ Target Behavior Evals │                               │ Alignment Evals       │  
-│ - Exact Match Accuracy│                               │ - Refusal Accuracy    │  
-│ - Syntax & Schema Adh.│                               │ - Jailbreak Resistance│  
-│ - Tool-Call Success   │                               │ - Privacy Leak Check  │  
-└───────────┬───────────┘                               └───────────┬───────────┘  
-            │                                                       │  
-            └──────────────────────────┬────────────────────────────┘  
-                                       │  Pass All Verification Criteria  
-                                       ▼  
-                        ┌─────────────────────────────┐  
-                        │      Regression Evals       │  
-                        │ - MMLU / GSM8K Track        │  
-                        │ - Perplexity Drift Tracking │  
-                        │ - Negative Transfer Check   │  
-                        └──────────────┬──────────────┘  
-                                       │  Pass Threshold (Max 2% Decay)  
-                                       ▼  
-                        ┌─────────────────────────────┐  
-                        │      Shadow Deployment      │  
-                        │ - Live Mirror Traffic Run   │  
-                        │ - Latency SLA Assessment    │  
-                        │ - Error Budget Tracking     │  
-                        └─────────────────────────────┘
++------------------------------------------------------------------------------------------------+
+|                       ADAPTATION REGRESSION AND SAFETY EVALUATION PLAN                         |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Goal: prove that an adapted checkpoint or adapter improves the target behavior without        
+|  degrading general capability, safety, privacy, schema reliability, or serving stability.      
+|                                                                                                
+|  [ Adaptation Candidate: SFT checkpoint / LoRA adapter / preference-tuned model / student ]    
+|                                      |                                                                                               v                                                         |
+|  +------------------------------------------------------------------------------------------+  
+|  |  1. Baseline Calibration Sweep                                                           |  
+|  |                                                                                          |  
+|  |  Run the frozen base model through the same target, safety, schema, retrieval, and tool  |  
+|  |  tests. Establish baseline accuracy, latency, refusal behavior, and failure profile.     |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  2. Artifact Compatibility Gate                                                          |  
+|  |                                                                                          |  
+|  |  Verify base checkpoint hash, tokenizer version, adapter rank, target modules, schema    |  
+|  |  config, serving engine version, merge policy, tenant scope, and rollback path.          |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Compatible? ]                                           
+|                                      /            \                                            
+|                               Yes   /              \   No                                      
+|                                    v                v                                          
+|                      [ Continue Evaluation ]     [ Reject Artifact / Repair Registry ]         
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  3. Held-Out Target Behavior Evaluation                                                  |  
+|  |                                                                                          |  
+|  |  Test unseen target examples. Measure exact-match accuracy, task success rate, schema    |  
+|  |  validity, tool-call correctness, output style, and domain-specific acceptance criteria. |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Target Gain >= Threshold? ]                             
+|                                      /                      \                                  
+|                               Yes   /                        \   No                            
+|                                    v                          v                                
+|                      [ Continue Evaluation ]        [ Reject / Re-train / Re-scope Dataset ]   
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  4. Structured Output and Tool-Use Verification                                          |  
+|  |                                                                                          |  
+|  |  Run high-volume parser tests, tool simulations, constrained decoding checks, sandboxed  |  
+|  |  compiler runs, API argument validation, and malformed-input recovery tests.             |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Boundary Valid? ]                                       
+|                                      /            \                                            
+|                               Yes   /              \   No                                      
+|                                    v                v                                          
+|                      [ Continue Evaluation ]     [ Enable Constraints / Fix Training Data ]    
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  5. General Capability Preservation                                                      |  
+|  |                                                                                          |  
+|  |  Run general reasoning, math, coding, instruction-following, multilingual, and retrieval |  
+|  |  tests. Compare against baseline. Maximum tolerated decay: usually <= 2%.                |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Regression Within Limit? ]                              
+|                                      /                      \                                  
+|                               Yes   /                        \   No                            
+|                                    v                          v                                
+|                      [ Continue Evaluation ]        [ Reject / Lower Rank / Add Rehearsal Set] 
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  6. Safety, Refusal, and Adversarial Red-Team Sweep                                      |  
+|  |                                                                                          |  
+|  |  Test jailbreak resistance, unsafe capability shift, refusal accuracy, benign false      |  
+|  |  refusals, prompt injection exposure, and policy-boundary preservation.                  |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Safety Preserved? ]                                     
+|                                      /            \                                            
+|                               Yes   /              \   No                                      
+|                                    v                v                                          
+|                      [ Continue Evaluation ]     [ Immediate Rejection / Safety Review ]       
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  7. Privacy Leakage and Memorization Audit                                               |  
+|  |                                                                                          |  
+|  |  Probe for memorized training records, PII, secrets, tenant schemas, proprietary code,   |  
+|  |  benchmark contamination, and exact-sequence reproduction.                               |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Leakage Detected? ]                                     
+|                                      /            \                                            
+|                                No   /              \   Yes                                     
+|                                    v                v                                          
+|                      [ Continue Evaluation ]     [ Reject / Redact / Deduplicate / Retrain ]   
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  8. Shadow Deployment                                                                    |  
+|  |                                                                                          |  
+|  |  Mirror live traffic to baseline and adapted artifact. Do not expose users to candidate  |  
+|  |  outputs. Log divergence, latency, cost, tool errors, refusals, and operator overrides.  |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Shadow Metrics Pass? ]                                  
+|                                      /                    \                                    
+|                               Yes   /                      \   No                              
+|                                    v                        v                                  
+|                      [ Continue to Canary ]        [ Hold Release / Investigate Drift ]        
+|                                    |                                                           
+|                                    v                                                           
+|  +------------------------------------------------------------------------------------------+  
+|  |  9. Canary Rollout and Automated Rollback                                                |  
+|  |                                                                                          |  
+|  |  Roll out progressively: 1% -> 10% -> 50% -> 100%. Roll back automatically on SLA breach,|  
+|  |  exception spike, safety incident, schema failure, latency regression, or quality decay. |  
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  10. Production Registration and Monitoring                                              |  
+|  |                                                                                          |  
+|  |  Register signed Adaptation Card, dataset hashes, eval results, artifact URI, rollback   |  
+|  |  target, monitoring thresholds, and reconsideration conditions.                          |  
+|  +------------------------------------------------------------------------------------------+  
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Rule: no adapted model enters production merely because target-task accuracy improved. It must |
+| also preserve safety, privacy, general capability, serving stability, and rollback readiness.  |
++------------------------------------------------------------------------------------------------+
 ```
 
 1. **Baseline Calibration Sweep**: Prior to fine-tuning, run the base model through prompt-engineered, context-grounded, and validation scenarios to establish a performance baseline.  
@@ -936,14 +1131,98 @@ Every model adaptation pipeline must pass through a multi-stage validation suite
 
 Weight optimization carries severe operational and systemic risks that can compromise downstream behavior.
 
-Supervised Fine-Tuning (SFT) Weight Shifts  
-  │  
-  ├─► Over-optimization of surface tokens  ──►  (Model repeats boilerplate length/format)
-  │                                                  
-  ├─► Overwriting deep parameter coordinates ──► [Catastrophic Forgetting]  (General reasoning/MMLU collapses)
-  │                                                  
-  └─► Over-sensitization of safety data     ──►  (Benign queries trigger false refusals)
-                                                   
+```
++------------------------------------------------------------------------------------------------+
+|                                  ADAPTATION FAILURE MODE MAP                                   | 
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Weight optimization changes behavior by altering parameters or logit preferences. Every gain  
+|  can create an adjacent failure unless regression, safety, and privacy boundaries are tested.  
+|                                                                                                
+|  [ Adaptation Intervention ]                                                                   
+|       |                                                                                        
+|       |  SFT | LoRA | QLoRA | Preference Tuning | Domain Adaptation | Distillation             
+|       v                                                                                        
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Training Data and Objective Risks                           |
+|  +----------------------+----------------------+----------------------+---------------------+
+|                         |                      |                      |                      
+|                         v                      v                      v                      
+|          +-------------------------+  +-----------------------+  +-----------------------------+
+|          | Label-Noise Amplif.     |  | Synthetic Monoculture |  | Benchmark Contamination     |
+|          |                         |  |                       |  |                             |
+|          | inconsistent labels     |  | repetitive teacher    |  | eval leakage inflates       |
+|          | become model behavior   |  | style collapses       |  | apparent performance        |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+
+|                      |                            |                            |                
+|                      v                            v                            v                
+|          [ stricter annotation ]      [ teacher diversity ]       [ contamination sweep ]       
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Parameter and Capability Risks                              |
+|  +----------------------+----------------------+----------------------+---------------------+
+|                         |                      |                      |                      
+|                         v                      v                      v                      
+|          +-------------------------+  +-----------------------+  +-----------------------------+
+|          | Catastrophic Forgetting |  | Domain Tunnel Vision  |  | Overconfident Hallucination |
+|          |                         |  |                       |  |                             |
+|          | general reasoning, math |  | narrow task success   |  | false labels become high-   |
+|          | or world knowledge drops|  | but brittle transfer  |  | confidence completions      |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+
+|                      |                            |                            |                
+|                      v                            v                            v                
+|          [ rehearsal sets ]          [ prompt diversity tests ]    [ data validation + abstain ]   
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Format, Tool, and Interface Risks                           |
+|  +----------------------+----------------------+----------------------+---------------------+
+|                         |                      |                      |                      
+|                         v                      v                      v                      
+|          +-------------------------+  +-----------------------+  +-----------------------------+
+|          | Format Regression       |  | Tool-Use Regression   |  | Prompt-Template Dependence  |
+|          |                         |  |                       |  |                             |
+|          | JSON/XML/schema drift   |  | wrong tool args, API  |  | only works with training    |
+|          | after adaptation        |  | misuse, state errors  |  | prompt syntax               |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+
+|                      |                            |                            |                
+|                      v                            v                            v                
+|          [ constrained decoding ]     [ tool harness tests ]       [ template perturbation ]    
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Safety and Privacy Risks                                    |
+|  +----------------------+----------------------+----------------------+---------------------+
+|                         |                      |                      |                      
+|                         v                      v                      v                           
+|          +-------------------------+  +-----------------------+  +-----------------------------+  
+|          | Refusal Drift           |  | Unsafe Capability     |  | Privacy / Tenant Leakage    |
+|          |                         |  | Shift                 |  |                             |
+|          | benign requests refused |  | safety barriers decay |  | PII, secrets, tenant data   |
+|          | from over-alignment     |  | after tuning          |  | memorized into weights      |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+
+|                      |                            |                            |                
+|                      v                            v                            v                
+|          [ contrastive safety ]       [ red-team retention ]       [ redaction + isolation ]    
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                              Serving and Artifact Risks                                  |
+|  +----------------------+----------------------+----------------------+---------------------+
+|                         |                      |                      |                      
+|                         v                      v                      v                      
+|          +-------------------------+  +-----------------------+  +-----------------------------+
+|          | Adapter Incompatibility |  | Stale-Knowledge       |  | Merge / Stack Conflict      |
+|          |                         |  | Fossilization         |  |                             |
+|          | rank, tokenizer, base   |  | dynamic facts encoded |  | incompatible adapters       |
+|          | hash, module mismatch   |  | into weights          |  | combined at runtime         |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+
+|                      |                            |                            |                
+|                      v                            v                            v                
+|          [ registry verification ]    [ keep facts in RAG ]       [ merge/stack policy gate ]   
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Doctrine: adaptation should specialize stable behavior, not smuggle volatile knowledge, private|
+| data, or unvalidated preferences into weights. Every adapter needs a rollback path.            |
++------------------------------------------------------------------------------------------------+
+```                                                   
 
 ### **Style Overfit**
 
@@ -1167,21 +1446,61 @@ Under this paradigm, the operational question shifts from "Which model version i
 In probabilistic systems, technical availability is a necessary but insufficient metric for production health.2 An AI system can maintain perfect infrastructure uptime, return valid HTTP 200 responses, and execute within latency SLAs while suffering from complete semantic failure.2 This phenomenon is defined as **silent regression**: a failure mode where the system remains technically operational and syntactically valid while its semantic accuracy, instruction compliance, or safety alignment degrades.5
 
 ```
-                               Traditional SRE Monitoring  
-                         ┌─────────────────────────────────────┐  
-                         ▼                                     ▼  
-                          ──►         [API Gateway]         ──►  
-                                                               │  
-                                                     (Dashboards Show Green)  
-                                                               │  
-                                                               ▼ 
-                                                        (Silent Failure)  
-                                                               ▲  
-                         ┌─────────────────────────────────────┘  
-                         ▼                                     ▼  
-                 [Negative Flips]  
-                  (Agent Fails)     (Stale Context)     (Target Task Loss)  
-                              Behavioral Release Engineering
++------------------------------------------------------------------------------------------------+
+|                    TRADITIONAL SRE MONITORING VS BEHAVIORAL RELEASE ENGINEERING                |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Traditional infrastructure monitoring can show green while the AI system is semantically      
+|  failing. Regression control monitors the behavior produced by the complete runtime bundle.    
+|                                                                                                
+|  +------------------------------------------------------------------------------------------+  
+|  |                           Traditional SRE Health Signals                                 |  
+|  |                                                                                          |
+|  |  HTTP 200 responses | low CPU | low memory pressure | stable latency | no server errors  |
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|                                  [ Dashboards Show Green ]                                     
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           Hidden Behavioral Failure Zone                                 |  
+|  |                                                                                          |
+|  |  The system is available, fast, and syntactically valid, but the output behavior has     |
+|  |  degraded. This is silent regression.                                                    |
+|  +----------------------+----------------------+----------------------+---------------------+
+|                         |                      |                      |                      
+|                         v                      v                      v                      
+|          +-------------------------+  +-----------------------+  +-----------------------------+   
+|          | Negative Flips          |  | Stale Context         |  | Target Task Loss            |   
+|          |                         |  |                       |  |                             |   
+|          | previously correct      |  | old retrieval, memory,|  | model stops satisfying      |   
+|          | cases become wrong      |  | or prompt cache wins  |  | core workflow requirements  |
+|          +-----------+-------------+  +-----------+-----------+  +-------------+---------------+
+|                      |                            |                            |                
+|                      +----------------------------+----------------------------+                
+|                                                   |                                             
+|                                                   v                                             
+|  +------------------------------------------------------------------------------------------+  
+|  |                           Behavioral Release Engineering                                 |  
+|  |                                                                                          |
+|  |  Track and compare the full behavior-producing bundle:                                   |
+|  |                                                                                          |
+|  |  model weights | adapters | prompts | tools | schemas | retrieval index | corpus snapshot|
+|  |  memory policy | routing policy | safety policy | validators | decoding parameters       |
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |                           Required Regression Controls                                   |  
+|  |                                                                                          |
+|  |  artifact manifest | behavioral baseline | replayable traces | negative-flip detection   | 
+|  |  staged rollout | semantic drift monitoring | atomic rollback path                       |
+|  +------------------------------------------------------------------------------------------+
+|                                                                                              
++------------------------------------------------------------------------------------------------+
+| Doctrine: uptime proves the service is reachable. It does not prove the behavior is still good.|
++------------------------------------------------------------------------------------------------+
 ```
 
 Examples of silent regressions include:
@@ -1222,123 +1541,351 @@ A unified registry provides the ingredients, but the **AI System Release Manifes
 Without this manifest, rollback is impossible.2 Rolling back model weights while leaving system prompts, vector databases, or tool schemas unchanged creates a mismatched configuration state, which frequently exacerbates the original outage.1 The manifest ensures that any deployment action is atomic, reproducible, and verifiable.6
 
 ```JSON  
-{  
-  "$schema": "https://json-schema.org/draft/2020-12/schema",  
-  "title": "AISystemReleaseManifest",  
-  "type": "object",  
-  "required": [  
-    "manifest_id",  
-    "created_at",  
-    "environment",  
-    "owner_team",  
-    "cognitive_core",  
-    "steering_layers",  
-    "retrieval_architecture",  
-    "execution_tooling",  
-    "system_routing",  
-    "evaluation_signature"  
-  ],  
-  "properties": {  
-    "manifest_id": {  
-      "type": "string",  
-      "pattern": "^asm-[a-f0-9]{32}$"  
-    },  
-    "created_at": {  
-      "type": "string",  
-      "format": "date-time"  
-    },  
-    "environment": {  
-      "type": "string",  
-      "enum": ["development", "staging", "canary", "production"]  
-    },  
-    "owner_team": {  
-      "type": "string"  
-    },  
-    "cognitive_core": {  
-      "type": "object",  
-      "required": ["base_model", "decoding_parameters"],  
-      "properties": {  
-        "base_model": {  
-          "type": "object",  
-          "required": ["urn", "provider", "api_version_pin"],  
-          "properties": {  
-            "urn": { "type": "string" },  
-            "provider": { "type": "string" },  
-            "api_version_pin": { "type": "string" }  
-          }  
-        },  
-        "adapters": {  
-          "type": "array",  
-          "items": {  
-            "type": "object",  
-            "required": ["adapter_id", "blend_weight"],  
-            "properties": {  
-              "adapter_id": { "type": "string" },  
-              "blend_weight": { "type": "number", "minimum": 0.0, "maximum": 1.0 }  
-            }  
-          }  
-        },  
-        "decoding_parameters": {  
-          "type": "object",  
-          "required": ["temperature", "top_p", "seed"],  
-          "properties": {  
-            "temperature": { "type": "number", "minimum": 0.0, "maximum": 2.0 },  
-            "top_p": { "type": "number", "minimum": 0.0, "maximum": 1.0 },  
-            "seed": { "type": "integer" }  
-          }  
-        }  
-      }  
-    },  
-    "steering_layers": {  
-      "type": "object",  
-      "required": ["system_instructions_urn", "prompt_template_urn"],  
-      "properties": {  
-        "system_instructions_urn": { "type": "string" },  
-        "prompt_template_urn": { "type": "string" },  
-        "few_shot_dataset_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }  
-      }  
-    },  
-    "retrieval_architecture": {  
-      "type": "object",  
-      "required": ["embedding_model_urn", "vector_index_id"],  
-      "properties": {  
-        "embedding_model_urn": { "type": "string" },  
-        "vector_index_id": { "type": "string" },  
-        "corpus_snapshot_id": { "type": "string" },  
-        "reranker_model_urn": { "type": "string" },  
-        "max_context_chunks": { "type": "integer", "minimum": 1 }  
-      }  
-    },  
-    "execution_tooling": {  
-      "type": "object",  
-      "required": ["tool_schema_versions", "validator_manifest_hash"],  
-      "properties": {  
-        "tool_schema_versions": {  
-          "type": "object",  
-          "additionalProperties": { "type": "string" }  
-        },  
-        "validator_manifest_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }  
-      }  
-    },  
-    "system_routing": {  
-      "type": "object",  
-      "required": ["routing_policy_id", "safety_policy_version"],  
-      "properties": {  
-        "routing_policy_id": { "type": "string" },  
-        "safety_policy_version": { "type": "string" }  
-      }  
-    },  
-    "evaluation_signature": {  
-      "type": "object",  
-      "required": ["golden_set_hash", "evaluated_accuracy", "p95_latency_ms", "max_cost_per_task_usd"],  
-      "properties": {  
-        "golden_set_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },  
-        "evaluated_accuracy": { "type": "number", "minimum": 0.0, "maximum": 1.0 },  
-        "p95_latency_ms": { "type": "number", "minimum": 0.0 },  
-        "max_cost_per_task_usd": { "type": "number", "minimum": 0.0 }  
-      }  
-    }  
-  }  
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AISystemReleaseManifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest_id",
+    "manifest_version",
+    "created_at",
+    "created_by",
+    "environment",
+    "owner_team",
+    "lineage",
+    "artifact_dependency_graph",
+    "cognitive_core",
+    "steering_layers",
+    "retrieval_architecture",
+    "execution_tooling",
+    "context_and_memory",
+    "system_routing",
+    "safety_and_governance",
+    "deployment_strategy",
+    "rollback",
+    "observability",
+    "evaluation_signature"
+  ],
+  "properties": {
+    "manifest_id": {
+      "type": "string",
+      "pattern": "^asm-[a-f0-9]{32}$"
+    },
+    "manifest_version": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "type": "string"
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["development", "staging", "shadow", "canary", "production"]
+    },
+    "owner_team": {
+      "type": "string"
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parent_manifest_id", "change_request_id", "release_notes_hash"],
+      "properties": {
+        "parent_manifest_id": {
+          "type": ["string", "null"],
+          "pattern": "^asm-[a-f0-9]{32}$"
+        },
+        "change_request_id": {
+          "type": "string"
+        },
+        "release_notes_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "artifact_dependency_graph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["graph_id", "graph_hash"],
+      "properties": {
+        "graph_id": {
+          "type": "string"
+        },
+        "graph_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "cognitive_core": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_model", "decoding_parameters"],
+      "properties": {
+        "base_model": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["urn", "provider", "api_version_pin", "tokenizer_config_hash", "context_window_tokens"],
+          "properties": {
+            "urn": { "type": "string" },
+            "provider": { "type": "string" },
+            "api_version_pin": { "type": "string" },
+            "tokenizer_config_hash": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            },
+            "context_window_tokens": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "adapters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["adapter_id", "base_model_compatibility_hash", "rank", "blend_weight"],
+            "properties": {
+              "adapter_id": { "type": "string" },
+              "base_model_compatibility_hash": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              },
+              "rank": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "blend_weight": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              }
+            }
+          }
+        },
+        "decoding_parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["temperature", "top_p", "seed", "max_output_tokens"],
+          "properties": {
+            "temperature": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 2.0
+            },
+            "top_p": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "seed": { "type": "integer" },
+            "max_output_tokens": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "steering_layers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system_instructions_urn", "prompt_template_urn"],
+      "properties": {
+        "system_instructions_urn": { "type": "string" },
+        "prompt_template_urn": { "type": "string" },
+        "few_shot_dataset_hash": {
+          "type": ["string", "null"],
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "retrieval_architecture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["embedding_model_urn", "vector_index_id", "corpus_snapshot_id"],
+      "properties": {
+        "embedding_model_urn": { "type": "string" },
+        "vector_index_id": { "type": "string" },
+        "index_build_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "corpus_snapshot_id": { "type": "string" },
+        "reranker_model_urn": { "type": ["string", "null"] },
+        "max_context_chunks": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "retrieval_policy_id": { "type": "string" }
+      }
+    },
+    "execution_tooling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool_schema_versions", "validator_manifest_hash"],
+      "properties": {
+        "tool_schema_versions": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "validator_manifest_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "mock_tool_payload_set_hash": {
+          "type": ["string", "null"],
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "context_and_memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["memory_policy_id", "context_compiler_version", "prompt_cache_policy_id"],
+      "properties": {
+        "memory_policy_id": { "type": "string" },
+        "context_compiler_version": { "type": "string" },
+        "prompt_cache_policy_id": { "type": "string" },
+        "max_prompt_tokens": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "system_routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["routing_policy_id", "fallback_chain_id"],
+      "properties": {
+        "routing_policy_id": { "type": "string" },
+        "fallback_chain_id": { "type": "string" },
+        "cost_budget_policy_id": { "type": "string" }
+      }
+    },
+    "safety_and_governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["safety_policy_version", "pii_policy_version", "approval_record_id"],
+      "properties": {
+        "safety_policy_version": { "type": "string" },
+        "pii_policy_version": { "type": "string" },
+        "approval_record_id": { "type": "string" },
+        "risk_class": {
+          "type": "string",
+          "enum": ["low", "moderate", "high", "critical"]
+        }
+      }
+    },
+    "deployment_strategy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "traffic_plan"],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": ["offline_only", "replay", "shadow", "canary", "ab_test", "full_release"]
+        },
+        "traffic_plan": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["stage", "traffic_percentage", "promotion_gate"],
+            "properties": {
+              "stage": { "type": "string" },
+              "traffic_percentage": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 100.0
+              },
+              "promotion_gate": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rollback_manifest_id", "rollback_mode", "automatic_triggers"],
+      "properties": {
+        "rollback_manifest_id": {
+          "type": "string",
+          "pattern": "^asm-[a-f0-9]{32}$"
+        },
+        "rollback_mode": {
+          "type": "string",
+          "enum": ["component_targeted", "full_manifest_atomic"]
+        },
+        "automatic_triggers": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "observability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trace_schema_version", "dashboard_id", "alert_policy_id"],
+      "properties": {
+        "trace_schema_version": { "type": "string" },
+        "dashboard_id": { "type": "string" },
+        "alert_policy_id": { "type": "string" },
+        "required_trace_fields": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "evaluation_signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "golden_set_hash",
+        "scenario_set_hash",
+        "judge_model_urn",
+        "evaluated_accuracy",
+        "p95_latency_ms",
+        "max_cost_per_task_usd",
+        "risk_gate_status"
+      ],
+      "properties": {
+        "golden_set_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "scenario_set_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "judge_model_urn": { "type": "string" },
+        "evaluated_accuracy": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "p95_latency_ms": {
+          "type": "number",
+          "minimum": 0.0
+        },
+        "max_cost_per_task_usd": {
+          "type": "number",
+          "minimum": 0.0
+        },
+        "risk_gate_status": {
+          "type": "string",
+          "enum": ["passed", "failed", "waived"]
+        }
+      }
+    }
+  }
 }
 ```
 
@@ -1347,30 +1894,121 @@ Without this manifest, rollback is impossible.2 Rolling back model weights while
 Because the components of an AI system are highly interconnected, changes do not execute in isolation.1 A modification to an upstream model weight or database schema triggers a cascade of structural and behavioral shifts downstream.1 To map, predict, and validate these cascading changes, platforms utilize an **Artifact Dependency Graph**.30
 
 ```
-                         [Embedding Model]  
-                                 │  
-                     (rebuilds)  │  (invalidates)  
-                                 ▼  
-                          
-                                 │  
-                     (populates) │  (warps coordinates)  
-                                 ▼  
-                         [Prompt Compiler]  
-                                 │  
-                     (steers)    │  (mismatches token size)  
-                                 ▼  
-                           ◄──  
-                                 │  
-                     (executes)  │  (mismatches logits)  
-                                 ▼  
-                         ◄──  
-                                 │  
-                     (restricts) │  (triggers false refusals)  
-                                 ▼  
-                        [Output Validator]  
-                                 │  
-                     (validates) │  (throws schema errors)  
-                                 ▼  
++-------------------------------------------------------------------------------+
+| ARTIFACT DEPENDENCY GRAPH MODEL                                               |
++-------------------------------------------------------------------------------+
+|
+| Goal:
+|   Identify which tests, rebuilds, cache invalidations, and rollback paths are
+|   required when any behavior-producing artifact changes.
+|
+| Core idea:
+|   The Release Manifest binds the stack. Individual artifacts do not merely
+|   point at each other; they are assembled into a runtime bundle whose behavior
+|   must be tested as a unit.
+|
+|                         +---------------------------+
+|                         | Release Manifest          |
+|                         | complete behavior bundle  |
+|                         +-------------+-------------+
+|                                       |
+|          +----------------------------+----------------------------+
+|          |                            |                            |
+|          v                            v                            v
+| +-------------------+        +-------------------+        +-------------------+
+| | Cognitive Core    |        | Steering Layer    |        | Retrieval Layer   |
+| |                   |        |                   |        |                   |
+| | base model        |        | system prompt     |        | corpus snapshot   |
+| | adapters          |        | prompt template   |        | chunking policy   |
+| | tokenizer         |        | few-shot set      |        | embedding model   |
+| | decoding params   |        | persona policy    |        | vector index      |
+| +---------+---------+        +---------+---------+        +---------+---------+
+|           |                            |                            |
+|           | supplies runtime model     | compiles prompt             | supplies evidence
+|           v                            v                            v
+| +-------------------+        +-------------------+        +-------------------+
+| | Model Runtime     |<-------| Prompt Compiler   |<-------| Retrieval Pipeline|
+| | model + adapters  |        | final input build |        | search + rerank   |
+| +---------+---------+        +---------+---------+        +---------+---------+
+|           |                            ^                            ^
+|           | produces output            | injects tool instructions   |
+|           v                            | and context blocks          |
+| +-------------------+        +---------+---------+        +---------+---------+
+| | Output Candidate  |        | Tool Schema Set   |        | Retrieval Policy  |
+| | text / JSON / call|        | args + auth shape |        | filters + top_k   |
+| +---------+---------+        +---------+---------+        +---------+---------+
+|           |                            |                            |
+|           | checked by                 | validated against           | constrains
+|           v                            v                            |
+| +-------------------+        +-------------------+                  |
+| | Output Validator  |<-------| Tool Harness      |                  |
+| | schema + policy   |        | mocks + contracts |                  |
+| +---------+---------+        +-------------------+                  |
+|           |
+|           | restricted by
+|           v
+| +-------------------+        +-------------------+        +-------------------+
+| | Safety Policy     |        | Router / Fallback |        | Memory / Context  |
+| | refusal/moderation|        | route + retry     |        | session state     |
+| +---------+---------+        +---------+---------+        +---------+---------+
+|           |                            |                            |
+|           +----------------------------+----------------------------+
+|                                       |
+|                                       v
+|                         +---------------------------+
+|                         | Behavioral Baseline       |
+|                         | golden sets + scenarios   |
+|                         +-------------+-------------+
+|                                       |
+|                                       v
+|                         +---------------------------+
+|                         | Evaluation + Telemetry    |
+|                         | traces, drift, gates      |
+|                         +-------------+-------------+
+|                                       |
+|                                       v
+|                         +---------------------------+
+|                         | Release Decision          |
+|                         | promote / hold / rollback |
+|                         +---------------------------+
+|
++--------------------------------------------------------------------------------
+| Impact paths:
+|
+|   Base model change
+|     -> rerun instruction, tool-use, schema, refusal, and target-task evals
+|     -> verify adapters and tokenizer compatibility
+|
+|   Embedding model change
+|     -> rebuild vector index
+|     -> rerun retrieval accuracy and grounding evals
+|     -> invalidate retrieval-dependent prompt caches
+|
+|   Corpus snapshot change
+|     -> rechunk / re-embed affected documents
+|     -> rerun grounding, freshness, and citation checks
+|     -> refresh truth-rot-sensitive baselines if source facts changed
+|
+|   Tool schema change
+|     -> update prompt compiler and tool harness
+|     -> rerun tool-call simulations and validator checks
+|     -> block release if arguments no longer parse
+|
+|   Safety policy change
+|     -> rerun adversarial and benign-refusal suites
+|     -> measure refusal drift and false-positive rate
+|     -> canary only if user utility remains inside tolerance
+|
+|   Routing policy change
+|     -> simulate route distribution and cost-per-success
+|     -> verify fallback chains and fail-open/fail-closed behavior
+|     -> monitor live route skew during rollout
++--------------------------------------------------------------------------------+
+| Doctrine:                                                                      |
+|   Dependency graphs should explain behavioral blast radius, not merely draw    |
+|   boxes. Any changed artifact must point to the tests, caches, traces, and     |
+|   rollback actions it invalidates.                                             |  
++--------------------------------------------------------------------------------+
 ```
 
 Formally, the Artifact Dependency Graph is modeled as a Directed Acyclic Graph (DAG) 16:  
@@ -1418,14 +2056,55 @@ In generative systems, this logic fails.1 LLM outputs are stochastic, governed b
 Therefore, regression control requires defining **Behavioral Baselines**.6 A behavioral baseline is a task-specific, frozen reference distribution of semantic, structural, and behavioral markers under a defined task distribution.6
 
 ```
-                                  [Live Output]  
-                                        │  
-                 ┌──────────────────────┼──────────────────────┐  
-                 ▼                      ▼                      ▼  
-            [Expected Update]          
-       - Check: Output fails   - Check: Intentional     - Check: External  
-         format or accuracy      policy or structural     data changed; base-  
-         (RCI < -1.96)           change validated         line needs update
++------------------------------------------------------------------------------------------------+
+|                         BEHAVIORAL BASELINE CLASSIFICATION MODEL                               |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Goal: distinguish true system regression from intentional behavior change and external truth  
+|  rot before blocking or rolling back a release.                                                
+|                                                                                                
+|  [ Candidate Output on Fixed Scenario Set ]                                                    
+|                      |                                                                         
+|                      v                                                                         
+|  +------------------------------------------------------------------------------------------+  
+|  | Compare Against Frozen Behavioral Baseline                                               | 
+|  |                                                                                          |
+|  | Inputs: baseline manifest, candidate manifest, fixed scenario, retrieved evidence,       |
+|  | expected output properties, rubric, K repeated trials, and current source-of-truth state.|
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|                                  [ Reliable Change Detected? ]                                 
+|                                         /                 \                                    
+|                                  No    /                   \   Yes                               
+|                                       v                     v                                  
+|  +-----------------------------------------+   +-------------------------------------------+  
+|  | Stable Behavior                         |   | Classify the Change                       |  
+|  |                                         |   |                                           |   
+|  | RCI remains within expected stochastic  |   | Determine whether the observed difference |
+|  | variance: -1.96 <= RCI <= 1.96          |   | is intended, externally caused, or faulty.|
+|  +--------------------+--------------------+   +------------------+------------------------+   
+|                       |                                           |                            
+|                       |                  +------------------------+------------------------+    
+|                       |                  |                        |                        |    
+|                       v                  v                        v                        v    
+|          +---------------------+ +---------------------+ +---------------------+ +-------------+
+|          | No Regression       | | Expected Update     | | Truth Rot           | | Regression  |
+|          |                     | |                     | |                     | |             |
+|          | promote if other    | | intentional prompt, | | external facts or   | | unintended  |
+|          | gates pass          | | policy, schema, or  | | source data changed | | degradation |
+|          |                     | | UX change validated | | after baseline was  | | in quality, |
+|          |                     | | by release notes    | | frozen              | | safety, or  |
+|          |                     | |                     | |                     | | compliance  |
+|          +----------+----------+ +----------+----------+ +----------+----------+ +------+------+
+|                     |                       |                       |                   |
+|                     v                       v                       v                   v
+|          [ Allow Release ]     [ Update Baseline Metadata ] [ Refresh Golden Set ] [ Block/Roll Back ]
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Rule: do not punish a system for disagreeing with an obsolete baseline, but never relabel an   |
+| unplanned failure as progress without release evidence.                                        |
++------------------------------------------------------------------------------------------------+
 ```
 
 When evaluating candidate versions, platforms must distinguish regressions from expected updates and truth rot 2:
@@ -1436,23 +2115,84 @@ When evaluating candidate versions, platforms must distinguish regressions from 
 
 ### **The Statistical Detection of Negative Flips**
 
-To evaluate model updates (e.g., transitioning from version N to N+1), platforms cannot rely solely on aggregate benchmark scores.9 An aggregate accuracy increase of +2% on a benchmark can mask severe item-level regressions where previously correct behaviors are broken—a phenomenon defined as a **negative flip**.9  
-To distinguish true negative flips from natural stochastic variance, platforms adapt the **Reliable Change Index (RCI)** from psychometric clinical psychology.9 By executing K repeated generations on each benchmark item at a defined temperature (T), we estimate the stability of the model's response distribution.9  
-Let the performance of baseline version N on a benchmark item i over K repeated trials be represented as a binomial proportion of success 9:  
-p1 = sum(x_1,j for j=1 to K) / K  
-Let the performance of the candidate upgraded version N+1 on the same item i over K trials be 9:  
-p2 = sum(x_2,j for j=1 to K) / K  
-The standard error of the difference (S_diff) under binomial distribution assumptions is defined as 9:  
-S_diff = sqrt( (p1 * (1 - p1) / K) + (p2 * (1 - p2) / K) )  
-The Reliable Change Index (RCI) for individual items is calculated as 9:  
-RCI = (p2 - p1) / S_diff  
-Under this framework, item-level transitions are classified with strict statistical confidence (p < 0.05) 9:
+To evaluate model updates, platforms cannot rely solely on aggregate benchmark scores. A candidate system can improve average accuracy while breaking specific behaviors that were previously stable. This item-level deterioration is called a **negative flip**.
 
-* **Reliable Improvement**: RCI > 1.96 (the model has reliably mastered the item).9  
-* **Unchanged**: -1.96 <= RCI <= 1.96 (any change in output is within the stochastically expected noise floor).9  
-* **Reliable Regression (Negative Flip)**: RCI < -1.96 (the model's capability on this item has deteriorated).9
+A negative flip occurs when a baseline system succeeds on item `i`, but the candidate system fails on the same item under the same evaluation conditions. In stochastic systems, however, a single pass is not enough to distinguish real regression from sampling noise. Regression control therefore evaluates each item across `K` repeated trials using fixed evaluation conditions:
 
-Empirical studies demonstrate that relying on single-shot, greedy decoding (K=1) to evaluate model updates is highly unreliable, missing up to 42% of reliably changed items while falsely flagging 25% of unchanged items as regressions.9
+- same test input
+- same release manifest fields except the candidate change
+- same retrieval snapshot or replayed retrieval state
+- same tool mocks
+- same decoding configuration or controlled seed schedule
+- same evaluator rubric
+
+Let:
+
+`x_1,j = 1` if the baseline succeeds on trial `j`, else `0`  
+`x_2,j = 1` if the candidate succeeds on trial `j`, else `0`
+
+The observed success proportions are:
+
+`p1 = sum(x_1,j for j = 1..K) / K`
+
+`p2 = sum(x_2,j for j = 1..K) / K`
+
+The standard error of the difference under binomial assumptions is:
+
+`S_diff = sqrt((p1 * (1 - p1) / K) + (p2 * (1 - p2) / K))`
+
+The item-level Reliable Change Index is:
+
+`RCI = (p2 - p1) / S_diff`
+
+Classification:
+
+| Item-Level Transition | Rule | Interpretation |
+| :--- | :--- | :--- |
+| **Reliable Improvement** | `RCI > 1.96` | Candidate reliably improves the item. |
+| **Unchanged** | `-1.96 <= RCI <= 1.96` | Observed difference is inside expected stochastic variation. |
+| **Reliable Regression / Negative Flip** | `RCI < -1.96` | Candidate reliably degrades the item. |
+
+#### **Degenerate and Boundary Cases**
+
+The raw RCI formula can produce a divide-by-zero condition when both systems are perfectly stable on an item, such as `p1 = 1.0` and `p2 = 1.0`, or both always fail, such as `p1 = 0.0` and `p2 = 0.0`.
+
+Production evaluators must handle these cases explicitly:
+
+| Case | Handling Rule |
+| :--- | :--- |
+| `p1 == p2` and `S_diff == 0` | Classify as **Unchanged**. No behavioral difference was observed. |
+| `p1 = 1.0`, `p2 = 0.0`, and `S_diff == 0` | Classify as **Critical Negative Flip**. Candidate moved from deterministic success to deterministic failure. |
+| `p1 = 0.0`, `p2 = 1.0`, and `S_diff == 0` | Classify as **Critical Improvement**. Candidate moved from deterministic failure to deterministic success. |
+| Extreme proportions near `0` or `1` | Use smoothed estimates before computing `S_diff`. |
+
+A practical smoothing method is Jeffreys smoothing:
+
+`p1_smooth = (successes_1 + 0.5) / (K + 1)`
+
+`p2_smooth = (successes_2 + 0.5) / (K + 1)`
+
+Then compute:
+
+`S_diff = sqrt((p1_smooth * (1 - p1_smooth) / K) + (p2_smooth * (1 - p2_smooth) / K))`
+
+`RCI = (p2_smooth - p1_smooth) / S_diff`
+
+This avoids infinite or undefined scores while preserving the direction of item-level change.
+
+#### **Negative Flip Reporting**
+
+A release report should track both aggregate performance and item-level flips:
+
+| Metric | Definition | Why It Matters |
+| :--- | :--- | :--- |
+| **Aggregate Accuracy Delta** | `mean(p2) - mean(p1)` | Shows overall benchmark movement. |
+| **Negative Flip Count** | Count of items where `RCI < -1.96` | Finds broken behaviors hidden by aggregate gains. |
+| **Critical Negative Flip Count** | Count of items moving from stable success to stable failure | Identifies release-blocking regressions. |
+| **Positive Flip Count** | Count of items where `RCI > 1.96` | Shows genuine item-level improvements. |
+| **Flip Severity** | Weighted score based on item risk class and business criticality | Prevents low-risk gains from masking high-risk failures. |
+
+Release doctrine: aggregate gains do not excuse critical negative flips. A candidate that improves average score while breaking high-risk workflows must be blocked, repaired, or routed through a scoped rollout with explicit mitigation.
 
 ### **Behavioral Baseline Model**
 
@@ -1472,20 +2212,85 @@ Traditional experiment trackers log training loss, hyperparameter settings, and 
 When a production regression occurs, teams pull the replayable trace to reconstruct the exact execution state, feeding the raw user input and context metadata through the candidate system to compare outcomes under identical conditions.6
 
 ```
-                          
-                                      │  
-                         (log complete runtime context)  
-                                      ▼  
-                       
-                                      │  
-                         (re-execute candidate manifest)  
-                                      ▼  
-                       
-                                      │  
-         ┌────────────────────────────┼────────────────────────────┐  
-         ▼                            ▼                            ▼  
-              [Grounding Audit]             
-(Verify tone/meaning)       (Detect hallucinations)      (Verify budget limits)
++------------------------------------------------------------------------------------------------+
+|                         EXPERIMENT TRACKING AND REPLAYABLE TRACE MODEL                         |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Goal: preserve enough runtime evidence to replay a production behavior under the original     
+|  manifest and compare it against a candidate manifest.                                         
+|                                                                                                
+|  [ Live Production Execution ]                                                                 
+|              |                                                                                 
+|              v                                                                                 
+|  +------------------------------------------------------------------------------------------+  
+|  |  1. Trace Capture                                                                        | 
+|  |                                                                                          |
+|  |  Capture: execution_id, session_id, timestamp, raw user input, tenant/user context,      |
+|  |  release_manifest_id, decoding parameters, compiled prompt, and active routing decision. |
+|  +---------------------------------------------+--------------------------------------------+
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  2. Retrieval and Tool State Snapshot                                                    | 
+|  |                                                                                          |
+|  |  Store retrieved chunks, reranker scores, corpus snapshot ID, citation coordinates,      |
+|  |  tool calls, tool arguments, tool responses, validator results, and mock payloads.       |
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  3. Baseline Output and Evaluation Record                                                |  
+|  |                                                                                          |
+|  |  Store raw output, parsed output, token counts, latency, cost, judge scores, grounding   |
+|  |  score, refusal label, user feedback, and operator override state.                       |
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|                              [ Replay Request Triggered ]                                      
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  4. Deterministic Replay Harness                                                         |
+|  |                                                                                          |
+|  |  Reconstruct original runtime conditions without hitting live external systems.          |
+|  |                                                                                          |
+|  |  Use stored prompt, retrieved evidence, mock tool payloads, seed, decoding params,       |
+|  |  release manifest, memory state, and policy versions.                                    |
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                         +----------------------+----------------------+                       
+|                         |                                             |                       
+|                         v                                             v                       
+|  +-----------------------------------------+       +----------------------------------------+   
+|  | Replay Baseline Manifest                |       | Replay Candidate Manifest              |   
+|  |                                         |       |                                        |   
+|  | Confirms trace reproducibility and      |       | Tests proposed model, prompt, routing, |
+|  | establishes comparison anchor.          |       | retrieval, schema, or policy update.   |
+|  +--------------------+--------------------+       +-------------------+--------------------+   
+|                       |                                            |                            
+|                       +--------------------+-----------------------+                            
+|                                            |                                                    
+|                                            v                                                    
+|  +------------------------------------------------------------------------------------------+  
+|  |  5. Comparative Audits                                                                   |  
+|  |                                                                                          |
+|  |  semantic equivalence | grounding audit | citation check | tool-call diff | schema diff  |
+|  |  refusal diff | cost and latency diff | token budget diff | safety and policy audit      |
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                                v                                               
+|  +------------------------------------------------------------------------------------------+  
+|  |  6. Release Decision                                                                     |  
+|  |                                                                                          |
+|  |  classify outcome as stable, expected update, truth rot, negative flip, or critical      |
+|  |  regression. Route result to CI gate, canary controller, rollback system, or baseline    |
+|  |  refresh workflow.                                                                       |
+|  +------------------------------------------------------------------------------------------+  
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Doctrine: without replayable traces, teams are guessing. With replayable traces, behavioral    |
+| regressions become reproducible engineering artifacts.                                         |
++------------------------------------------------------------------------------------------------+
 ```
 
 To enable this verification pipeline, the platform logs and tracks these critical parameters:
@@ -1515,20 +2320,84 @@ To enable this verification pipeline, the platform logs and tracks these critica
 Because high-dimensional AI behaviors are highly context-dependent, offline validations alone cannot guarantee production stability.1 Therefore, platform architectures must implement **progressive delivery**—staged exposure strategies that use automated behavioral gates to minimize the blast radius of regressions.11
 
 ```
-                               │  
-                               ▼  
-                        [Offline Evals]  
-                               │ (Passes Accuracy Gates)  
-                               ▼  
-                         
-                               │ (Passes Trace Assertions)  
-                               ▼  
-                        
-                               │ (Passes Latency & Cost Budgets)  
-                               ▼  
-                         
-                               │ (Passes Live User Signals)  
-                               ▼  
++------------------------------------------------------------------------------------------------+
+|                              PROGRESSIVE DELIVERY AND ROLLOUT FLOW                             |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Goal: expose candidate AI behavior gradually, using increasingly realistic evidence while     
+|  limiting the blast radius of regressions.                                                      
+|                                                                                                
+|  [ Candidate Release Manifest ]                                                                
+|                  |                                                                             
+|                  v                                                                             
+|  +------------------------------------------------------------------------------------------+  
+|  |  1. Offline Evaluations                                                                  |  
+|  |                                                                                          |
+|  |  Golden sets, schema checks, refusal tests, retrieval evals, tool simulations, and       |
+|  |  safety checks run inside CI/CD.                                                         |
+|  +---------------------------------------------+--------------------------------------------+  
+|                                                |                                               
+|                                      [ Pass Offline Gates? ]                                   
+|                                      /             \                                           
+|                               Yes   /               \   No                                     
+|                                    v                 v                                         
+|  +-----------------------------------------+   [ Block Release / Repair Candidate ]          
+|  |  2. Replay Tests                        |                                               
+|  |                                         |                                               
+|  |  Re-run stored production traces using  |                                               
+|  |  mock tools and fixed retrieval state.  |                                               
+|  +--------------------+--------------------+                                               
+|                       |                                                                    
+|              [ Pass Replay Assertions? ]                                                   
+|                       /        \                                                           
+|                Yes   /          \   No                                                     
+|                     v            v                                                         
+|  +-----------------------------------------+   [ Block Release / Investigate Trace Diff ]  
+|  |  3. Shadow Testing / Dark Launch        |                                              
+|  |                                         |                                               
+|  |  Mirror live traffic to candidate.      |                                              
+|  |  Serve users baseline output only.      |                                               
+|  |  Measure latency, cost, schema, safety, |                                               
+|  |  grounding, and output divergence.      |                                               
+|  +--------------------+--------------------+                                               
+|                       |                                                                    
+|              [ Pass Shadow Metrics? ]                                                        
+|                       /        \                                                            
+|                Yes   /          \   No                                                       
+|                     v            v                                                          
+|  +-----------------------------------------+   [ Hold Release / Roll Back Candidate Route ]   
+|  |  4. Canary Rollout                      |                                               
+|  |                                         |                                               
+|  |  Serve candidate to small live cohort:  |                                               
+|  |  1% -> 5% -> 10% as gates pass.         |                                               
+|  +--------------------+--------------------+                                               
+|                       |                                                                    
+|              [ Canary Healthy? ]                                                             
+|                       /        \                                                            
+|                Yes   /          \   No                                                       
+|                     v            v                                                          
+|  +-----------------------------------------+   [ Automatic Rollback to Stable Manifest ]      
+|  |  5. A/B Test or Progressive Promotion   |                                               
+|  |                                         |                                               
+|  |  Compare business metrics, user signals,|                                               
+|  |  quality scores, and behavioral traces. |                                               
+|  +--------------------+--------------------+                                               
+|                       |                                                                    
+|              [ Promotion Approved? ]                                                         
+|                       /        \                                                            
+|                Yes   /          \   No                                                       
+|                     v            v                                                          
+|  +-----------------------------------------+   [ Keep Baseline / Iterate Candidate ]          
+|  |  6. Production Promotion                |                                               
+|  |                                         |                                               
+|  |  Promote manifest, pin artifact bundle, |                                               
+|  |  publish release record, arm rollback,  |                                               
+|  |  and monitor drift continuously.        |                                               
+|  +-----------------------------------------+                                               
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Rule: every rollout stage must have an explicit promotion gate and an explicit rollback path.  |
++------------------------------------------------------------------------------------------------+
 ```
 
 ### **Progressive Delivery Implementation Flow**
@@ -1598,14 +2467,76 @@ AI applications degrade silently over time due to **behavioral drift**—a shift
 Because silent regressions do not trigger standard server errors or infrastructure crashes, platforms must monitor semantic, behavioral, and statistical process indicators to detect degraded performance under live production load.2
 
 ```                           
-                                         │  
-         ┌───────────────────────────────┼───────────────────────────────┐  
-         ▼                               ▼                               ▼  
-       
- - Wasserstein Distance on      - Cumulative Sum (CUSUM) on     - Execute fixed scenarios on  
-   high-dim embedding spaces      binary model errors             a defined nightly cadence  
- - Autoencoder reconstruction   - Page-Hinkley test on average  - Track pass-rate to isolate  
-   loss to flag outlier states    token usage / cost deviations   behavioral drift sources
++------------------------------------------------------------------------------------------------+
+|                              SILENT REGRESSION DETECTION FRAMEWORK                             |
++------------------------------------------------------------------------------------------------+
+|                                                                                                
+|  Goal: detect semantic and behavioral degradation even when infrastructure metrics remain      
+|  healthy and outputs remain syntactically valid.                                               
+|                                                                                                
+|  [ Live Production Stream ]                                                                    
+|             |                                                                                  
+|             v                                                                                  
+|  +------------------------------------------------------------------------------------------+  
+|  |  Signal Collection Layer                                                                 |
+|  |                                                                                          |
+|  |  Collect: prompts, outputs, embeddings, retrieved chunks, tool calls, validator failures,|
+|  |  refusals, user corrections, latency, token cost, and release manifest IDs.              |
+|  +----------------------+----------------------+----------------------+---------------------+
+|                         |                      |                      |                           
+|                         v                      v                      v                           
+|  +----------------------------+   +---------------------------+   +-----------------------------+ 
+|  | Embedding-Space Observers  |   | Statistical Process       |   | Scheduled Scenario Replays  |
+|  |                            |   | Control Monitors          |   |                             |
+|  | Wasserstein distance       |   | CUSUM on binary errors    |   | fixed scenario sets         |
+|  | autoencoder recon. error   |   | Page-Hinkley on costs     |   | nightly/hourly eval runs    | 
+|  | domain classifier AUC      |   | refusal and schema rates  |   | static inputs, fixed checks | 
+|  +-------------+--------------+   +-------------+-------------+   +--------------+--------------+ 
+|                |                                |                                |                
+|                +--------------------------------+--------------------------------+                
+|                                                 |                                                 
+|                                                 v                                                 
+|  +------------------------------------------------------------------------------------------+  
+|  |  Behavioral Drift Classifier                                                             |  
+|  |                                                                                          |
+|  |  Classify signal as: semantic drift, prompt drift, retrieval drift, schema invalidation, |
+|  |  anomalous refusal, grounding failure, context leak, routing drift, or traffic drift.    |
+|  +---------------------------------------------+--------------------------------------------+
+|                                                |                                             
+|                                      [ Threshold Breached? ]                                   
+|                                         /                 \                                     
+|                                  No    /                   \   Yes                               
+|                                       v                     v                                  
+|  +-----------------------------------------+   +--------------------------------------------+   
+|  | Continue Monitoring                     |   | Verification and Triage                    |   
+|  |                                         |   |                                            |   
+|  | Update rolling baselines, preserve      |   | Pull replayable traces, identify active    |   
+|  | telemetry, and sample for future evals. |   | release manifest, run targeted evals.      |   
+|  +--------------------+--------------------+   +------------------+-------------------------+   
+|                       |                                           |                             
+|                       |                                           v                             
+|                       |                        +--------------------------------------------+   
+|                       |                        | Mitigation Path                            |   
+|                       |                        |                                            |   
+|                       |                        | rollback manifest | revert prompt          |   
+|                       |                        | rebuild index     | repair schema          |   
+|                       |                        | refresh corpus    | adjust router          |   
+|                       |                        | trigger PRISM loop| human incident review  |
+|                       |                        +------------------+-------------------------+   
+|                       |                                           |                             
+|                       +-------------------------------------------+                             
+|                                                                   |                             
+|                                                                   v                             
+|  +------------------------------------------------------------------------------------------+  
+|  |  Feedback into Regression Control                                                        |
+|  |                                                                                          |
+|  |  Add failing traces to evaluation sets, update golden scenarios, refresh baselines when  |
+|  |  truth rot is confirmed, and preserve incident evidence for audit and lifecycle control. |
+|  +------------------------------------------------------------------------------------------+
+|                                                                                                
++------------------------------------------------------------------------------------------------+
+| Doctrine: silent regressions require behavioral monitors, not just infrastructure monitors.    |
++------------------------------------------------------------------------------------------------+
 ```
 
 ### **1. High-Dimensional Embedding Space Observers**
@@ -1639,7 +2570,7 @@ To catch regressions caused by model updates, system prompts, or library upgrade
 
 For conversational agents, platforms run the PRISM framework.28 PRISM parses plain-language agent requirements, automatically generates diverse multi-turn test scripts, runs them in a mock simulator, grades the responses using an LLM-as-judge, and surgically modifies prompt instructions to repair detected failures.28 By running daily, PRISM detects and repairs regressions within a 24-hour window.28
 
-### **Silent Regression Detection Framework**
+### **Silent Regression Detection Matrix**
 
 The platform maps key metrics, data sources, and alerting thresholds to isolate silent degradations:
 
@@ -1658,11 +2589,13 @@ The platform maps key metrics, data sources, and alerting thresholds to isolate 
 
 To manage deployment risk, AI platforms must enforce automated regression gates within the CI/CD pipeline.33 These gates prevent underperforming candidate manifests from reaching production, scaling in severity based on the target workflow's risk classification.5
 
-| Workflow Risk Classification | Operational Definition & Safety Level | Required Release Gates | Quantitative Pass Criteria | Post-Release Observability |
-| :---- | :---- | :---- | :---- | :---- |
-| **Class 1: Low-Risk** (Internal assistants, text summaries) 12 | High failure tolerance; semantic and formatting errors have minimal brand or financial impact. | * JSON schema match check.6 * Golden set validation check.6 | * JSON validation rate >= 95%.6 * Golden accuracy change is stable (RCI >= -1.96).9 | * Basic token counting.2 * Uptime tracking.2 |
-| **Class 2: Moderate-Risk** (Customer-facing search, drafting) 3 | Moderate failure tolerance; semantic errors or refusals directly impact user experience. | * Declarative schema compliance check.6 * Golden set evaluation.6 * LLM-as-judge citation grounding audit.17 | * JSON validation rate = 100%.6 * Golden accuracy remains stable.9 * Average grounding score is >= 0.90.26 * P95 latency is stable.27 | * Wasserstein distance monitoring.24 * Implicit user feedback tracking.3 |
-| **Class 3: High-Risk** (Financial analysis, healthcare triage) 7 | Zero-tolerance for errors; semantic failures can lead to immediate financial, legal, or safety risks.7 | * 100% schema validation.6 * Task success evaluation.5 * Citation grounding audit.17 * Automated red-teaming checks.4 * Manual platform board sign-off.33 | * JSON validation rate = 100%.6 * Task success on safety tests = 100%.5 * Sentence-level grounding score = 100%.26 * Zero safety violations.17 * P95 latency is stable.27 | * High-frequency Wasserstein distance tracking.24 * CUSUM error tracking.45 * Interactive shadow comparisons.3 |
+| Workflow Risk Classification                                                                                       | Operational Definition & Safety Level                                                                                                               | Required Release Gates                                                                                                                                                                                   | Quantitative Pass Criteria                                                                                                                                                                                          | Post-Release Observability                                                                                                                                                        |
+| :----------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Class 1: Low-Risk**<br>Internal assistants, rough summaries, brainstorming aids                                  | High failure tolerance; errors are recoverable by the user and do not directly trigger customer, financial, legal, or safety consequences.          | JSON/schema sanity check; golden set validation; basic prompt-injection screen; latency and cost budget check.                                                                                           | JSON validation rate `>= 95%`; no critical parser failures; golden-set change remains stable with `RCI >= -1.96`; P95 latency remains within budget.                                                                | Basic token counting; uptime tracking; user correction sampling; periodic golden-set replay.                                                                                      |
+| **Class 2: Moderate-Risk**<br>Customer-facing search, drafting, support workflows                                  | Moderate failure tolerance; semantic errors, refusals, or missing context can degrade user experience or create operational cost.                   | Declarative schema compliance; golden set evaluation; citation/grounding audit; refusal regression check; replay tests on production traces; tool-contract tests where applicable.                       | JSON validation rate `= 100%`; no reliable negative flips on priority scenarios; average grounding score `>= 0.90`; refusal rate within baseline band; P95 latency stable; tool-call accuracy `>= 0.98`.            | Wasserstein or embedding-distribution monitoring; implicit feedback tracking; refusal-rate monitoring; grounding-score sampling; trace replay for anomalous sessions.             |
+| **Class 3: High-Risk**<br>Financial analysis, healthcare triage, legal or compliance assistance                    | Low failure tolerance; incorrect outputs can create financial, legal, compliance, medical, or safety exposure.                                      | 100% schema validation; target task success evaluation; sentence-level citation grounding; adversarial red-team sweep; privacy leakage audit; replay tests; shadow deployment; manual platform approval. | JSON validation rate `= 100%`; sentence-level grounding `= 100%` for asserted claims; zero safety violations; zero privacy leaks; no critical negative flips; tool-call accuracy `>= 0.99`; P95 latency within SLA. | High-frequency semantic drift monitoring; CUSUM or Page-Hinkley error tracking; shadow comparisons during sensitive updates; manual review sampling; automatic rollback triggers. |
+| **Class 4: Critical / Fail-Closed**<br>Autonomous transactions, regulated decisions, security-sensitive operations | Near-zero failure tolerance; the system may trigger real-world action, deny access, move money, alter records, or affect safety-critical decisions. | All Class 3 gates; deterministic tool sandbox validation; authorization replay; full manifest rollback test; human approval board; fail-closed dry run; incident-response rehearsal.                     | Zero unauthorized actions; zero ungrounded decisive claims; zero unresolved schema/tool failures; zero critical negative flips; rollback manifest verified; all policy and access-control tests pass.               | Continuous trace capture; live anomaly detection; real-time escalation alerts; automatic fail-closed containment; mandatory post-release audit window.                            |
+
 
 ## **Evaluation and Observability Guidance**
 
@@ -1671,7 +2604,7 @@ To maintain high-dimensional system health, platform metrics must monitor both p
 | System Health Metric | Mathematical Formulation | Target Threshold | Telemetry Data Source | Operational Importance |
 | :---- | :---- | :---- | :---- | :---- |
 | **Item-Level Stable Accuracy** | RCI = (p2 - p1) / sqrt( (p1 * (1 - p1) / K) + (p2 * (1 - p2) / K) ) 9 | RCI >= -1.96 (Statistically confident stable performance).9 | Repeated testing outputs (K=10, T=0.7).9 | Identifies fine-grained, item-level regressions that are masked by global averages.9 |
-| **Output Semantic Drift** | W1(P, Q) = inf_gamma E[ |  | x - y |  |
+|**Output Semantic Drift** |`W1(P, Q) = inf_gamma E_{(x,y) ~ gamma}[norm(x - y)]`, where `P` is the baseline output embedding distribution, `Q` is the live output embedding distribution, and `gamma` ranges over valid couplings between them. |`W1 <= configured drift threshold`, typically calibrated per task family and embedding model. | Production output embeddings compared against baseline scenario embeddings. | Detects semantic behavior shifts that do not appear as server errors, schema failures, or exact-match differences. |
 | **Input Distribution Shift** | PSI = sum( (Ai - Ei) * ln(Ai / Ei) ) 43 | PSI < 0.10 (Low input distribution shift).43 | Production queries vs. baseline evaluation queries.43 | Identifies when user queries deviate from tested evaluation scenarios.4 |
 | **Grounding Alignment** | G = Claims_Grounded / Claims_Total 26 | G >= 0.95 (Zero tolerance for hallucinations in critical tasks).26 | RAG context passages vs. model response texts.1 | Detects hallucinations and verifies the accuracy of cited sources.1 |
 | **Task Success Rate** | T_success = N_Success / N_Total 17 | T_success >= 0.98 (Strict target adherence).5 | Evaluator judgment scores.17 | Measures overall capability on defined domain tasks.5 |
@@ -1686,18 +2619,19 @@ To maintain high-dimensional system health, platform metrics must monitor both p
 
 The regression control pipeline integrates directly with upstream development stages and downstream runtime operations, establishing the lifecycle baseline for the entire AI Engineering Canon:
 
-| Target Canon Report | Shared Artifacts & Policies | Dynamic Handoff Protocol | Integrated Operational Purpose |
-| :---- | :---- | :---- | :---- |
-| **AI-ENG-J/K/L — Serving & Deployment** | * Release Manifests 6 * Seldon Deployment Configurations 27 * Model Router Settings 1 | Automated CI/CD pipelines register validated manifests to trigger canary rollouts.27 | Transitions validated behavioral packages to runtime orchestration engines.1 |
-| **AI-ENG-M/N/O — Agent Stability** | * Pydantic Tool Schemas 6 * Mock Tool Payloads 28 * System Instructions 12 | Traverses dependency graphs to trigger agent validations when tool interfaces change.3 | Verifies the stability of multi-step agent interactions and tool-calling sequences.2 |
-| **AI-ENG-S — Production Pathologies** | * Silent Regressions 5 * Embedding Outliers 43 * Loop Failures 2 | Ingests live telemetry anomalies and flags failures on behavioral monitoring dashboards.25 | Detects and diagnoses system-level failures under active production load.2 |
-| **AI-ENG-W — Failbacks & Resilience** | * Fallback Routing Configs 1 * Emergency Feature Flags 12 * Budget Controls 2 | Automated triggers shift traffic from degraded primary engines to fallback weights during incidents.1 | Executes graceful degradation paths to preserve availability during outages.1 |
-| **AI-ENG-Z — Live System Telemetry** | * OpenTelemetry Spans 27 * Prometheus Latency Logs 27 * Token Counters 2 | Exposes execution IDs and manifest hashes to correlate live latency spikes with registry configurations.2 | Provides infrastructure telemetry to monitor live system performance.27 |
-| **AI-ENG-AA — Evaluation Infrastructure** | * Scenario Sets 4 * Golden Datasets 6 * Judge Models 17 | Pulls production traces from logs to build and enrich evaluation datasets over time.6 | Orchestrates pre-deployment check runs and verifies system accuracy.26 |
-| **AI-ENG-AB — Auditability & Replay** | * Replayable Traces 6 * Unified Registries 1 | Guarantees compliance auditors can reconstruct the exact system state for any target execution.11 | Ensures compliance, audit readiness, and consistent trace replay capabilities.11 |
-| **AI-ENG-AC — Incident Response** | * Rollback Playbooks 2 * CUSUM Alarms 45 * Anomaly Detections 25 | Routes live performance alerts directly to on-call platform teams to trigger targeted rollbacks.27 | Mitigates live production incidents and restores stable system states.27 |
-| **AI-ENG-AD — System Governance** | * Release Approvals 12 * Safety Policies 1 * Contracts 5 | Asserts that every production manifest passes safety evaluations before deployment.5 | Enforces regulatory alignment, safety boundaries, and release approval loops.13 |
-| **AI-ENG-AK — AI Platform Mindset** | * Core Doctrines * SRE Error Budgets 2 * Risk Classifications 7 | Establishes behavioral reliability as the foundation of modern high-dimensional system design.3 | Establishes the engineering principles and design patterns for AI platform teams.11 |
+| Target Canon Report                       | Shared Artifacts & Policies                                                                                                     | Dynamic Handoff Protocol                                                                                                                          | Integrated Operational Purpose                                                                                                                   |
+| :---------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **AI-ENG-J/K/L — Serving & Deployment**   | Release manifests; deployment topology; model router settings; latency and cost budgets; serving configuration pins.            | Validated manifests are registered into CI/CD and serving orchestration systems to trigger replay, shadow, canary, and production rollout stages. | Transitions behaviorally validated artifact bundles into runtime serving systems without separating model, prompt, retrieval, and tool versions. |
+| **AI-ENG-M/N/O — Agent Stability**        | Tool schemas; mock tool payloads; system instructions; validator hashes; replayable traces; workflow state-machine assumptions. | Dependency graph traversal triggers agent simulations whenever tool schemas, prompt templates, validators, or orchestration policies change.      | Verifies the stability of multi-step agent interactions, tool invocation, state transitions, and recovery behavior.                              |
+| **AI-ENG-S — Production Pathologies**     | Silent-regression signals; context-rot indicators; embedding outliers; loop failures; refusal spikes; grounding failures.       | Live anomalies are ingested from telemetry and mapped back to the active release manifest and dependency graph.                                   | Detects and diagnoses semantic, behavioral, and context-level failures under active production load.                                             |
+| **AI-ENG-W — Fallbacks & Resilience**     | Fallback routing configs; emergency feature flags; budget controls; fail-open/fail-closed rules; rollback manifest IDs.         | Regression monitors and incident triggers shift traffic from degraded primary paths to verified fallback paths or human review.                   | Preserves availability or enforces containment when primary AI behavior degrades beyond tolerance.                                               |
+| **AI-ENG-Z — Live System Telemetry**      | OpenTelemetry spans; manifest hashes; execution IDs; token counters; latency logs; cost metrics; drift-monitoring signals.      | Runtime systems expose trace IDs and manifest IDs so live behavior can be correlated with exact artifact bundles.                                 | Provides the observability layer needed to detect, localize, replay, and explain behavioral drift.                                               |
+| **AI-ENG-AA — Evaluation Infrastructure** | Scenario sets; golden datasets; judge models; rubric versions; replay harnesses; adversarial suites.                            | Production traces and incident cases are promoted into evaluation suites, while evaluation failures gate future releases.                         | Orchestrates pre-deployment and post-deployment verification of system accuracy, robustness, and safety.                                         |
+| **AI-ENG-AB — Auditability & Replay**     | Replayable traces; unified registries; release manifests; dependency graphs; evaluation signatures; approval records.           | Every production output is linked to the artifact bundle, trace state, retrieval context, and policy version that produced it.                    | Enables compliance review, incident reconstruction, forensic replay, and evidence-preserving audits.                                             |
+| **AI-ENG-AC — Incident Response**         | Rollback playbooks; CUSUM alarms; anomaly detections; regression symptoms; blast-radius controls.                               | Live alerts route to on-call teams with manifest IDs, dependency impact paths, and recommended rollback targets.                                  | Turns regression detection into actionable operational response and restores stable system states.                                               |
+| **AI-ENG-AD — System Governance**         | Release approvals; risk classifications; safety policies; contractual obligations; data-handling rules; exception records.      | Governance gates assert that every production manifest satisfies required evaluations, approvals, and compliance constraints before promotion.    | Enforces regulatory alignment, accountability, safety boundaries, and release authorization.                                                     |
+| **AI-ENG-AK — AI Platform Mindset**       | Core doctrines; behavioral reliability principles; SRE error budgets; risk classifications; release engineering patterns.       | Regression control exports operating principles and reliability patterns back into platform-wide engineering practice.                            | Establishes behavioral reliability as a first-class platform discipline rather than a loose model-quality afterthought.                          |
+
 
 ## **Durable Principles of Regression Control**
 
