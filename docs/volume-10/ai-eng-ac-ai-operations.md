@@ -36,6 +36,7 @@ The following glossary defines the core operational metrics and terms governing 
 
 Probabilistic failure modes are highly distributed and cross-cut multiple system layers.1 To facilitate rapid categorization and triage, the platform establishes a multi-dimensional AI Incident Taxonomy.4 Incidents are classified not by their infrastructure symptoms, but by their failing semantic layer and downstream consequences.2 A successful HTTP 200 response code can still be categorized as a critical SEV-1 failure if it delivered unauthorized, harmful, or ungrounded action guidance to the execution environment.1
 
+```
                                  
                                        │  
          ┌─────────────────────────────┼────────────────────────────┐  
@@ -61,6 +62,7 @@ Probabilistic failure modes are highly distributed and cross-cut multiple system
   [Citation Failures]           [User Overreliance]           
   - Missing page coordinates    - Invisible warnings         - Outdated data active  
   - Hallucinated text quote     - False success claims       - Cross-tenant hits
+```
 
 The taxonomy maps sixteen distinct classes of system failure across the data ingestion, runtime processing, and interface delivery layers:
 
@@ -123,6 +125,7 @@ Upon ingestion of a serious or catastrophic incident (SEV-0 or SEV-1), the intak
 
 To speed up diagnostic workflows under pressure, responders utilize a structured Semantic Triage Tree.20 The tree guides operators through the system's technical layers, mapping visible symptoms to the exact failing layer, diagnostic artifacts, immediate containment options, and targeted rollback surfaces 2:
 
+```
   [User-Visible Failure]  
          │  
          ▼  
@@ -136,6 +139,7 @@ To speed up diagnostic workflows under pressure, responders utilize a structured
          │ (No)  
          ▼  
       ──(Yes)──► Contain: Model Switch / Safe Degraded Mode
+```
 
 The operational execution branches are organized as follows:
 
@@ -223,6 +227,7 @@ The operational execution branches are organized as follows:
 
 The Incident Evidence Package serves as the primary forensic resource during post-incident reviews.1 Raw syslog files are insufficient for auditing probabilistic systems; instead, the platform captures and links all intermediate states that shaped the model's behavior.1
 
+```
   ┌────────────────────────────────────────────────────────┐  
   │               INCIDENT EVIDENCE PACKAGE                │  
   ├────────────────────────────────────────────────────────┤  
@@ -234,6 +239,7 @@ The Incident Evidence Package serves as the primary forensic resource during pos
   │  - Saga Distributed Transaction ledger                 │  
   │  - C2PA Cryptographic Provenance Manifests             │  
   └────────────────────────────────────────────────────────┘
+```
 
 The package compiles seven core evidence dimensions:
 
@@ -249,6 +255,7 @@ The package compiles seven core evidence dimensions:
 
 To coordinate complex semantic triage, the platform defines distinct AI Incident Command Roles.17 Each role carries specific responsibilities, authorities, and audit parameters, separating technical investigation from compliance decision-making during crises 17:
 
+```
                     ┌───────────────────────────┐  
                     │     INCIDENT COMMANDER    │  
                     └─────────────┬─────────────┘  
@@ -258,6 +265,7 @@ To coordinate complex semantic triage, the platform defines distinct AI Incident
   [AI Operations]          [Model Owner]            [Compliance Lead]  
   - Gateways & Proxies     - Checkpoints & LoRAs    - Regulatory / SLA Risk  
   - Telemetry & Paths      - Hyperparameters        - EU AI Act Triggering
+```
 
 ### **Incident Commander (IC)**
 
@@ -368,6 +376,7 @@ To coordinate complex semantic triage, the platform defines distinct AI Incident
 
 Containment means stopping active harm before the definitive root cause is identified.2 Probabilistic systems require a graduated containment progression to limit the blast radius while preserving task continuity for unaffected enterprise tenants 2:
 
+```
   Incident Ingested ──► Map blast radius to session contexts  
                              │  
                              ▼  
@@ -378,6 +387,7 @@ Containment means stopping active harm before the definitive root cause is ident
                              │  
                              ▼  
   System Failover    ──► Route Fallback / Fail-Closed 
+```
 
 ### **1. Identify and Scope the Failure**
 
@@ -399,11 +409,13 @@ If containment paths cannot satisfy the system's defined safety, privacy, or com
 
 Feature flags and kill switches must operate strictly outside the model's cognitive boundary, utilizing centralized gateway routing weights or isolated container-level network proxies to enforce boundaries.2
 
+```
   Requests ──► Filter checks (OIDC JWT verified)  
                      │  
                      ├─► FF_MODEL_ROUTE ( claude-3-5-sonnet -> claude-3-5-haiku )   
                      ├─► FF_TOOL_REVOKE ( Revokes OAuth token inside vault )   
                      └─► FF_INDEX_FREEZE ( Sets HNSW partition to read-only ) 
+```
 
 The Feature Flag and Kill Switch Matrix outlines the technical implementation, operational check, and restoration procedure for each control:
 
@@ -421,15 +433,16 @@ The Feature Flag and Kill Switch Matrix outlines the technical implementation, o
 
 Reverting a probabilistic system requires coordinated rollbacks across multiple interconnected surfaces.26 Reverting only model weights without aligning prompts or retrieval states can introduce new failure modes.26
 
-  ┌────────────────────────────────────────────────────────┐  
-  │                 ROLLBACK SURFACE MAP                   │  
-  ├────────────────────────────────────────────────────────┤  
-  │  [Ingress] Prompt Templates ──► Versioned Git Commits  │  
-  │  Model Weights    ──► PIN Endpoint / LoRAs   │  
-  │  [Context] Retrieval Index  ──► Rebuild HNSW Backup   │  
-  │  [API]     Tool Schemas     ──► Lock OpenInference API │  
-  │   Policy Bundles   ──► OPA Policy-as-Code     │  
-  └────────────────────────────────────────────────────────┘
+```
+                 ROLLBACK SURFACE MAP                     
+  ────────────────────────────────────────────────────────  
+  │  [Ingress] Prompt Templates ──► Versioned Git Commits    
+  │  Model Weights    ──► PIN Endpoint / LoRAs     
+  │  [Context] Retrieval Index  ──► Rebuild HNSW Backup     
+  │  [API]     Tool Schemas     ──► Lock OpenInference API   
+  │   Policy Bundles   ──► OPA Policy-as-Code       
+  
+```
 
 The platform's Rollback Surface Map defines how each layer is reverted during regressions:
 
@@ -447,6 +460,7 @@ The platform's Rollback Surface Map defines how each layer is reverted during re
 
 Emergency prompt overrides are critical tools for mitigating active safety breaches, jailbreaks, or formatting regressions.7 However, prompts must be managed with software engineering rigor to prevent ad-hoc templates from introducing latent behavior regressions.2
 
+```
   [Active Prompt Failure]  
              │  
              ▼  
@@ -460,6 +474,7 @@ Emergency prompt overrides are critical tools for mitigating active safety breac
              │  
              ▼  
   ──► Merge to Main; update Golden Sets 
+```
 
 The platform's Prompt Hotfix Protocol mandates five strict gates:
 
@@ -485,6 +500,7 @@ Model rollback must be executed at the central gateway proxy layer to insulate d
 
 When retrieval pipelines ingest poisoned data, stale files, or cross-tenant leakage pathways, the platform must isolate the vectors and restore index integrity without taking the application offline.2
 
+```
   Corpus Poison Alert Ingested (z_i > 5.0)  
                │  
                ▼  
@@ -499,6 +515,7 @@ When retrieval pipelines ingest poisoned data, stale files, or cross-tenant leak
                │  
                ▼  
   ──► Rebuild HNSW graph; serve cached references only 
+```
 
 * **Poisoning Detection (HubScan):** The index validator runs HubScan at fixed intervals, calculating the robust z-score of document vectors across a representative query sample space Q 2:  
   MAD = median(|x_i - x_tilde|)  
@@ -529,12 +546,14 @@ State-changing tools (such as bank transfers or cloud deployments) require stric
 
 Recursive multi-agent loops can consume significant token budgets in minutes.2 The platform must implement external, run-level economic controls to prevent "denial-of-wallet" incidents.2
 
+```
   Active Agent Turn ──► Calculate Token Burn ──► Exceed Budget Ceiling?  
                                                         │  
                  ┌──────────────────────────────────────┴───┐  
               (Yes)                                        (No)  
                  ▼                                          ▼  
    Trigger Loop Termination & Fail-Closed                 Proceed
+```
 
 * **Mathematical Modeling of Token Loops:** In recursive planning or formatting repair loops, input context scales quadratically as history, observations, and validation errors accumulate over consecutive turns.1 The total input tokens T_input consumed across N execution turns is modeled as 1:  
   T_input(N) = N * S + (u * N * (N + 1)) / 2 + (r * N * (N - 1)) / 2  
@@ -553,6 +572,7 @@ Recursive multi-agent loops can consume significant token budgets in minutes.2 T
 
 When semantic failures or model downgrades affect the user experience, communications must be transparent and direct.3 The system must explain active limitations clearly, avoiding vague rationalizations like "the AI hallucinated".2
 
+```
   ┌─────────────────────────────────────────────────────────────────────────────┐  
   │                           ENTERPRISE CONSOLE UX                             │  
   ├─────────────────────────────────────────────────────────────────────────────┤  
@@ -561,6 +581,7 @@ When semantic failures or model downgrades affect the user experience, communica
   │                                                                             │  
   │  [ View Verification Logs ]    │  
   └─────────────────────────────────────────────────────────────────────────────┘
+```
 
 The User Communication Matrix defines the communication templates and guidelines for each incident class:
 
@@ -576,6 +597,7 @@ The User Communication Matrix defines the communication templates and guidelines
 
 An AI postmortem must look beyond traditional server uptime metrics, conducting a thorough analysis of prompt templates, retrieved evidence chunks, and model configurations.20
 
+```
   ┌────────────────────────────────────────────────────────┐  
   │                 AI POSTMORTEM SCHEMA                   │  
   ├────────────────────────────────────────────────────────┤  
@@ -586,6 +608,7 @@ An AI postmortem must look beyond traditional server uptime metrics, conducting 
   │  - Evaluation Gaps: Missed Canary or Golden Sets      │  
   │  - Action Items: Preventative CI/CD Gates Added       │  
   └────────────────────────────────────────────────────────┘
+```
 
 The postmortem process is structured to systematically catalog failure metrics, trace the chronological progression, and implement permanent behavioral guards:
 
@@ -600,6 +623,7 @@ The postmortem process is structured to systematically catalog failure metrics, 
 
 The platform maintains a library of ten pre-built, executable runbooks, providing step-by-step procedures to contain, resolve, and audit AI-specific failure modes.10
 
+```
   ──► Open AI-ENG-AC Runbook Library  
                                     │  
     ┌───────────────────────────────┼───────────────────────────────┐  
@@ -608,6 +632,7 @@ The platform maintains a library of ten pre-built, executable runbooks, providin
   - Check NLI Entailment      - Check Input Prompts          - Check HubScan z-score  
   - Route to Cached Mode      - Revert System Prompt in Git  - Inject Database RLS Filter  
   - Display UI Warning Banner - Revoke Scoped Tool Tokens    - Fallback to BM25 Search
+```
 
 ### **Runbook 1: Ungrounded Answer Incident (Factual Hallucination)**
 
@@ -801,6 +826,7 @@ The feedback loop is executed through a disciplined engineering pipeline:
 
 This report establishes the baseline operational procedures for Volume 10 of *The AI Engineering Systems Canon*. These processes depend directly on upstream telemetry, evaluation, and verification substrates, and feed downstream governance, access control, and lifecycle workflows:
 
+```
   ┌────────────────────────────────────────────────────────┐  
   │                 CROSS-CANON HANDOFF                    │  
   ├────────────────────────────────────────────────────────┤  
@@ -809,6 +835,7 @@ This report establishes the baseline operational procedures for Volume 10 of *Th
   │  [Evidence]   AI-ENG-AB  ──► Signed C2PA Manifests     │  
   │   Boundary    AI-ENG-T   ──► Row-Level Security / RLS  │  
   └────────────────────────────────────────────────────────┘
+```
 
 The handoff contracts with other canon layers are defined as follows:
 

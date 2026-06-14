@@ -174,342 +174,566 @@ Saving only raw templates is insufficient because compiled prompts include dynam
 
 ### **The Model and Route Manifest**
 
-Model route decisions are critical audit artifacts.1 A silent model downgrade, failover routing, or cache bypass changes the quality, safety, and cost of a response, and must be documented explicitly 1:
+Model route decisions are critical audit artifacts. A silent downgrade, fallback, cache hit, provider change, or safety-route change can alter quality, cost, latency, and policy behavior.
 
-| Field Name | Physical Data Type | Validation Range | Description / Key Purpose |
+| Field Name | Physical Data Type | Capture Rule | Description / Key Purpose |
 | :---- | :---- | :---- | :---- |
-| route.provider_name | String | openai | anthropic | local | Identifies the physical host handling the query.1 |
-| route.requested_model | String | Standard model names | Documents the client's intended capability baseline.1 |
-| route.selected_model | String | Standard model names | Records the actual model executed for inference.1 |
-| route.model_version | String | Vendor snapshot tag | Pinpoints the exact model snapshot used.1 |
-| route.routing_reason | Enum | nominal | failover | cost | Explains why the gateway deviated from requested models.1 |
-| route.fallback_path | String | URI string | Documents the fallback route triggered on failure.1 |
-| route.cached_response | Boolean | True | False | Flags whether the gateway served a semantic cache hit.1 |
-| route.router_policy | String | SemVer format | Tracks the active gateway model selection policy version.1 |
-| route.quality_floor | String | Class identifier | Verifies fallback models met capability thresholds.1 |
-| route.safety_floor | String | Class identifier | Verifies fallback models contained necessary filters.1 |
-| route.cost_estimate | Double | Currency (> 0.00) | Tracks preflight cost calculations.1 |
-| route.latency_estimate | Double | Latency (> 0.0) | Tracks expected response durations.1 |
-| route.context_headroom | Integer | Token count (> 0) | Verifies model possessed necessary context size.1 |
-| route.tool_requirement | Boolean | True | False | Flags if the task required native tool capabilities.1 |
-| route.modality | Enum | text | image | video | Records the input modalities processed.1 |
-| route.tenant_tier | Enum | free | standard | enterprise | Links execution priorities to B2B subscription metrics.1 |
-| route.budget_state | Double | Currency (> 0.00) | Confirms tenant credit balances were verified.1 |
-| route.decoding_settings | JSON String | JSON map | Documents temperature, top_p, and frequency penalty.1 |
-| route.stop_reason | Enum | stop | length | content_filter | Records why token generation terminated.1 |
-| route.user_disclosed | Boolean | True | False | Proves the user was notified of model changes.1 |
+| `route.requested_route` | String | Metadata. | Captures requested capability profile. |
+| `route.selected_route` | String | Metadata. | Captures actual executed route. |
+| `route.provider_name` | String | Metadata. | Records model host or serving class. |
+| `route.provider_api_version` | String | Metadata if available. | Captures provider/API version surface. |
+| `route.model_id` | String | Metadata. | Records requested model identifier. |
+| `route.model_snapshot_ref` | String / secure ref | Metadata/reference. | Records model version or provider-supplied snapshot when available. |
+| `route.tokenizer_ref` | String / hash | Metadata/hash. | Captures tokenizer version for replay. |
+| `route.routing_reason` | Enum string | Metadata. | Examples: `nominal`, `failover`, `quota`, `cost_policy`, `quality_floor`, `safety_policy`, `cache_hit`. |
+| `route.fallback_path_id` | String | Metadata. | Identifies fallback chain step if used. |
+| `route.cached_response` | Boolean | Metadata. | Flags whether semantic, prefix, or response cache was used. |
+| `route.router_policy_hash` | SHA-256 hash | Hash. | Verifies active routing policy. |
+| `route.quality_floor_id` | String | Metadata. | Links route decision to required task quality floor. |
+| `route.safety_floor_id` | String | Metadata. | Links route decision to safety/policy floor. |
+| `route.cost_estimate` | Number / object | Metadata. | Records preflight cost estimate and confidence. |
+| `route.actual_cost_ref` | Reference / number | Metadata/reference. | Links to reconciled cost ledger. |
+| `route.latency_profile` | Object | Metadata. | Records expected/observed latency class. |
+| `route.context_headroom_tokens` | Integer | Metadata. | Verifies route could fit required context. |
+| `route.tool_capability_required` | Boolean | Metadata. | Flags if task needed tool-use support. |
+| `route.modality` | Array of strings | Metadata. | Records modalities processed, such as text, image, audio, or video. |
+| `route.tenant_tier_hash` | Hash/string | Metadata/hash. | Supports priority/cost analysis without exposing tenant identity. |
+| `route.budget_state_ref` | Secure reference | Restricted. | Links to budget ledger. |
+| `route.decoding_settings_hash` | SHA-256 hash | Hash. | Verifies temperature, top-p, max-token, and related decoding configuration. |
+| `route.decoding_settings_ref` | Secure reference | Restricted. | Allows controlled replay of decoding parameters. |
+| `route.stop_reason` | String | Metadata. | Records completion stop condition. |
+| `route.user_disclosure_required` | Boolean | Metadata. | Records whether user should have been told. |
+| `route.user_disclosure_shown` | Boolean | Metadata. | Records whether disclosure occurred. |
+
 
 ### **The Retrieval Evidence Snapshot**
 
-GRC verification requires proving the exact context available to the system before generation, ensuring models do not perform "citation laundering" (citing files that were never actually retrieved) 1:
+GRC verification requires proving the context available before generation. The retrieval snapshot should show what was searched, what was authorized, what was selected, what was omitted, and how citations map to evidence.
 
-| Field Name | Physical Data Type | Validation Range | Description / Key Purpose |
+| Field Name | Physical Data Type | Capture Rule | Description / Key Purpose |
 | :---- | :---- | :---- | :---- |
-| retrieval.raw_query | String | Unicode text | The raw query submitted to the retrieval engine.1 |
-| retrieval.rewritten | Array | String Array | Logs query expansion and reformulation steps.1 |
-| retrieval.embedding | String | Model ID + Hash | Records the model used to vectorize the query.1 |
-| retrieval.index_id | String | UUIDv4 format | Identifies the physical database partition searched.1 |
-| retrieval.index_version | String | SemVer format | Tracks database migrations and schema updates.1 |
-| retrieval.corpus_version | String | SemVer format | Tracks knowledge base ingestion updates.1 |
-| retrieval.tenant_scope | String | UUIDv4 format | Confirms search was isolated to the active tenant partition.1 |
-| retrieval.permissions | Array | Role principal strings | Records active RBAC filters applied during search.1 |
-| retrieval.metadata | JSON String | JSON map | Logs structural metadata filters applied.1 |
-| retrieval.candidates | Array | Object Array | Logs the top-100 initial retrieved candidate IDs and scores.1 |
-| retrieval.selected | Array | Object Array | Logs the subset of chunks loaded into active context.1 |
-| retrieval.omitted | Array | Object Array | Logs relevant chunks bypassed during context pruning.1 |
-| retrieval.rerank_scores | Array | Double Array | Records cross-encoder relevance scores for candidates.1 |
-| retrieval.authority | Double | Range [0.0, 1.0] | Documents the trust weight of the retrieved document.1 |
-| retrieval.freshness | String | Timestamp (ISO-8601) | Compares document modification dates against database states.1 |
-| retrieval.doc_version | String | SHA-256 Hex | Cryptographic digest of the parent document source.1 |
-| retrieval.chunk_ids | Array | UUIDv4 Array | Unique identifiers of the exact retrieved segments.1 |
-| retrieval.secure_ref | String | Secure URI string | Redirection pointer to raw text (for data protection).1 |
-| retrieval.coordinates | Array | Bounding Box Coordinate Array | Page, line, and offset coordinates of retrieved data.1 |
-| retrieval.citation_map | JSON String | JSON mapping object | Binds generated sentences to retrieved coordinates.1 |
-| retrieval.conflict_signal | Boolean | True | False | Flags if different retrieved sources contradicted each other.1 |
-| retrieval.stale_flag | Boolean | True | False | Flags if retrieved document had exceeded its TTL.1 |
-| retrieval.inaccessible | Boolean | True | False | Flags if source was deleted but remained in vector index.1 |
-| retrieval.claim_links | Array | Object Array | Maps specific model-generated assertions to chunk hashes.1 |
+| `retrieval.raw_query_hash` | SHA-256 hash | Hash. | Verifies original query without exposing it. |
+| `retrieval.raw_query_ref` | Secure reference | Restricted. | Allows controlled access to raw query if needed. |
+| `retrieval.rewrite_hashes` | Array of hashes | Hash. | Records query reformulation steps. |
+| `retrieval.index_id` | String | Metadata. | Identifies searched index or partition. |
+| `retrieval.index_version` | String | Metadata. | Tracks index migrations and rebuilds. |
+| `retrieval.corpus_version` | String/hash | Metadata/hash. | Tracks source corpus state. |
+| `retrieval.embedding_model_ref` | String/hash | Metadata/hash. | Records query embedding model. |
+| `retrieval.permission_policy_version` | String/hash | Metadata/hash. | Records authorization policy used. |
+| `retrieval.tenant_scope_hash` | SHA-256 hash | Hash. | Confirms tenant scope without raw tenant leakage. |
+| `retrieval.permission_filter_ids` | Array of strings | Metadata. | Records RBAC/ABAC filters applied. |
+| `retrieval.metadata_filter_hash` | SHA-256 hash | Hash. | Verifies structural filters. |
+| `retrieval.candidate_ids` | Array | Metadata. | Logs candidate IDs and scores. |
+| `retrieval.selected_chunk_ids` | Array | Metadata. | Logs chunks admitted into context. |
+| `retrieval.omitted_chunk_ids` | Array | Metadata. | Logs relevant chunks pruned or omitted. |
+| `retrieval.rerank_score_summary` | Object | Metadata. | Records score distribution or secure score references. |
+| `retrieval.source_version_hashes` | Array | Hash. | Verifies parent document versions. |
+| `retrieval.evidence_refs` | Array of secure refs | Restricted. | Links to raw text or regions when access is allowed. |
+| `retrieval.coordinates` | Array of objects | Metadata. | Page, span, line, offset, or bounding boxes. |
+| `retrieval.citation_map_hash` | SHA-256 hash | Hash. | Verifies claim-to-evidence mapping. |
+| `retrieval.citation_map_ref` | Secure reference | Restricted. | Allows detailed citation replay. |
+| `retrieval.conflict_signal` | Boolean/object | Metadata. | Flags source contradiction or unresolved conflict. |
+| `retrieval.stale_flag` | Boolean/object | Metadata. | Flags source age or freshness concerns. |
+| `retrieval.inaccessible_flag` | Boolean | Metadata. | Flags deleted or unauthorized source references. |
+| `retrieval.claim_links` | Array of hashes/refs | Hash/reference. | Maps generated claims to chunk/source evidence. |
 
-This snapshot provides bounded verifiability when capture coverage, source versioning, and permission metadata are complete: if a model generates a factual error, the snapshot proves whether the error was caused by retrieval failure or model hallucination.1
+This snapshot provides bounded verifiability: it can distinguish retrieval failure, stale-source failure, citation failure, and generation failure when capture coverage, source versioning, and permission metadata are complete.
 
 ### **The Tool Execution Record**
 
-A generated text statement claiming an action succeeded (e.g., "invoice sent") is not evidence of success.1 Auditing requires verifying the physical database transactions and tool invocations 1:
+A generated statement claiming an action succeeded is not evidence of success. Auditing requires verification of tool authorization, payload integrity, idempotency, execution status, and post-action state.
 
-| Field Name | Physical Data Type | Validation Constraint | Description / Key Purpose |
+| Field Name | Physical Data Type | Capture Rule | Description / Key Purpose |
 | :---- | :---- | :---- | :---- |
-| tool.planned_name | String | Match approved tool schemas | The tool the model intended to invoke.1 |
-| tool.executed_name | String | Match approved tool schemas | The tool actually executed by the coordinator.1 |
-| tool.schema_version | String | SemVer format | Tracks modifications to API specifications.1 |
-| tool.action_class | Enum | idempotent | mutation | Identifies state-changing operations.1 |
-| tool.permissions | Array | Role principal strings | Confirms active RBAC credentials before execution.1 |
-| tool.credential | String | Token reference URI | Records the short-lived OAuth credentials utilized.1 |
-| tool.argument_object | JSON String | JSON schema compliant | The exact inputs generated by the model.1 |
-| tool.argument_hash | String | SHA-256 Hex | Cryptographic digest of the argument object.1 |
-| tool.user_edit_diff | String | Unified character diff | Records manual overrides made by the user.1 |
-| tool.idempotency_key | String | Unique UUIDv4 | Prevents duplicate actions during network retries.1 |
-| tool.request_payload | String | Serialized payload string | The raw request dispatched to the external system.1 |
-| tool.response_payload | String | Serialized payload string | The raw response returned by the external system.1 |
-| tool.error_status | Enum | success | timeout | error | Captures API-level exceptions and system errors.1 |
-| tool.retry_decision | Enum | backoff | abort | Documents retry actions triggered on failure.1 |
-| tool.quota_consumed | Double | Resource metric | Tracks external system rate limits and credits.1 |
-| tool.side_effects | Array | Object Array | Documents downstream mutations triggered by the tool.1 |
-| tool.state_pre_hash | String | SHA-256 Hex | Proves database state before action execution.1 |
-| tool.state_post_hash | String | SHA-256 Hex | Proves database state after action execution.1 |
-| tool.system_verified | Boolean | Must be True | Proves the state change was verified in the database.1 |
-| tool.compensation | String | URI Endpoint | Specifies the rollback action to trigger on failure.1 |
-| tool.user_confirmed | Boolean | True | False | Proves explicit user consent before execution.1 |
+| `tool.planned_name` | String | Metadata. | Tool the model/coordinator intended to invoke. |
+| `tool.executed_name` | String | Metadata. | Tool actually executed. |
+| `tool.schema_version` | String | Metadata. | Tracks API/tool contract version. |
+| `tool.action_class` | Enum string | Metadata. | Examples: `read_only`, `idempotent_mutation`, `non_idempotent_mutation`, `high_impact_action`. |
+| `tool.permission_decision` | Object/string | Metadata. | Records authorization outcome. |
+| `tool.credential_ref_hash` | SHA-256 hash | Hash. | Verifies scoped credential reference without storing token. |
+| `tool.argument_hash` | SHA-256 hash | Hash. | Verifies exact argument object. |
+| `tool.argument_summary` | Redacted object | Redacted. | Provides safe diagnostic summary. |
+| `tool.argument_ref` | Secure reference | Restricted. | Controlled access to full arguments if policy allows. |
+| `tool.user_edit_diff_ref` | Secure reference | Restricted. | Records human changes to tool arguments. |
+| `tool.idempotency_key_hash` | SHA-256 hash | Hash. | Supports duplicate-action prevention. |
+| `tool.request_payload_hash` | SHA-256 hash | Hash. | Verifies outbound request. |
+| `tool.request_payload_ref` | Secure reference | Restricted. | Controlled access to raw request. |
+| `tool.response_payload_hash` | SHA-256 hash | Hash. | Verifies inbound response. |
+| `tool.response_payload_ref` | Secure reference | Restricted. | Controlled access to raw response. |
+| `tool.error_status` | Enum string | Metadata. | Examples: `success`, `timeout`, `provider_error`, `validation_error`, `unknown`. |
+| `tool.retry_decision` | Enum string | Metadata. | Examples: `none`, `backoff`, `abort`, `manual_review`, `reconcile`. |
+| `tool.quota_consumed` | Number/object | Metadata. | Tracks external quota or cost usage. |
+| `tool.side_effect_summary` | Object | Redacted metadata. | Records expected and observed side-effect classes. |
+| `tool.state_pre_hash` | SHA-256 hash | Hash. | Proves source-of-record state before action. |
+| `tool.state_post_hash` | SHA-256 hash | Hash. | Proves source-of-record state after action, if known. |
+| `tool.verification_status` | Enum string | Metadata. | Examples: `verified`, `failed`, `pending`, `unknown`, `not_applicable`. |
+| `tool.compensation_supported` | Boolean | Metadata. | Records whether compensation is possible. |
+| `tool.compensation_plan_ref` | Secure reference | Restricted. | Links to compensation plan without leaking endpoint surface. |
+| `tool.user_confirmation_ref` | Secure reference/hash | Restricted. | Proves required consent or approval where applicable. |
 
 ### **The Intermediate State Ledger**
 
-To trace execution trajectories without exposing raw model reasoning, the system preserves the Intermediate State Ledger 1:
+To trace execution trajectories without exposing hidden reasoning or private chain-of-thought, the system preserves an Intermediate State Ledger. It records state transitions, decisions, validation failures, and observable progress—not the model’s private scratchpad.
 
-| Field Name | Physical Data Type | Validation Constraint | Description / Key Purpose |
+| Field Name | Physical Data Type | Capture Rule | Description / Key Purpose |
 | :---- | :---- | :---- | :---- |
-| state.plan_version | String | SemVer format | Tracks modifications to the agentic planner.1 |
-| state.subtask_graph | JSON String | JSON DAG representation | Maps dependencies across planned agent tasks.1 |
-| state.transitions | Array | Object Array | Logs state-machine transitions and events.1 |
-| state.loop_counter | Integer | Positive Integer (<= 10) | Prevents runaway costs and infinite tool loops.1 |
-| state.memory_reads | Array | String Array (hashes) | Logs profile and memory retrievals during the turn.1 |
-| state.memory_writes | Array | String Array (hashes) | Logs updates committed to long-term storage.1 |
-| state.retry_branches | Array | Object Array | Logs sub-agent retries and execution paths.1 |
-| state.repair_attempts | Array | Object Array | Logs schema corrections and output modifications.1 |
-| state.validation_fails | Array | Object Array | Logs Pydantic and JSON validation exceptions.1 |
-| state.no_progress | Integer | Positive Integer (<= 2) | Tracks sequential turns with zero logical progress.1 |
-| state.tool_results | Array | String Array (hashes) | Correlates execution results with active steps.1 |
-| state.policy_blocks | Array | String Array (rule IDs) | Logs safety and compliance rules triggered.1 |
-| state.fallback | Enum | nominal | degraded_model | Logs gateway fallback transitions triggered.1 |
-| state.degraded_state | Enum | nominal | cached | partial | Tracks system behavior under resource pressure.1 |
-| state.termination | Enum | success | max_turns | abort | Records why the execution sequence terminated.1 |
+| `state.planner_version` | Version/hash | Metadata. | Tracks planner/orchestrator implementation. |
+| `state.subtask_graph_hash` | SHA-256 hash | Hash. | Verifies task graph structure. |
+| `state.subtask_graph_ref` | Secure reference | Restricted. | Allows controlled inspection of task DAG. |
+| `state.transitions` | Array of objects | Metadata. | Logs state-machine transitions and events. |
+| `state.loop_count` | Integer | Metadata. | Tracks total loop steps against workflow profile. |
+| `state.loop_budget_profile` | String | Metadata. | Links loop limit to risk/workflow class. |
+| `state.memory_read_hashes` | Array of hashes | Hash. | Records memory items read. |
+| `state.memory_write_hashes` | Array of hashes | Hash. | Records memory items written. |
+| `state.retry_branches` | Array of objects | Metadata. | Logs retry and branch attempts. |
+| `state.repair_attempts` | Array of objects | Metadata. | Logs output/schema repair attempts. |
+| `state.validation_failures` | Array of objects | Metadata/redacted. | Logs parser/schema/business-rule failures. |
+| `state.no_progress_count` | Integer | Metadata. | Tracks repeated states without material progress. |
+| `state.no_progress_policy` | String | Metadata. | Links action to halt, replan, or escalation policy. |
+| `state.tool_result_hashes` | Array of hashes | Hash. | Correlates tool results with steps. |
+| `state.policy_blocks` | Array of rule IDs | Metadata. | Logs triggered safety/compliance blocks. |
+| `state.fallback_state` | Enum string | Metadata. | Examples: `nominal`, `degraded_model`, `degraded_retrieval`, `cached`, `partial`, `fail_closed`. |
+| `state.termination_reason` | Enum string | Metadata. | Examples: `success`, `max_steps`, `budget_exhausted`, `user_cancelled`, `policy_block`, `unknown_state`. |
 
 ### **The User Edit and Output Diff Record**
 
-The final answer displayed on a user's screen is simply the last artifact in a chain of output transformations.1 The system documents each transformation step:
+The final answer displayed or submitted is the last artifact in a chain of transformations. The system should record hashes, diffs, edit metadata, and secure references while avoiding uncontrolled raw output storage.
 
-| Field Name | Physical Data Type | Validation Constraint | Description / Key Purpose |
+| Field Name | Physical Data Type | Capture Rule | Description / Key Purpose |
 | :---- | :---- | :---- | :---- |
-| edit.original_draft | String | Raw output text | The unmodified token stream generated by the model.1 |
-| edit.user_edits | String | Unicode text | The finalized text after human modification.1 |
-| edit.editor_id | String | User principal string | Identifies the operator executing changes.1 |
-| edit.edit_class | Enum | factual | stylistic | code | Categorizes the modification type.1 |
-| edit.timestamp | String | Timestamp (ISO-8601) | Pinpoints when the override occurred.1 |
-| edit.target_field | String | Schema property name | Identifies the specific input field altered.1 |
-| edit.status | Enum | accepted | rejected | Documents whether edits were committed.1 |
-| edit.diff_view | String | Standard Unified Diff | Unified character diff of the user modification.1 |
-| edit.updated_memory | Boolean | True | False | Logs if edits updated local conversation memory.1 |
-| edit.entered_evals | Boolean | True | False | Flags if edited runs were promoted to golden sets.1 |
-| edit.changed_args | Boolean | True | False | Flags if edits updated tool parameters.1 |
-| edit.preserved_output | Boolean | True | False | Flags if the edit was retained in final display.1 |
-| edit.overwritten | Boolean | True | False | Flags if the model later discarded user changes.1 |
+| `edit.original_draft_hash` | SHA-256 hash | Hash. | Verifies model-generated draft. |
+| `edit.original_draft_ref` | Secure reference | Restricted. | Controlled access to raw draft if retained. |
+| `edit.final_text_hash` | SHA-256 hash | Hash. | Verifies final edited text. |
+| `edit.final_text_ref` | Secure reference | Restricted. | Controlled access to final text if retained. |
+| `edit.editor_hash` | SHA-256 hash | Hash/metadata. | Identifies editor without broad raw identity exposure. |
+| `edit.editor_role` | String | Metadata. | Captures role or authority class. |
+| `edit.edit_class` | Enum string | Metadata. | Examples: `factual`, `stylistic`, `policy`, `tool_argument`, `redaction`, `citation`, `approval`. |
+| `edit.timestamp` | ISO-8601 timestamp | Metadata. | Records edit time. |
+| `edit.target_field` | String | Metadata. | Identifies field or region altered. |
+| `edit.status` | Enum string | Metadata. | Examples: `accepted`, `rejected`, `overridden`, `pending_review`. |
+| `edit.diff_hash` | SHA-256 hash | Hash. | Verifies diff artifact. |
+| `edit.diff_ref` | Secure reference | Restricted. | Controlled access to unified or structured diff. |
+| `edit.updated_memory` | Boolean | Metadata. | Records if edit updated memory. |
+| `edit.entered_evals` | Boolean | Metadata. | Records if run was promoted to evals. |
+| `edit.changed_tool_args` | Boolean | Metadata. | Flags edits to tool parameters. |
+| `edit.preserved_in_final` | Boolean | Metadata. | Verifies whether edit survived final rendering/submission. |
 
-To ensure complete output lineage, the platform captures every intermediate transformation stage, recording the SHA-256 hash and a character diff for each:
+Output lineage should capture transformation hashes for each stage:
 
-1. output.raw_model -> output.post_processed (e.g., stripping Markdown blocks, parsing syntax).1  
-2. output.post_processed -> output.policy_filtered (e.g., blocking toxic content, enforcing compliance rules).1  
-3. output.policy_filtered -> output.redacted (e.g., masking SSNs, credentials, PII via ARGUS).1  
-4. output.redacted -> output.citation_injected (e.g., binding references to coordinate-level chunks).1  
-5. output.citation_injected -> output.rendered_ui (e.g., compiling text to structured UI cards or speech).1  
-6. output.rendered_ui -> output.human_edited (e.g., capturing operator overrides and updates).1  
-7. output.human_edited -> output.final_submitted (e.g., the finalized output written to database).1
+1. `output.raw_model_hash`
+2. `output.post_processed_hash`
+3. `output.policy_filtered_hash`
+4. `output.redacted_hash`
+5. `output.citation_injected_hash`
+6. `output.rendered_ui_hash`
+7. `output.human_edited_hash`
+8. `output.final_submitted_hash`
+
+Raw text for any stage should be stored only according to capture class and retention policy.
 
 ### **The Policy Check Record**
 
-Policy checks must function as executable verification artifacts, rather than passive, unstructured annotations 1:
+Policy checks must function as executable verification artifacts, not passive annotations. Deterministic rules, classifiers, human approvals, and override paths should be recorded separately so auditors can tell what kind of control actually fired.
 
-| Field Name | Physical Data Type | Validation Constraint | Description / Key Purpose |
+| Field Name | Physical Data Type | Capture Rule | Description / Key Purpose |
 | :---- | :---- | :---- | :---- |
-| policy.bundle_version | String | SemVer format | Tracks the active regulatory and safety rules.1 |
-| policy.rule_ids | Array | String Array | Identifies the specific rules executed.1 |
-| policy.source_auth | String | Authority principal string | Documents who authorized and signed the rule.1 |
-| policy.input_evaluated | String | SHA-256 Hex | Verifies the input data evaluated by the rule.1 |
-| policy.decision | Enum | allow | block | escalate | The action completed by the policy check.1 |
-| policy.threshold | Double | Range [0.0, 1.0] | The sensitivity cutoff of the policy filter.1 |
-| policy.confidence | Double | Range [0.0, 1.0] | The classifier confidence of the safety model.1 |
-| policy.enforce_point | Enum | ingress | egress | gateway | Pinpoints where the policy filter was applied.1 |
-| policy.pass_fail | Enum | pass | fail | Records the binary rule check status.1 |
-| policy.override_status | Enum | nominal | authorized_override | Flags if the block was overridden.1 |
-| policy.exception | String | ASCII Error String | Logs system and parsing exceptions.1 |
-| policy.reviewer | String | Reviewer principal string | Identifies the officer authorizing overrides.1 |
-| policy.approval_path | String | URI string | Documents the digital approval trail.1 |
-| policy.escalation | String | URI string | Links the check to human-in-the-loop queues.1 |
-| policy.action_state | Enum | completed | blocked | Records the final system state post-check.1 |
+| `policy.bundle_version` | Version/hash | Metadata/hash. | Tracks active policy bundle. |
+| `policy.rule_ids` | Array of strings | Metadata. | Identifies rules executed. |
+| `policy.rule_authority` | String/hash | Metadata/hash. | Documents policy source or owner. |
+| `policy.input_hash` | SHA-256 hash | Hash. | Verifies evaluated input. |
+| `policy.input_ref` | Secure reference | Restricted. | Controlled access to evaluated content. |
+| `policy.decision` | Enum string | Metadata. | Examples: `allow`, `block`, `escalate`, `redact`, `degrade`, `require_approval`. |
+| `policy.rule_type` | Enum string | Metadata. | Examples: `deterministic`, `classifier`, `human_review`, `external_policy`. |
+| `policy.threshold` | Number/object | Metadata. | Classifier threshold when applicable. |
+| `policy.score` | Number/object | Metadata. | Classifier score when applicable. |
+| `policy.enforcement_point` | Enum string | Metadata. | Examples: `ingress`, `context_assembly`, `pre_action`, `tool_gateway`, `egress`, `ui_render`. |
+| `policy.result_status` | Enum string | Metadata. | Examples: `pass`, `fail`, `error`, `not_applicable`. |
+| `policy.override_status` | Enum string | Metadata. | Examples: `none`, `requested`, `authorized`, `denied`, `expired`. |
+| `policy.exception_summary` | String/object | Redacted. | Logs parser or system exception safely. |
+| `policy.reviewer_hash` | SHA-256 hash | Restricted metadata. | Identifies reviewer where applicable. |
+| `policy.approval_ref` | Secure reference | Restricted. | Links to approval trail. |
+| `policy.escalation_ref` | Secure reference | Restricted. | Links to escalation queue or package. |
+| `policy.final_action_state` | Enum string | Metadata. | Examples: `completed`, `blocked`, `pending`, `unknown`, `review_required`. |
+
 
 ## **Replay Package Model and Execution Safety**
 
-To audit, debug, or evaluate a transaction safely, the system compiles a Replay Package.1 It is an executable, sandboxed environment that allows developers and compliance teams to rerun or simulate runs without risking side effects.1  
-The Replay Package consists of several core components:
+To audit, debug, or evaluate a transaction safely, the system compiles a Replay Package. A Replay Package is not merely a folder of logs; it is a controlled reconstruction environment designed to reproduce or simulate behavior without mutating production systems.
 
-* **Trace Graph:** The parent-child span hierarchy representing the original causal execution path.1  
-* **Verification Bundle:** The cryptographically signed, complete evidence record of the transaction.1  
-* **Dependency Manifest:** Pinned package lockfiles and container image digests.1  
-* **Tool Mocks:** Pre-recorded, signed tool response payloads, mapped directly to caller keys.1  
-* **Environment Variables:** Locked configuration parameters and system feature flag states.1  
-* **Policy Bundle:** The exact policy engine rules and thresholds that evaluated the run.1  
-* **Evaluation Rubric:** The objective performance benchmarks used to score completions.1
+A replay package contains:
 
-To prevent actions from escaping containment and mutating live production systems, the platform enforces several execution constraints 1:
+* **Trace Graph:** Parent-child spans and timing relationships.
+* **Verification Bundle:** Signed evidence record for the run.
+* **Reproducibility Envelope:** Prompt, model, retrieval, policy, tool, and runtime state.
+* **Dependency Manifest:** Container digests, package locks, runtime versions, and feature flags.
+* **Tool Mocks:** Signed, recorded responses or deterministic simulators.
+* **Payload Vault References:** Secure references to redacted or raw payloads where permitted.
+* **Policy Bundle:** Exact rules, thresholds, and approval requirements.
+* **Evaluation Rubric:** Scoring rules for semantic or counterfactual replay.
 
 ```
-+-----------------------------------------------------------------------------------+  
-|                              REPLAY PACKAGE CONTAINER                             |  
-+-----------------------------------------------------------------------------------+  
-|    |                                                                              |  
-|    +----> Simulated LLM Inference  ----> (Mocked via recorded output tokens)      |  
-|    +----> Simulated DB Similarity  ----> (Mocked via retrieval snapshot chunks)   |  
-|    +----> Simulated Tool API Calls ----> (Blocked at loopback proxy)              |  
-+-----------------------------------------------------------------------------------+
+REPLAY PACKAGE CONTAINER
+
++----------------------------------------------------------+
+| Replay Orchestrator                                      
+|  loads trace graph, bundle, envelope, policy, rubric      
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Network and Credential Controls                          
+|  no production credentials                                
+|  egress blocked or allowlisted                            
+|  production endpoints denied                              
+|  secrets replaced with inert references                   
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Mocked / Simulated Dependencies                           
+|  recorded LLM outputs                                     
+|  signed tool responses                                    
+|  retrieval snapshot                                       
+|  sandbox database                                         
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Replay Result                                             
+|  exact replay, constrained replay, semantic comparison,    
+|  counterfactual analysis, or forensic timeline             
++----------------------------------------------------------+
 ```
 
-These execution bounds are mapped across six discrete replay modes:
+These execution bounds are mapped across six replay modes:
 
 | Replay Mode | Egress Policy | Input Constraints | Execution Layer | Target Verification | Side-Effect Prevention |
 | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Read-Only Replay** | Blocked entirely.1 | Inputs locked to original values.1 | Re-compiles layout structures only.1 | Verifies text rendering and display formats.1 | Read-only execution prevents database write actions.1 |
-| **Mocked-Tool Replay** | Blocked entirely.1 | Inputs locked to original values.1 | Re-executes model inference; mocks tools.1 | Evaluates output variance under fixed templates.1 | API gateway loopback intercepts and mocks all writes.1 |
-| **Sandbox Replay** | Isolated sandbox subnet.31 | Inputs locked; dynamic tools active.31 | Re-executes the run within a isolated test database.31 | Evaluates end-to-end integration safety.1 | Local Docker environments isolate tool containers.31 |
-| **Counterfactual Replay** | Blocked entirely.1 | Allows single parameter modifications.1 | Re-runs template compilation over model.1 | Pinpoints regressions and evaluates changes.1 | Mocks tool response arrays using similarity indexes.1 |
-| **Semantic Replay** | Blocked entirely.1 | Inputs locked to original values.1 | Evaluates logical constraints on standard stack.1 | Verifies semantic and grounding equivalence.1 | Compares output tokens to ensure compliance.1 |
-| **Forensic Replay** | Blocked entirely.1 | No model execution; uses recorded states.3 | Timeline analysis of pre-recorded traces.3 | Pinpoints failure locations and identifies causes.3 | Complete execution decoupling; no code is run.3 |
+| **Read-Only Replay** | Egress blocked except approved artifact stores. | Inputs locked to original values. | Recompiles prompts, layouts, UI rendering, and local transformations. | Verifies rendering, formatting, redaction, and citation display. | No tool credentials; no production write paths. |
+| **Mocked-Tool Replay** | Egress blocked. | Inputs locked; tool responses loaded from signed mocks. | Re-executes orchestration against recorded dependency responses. | Evaluates route behavior, state transitions, and output variance. | Tool gateway intercepts all calls and returns mocks. |
+| **Sandbox Replay** | Egress restricted to isolated test network. | Inputs locked or copied into sandbox fixtures. | Runs against test database, test tool servers, and inert credentials. | Evaluates integration behavior under controlled conditions. | Production endpoints denied; credentials scoped to sandbox only. |
+| **Counterfactual Replay** | Egress blocked or sandbox-only. | Allows one declared variable modification at a time. | Re-runs selected prompt/model/retrieval/policy variant. | Attributes behavioral changes to the modified variable. | Tools mocked unless explicit sandbox mutation is approved. |
+| **Semantic Replay** | Egress blocked or sandbox-only. | Inputs locked; model may vary within declared route envelope. | Evaluates logical constraints, grounding, citations, and policy outcomes. | Verifies equivalent behavior rather than exact tokens. | No production side effects; unknown states remain marked unknown. |
+| **Forensic Replay** | No execution egress. | No active model/tool execution. | Timeline analysis of recorded evidence. | Identifies likely failure point from trace, ledger, and artifacts. | Complete decoupling from execution systems. |
+
 
 ## **Evidence Chain and Tamper-Evidence Infrastructure**
 
-To guarantee that recorded verification artifacts are not silently modified or deleted after the fact, the platform implements a cryptographic hash chain.1 Each transaction's Verification Artifact Bundle (sigma_i) is cryptographically linked to its predecessor, forming an append-only chain 1:  
-h_i = H(h_{i-1} |  
-| canonical(sigma_i))  
-where h_0 = 0^64, H is a collision-resistant SHA-256 function, and canonical represents a deterministic JSON serialization format (with sorted keys and stripped whitespace).33  
-To establish an institutional root of trust, the platform integrates with the OpenSSF Model Signing (OMS) and Sigstore standards, keyless signing pipelines, and C2PA metadata frameworks.34  
-The integration of these standards operates through three distinct layers:
+To detect silent modification or deletion of verification artifacts, the platform should implement tamper-evident evidence chains. Each Verification Artifact Bundle is canonicalized, hashed, signed when required, and linked to prior artifacts or workflow checkpoints.
 
-1. **Identity Attestation (Fulcio CA):** The signing engine (e.g., an agent runtime or a CI/CD pipeline) generates an ephemeral public/private keypair in-memory.35 It authenticates with a trusted OpenID Connect (OIDC) provider (e.g., GitHub, Google) to obtain an identity token.35 Fulcio validates this token and issues a short-lived X.509 certificate (typically valid for 10 minutes) binding the verified identity to the ephemeral public key.35  
-2. **Tamper-Evident Ledger (Rekor Log):** The signature, the X.509 certificate, the artifact digest, and the parent hash chain are submitted to Rekor, an append-only, public transparency log.35 Rekor records the entry in its Merkle tree and returns a signed timestamp token proving the signature was generated during the certificate's 10-minute validity window.35 The ephemeral private key is then permanently discarded, eliminating the security risks of long-lived keys.35  
-3. **Media and Text Provenance (C2PA standard):** For visual outputs, charts, or video, the signing engine embeds a C2PA manifest within a JUMBF metadata box directly inside the output file.12 For text-only or binary datasets, the engine generates a sidecar C2PA manifest utilizing an Asset Reference Assertion to cryptographically bind the signature to the external file hash.38
+The hash-chain relation can be expressed as:
+
+h_i = H(canonical(bundle_i) || h_(i-1))
+
+where `H` is a collision-resistant hash function, `canonical(bundle_i)` is a deterministic serialization of the bundle, and `h_(i-1)` is the previous chain hash. This does not make evidence indestructible or magically true. It makes later alteration detectable when verification is performed.
+
+The platform may use several signing and provenance mechanisms depending on artifact type:
+
+1. **Signed Attestation Envelope:** Verification bundles, model manifests, tool manifests, and replay packages can be wrapped in DSSE / in-toto-style signed envelopes.
+2. **Sigstore / Fulcio / Rekor:** CI/CD artifacts, container images, model bundles, and build outputs can use keyless signing and transparency logging where appropriate.
+3. **C2PA Manifests:** Images, charts, video, generated media, or datasets may carry embedded or sidecar C2PA manifests. Text-only or binary artifacts may bind to C2PA through sidecar manifests and asset references.
+4. **Internal WORM / Append-Only Ledger:** Regulated systems may store chain checkpoints in WORM object storage or append-only audit databases.
+5. **External Anchoring:** High-assurance systems may periodically anchor evidence-chain checkpoints externally to improve tamper detection.
 
 ```
-+---------------------------------------------------------------------------------+  
-|                            TAMPER-EVIDENT EVIDENCE CHAIN                        |  
-+---------------------------------------------------------------------------------+  
-|  [ Ingest Artifact ] (SHA-256 Hash)                                             |  
-|        |                                                                        |  
-|        +----> Sign with short-lived X.509 Certificate (Fulcio)                  |  
-|        +----> Record Signature & Certificate in Append-Only Ledger (Rekor)      |  
-|        +----> Embed CBOR-serialized Manifest in JUMBF Container (C2PA)          |  
-+---------------------------------------------------------------------------------+
-```
+TAMPER-EVIDENT EVIDENCE CHAIN
 
-The specific schema mapping for the Evidence Chain is detailed below:
++----------------------------------------------------------+
+| Artifact Created                                         
+|  bundle, replay package, manifest, snapshot, or diff     
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Canonicalize and Hash                                    
+|  deterministic serialization                             
+|  content hash                                            
+|  parent hash                                             
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Sign / Attest When Required                              
+|  DSSE / in-toto envelope                                  
+|  Sigstore or internal signing                             
+|  policy-defined signer identity                           
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Store Evidence                                           
+|  content-addressed storage                                
+|  retention class                                          
+|  access policy                                            
+|  redaction status                                         
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Verify Chain                                             
+|  validate hashes                                          
+|  validate signatures                                      
+|  validate timestamps                                      
+|  detect missing or altered records                        
++----------------------------------------------------------+
+```
 
 | Field Name | JSON Field Key Path | Data Type | Validation Standard |
 | :---- | :---- | :---- | :---- |
-| **Artifact ID** | chain.artifact_id | String | Regex UUIDv4.1 |
-| **Artifact Type** | chain.artifact_type | Enum | verification_bundle | repro_env.1 |
-| **Content Hash** | chain.content_hash | String | SHA-256 Hex.1 |
-| **Parent Hash** | chain.parent_hash | String | SHA-256 Hex (matches h_{i-1}).1 |
-| **Created By** | chain.created_by | String | OIDC Workload Identity.1 |
-| **Created At** | chain.created_at | String | Timestamp (ISO-8601 with ms).1 |
-| **Signed By** | chain.signed_by | String | Fulcio X.509 Subject.1 |
-| **Signing Key** | chain.signing_key | String | Ephemeral Public Key.1 |
-| **Storage Location** | chain.storage_path | String | S3 URI with region.1 |
-| **Retention Class** | chain.retention_class | Enum | hot | warm | cold.1 |
-| **Access Policy** | chain.access_policy | String | IAM Role Identifier.1 |
-| **Redaction Status** | chain.redacted | Enum | un_redacted | partially_redacted.1 |
-| **Deletion Eligibility** | chain.deletion_date | String | Timestamp or permanent.1 |
-| **Legal Hold** | chain.legal_hold | Boolean | True | False.1 |
-| **Verification** | chain.verification | Enum | verified | unverified.1 |
+| **Artifact ID** | `chain.artifact_id` | String | UUID or platform artifact ID. |
+| **Artifact Type** | `chain.artifact_type` | Enum string | Examples: `verification_bundle`, `replay_package`, `manifest`, `snapshot`, `diff`, `policy_record`. |
+| **Content Hash** | `chain.content_hash` | String | SHA-256 or approved hash algorithm. |
+| **Parent Hash** | `chain.parent_hash` | String/null | Previous chain hash or null for chain root. |
+| **Canonicalization Version** | `chain.canonicalization_version` | String | Defines deterministic serialization rules. |
+| **Created By** | `chain.created_by_hash` | String | Workload, service, or user hash. |
+| **Created At** | `chain.created_at` | Timestamp | ISO-8601 with timezone. |
+| **Signed By** | `chain.signed_by` | String/reference | Signing identity or certificate reference. |
+| **Signature Reference** | `chain.signature_ref` | Secure reference | Link to DSSE, Sigstore, or internal signature record. |
+| **Transparency Entry** | `chain.transparency_log_ref` | Optional reference | Rekor or internal transparency log entry. |
+| **Storage Location** | `chain.storage_ref` | Secure reference | Content-addressed object or archive reference. |
+| **Retention Class** | `chain.retention_class` | Enum string | Policy-defined retention profile. |
+| **Access Policy** | `chain.access_policy_id` | String | Policy governing read/write access. |
+| **Redaction Status** | `chain.redaction_status` | Enum string | Examples: `metadata_only`, `redacted`, `reference_only`, `restricted_full_payload`. |
+| **Deletion Eligibility** | `chain.deletion_eligibility` | Timestamp/string | Date or policy state, subject to legal hold. |
+| **Legal Hold** | `chain.legal_hold` | Boolean | True when deletion is suspended. |
+| **Verification Status** | `chain.verification_status` | Enum string | Examples: `verified`, `failed`, `degraded`, `not_checked`. |
 
-This structure prevents "blockchain theater," using practical, industry-standard cryptographic tools to ensure that if an attacker alters a single historical byte, subsequent hash-chain comparisons fail immediately, alert monitors trigger, and the compromised environment is quarantined.1
+If a historical record is altered, hash-chain verification fails and the system can trigger investigation, containment, and recovery workflows. That is the sober version. The cartoon version where cryptography tackles the attacker through a window is, regrettably, not in scope.
+
 
 ## **Artifact Privacy, Redaction, and Retention Model**
 
-Verification artifacts contain sensitive operational data, including proprietary documents, customer records, payment details, and credentials.1 To prevent the evidence trail from acting as a data leak repository, the system implements a strict Data Minimization Model.1  
-This is enforced using seven distinct Capture Classes that categorize and redact data prior to storage:
+Verification artifacts contain sensitive operational data: proprietary documents, customer records, payment details, credentials, policy decisions, reviewer comments, tool payloads, and source-of-record state. Evidence trails must therefore follow a data-minimization model. Auditability is not permission to build a beautifully indexed breach warehouse.
+
+Redaction should be layered. Regex and NER scans are useful but insufficient alone. The system should combine structured field suppression, secret scanning, policy-aware capture classes, secure payload references, access logging, retention limits, and legal-hold rules.
 
 ```
-+-----------------------------------------------------------------------------+  
-|                            PRIVACY REDACTION WORKFLOW                       |  
-+-----------------------------------------------------------------------------+  
-|  ----> ARGUS Regex/NER Scanner                                              |  
-|        |                                                                    |  
-|        +----> Raw SSN/Passwords  ----> Class 0: Never Capture (Dropped)     |  
-|        +----> Large Documents    ----> Class 4: Reference Only (Secure S3)  |  
-|        +----> Conversation Logs  ----> Class 3: Redacted Snippet (Masked)   |  
-+-----------------------------------------------------------------------------+
-```
+PRIVACY REDACTION WORKFLOW
 
-The specific properties and processing rules of these capture classes are mapped below:
++----------------------------------------------------------+
+| Artifact Capture Point                                   
+|  prompt, retrieval, tool, output, review, policy, state   
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Capture-Class Decision                                   
+|  never capture                                             
+|  hash only                                                 
+|  metadata only                                             
+|  redacted snippet                                          
+|  reference only                                            
+|  restricted full payload                                   
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Redaction and Secret Controls                            
+|  structured denylist                                       
+|  regex / NER / classifier scan                             
+|  source-aware policy                                       
+|  credential stripping                                      
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Storage and Access Policy                                
+|  content-addressed storage                                 
+|  secure payload vault                                      
+|  WORM archive when needed                                  
+|  access logs and retention                                 
++----------------------------------------------------------+
+```
 
 | Capture Class | Technical Processing Rule | Physical Storage Substrate | Access Control Level | Typical Data Target |
 | :---- | :---- | :---- | :---- | :---- |
-| **0. Never Capture** | Strip elements immediately at the gateway before writing any records.2 | No storage footprint.31 | None.31 | Passwords, API tokens, credit card CVVs.31 |
-| **1. Hash Only** | Calculate the SHA-256 digest of the payload; discard the raw characters.1 | Relational Database metadata columns.10 | Public / System audit.10 | File attachments, large database structures.5 |
-| **2. Metadata Only** | Preserve size, schema names, and response status; strip content.2 | Relational Database indexes.10 | Standard Auditor | PDF layout trees, API schemas.5 |
-| **3. Redacted Snippet** | Run the ARGUS engine to replace sensitive variables with placeholders.2 | Ephemeral Redis cache partitions.5 | Standard Operator | Conversation histories containing PII.2 |
-| **4. Reference-Only** | Store the raw payload in a secure, role-gated bucket; save only the URI in traces.1 | Encrypted Object Storage (S3 with KMS encryption).2 | Role-Gated Administrator | Original customer PDFs, full invoice scans.2 |
-| **5. Full Payload** | Retain complete data under strict encryption and access logging.1 | Decoupled Secure S3 Bucket (restricted region).31 | Decoupled Security Admin | High-risk financial ledger writes.1 |
-| **6. Incident Mode** | Temporarily escalate capture settings during active outages or attacks.1 | Ephemeral Forensic Vault (short TTL).31 | Escalated Security Analyst | Running agent trace dumps during failure runs.1 |
+| **0. Never Capture** | Strip or block before any persistent write. | No raw storage. | None for raw value; security event may record detection metadata. | Passwords, API tokens, private keys, CVVs, raw auth headers. |
+| **1. Hash Only** | Store digest and capture metadata; discard raw payload. | Metadata database or audit ledger. | Restricted audit/SRE as policy allows. | Large payload identity, file equality checks, prompt/output fingerprints. |
+| **2. Metadata Only** | Store size, schema, type, source ID, status, version, and timing. | Trace store or artifact metadata index. | Standard operational access if non-sensitive. | Parser status, route metadata, model IDs, schema names. |
+| **3. Redacted Snippet** | Store minimal masked excerpt sufficient for debugging. | Secure artifact store with retention limit. | Purpose-bound operator/auditor access. | Conversation excerpts, validation errors, reviewer notes. |
+| **4. Reference Only** | Store raw payload in secure vault; artifact stores only hash and reference. | Encrypted object store or payload vault. | Role-gated and access-logged. | Customer PDFs, full prompts, tool request/response bodies, raw completions. |
+| **5. Restricted Full Payload** | Retain full payload only when legally or operationally required. | Segregated encrypted vault or WORM storage. | Strict audit/security/legal roles; all access logged. | Regulated evidence, high-impact transaction records, legal holds. |
+| **6. Incident Mode** | Temporarily escalate capture under declared incident policy. | Forensic vault with short TTL or legal hold. | Incident/security team with approval trail. | Active attack traces, compromised tool sessions, outage forensics. |
 
-This model ensures that the evidence trail remains a safe GRC capability rather than a target for data harvest attacks.1
+Metadata can itself be sensitive. Tenant hashes, source IDs, route choices, policy decisions, and timing records can reveal business activity. Access rules should therefore apply to both payloads and metadata.
+
 
 ## **GRC Audit Query Playbook**
 
-To support systematic audits and regulatory inspections, the verification framework resolves standard queries through precise mapping to required artifacts, trace fields, and replay modes 1:
+To support audits, investigations, dispute resolution, and regulatory inspections, the verification framework should map common audit questions to the artifacts and replay modes required to answer them.
 
 | Audit Question | Required Verification Artifacts | Target Trace Fields / Metadata | Optimal Replay Mode | Technical Validation Path |
 | :---- | :---- | :---- | :---- | :---- |
-| **Why did the model cite this source?** | Retrieval Snapshot, Model Manifest.1 | retrieval.chunks, model.selected_model.1 | Forensic Replay.1 | Checks that the cited text has a high NLI entailment score against the source document coordinates.1 |
-| **Was the source document actually retrieved?** | Retrieval Snapshot.1 | retrieval.index_id, retrieval.chunks.id.1 | Audit-Only.1 | Matches retrieved chunk IDs against the database access log.1 |
-| **Was the source version current?** | Retrieval Snapshot, Model Manifest.1 | retrieval.chunks.version, model.snapshot.1 | Audit-Only.1 | Compares retrieved version hashes against the master registry.1 |
-| **Which prompt version produced this answer?** | Prompt Lineage Record.1 | prompt.template_id, prompt.template_version.1 | Constrained Replay.1 | Re-compiles the template to confirm it outputs matching token hashes.1 |
-| **Did routing silently downgrade the model?** | Model Selection Manifest.1 | model.requested_model, model.selected_model.1 | Audit-Only.1 | Detects discrepancies between requested and executed models.2 |
-| **Which tool call failed, and did it succeed later?** | Tool Execution Record.1 | tool.verification_status, tool.logical_epoch.1 | Semantic Replay.1 | Audits the epoch timeline to identify the failure point.1 |
-| **Did the tool actually execute, or did the model hallucinate success?** | Tool Execution Record.1 | tool.state_post_hash, tool.verification_status.1 | Forensic Replay.1 | Verifies that the post-action state hash matches the database record.1 |
-| **Was a confirmation shown before transaction execution?** | Tool Execution Record, Policy Record.1 | tool.idempotency_key, policy.fired_rules.1 | Forensic Replay.1 | Verifies that a signed permission token was generated before the epoch write.1 |
-| **Did the user edit the value?** | User Edit Record.1 | edit.character_diff, edit.user_id.1 | Counterfactual Replay.1 | Compares the generated draft with the final display text.1 |
-| **Did the model overwrite the correction?** | User Edit Record, Intermediate State Ledger.1 | edit.character_diff, ledger.current_step.1 | Counterfactual Replay.1 | Compares subsequent generation blocks with the edited state.1 |
-| **Which policy rule fired?** | Policy Check Record.1 | policy.fired_rules, policy.bundle_version.1 | Audit-Only.1 | Verifies rule execution parameters against rule assertions.1 |
-| **Who approved the override?** | Policy Check Record.1 | policy.override_signer, policy.fired_rules.1 | Audit-Only.1 | Checks the X.509 signature against root access directories.1 |
-| **Did the final UI hide a warning?** | Output Transformation Record, Policy Record.1 | transform.final_display, policy.fired_rules.1 | Forensic Replay.1 | Confirms that the rendered output contains the warning blocks.5 |
-| **Would a different model have behaved differently?** | Verification Bundle, Reproducibility Envelope.1 | model.model_id, repro_env.transformers_version.1 | Counterfactual Replay.1 | Re-runs the compiled prompt over alternative model versions.1 |
+| **Why did the model cite this source?** | Retrieval Snapshot, Output Lineage, Model/Route Manifest. | `retrieval.selected_chunk_ids`, `retrieval.citation_map_ref`, `output.citation_injected_hash`. | Forensic Replay. | Verify claim-to-source mapping, source version, and evidence support. |
+| **Was the source document actually retrieved?** | Retrieval Snapshot. | `retrieval.index_id`, `retrieval.selected_chunk_ids`, `retrieval.evidence_refs`. | Audit-Only. | Match chunk IDs and source hashes against retrieval trace and access log. |
+| **Was the source version current?** | Retrieval Snapshot, Reproducibility Envelope. | `retrieval.source_version_hashes`, `retrieval.stale_flag`, `env.retrieval.corpus_version`. | Audit-Only. | Compare source hashes and freshness metadata against source registry. |
+| **Which prompt version produced this answer?** | Prompt Lineage Record, Reproducibility Envelope. | `prompt.template_id`, `prompt.template_version`, `prompt.compiled_hash`. | Constrained Replay. | Recompile template under recorded envelope and compare compiled prompt hash. |
+| **Did routing silently downgrade the model?** | Model and Route Manifest. | `route.requested_route`, `route.selected_route`, `route.routing_reason`, `route.user_disclosure_shown`. | Audit-Only. | Compare requested vs selected route and disclosure requirement. |
+| **Which tool call failed, and did it succeed later?** | Tool Execution Record, State Ledger. | `tool.error_status`, `tool.verification_status`, `state.transitions`. | Forensic Replay. | Walk action ledger and post-action verification state. |
+| **Did the tool actually execute, or did the model hallucinate success?** | Tool Execution Record, Output Lineage. | `tool.state_post_hash`, `tool.verification_status`, `output.final_hash`. | Forensic Replay. | Verify source-of-record state and compare completion claim to verified state. |
+| **Was confirmation shown before transaction execution?** | Tool Execution Record, Policy Check Record, Human Approval Record. | `tool.user_confirmation_ref`, `policy.decision`, `approval.status`. | Forensic Replay. | Confirm approval/consent existed before high-impact action boundary. |
+| **Did the user or reviewer edit the value?** | User Edit and Output Diff Record. | `edit.diff_ref`, `edit.editor_hash`, `edit.edit_class`, `edit.preserved_in_final`. | Counterfactual Replay. | Compare draft hash, diff hash, and final output hash. |
+| **Did the model overwrite a correction?** | User Edit Record, Intermediate State Ledger, Output Lineage. | `edit.preserved_in_final`, `state.transitions`, `output.final_submitted_hash`. | Counterfactual Replay. | Compare subsequent outputs and state transitions against edited artifact. |
+| **Which policy rule fired?** | Policy Check Record. | `policy.rule_ids`, `policy.bundle_version`, `policy.decision`, `policy.enforcement_point`. | Audit-Only. | Verify rule execution parameters and policy bundle version. |
+| **Who approved the override?** | Policy Check Record, Human Approval Record, Evidence Chain. | `policy.override_status`, `policy.reviewer_hash`, `approval.signature_ref`. | Audit-Only. | Verify approval signature or audit record against trusted identity registry. |
+| **Did the final UI hide a warning?** | Output Lineage, Policy Check Record, UI/Render Manifest. | `output.rendered_hash`, `policy.rule_ids`, `route.user_disclosure_shown`. | Forensic Replay. | Re-render under recorded UI version and verify warning/disclosure presence. |
+| **Would a different model have behaved differently?** | Verification Bundle, Reproducibility Envelope, Evaluation Rubric. | `route.selected_route`, `env.model.snapshot_ref`, `prompt.compiled_hash`. | Counterfactual Replay. | Change one declared model/route variable and evaluate behavior under same rubric. |
+| **Was sensitive data over-captured?** | Privacy Capture Record, Evidence Chain, Access Logs. | `chain.redaction_status`, `capture_class`, `access_policy_id`. | Audit-Only. | Verify capture class, retention class, and access events against privacy policy. |
 
 ## **Artifact Lifecycle and Storage Architecture**
 
-To manage costs and comply with regulatory retention policies, the platform organizes evidence across three storage tiers 4:
+Verification artifacts must be retained according to risk, regulatory obligations, incident status, tenant contract, and operational debugging value. Storage architecture should therefore be policy-based rather than hardcoded to one fixed age ladder. A low-risk FAQ trace, a failed high-impact payment action, a legal hold, and an active security incident should not share the same retention path just because the calendar was feeling democratic.
 
 ```
-+-----------------------------------------------------------------------------------+  
-|                            EVIDENCE STORAGE LIFECYCLE                             |  
-+-----------------------------------------------------------------------------------+  
-|   -> 0-90 days, 4-hour retrieval, Multi-tenant Redis/PostgreSQL      |  
-|       |                                                                           |  
-|       v (Age > 90 days)                                                           |  
-|  -> 91 days - 2 years, 24-hour retrieval, S3 CAS with RLS           |  
-|       |                                                                           |  
-|       v (Age > 2 years & REGULATORY_7YR tag)                                      |  
-|  -> 2-7 years, 72-hour retrieval, WORM Archive (Glacier Object Lock)|  
-+-----------------------------------------------------------------------------------+
+EVIDENCE STORAGE LIFECYCLE
+
++----------------------------------------------------------+
+| Artifact Created                                         
+|  bundle, trace, snapshot, manifest, diff, replay package  
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Classification                                            
+|  risk class                                               
+|  capture class                                            
+|  retention class                                          
+|  legal hold                                               
+|  tenant / regulatory policy                               
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Hot Operational Store                                     
+|  short debugging window                                   
+|  fast lookup                                              
+|  redacted or reference-first payloads                     
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Warm Audit Store                                          
+|  content-addressed objects                                
+|  signed manifests                                         
+|  scoped metadata indexes                                  
+|  access logging                                           
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Cold Compliance / Legal Hold                              
+|  WORM or immutable archive where required                 
+|  slower retrieval                                         
+|  legal-hold controls                                      
+|  deletion review                                          
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Expiry / Deletion / Preservation Decision                 
+|  purge                                                    
+|  retain under legal hold                                  
+|  anonymize / aggregate                                    
+|  preserve hash-only evidence                              
++----------------------------------------------------------+
 ```
 
-The operational profiles, retrieval SLAs, and redundancy targets of these storage tiers are specified as follows:
+The operational profiles, retrieval expectations, and redundancy targets of these storage tiers are specified below:
 
-| Storage Tier | Data Age Window | Retrieval SLA | Storage Redundancy Target | Physical Technology | Encryption Profile |
+| Storage Tier | Retention Window | Retrieval Expectation | Storage Pattern | Encryption and Access | Typical Contents |
 | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Hot Debugging** | 0 to 90 days.4 | 4 hours.4 | Minimum of 3 active nodes (N + 2).4 | PostgreSQL with pgvector indexes; multi-tenant Redis partitions.2 | AES-256 with tenant-scoped KMS keys.2 |
-| **Warm Audit** | 91 days to 2 years.4 | 24 hours.4 | Minimum of 3 active nodes (N + 2).4 | Content-Addressed Object Storage (S3 with content-hash indexing).4 | AES-256 with tenant-scoped KMS keys.2 |
-| **Cold Compliance** | 2 to 7 years.4 | 72 hours.4 | Minimum of 2 active nodes (N + 1).4 | Write-Once-Read-Many (WORM) storage (AWS S3 Glacier Object Lock).4 | Corporate-managed KMS keys.4 |
+| **Hot Operational** | Short operational window defined by retention class. | Fast enough for debugging and incident triage. | Operational database, trace store, short-TTL object store, or managed equivalent. | Tenant-scoped encryption, role-based access, audit logs. | Metadata, hashes, redacted snippets, recent traces, pending action state. |
+| **Warm Audit** | Medium retention window defined by audit and product policy. | Hours to day-scale retrieval depending on policy. | Content-addressed object storage, signed bundle registry, audit index. | Strong access control, access logging, scoped evidence views. | Verification bundles, manifests, secure payload references, signed hashes, reviewer artifacts. |
+| **Cold Compliance** | Long retention window for regulated, contractual, or legal-hold artifacts. | Slower retrieval acceptable. | WORM storage, immutable archive, Glacier-like storage, or compliant managed archive. | Legal/compliance access controls, key management, deletion controls. | Signed evidence chains, legal-hold bundles, high-impact action records, compliance artifacts. |
+| **Forensic Vault** | Incident-scoped retention window or legal-hold period. | Fast during incident, policy-controlled afterward. | Segregated forensic storage with restricted access and enhanced logging. | Security/legal approval, immutable access logs, strict retention review. | Attack traces, compromised sessions, break-glass records, raw payloads when justified. |
+| **Hash-Only Archive** | Long-lived integrity reference. | Lightweight lookup. | Metadata ledger or content-addressed hash registry. | Lower exposure than payload stores but still access controlled. | Content hashes, chain hashes, artifact IDs, deletion tombstones, proof-of-existence records. |
 
-To support discoverability, evidence indexes must be searchable across multiple keys—including trace_id, session_id, tenant_id, model_version, prompt_version, document_id, tool_call_id, and final_output_hash.1 These indexes are updated dynamically via event-driven ingestion workers, ensuring compliance officers can locate specific transactions in minutes.4
+Evidence indexes should be searchable through authorized metadata views across keys such as `trace_id`, `artifact_id`, `workflow_id`, `prompt_version`, `model_route`, `document_id`, `tool_call_id`, `approval_request_id`, and `final_output_hash`. Raw `tenant_id`, `session_id`, and user identifiers should be avoided in broad indexes; use scoped hashes or access-controlled identity joins.
+
+Storage policy must also support:
+
+| Lifecycle Control | Requirement |
+| :---- | :---- |
+| **Legal Hold** | Suspends deletion and records authority, scope, and reason. |
+| **Deletion Eligibility** | Determines when payloads, metadata, hashes, or references may be purged. |
+| **Payload Minimization** | Allows raw payload deletion while preserving hash-bound proof where legally permitted. |
+| **Access Logging** | Records every access to sensitive payload references and restricted bundles. |
+| **Key Management** | Supports tenant-scoped keys, rotation, revocation, and recovery procedures. |
+| **Redaction Reprocessing** | Allows artifacts to be reclassified or re-redacted when policy changes. |
+| **Integrity Verification** | Periodically verifies hash chains, signatures, manifests, and storage references. |
 
 ## **Cross-Canon Handoff Map**
 
-The Verification Artifacts architecture integrates with adjacent disciplines across the AI Systems Engineering Canon 1:
+The Verification Artifacts architecture integrates across the entire AI Systems Engineering Canon because every major subsystem eventually needs evidence for audit, replay, incident response, evaluation, governance, and dispute resolution.
 
-| Target Report ID | Target Report Domain | Operational Handoff Metric | Dependency / Engineering Integration Rules |
+| Target Report ID | Target Report Domain | Verification Artifact Handoff | Dependency / Engineering Integration Rules |
 | :---- | :---- | :---- | :---- |
-| **AI-ENG-AC** | Incident Response & Remediation.1 | Isolation Containment Delay (< 15 seconds).31 | Leverages the Verification Artifact Bundle to run forensic postmortems and isolate compromised user accounts.1 |
-| **AI-ENG-AD** | Operational Governance & Compliance. | Gating Compliance Ratio (100.0%).1 | Uses Evidence Trails and in-toto attestations to satisfy SOC2 Type II and ISO/IEC 42001 audits.13 |
-| **AI-ENG-AJ** | Reference Architectures. | Schema Validation Fidelity (100.0%).2 | Integrates the Verification Bundle schema into B2B multi-tenant reference blueprints.2 |
-| **AI-ENG-Z** | Strategic Telemetry.1 | OpenTelemetry Compliance Score (100.0%).2 | Inherits the trace-id and span-id propagation rules to correlate physical telemetry with logical evidence.2 |
-| **AI-ENG-AA** | Evals Architecture.1 | Golden Set Relevance Density (100.0%).1 | Feeds production failure traces and user corrections directly into versioned golden test sets.1 |
-| **AI-ENG-Y** | Human-in-the-Loop Governance.5 | Escalation Transition Delay (< 45 seconds).5 | Uses the Escalation Packaging Model to deliver rich, redacted evidence histories to manual review queues.5 |
+| **AI-ENG-B** | Context and State Governance | Context snapshots, memory refs, state hashes, compaction records. | Preserve enough context lineage to prove what was available, included, omitted, or summarized. |
+| **AI-ENG-D** | Corpus Engineering | Source provenance, corpus manifests, document version hashes, ingestion records. | Evidence artifacts must bind claims to source lineage and corpus version. |
+| **AI-ENG-E** | Retrieval Pipeline | Retrieval snapshots, query hashes, source refs, citation maps, permission filters. | Retrieval evidence must prove authorization, source version, selected chunks, omitted chunks, and citation bindings. |
+| **AI-ENG-F** | Freshness and Conflict Detection | Freshness flags, conflict signals, source-age metadata, stale-cache records. | Audit trails must show whether outputs relied on stale, conflicting, or unresolved evidence. |
+| **AI-ENG-G** | Model Selection | Model/route manifest, requested route, selected route, fallback reason. | Silent downgrades, provider shifts, and capability changes must be replayable. |
+| **AI-ENG-H** | Model Adaptation | Adapter hashes, fine-tune manifests, calibration artifacts, regression records. | Adapted model behavior must be traceable to training/adaptation lineage. |
+| **AI-ENG-I** | Regression Control | Baseline artifacts, failed-run bundles, diff records, gate outcomes. | Regression investigations require preserved inputs, outputs, routes, and evaluation artifacts. |
+| **AI-ENG-J** | Throughput Mechanics | Token metrics, latency spans, serving-envelope data, queue and batch policy. | Performance regressions must be tied to reproducibility envelopes and serving conditions. |
+| **AI-ENG-K** | Weight Dynamics | Quantization/compression manifests, runtime kernel settings, model snapshots. | Optimization-induced behavior changes require route and model-state evidence. |
+| **AI-ENG-L** | Serving Architecture | Provider manifest, route manifest, cache state, fallback path, deployment hash. | Serving decisions must be reconstructable from route and environment artifacts. |
+| **AI-ENG-M** | Agentic Orchestration | State ledger, plan graph refs, loop counters, branch/retry records. | Agent failures require trajectory evidence without exposing hidden reasoning. |
+| **AI-ENG-N** | Tool Contracts | Tool schema versions, payload hashes, authorization records, idempotency hashes. | Tool calls must be auditable from planned call through verified post-action state. |
+| **AI-ENG-O** | Action Verification | Pre/post state hashes, action ledger, verification status, compensation refs. | Completion claims require state-backed verification artifacts. |
+| **AI-ENG-P** | Multimodal Understanding | Parser manifests, OCR/layout refs, coordinates, media hashes, evidence regions. | Visual/document claims must bind to source coordinates or secure evidence refs. |
+| **AI-ENG-Q** | Speech and Realtime Interaction | Transcript hashes, confirmation records, voice fallback state, endpointing metadata. | High-impact voice actions need replayable confirmation and transcript evidence. |
+| **AI-ENG-R** | UI Agents | UI state snapshots, DOM/screenshot hashes, action refs, post-action verification. | UI automation must preserve observe-act-verify evidence. |
+| **AI-ENG-S** | Production Pathologies | Malformed output records, repair-loop artifacts, false-success traces. | Pathologies require typed evidence for debugging and regression tests. |
+| **AI-ENG-T** | Boundary Defense | Tenant hashes, authorization decisions, prompt-injection evidence, redaction records. | Security boundaries must be provable without leaking the protected payload. |
+| **AI-ENG-U** | Supply Chain Security | Signed manifests, dependency locks, parser/tool/container hashes. | Evidence trails must bind behavior to approved supply-chain artifacts. |
+| **AI-ENG-V** | Resource Abuse | Cost ledgers, token-burn records, retry artifacts, quota state. | Cost bombs and runaway loops need replayable consumption evidence. |
+| **AI-ENG-W** | UX Resilience | Degraded-mode state, fallback disclosures, partial-answer records, saved-state refs. | User-visible degraded states must be backed by evidence of preserved state and disclosure. |
+| **AI-ENG-X** | User Trust and Transparency | Disclosure records, citation UX state, contestability records, user correction diffs. | Trust claims must be tied to what the user actually saw and could contest. |
+| **AI-ENG-Y** | High-Impact Workflow Design | Approval packets, maker/checker records, escalation packages, break-glass artifacts. | High-impact decisions require signed approval, reviewer, and escalation evidence. |
+| **AI-ENG-Z** | Strategic Telemetry | Trace IDs, span IDs, token metrics, latency records, semantic drift signals. | Telemetry provides sensor data; verification artifacts preserve durable evidence. |
+| **AI-ENG-AA** | Evals Architecture | Golden traces, case versions, labels, rubrics, regression gate artifacts. | Production failures and corrected outputs should become reproducible evaluation artifacts where appropriate. |
+| **AI-ENG-AC** | Incident Response and Remediation | Forensic bundles, containment timeline, compromised artifact refs, recovery evidence. | Incidents require evidence chains for scope, timeline, root cause, and remediation. |
+| **AI-ENG-AD** | Governance and Compliance | Retention class, policy bundle, approval authority, audit signatures, access logs. | Governance defines capture obligations, retention, deletion, legal hold, and exception approvals. |
+| **AI-ENG-AJ** | Reference Architectures | Verification bundle schema, replay package pattern, evidence store, audit ledger. | Reference architectures should include evidence trails as first-class infrastructure. |
+
+## **Durable Principles of Verification Artifacts**
+
+1. **Logs Are Not Evidence Trails**  
+   Logs show that something happened somewhere. Verification artifacts preserve enough structured evidence to reconstruct what happened, why it happened, what data shaped it, and what state resulted.
+
+2. **Auditability Requires Scope, Not Hoarding**  
+   More raw data is not automatically better auditability. Better auditability comes from scoped hashes, secure references, source versions, policy decisions, state checks, and signed manifests.
+
+3. **Tamper-Evident Does Not Mean True**  
+   A signed artifact proves integrity of the recorded evidence. It does not prove the underlying decision was correct unless the evidence, checks, and policies were also adequate.
+
+4. **Replay Has Levels**  
+   Exact replay, constrained replay, semantic replay, counterfactual replay, forensic replay, and audit-only verification serve different purposes. Do not promise bit-exact reproduction when the environment cannot support it.
+
+5. **The Reproducibility Unit Is the Whole Runtime**  
+   Model ID alone is not enough. Prompt compiler, retrieval index, policy bundle, route manifest, tool schema, feature flags, cache state, and deployment environment all shape behavior.
+
+6. **Hidden Reasoning Is Not an Audit Primitive**  
+   Preserve decisions, state transitions, prompts, evidence, policy checks, tool calls, and outputs. Do not require private chain-of-thought capture to explain system behavior.
+
+7. **Tool Claims Require State Evidence**  
+   “The model said it sent the invoice” proves nothing. Tool records must preserve authorization, payload hash, idempotency, execution status, and post-action verification.
+
+8. **Sensitive Payloads Need Capture Classes**  
+   Never-capture, hash-only, metadata-only, redacted snippet, reference-only, restricted full payload, and incident-mode capture should be explicit policy states.
+
+9. **Evidence Storage Must Follow Risk and Law**  
+   Retention windows should be driven by risk class, contract, regulation, incident state, legal hold, and operational need—not by vibes or one universal timer.
+
+10. **Every Artifact Needs Ownership**  
+   Prompt records, route manifests, retrieval snapshots, policy checks, approval records, and replay packages need owners, version history, and access rules.
+
+11. **Evidence Must Support Dispute Resolution**  
+   A user correction, reviewer override, citation dispute, model downgrade, or failed action should be traceable through artifacts rather than reconstructed from memory and regret.
+
+12. **Verification Infrastructure Is Governance Infrastructure**  
+   If the system cannot prove what happened, it cannot be governed. If it cannot be governed, it should not be trusted with consequential autonomy.
 
 #### **Works cited**
 
