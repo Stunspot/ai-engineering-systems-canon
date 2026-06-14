@@ -14,24 +14,24 @@ The following glossary defines the core terms and operational metrics governing 
 
 | Term | Technical Definition | Primary Operational Metric | Standard Production Target |
 | :---- | :---- | :---- | :---- |
-| **Production Pathology** | A recurring, systemic failure mode in deployed AI systems arising from the intersection of probabilistic generation with deterministic constraints.1 | Systemic Incident Rate (R\_inc) | 0.00% of automated transaction pipelines |
-| **Confabulation** | The generation of linguistically fluent but factually unsupported, inaccurate, or internally contradictory output.13 | Factual Grounding Ratio (G\_fact) | \> 99.5% of generated statements |
-| **Malformed Output** | Output that violates the syntactical, structural, or lexical expectations of the downstream parser or schema compiler.3 | Parser Exception Rate (R\_parse) | \< 0.10% of API responses |
-| **Schema Validity** | The state where a generated structural payload conforms exactly to a defined schema's keys, types, array bounds, and nullability constraints.3 | Schema Rejection Rate (R\_reject) | 0.00% under native constrained decoding |
-| **Semantic Validity** | The state where a syntactically and structurally valid payload contains values that align with real-world business rules and logic.3 | Semantic Violation Rate (R\_sem\_violation) | \< 0.50% of evaluated transactions |
-| **Contract Drift** | The gradual divergence between a model's semantic interpretation of a schema and the downstream system's execution expectations.16 | Value Distribution Drift (Delta\_drift) | PSI (Population Stability Index) \< 0.10 |
-| **Citation Integrity** | The exact, verifiable alignment between a generated claim and the specific region, page, or cell coordinates of the retrieved source.18 | Citation Alignment Score (A\_cite) | \> 98.0% verification precision |
-| **Grounding Failure** | An execution where a model answers from pre-trained prior weights while appearing to use retrieved context.21 | Prior-Weight Influence Delta (Delta\_prior) | Recall-to-prior ratio \< 0.05 |
-| **Instruction Loss** | The degradation of system directives as they pass through long contexts, summaries, or tool-output streams.7 | Instruction Adherence Index (I\_adh) | \> 99.0% on adversarial distractors |
-| **Harness Drift** | The degradation of evaluation or safety wrapper templates during recursive state reconstruction or repair loops.12 | Template Consistency Score (C\_temp) | Zero unmapped system modifications |
-| **Brittle Chain** | A multi-step sequence where minor, unobserved state corruptions compound to cause catastrophic failure at the final step.1 | Cascade Probability (P\_cascade) | Joint F1 score drop \< 1.0% per step |
-| **Tool Loop** | A state where an agent repeatedly calls tools with identical or slightly altered parameters without making progress.1 | State Repetition Count (C\_rep) | Limit of \<= 2 identical repeated states |
-| **Repair Loop** | A multi-turn pattern where a system attempts to fix a schema violation but continues to emit malformed payloads.1 | Repair Intertwining Index (I\_repair) | Complete termination after \<= 2 attempts |
-| **Runaway Behavior** | Unbounded model execution that bypasses rate limits, loops continuously, or consumes compute credits without completing.1 | Budget Depletion Velocity (V\_burn) | Auto-halt on 100% of budget breaches |
-| **Non-Deterministic Regression** | A drop in accuracy, formatting, or instruction adherence caused by unannounced model updates or system changes.17 | Regression Variance Delta (sigma^2\_reg) | Accuracy variance standard deviation \< 0.02 |
-| **Golden Trace** | A recorded, high-fidelity log of a successful production run containing all prompts, tool calls, and states.11 | Trace Match Fidelity (F\_trace) | 100% structural equivalent match |
+| **Production Pathology** | A recurring, systemic failure mode in deployed AI systems arising from the intersection of probabilistic generation with deterministic constraints.1 | Systemic Incident Rate (R_inc) | 0.00% of automated transaction pipelines |
+| **Confabulation** | The generation of linguistically fluent but factually unsupported, inaccurate, or internally contradictory output.13 | Factual Grounding Ratio (G_fact) | > 99.5% of generated statements |
+| **Malformed Output** | Output that violates the syntactical, structural, or lexical expectations of the downstream parser or schema compiler.3 | Parser Exception Rate (R_parse) | < 0.10% of API responses |
+| **Schema Validity** | The state where a generated structural payload conforms exactly to a defined schema's keys, types, array bounds, and nullability constraints.3 | Schema Rejection Rate (R_reject) | 0.00% under native constrained decoding |
+| **Semantic Validity** | The state where a syntactically and structurally valid payload contains values that align with real-world business rules and logic.3 | Semantic Violation Rate (R_sem_violation) | < 0.50% of evaluated transactions |
+| **Contract Drift** | The gradual divergence between a model's semantic interpretation of a schema and the downstream system's execution expectations.16 | Value Distribution Drift (Delta_drift) | PSI (Population Stability Index) < 0.10 |
+| **Citation Integrity** | The exact, verifiable alignment between a generated claim and the specific region, page, or cell coordinates of the retrieved source.18 | Citation Alignment Score (A_cite) | > 98.0% verification precision |
+| **Grounding Failure** | An execution where a model answers from pre-trained prior weights while appearing to use retrieved context.21 | Prior-Weight Influence Delta (Delta_prior) | Recall-to-prior ratio < 0.05 |
+| **Instruction Loss** | The degradation of system directives as they pass through long contexts, summaries, or tool-output streams.7 | Instruction Adherence Index (I_adh) | > 99.0% on adversarial distractors |
+| **Harness Drift** | The degradation of evaluation or safety wrapper templates during recursive state reconstruction or repair loops.12 | Template Consistency Score (C_temp) | Zero unmapped system modifications |
+| **Brittle Chain** | A multi-step sequence where minor, unobserved state corruptions compound to cause catastrophic failure at the final step.1 | Cascade Probability (P_cascade) | Joint F1 score drop < 1.0% per step |
+| **Tool Loop** | A state where an agent repeatedly calls tools with identical or slightly altered parameters without making progress.1 | State Repetition Count (C_rep) | Limit of <= 2 identical repeated states |
+| **Repair Loop** | A multi-turn pattern where a system attempts to fix a schema violation but continues to emit malformed payloads.1 | Repair Intertwining Index (I_repair) | Complete termination after <= 2 attempts |
+| **Runaway Behavior** | Unbounded model execution that bypasses rate limits, loops continuously, or consumes compute credits without completing.1 | Budget Depletion Velocity (V_burn) | Auto-halt on 100% of budget breaches |
+| **Non-Deterministic Regression** | A drop in accuracy, formatting, or instruction adherence caused by unannounced model updates or system changes.17 | Regression Variance Delta (sigma^2_reg) | Accuracy variance standard deviation < 0.02 |
+| **Golden Trace** | A recorded, high-fidelity log of a successful production run containing all prompts, tool calls, and states.11 | Trace Match Fidelity (F_trace) | 100% structural equivalent match |
 | **Stochastic Replay** | The technique of debugging non-deterministic agent executions by playing back recorded events and mocking external states.11 | Replay Alignment Precision | 100% reproducibility of logic paths |
-| **Replay Divergence** | The point where a replayed run deviates from the recorded path due to unintercepted time calls or system changes.11 | Divergence Step Offset (S\_div) | 0.00% divergence on unchanged code |
+| **Replay Divergence** | The point where a replayed run deviates from the recorded path due to unintercepted time calls or system changes.11 | Divergence Step Offset (S_div) | 0.00% divergence on unchanged code |
 
 ## **Production Pathology Taxonomy**
 
@@ -52,169 +52,283 @@ In contrast, a **production pathology** is a systemic failure mode that emerges 
 
 ## **Failure Boundary Map**
 
-AI systems fail when outputs cross boundaries in forms that downstream components cannot safely interpret.3 This map illustrates the physical flow of data and the specific boundaries where failures enter and propagate.
+AI systems fail when probabilistic outputs cross deterministic boundaries without adequate validation, authority checks, observability, or recovery controls. A production pathology is rarely “just the model being wrong.” It is usually a boundary failure: a generated claim, payload, citation, tool call, or state update is accepted by another subsystem as if it were valid, grounded, authorized, or complete.
 
 ### **Artifact 3: Failure Boundary Map**
 
-   
-       │   
-       ▼ (Boundary 1: Sanitization & Safety Gate)   
-\[ Intent Parser \] ─── (Failure: Prompt Injection, Jailbreaks)   
-       │   
-       ▼ (Boundary 2: Knowledge & Query Routing)   
- ─── (Failure: Stale/Poisoned Corpus, Empty Results)   
-       │   
-       ▼ (Boundary 3: Context Assembly & Token Limits)   
-\[ Context Assembly \] ─── (Failure: Lost in the Middle, Truncation) \[7, 8, 23\]  
-       │   
-       ▼ (Boundary 4: LLM Generation / Serving Engine)   
-\[ Generator Model \] ─── (Failure: Floating-point Non-associativity, Drift)   
-       │   
-       ▼ (Boundary 5: Output Validation & Parser Layer)   
-\[ Parser / Validator \] ─── (Failure: Syntax Exceptions, Type Invalidation)   
-       │   
-       ├───────────────┐   
-       ▼ (Success)     ▼ (Failure: ValidationError)   
-\[ Action Gate \]   ─── (Failure: Infinite Repair Loops)   
-       │   
-       ▼ (Boundary 6: Tool Execution Environment)   
- ─── (Failure: Excessive Agency, Side-Effects) \[1, 5, 6\]
+```text
++--------------------------------------------------------------------------------
+| PRODUCTION AI FAILURE BOUNDARY MAP
++--------------------------------------------------------------------------------
+|
+| [ User / External Input / Scheduled Run ]
+|          |
+|          v
+| [ Boundary 1: Intake, Policy, and Sanitization ]
+|   prompt injection | unsafe request | malformed file | hostile source content
+|          |
+|          v
+| [ Intent and Task Parser ]
+|   ambiguous intent | missing entities | wrong risk class | stale user state
+|          |
+|          v
+| [ Boundary 2: Retrieval and Source Routing ]
+|   empty retrieval | stale corpus | low-authority source | permission leakage
+|          |
+|          v
+| [ Evidence and Context Assembly ]
+|   lost instructions | context rot | truncation | citation laundering
+|          |
+|          v
+| [ Boundary 3: Model Generation / Planning ]
+|   confabulation | contradiction | policy invention | malformed plan
+|          |
+|          v
+| [ Boundary 4: Output Contract Validation ]
+|   syntax failure | schema failure | semantic invalidity | grounding failure
+|          |
+|          +----------------------------+
+|          |                            |
+|          v                            v
+| [ Repair / Retry Controller ]   [ Validated Payload / Response ]
+|   repeated failures               |
+|   repair drift                    v
+|   loop saturation            [ Boundary 5: Tool / Action Gate ]
+|          |                   unauthorized tool | wrong tool | missing approval
+|          |                         |
+|          |                         v
+|          |                   [ Execution Boundary ]
+|          |                   timeout | partial commit | duplicate side effect
+|          |                         |
+|          |                         v
+|          |                   [ Observation and Verification ]
+|          |                   stale observation | ignored exception | unknown state
+|          |                         |
+|          |                         v
+|          |                   [ State Update and User Response ]
+|          |                   false success | unsupported claim | audit gap
+|          |
+|          v
+| [ Containment Boundary ]
+|   halt | degrade | compensate | escalate | incident | replay
+|
++--------------------------------------------------------------------------------
+| Invariant:
+|   A boundary crossing is safe only when the receiving system can validate,
+|   authorize, observe, and recover from the artifact it receives.
++--------------------------------------------------------------------------------
+```
 
 To diagnose propagation, failures are classified into seven architectural categories:
 
-* **Model-level errors** emit false, unsupported, contradictory, or off-policy content.  
-* **Interface-level errors** violate schemas, parsing rules, citation formats, or downstream consumer expectations.  
-* **Workflow-level errors** corrupt the shared state across a chain of transformations.  
-* **Tool-level errors** invoke incorrect APIs, fabricate tool results, retry dangerously, or misread system observations.  
-* **Grounding-level errors** cite wrong, stale, insufficient, or uninspected evidence.  
-* **Runtime-level errors** alter execution via latency spikes, silent truncations, rate limits, or unannounced provider updates.  
+* **Model-level errors** emit false, unsupported, contradictory, or off-policy content.
+* **Interface-level errors** violate schemas, parsing rules, citation formats, or downstream consumer expectations.
+* **Workflow-level errors** corrupt shared state across a chain of transformations.
+* **Tool-level errors** invoke incorrect APIs, fabricate tool results, retry dangerously, or misread system observations.
+* **Grounding-level errors** cite wrong, stale, insufficient, or uninspected evidence.
+* **Runtime-level errors** alter execution via latency spikes, silent truncation, rate limits, or unannounced provider updates.
 * **Control-level errors** continue, repair, retry, or escalate transactions at incorrect times.
+
+The operational goal is to prevent failure propagation. Each boundary should either transform the artifact into a validated state or halt safely with a structured failure object.
 
 ## **Hallucination as Operational Subtypes**
 
-Labeling all incorrect model outputs as "hallucinations" is too broad for production troubleshooting.3 Useful incident diagnosis requires identifying the specific class of fabrication, isolating its entry point, and deploying targeted controls.1
+Labeling all incorrect model outputs as “hallucinations” is too broad for production troubleshooting. Useful incident diagnosis requires identifying the specific fabrication class, locating the boundary where it entered the system, and applying the correct containment strategy.
 
 ### **Table 3: Hallucination Subtype Model**
 
 | Subtype | Structural Presentation | Systemic Root Cause | Diagnostic Signal | Containment & Recovery |
 | :---- | :---- | :---- | :---- | :---- |
-| **Factual Hallucination** | Output states an incorrect fact without creating non-existent entities.13 | Model relies on weak semantic associations in pre-trained weights.14 | Entailment scores on knowledge graphs drop below threshold.13 | Force context retrieval, run BM25 cross-checks.12 |
-| **Citation Hallucination** | Output cites non-existent, irrelevant, or outdated sources.18 | Citation markers are generated after text generation without grounding.12 | Source documents missing from index, or lack support.18 | Run citation-support classifiers, suppress ungrounded claims.18 |
-| **Tool Hallucination** | Output claims a tool ran or invents fake results.2 | Tool-calling definitions overlap, causing model confusion.5 | Tool invocation name missing from system trace logs.2 | Enforce strict tool call validation, intercept payload before execution.2 |
-| **State Hallucination** | Output claims system operations are complete when they are not.12 | Model predicts conversational completion tokens prematurely.12 | State mismatch between local variables and database.12 | Prevent the model from speaking completion until actions are verified.12 |
-| **Schema Hallucination** | Output generates unmapped JSON keys or fields.4 | Generation temperature flatly distributes logits across wrong tokens.25 | Parser throws unexpected key or validation exception.3 | Compile schemas to Finite State Machines for constrained decoding.4 |
-| **Policy Hallucination** | Output invents rules or guidelines to justify decisions.5 | System instructions lack clear hierarchies and boundaries.5 | Contrast with business rules flags out-of-bounds assertions.16 | Inject explicit policy wrappers, run model-based evaluations.16 |
-| **Grounding Hallucination** | Answers from model prior while appearing grounded in retrieved documents.21 | Input context contains long distractor passages, diluting attention.7 | Low semantic overlap between generated text and source chunks.21 | Enforce strict source verification, adjust context positioning.8 |
-| **Confidence Hallucination** | Output expresses high certainty on ungrounded claims.16 | Soft-max scoring maps peak probabilities to incorrect tokens.14 | Discrepancy between semantic entropy and stated certainty.14 | Calculate token-level entropy, append variance warning to UI.26 |
+| **Factual Hallucination** | Output states an incorrect fact without inventing a source or tool result. | Model prior or weak context overpowers evidence. | Claim fails source entailment or factual evaluation. | Retrieve stronger evidence, suppress unsupported claim, or answer with uncertainty. |
+| **Citation Hallucination** | Output cites non-existent, irrelevant, outdated, or insufficient sources. | Citation generated as decoration rather than evidence binding. | Citation target missing, stale, irrelevant, or unsupported. | Require claim-to-source support validation before output. |
+| **Tool Hallucination** | Output claims a tool ran or invents tool results. | Model treats expected action/result as if it were observed. | Claimed tool call missing from execution trace or observation ledger. | Accept only orchestrator-owned tool observations as execution evidence. |
+| **State Hallucination** | Output claims an operation is complete when it is pending, failed, partial, or unknown. | Conversational completion outruns action verification. | User-facing status conflicts with authoritative state. | Block completion claims until post-action verification reconciles state. |
+| **Schema Hallucination** | Output generates unmapped keys, invalid enum values, wrong nesting, or non-contract fields. | Weak schema constraints, ambiguous examples, contract drift, or missing constrained decoding. | Parser or schema validator rejects payload. | Use constrained decoding where available, strict validators, schema registries, and bounded repair. |
+| **Policy Hallucination** | Output invents rules, exceptions, permissions, or compliance justifications. | Policy context is missing, stale, ambiguous, or mixed with untrusted data. | Generated policy differs from canonical policy store. | Retrieve authoritative policy, validate against policy engine, and suppress invented rules. |
+| **Grounding Hallucination** | Answer appears grounded but is not supported by retrieved documents or selected evidence. | Long context, distractors, weak citation binding, or poor evidence selection. | Low overlap/support between claim and evidence packet. | Enforce evidence sufficiency checks and abstain when evidence is inadequate. |
+| **Confidence Hallucination** | Output expresses high certainty despite weak evidence or high ambiguity. | The response policy lacks calibrated uncertainty and abstention rules. | Confidence language exceeds evidence strength or evaluator confidence. | Use evidence adequacy, calibration checks, uncertainty policy, and abstention gates. |
+| **Action-Authority Hallucination** | Output implies the model is allowed to perform an action it is not authorized to perform. | Tool authority is confused with conversational ability. | Proposed action violates autonomy boundary, approval policy, or role permission. | Enforce runtime authorization outside the model. |
+| **Temporal Hallucination** | Output treats stale, pending, future, or provisional information as current truth. | Freshness checks, time bounds, or state versioning are absent. | Claim timestamp/version mismatches current source of record. | Revalidate freshness and mark stale or pending information explicitly. |
+
+The operational question is not “Did the model hallucinate?” but:
+
+```text
+What kind of hallucination crossed which boundary,
+which validator failed to stop it,
+and what state must be corrected or contained?
+```
 
 ## **Malformed Output and Structural Failure**
 
-Enforcing structured output is one of the most common challenges in production reliability.4 To prevent valid-but-wrong JSON from silently corrupting data downstream, architectures must implement a strict validation pipeline.3
+Enforcing structured output is one of the most common challenges in production reliability. Valid JSON is not sufficient. A payload may parse successfully while still violating schema, business logic, policy, grounding, security, or downstream usability constraints.
+
+A production system should therefore validate outputs in layers.
 
 ### **Table 4: Layered Output Integrity Model**
 
-| Integrity Layer | Verification Scope | Core Verification Mechanism | Failure Mode presentation |
+| Integrity Layer | Verification Scope | Core Verification Mechanism | Failure Mode Presentation |
 | :---- | :---- | :---- | :---- |
-| **1\. Syntax Validity** | Raw formatting compliance 4 | Parser compliance check (JSON, YAML, TOML) 4 | Unescaped quotes, trailing commas, truncated structures 15 |
-| **2\. Schema Validity** | Structural contract compliance 3 | Pydantic model type-checking, extra="forbid" 3 | Missing required keys, type mismatches, invented fields 3 |
-| **3\. Semantic Validity** | Multi-field logical consistency 3 | Python-based @model\_validator(mode="after") 3 | Mathematically impossible dates, inverted pricing 3 |
-| **4\. Policy Validity** | Compliance and safety rules 5 | Policy evaluation engines, safety filter checks 5 | Generation of prohibited topics or banned content 5 |
-| **5\. Grounding Validity** | Contextual evidence matching 21 | Cross-correlation against source coordinates 12 | Statements unaligned with retrieved context 21 |
-| **6\. Downstream Usability** | Security and injection hardening 6 | Sanitization and parameterization checks 6 | Script injection, path traversal payloads 6 |
-| **7\. User-Facing Clarity** | Conversational formatting clean-up 12 | Markdown fence stripping, layout normalization 15 | Raw JSON wrappers shown directly to end users 15 |
+| **1. Syntax Validity** | Raw format compliance. | Parser compliance check for JSON, YAML, XML, TOML, Markdown, or other expected structure. | Unescaped quotes, trailing commas, broken fences, truncated structures. |
+| **2. Schema Validity** | Structural contract compliance. | Typed validators, JSON Schema, Pydantic models, enum bounds, `additionalProperties: false`, nullability checks. | Missing required keys, type mismatches, invented fields, wrong enum values. |
+| **3. Semantic Validity** | Cross-field and business-rule consistency. | Business validators, relational checks, domain constraints, arithmetic checks, date/state logic. | Impossible dates, invalid totals, inverted pricing, contradictory statuses. |
+| **4. Policy Validity** | Compliance, safety, permission, and risk rules. | Policy engine, autonomy boundary checks, approval validation, tenant authorization. | Prohibited content, unauthorized action, wrong risk class, missing approval. |
+| **5. Grounding Validity** | Alignment between claims and evidence. | Citation support checks, source entailment, coordinate/cell/region verification. | Claims unsupported by retrieved context or citations. |
+| **6. Downstream Usability** | Safety of values passed to tools or users. | Sanitization, escaping, parameterization, path/domain allowlists. | Script injection, path traversal, unsafe URL, raw internal state exposed. |
+| **7. User-Facing Clarity** | Suitability of output presentation. | Formatting normalization, channel adaptation, refusal/status clarity. | Raw JSON shown to users, malformed tables, ambiguous status, overconfident uncertainty. |
 
-The physical implementation of this layered verification pipeline requires executing multi-stage assertions. The following Python program illustrates how to enforce strict schema boundaries, handle provider-side refusals, and validate complex cross-field business logic using Pydantic:
+The physical implementation of this layered verification pipeline requires explicit assertions at the boundary. The following Python example illustrates strict schema boundaries, provider-status checks, and cross-field business validation using Pydantic v2.
 
-Python  
-from decimal import Decimal  
-from typing import Any, Dict, Optional  
-from pydantic import BaseModel, Field, ValidationError, model\_validator
+```python
+from __future__ import annotations
 
-class ProductionContract(BaseModel):  
-    """  
-    Doctrinal schema contract enforcing strict object shapes.  
-    Utilizes extra="forbid" to block the model from generating undeclared fields.  
-    """  
-    transaction\_id: str \= Field(pattern=r"^TXN-\[0-9\]{4}-\[0-9\]{4}$")  
-    base\_amount: Decimal \= Field(gt=0)  
-    discounted\_amount: Optional \= Field(default=None)  
-    is\_promotional: bool  
-    status: str \= Field(pattern=r"^(PENDING|COMMITTED|RECONCILED)$")
+from decimal import Decimal
+from typing import Any, Literal
 
-    class Config:  
-        extra \= "forbid"
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
-    @model\_validator(mode="after")  
-    def verify\_financial\_logic(self) \-\> "ProductionContract":  
-        """  
-        Layer 3 (Semantic Validity) execution.  
-        Enforces business rules that cannot be represented in a standard JSON schema.  
-        """  
-        if self.is\_promotional:  
-            if self.discounted\_amount is None:  
-                raise ValueError("discounted\_amount is required when is\_promotional is True.")  
-            if self.discounted\_amount \>= self.base\_amount:  
-                raise ValueError("discounted\_amount must be strictly less than base\_amount.")  
-        else:  
-            if self.discounted\_amount is not None:  
-                raise ValueError("discounted\_amount must not be populated when is\_promotional is False.")  
+
+class ProductionContract(BaseModel):
+    """
+    Doctrinal schema contract enforcing strict object shapes.
+
+    extra="forbid" blocks undeclared fields instead of silently dropping them.
+    Semantic validators enforce business rules that raw JSON Schema cannot
+    fully express.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    transaction_id: str = Field(pattern=r"^TXN-[0-9]{4}-[0-9]{4}$")
+    base_amount: Decimal = Field(gt=0)
+    discounted_amount: Decimal | None = None
+    is_promotional: bool
+    status: Literal["PENDING", "COMMITTED", "RECONCILED"]
+
+    @model_validator(mode="after")
+    def verify_financial_logic(self) -> "ProductionContract":
+        """
+        Layer 3: semantic validity.
+
+        Enforces cross-field business rules after syntax and schema checks pass.
+        """
+
+        if self.is_promotional:
+            if self.discounted_amount is None:
+                raise ValueError(
+                    "discounted_amount is required when is_promotional is True."
+                )
+            if self.discounted_amount >= self.base_amount:
+                raise ValueError(
+                    "discounted_amount must be strictly less than base_amount."
+                )
+        else:
+            if self.discounted_amount is not None:
+                raise ValueError(
+                    "discounted_amount must not be populated when is_promotional is False."
+                )
+
         return self
 
-def execute\_boundary\_ingestion(raw\_payload: str, api\_response\_metadata: Dict\[str, Any\]) \-\> ProductionContract:  
-    """  
-    Ingestion handler validating Layer 1 and Layer 2 transitions.  
-    Intercepts incomplete generations and provider-level refusals.  
-    """  
-    \# Verify provider-level status flags before attempting parsing  
-    if api\_response\_metadata.get("status") \== "incomplete":  
-        raise RuntimeError(f"Generation truncated: {api\_response\_metadata.get('incomplete\_reason')}")  
-    if api\_response\_metadata.get("type") \== "refusal":  
-        raise RuntimeError(f"Provider refusal intercepted: {api\_response\_metadata.get('refusal\_message')}")  
-          
-    try:  
-        \# Simultaneously parses and validates the structured model output  
-        validated\_contract \= ProductionContract.model\_validate\_json(raw\_payload)  
-        return validated\_contract  
-    except ValidationError as exc:  
-        \# Logs the structural exception and triggers the repair pipeline  
+
+def execute_boundary_ingestion(
+    raw_payload: str,
+    api_response_metadata: dict[str, Any],
+) -> ProductionContract:
+    """
+    Validates a model-generated payload before any downstream code consumes it.
+
+    This boundary:
+    1. checks provider-level generation status,
+    2. rejects refusals/incomplete generations,
+    3. parses and validates the payload,
+    4. returns only typed, validated state.
+    """
+
+    status = api_response_metadata.get("status")
+    response_type = api_response_metadata.get("type")
+
+    if status == "incomplete":
+        reason = api_response_metadata.get("incomplete_reason", "unknown")
+        raise RuntimeError(f"Generation truncated before contract boundary: {reason}")
+
+    if response_type == "refusal":
+        message = api_response_metadata.get("refusal_message", "no refusal message")
+        raise RuntimeError(f"Provider refusal intercepted: {message}")
+
+    try:
+        return ProductionContract.model_validate_json(raw_payload)
+    except ValidationError as exc:
+        # In production, log the structured validation errors and route to a
+        # bounded repair path. Do not pass the raw payload downstream.
         raise ValueError(f"Contract violation detected: {exc.errors()}") from exc
+```
+
+### **Boundary Rule**
+
+```text
+Parsed is not valid.
+Schema-valid is not semantically valid.
+Semantically valid is not authorized.
+Authorized is not executed.
+Executed is not verified.
+Verified is not user-safe until formatted and reported honestly.
+```
 
 ## **Broken Schemas and Contract Drift Map**
 
-Structured outputs are software interfaces, and like any interface, they regress.16 Contract drift occurs when provider updates shift how a model interprets fields, changing value distributions without breaking the raw schema.16
+Structured outputs are software interfaces, and like any interface, they regress. Contract drift occurs when prompts, model behavior, schemas, validators, SDKs, or downstream consumers diverge. Some drift breaks validation immediately. More dangerous drift preserves syntactic validity while shifting value distributions or semantics.
 
 ### **Table 5: Schema Failure and Contract Drift Map**
 
 | Failure Point | Failure Origin | Failure Mechanism | Prevention & Control |
 | :---- | :---- | :---- | :---- |
-| **Prompt/Schema Mismatch** | System prompt templates | Textual examples show old field structures while the parser expects new variables. | Release manifests verifying prompts and validation schemas in sync. |
-| **Old Schema Emission** | Model weights cache | Model emits retired properties after system updates, bypassing validators. | Pinning specific model snapshot versions (gpt-4o-2024-08-06). |
-| **Enum Value Shift** | Probabilistic decoding | Model invents synonyms or unmapped categories inside string fields. | Enforcing native constrained decoding via Finite State Machines. |
-| **Field Requirement Drift** | API Provider updates | Optional variables suddenly become required, blocking validation. | Automated regression testing of schema variants before deployment. |
-| **Response-Shape Changes** | Model serialization | Model wraps objects in nested structures or arrays unexpectedly. | Schema registries with strict compatibility checks. |
-| **SDK Serialization Drift** | Client-side libraries | Library updates modify how fields are serialized, breaking parsers. | Lockstep version pinning of all client-side dependencies. |
-| **Strict Schema Rejections** | Parser compilation | Strict validation modes reject valid regex patterns or nested constraints. | Running pre-flight schema compilation checks in CI/CD. |
-| **Validator Silent Drops** | Validation libraries | Parsers silently drop unrecognized fields, hiding system errors. | Configuring validators to reject extra properties (extra="forbid"). |
+| **Prompt / Schema Mismatch** | System prompt templates. | Examples show retired fields while validators expect new structures. | Release manifests bind prompt version, schema version, validator version, and model route. |
+| **Old Schema Emission** | Prompt examples, cached templates, model behavior, or stale tool definitions. | Model emits retired properties or old nested shapes. Strict validators reject; permissive validators may silently drop. | Pin schema versions; reject extra properties; run schema compatibility tests. |
+| **Enum Value Shift** | Probabilistic decoding or ambiguous field descriptions. | Model invents synonyms or unmapped categories. | Use explicit enums, constrained decoding where possible, and semantic enum validators. |
+| **Field Requirement Drift** | API/provider/downstream contract updates. | Optional fields become required, required fields become deprecated, or nullability changes. | Contract tests against live/staged downstream systems before rollout. |
+| **Response-Shape Changes** | Model serialization behavior or SDK response handling. | Object is wrapped in arrays, nested envelopes, Markdown, or tool-call wrappers unexpectedly. | Schema registry with compatibility checks and response-envelope normalization. |
+| **SDK Serialization Drift** | Client-side library updates. | SDK modifies field names, null handling, date serialization, or response object access. | Dependency pinning, lockfiles, release manifests, and contract tests. |
+| **Strict Schema Rejections** | Parser/compiler limitations. | Valid-looking schemas fail provider-side compilation due to unsupported features, regexes, recursion, or nesting. | Pre-flight schema compilation checks in CI/CD. |
+| **Validator Silent Drops** | Permissive validation defaults. | Unknown fields are dropped, hiding model drift and payload corruption. | Configure validators to reject extras and log rejected payloads. |
+| **Semantic Distribution Drift** | Model/provider/routing changes. | Schema remains valid but values shift: more nulls, different categories, suspicious defaults. | Monitor value distributions, PSI/KL drift, null-rate shifts, and enum frequency changes. |
+| **Consumer Contract Drift** | Downstream service changes. | Valid model payload no longer matches business logic or execution expectations. | Consumer-driven contract tests and staged traffic canaries. |
+
+### **Contract Drift Rule**
+
+```text
+A schema version is not just field names.
+It is prompt examples, validator behavior, model route, SDK serialization,
+downstream consumer expectations, and observed value distributions.
+```
 
 ## **Tool-Use Failure Pathologies**
 
-Tool-use failures are critical because outputs cross from text into system actions.5 An ungrounded tool call or a malformed payload can corrupt databases, trigger unauthorized actions, or result in costly resource leaks.1
+Tool-use failures are critical because outputs cross from text into system actions. An ungrounded tool call, malformed payload, duplicate retry, ignored exception, or false success claim can corrupt databases, trigger unauthorized actions, leak data, or waste large budgets.
 
 ### **Table 6: Tool-Use Failure Map**
 
 | Pathology | Mechanical Trigger | Detection Signal | Prevention & Containment |
 | :---- | :---- | :---- | :---- |
-| **Phantom Tool Call** | Model outputs a tool-calling command without user intent.2 | Tool execution trace exists without matching prompt trigger.2 | Restricting tool execution to validated, explicit intent profiles.2 |
-| **Wrong Tool Selection** | Model selects a tool with a similar name or purpose.2 | Execution of a different API route than planned.2 | designing unique, non-overlapping tool definitions and names.5 |
-| **Unavailable Tool Reference** | Model attempts to invoke retired or restricted tools.2 | API gateway returns a 404 error.2 | Dynamic registry schema updates.2 |
-| **Invalid Tool Payload** | Model outputs arguments that fail API type checks.2 | API validation returns a 400 error.2 | Running pre-execution Pydantic validation on all arguments.3 |
-| **Stale Tool Observation** | Model relies on cached tool results instead of re-running queries.12 | Model reports outdated values, ignoring update logs.12 | Implementing strict cache invalidation policies.12 |
-| **Ignored Tool Exception** | Model ignores API errors and summarizes the run as successful.2 | API error log followed by a successful complete token.2 | Catching and formatting exceptions as structured tool results.3 |
-| **Fabricated Tool Result** | Model invents results instead of executing the API call.2 | API gateways report zero requests while the model outputs data.2 | Requiring execution hashes before state updates.12 |
-| **Duplicate Tool Call** | Model calls a tool multiple times due to slow network responses.1 | Parallel API requests with identical body payloads.1 | Enforcing idempotency keys on all state-changing API calls.1 |
-| **Non-Idempotent Retry** | Client retries failed state-changing API calls.1 | Multiple mutations on the same record.1 | Managing runs via an idempotency ledger.2 |
-| **Tool Repair Loop** | Model repeatedly attempts to fix failed tool arguments.1 | High iteration counts with similar parameters.1 | Capping tool retries to a hard limit (\<= 2).2 |
-| **Action-Success Hallucination** | Model claims a change occurred without verifying the tool output.12 | Success message emitted to user despite tool failure.12 | Enforcing coordinate checks against database records.12 |
+| **Phantom Tool Call** | Model describes a tool action that was never physically invoked. | Claimed action missing from orchestrator trace. | Treat only orchestrator-owned tool logs as execution evidence. |
+| **Wrong Tool Selection** | Model selects a tool with similar name, overlapping affordance, or vague description. | Executed tool route differs from planned capability. | Design unique, non-overlapping tool definitions and enforce tool-policy routing. |
+| **Unavailable Tool Reference** | Model attempts to invoke retired, disabled, or unauthorized tool. | Registry lookup fails or policy denies capability. | Dynamic registry exposure scoped to user, task, environment, and risk. |
+| **Invalid Tool Payload** | Generated arguments fail type, enum, range, or required-field checks. | Pre-execution validator rejects payload. | Validate all arguments before dispatch; route to bounded repair. |
+| **Semantically Invalid Payload** | Payload passes schema but violates business logic or state constraints. | Domain validator, policy engine, or target precondition fails. | Add semantic validators and pre-action state checks. |
+| **Stale Tool Observation** | Model relies on cached result or old observation instead of current state. | Observation timestamp/version precedes relevant state change. | Invalidate caches, require freshness bounds, and re-query source of record. |
+| **Ignored Tool Exception** | Tool error is summarized as success. | Tool returns error/timeout but user-facing status says complete. | Normalize errors into typed observation objects and block completion claims. |
+| **Fabricated Tool Result** | Model invents results instead of executing or reading tool output. | Output contains data absent from tool observation. | Only structured observations may update task state. |
+| **Duplicate Tool Call** | Slow response or retry logic causes repeated calls with same logical payload. | Parallel or repeated requests share payload hash. | Enforce idempotency keys and duplicate detection for mutating tools. |
+| **Non-Idempotent Retry** | Client retries state-changing call after timeout without reconciliation. | Multiple mutations or unknown pending state. | Use durable idempotency records; hold/reconcile unknown states before retry. |
+| **Tool Repair Loop** | Model repeatedly fixes failed arguments but remains invalid. | Similar invalid payloads exceed repair threshold. | Cap repairs, return structured failure, and escalate when needed. |
+| **Action-Success Hallucination** | Model claims a change occurred without verification. | Completion message mismatches authoritative state. | Enforce post-action verification against authoritative system state. |
+| **Observation Injection** | Tool output contains instruction-like content that contaminates later prompts. | Tool result includes commands, hidden prompts, or untrusted text. | Treat tool output as data, sanitize, and preserve role boundaries. |
+| **Authority Creep** | Tool grants broader access than task requires. | Tool call touches resources outside task scope. | Least-privilege tools, scoped credentials, and policy-gated execution. |
+
+Tool failures should be handled by the same state doctrine used in action verification:
+
+```text
+proposed -> validated -> authorized -> executed -> observed -> verified -> reconciled
+```
 
 ## **Invalid Citations and Evidence Integrity**
 
@@ -266,16 +380,16 @@ As interactions extend across long contexts, system directives often degrade.7 T
 ## **Runaway Behavior and Loop Pathologies**
 
 Unbounded, stateful agent execution represents a major financial and operational risk.1 In recursive agent loops, input token costs grow quadratically as tool outputs and trace logs accumulate across turns.24 The total input tokens consumed in a naive N-turn loop can be modeled mathematically as:  
-Total Token Cost \= N \* S \+ u \* N \* (N \+ 1\) / 2 \+ r \* N \* (N \- 1\) / 2 24  
-Where S represents the fixed system prompt tokens, u is the new input tokens per iteration (user message \+ tool result), and r is the generated output tokens per iteration.24 If an agent enters an infinite loop, this quadratic token accumulation can rapidly deplete budgets and trigger "denial-of-wallet" dynamics.1 Every repair loop is an agent loop; therefore, every agent loop must have a hard budget, stop condition, and escalation path.1
+Total Token Cost = N * S + u * N * (N + 1) / 2 + r * N * (N - 1) / 2 24  
+Where S represents the fixed system prompt tokens, u is the new input tokens per iteration (user message + tool result), and r is the generated output tokens per iteration.24 If an agent enters an infinite loop, this quadratic token accumulation can rapidly deplete budgets and trigger "denial-of-wallet" dynamics.1 Every repair loop is an agent loop; therefore, every agent loop must have a hard budget, stop condition, and escalation path.1
 
 ### **Table 9: Runaway Behavior Model**
 
 | Loop Classification | Mechanical Trigger | Detection Signal | Containment Control | Escalation Path |
 | :---- | :---- | :---- | :---- | :---- |
-| **Recursive Tool Loop** | Model repeatedly retries failed tool calls.1 | State repetition count exceeds limit (C\_rep \> 2).2 | Hard limit on tool calls per run.1 | Suspend run, alert operator.2 |
-| **Format Repair Loop** | Parser failures trigger constant re-generation.1 | High repair attempts with identical schemas.1 | Halt after \<= 2 repair attempts.3 | Fall back to default states.1 |
-| **Retrieval Loop** | Search returns empty or conflicting results.1 | Identical search queries in sequential steps.2 | Max search limit of \<= 3 attempts.2 | Fall back to manual review.12 |
+| **Recursive Tool Loop** | Model repeatedly retries failed tool calls.1 | State repetition count exceeds limit (C_rep > 2).2 | Hard limit on tool calls per run.1 | Suspend run, alert operator.2 |
+| **Format Repair Loop** | Parser failures trigger constant re-generation.1 | High repair attempts with identical schemas.1 | Halt after <= 2 repair attempts.3 | Fall back to default states.1 |
+| **Retrieval Loop** | Search returns empty or conflicting results.1 | Identical search queries in sequential steps.2 | Max search limit of <= 3 attempts.2 | Fall back to manual review.12 |
 | **Planner Loop** | Agent continually updates plans without acting.1 | High token usage with zero tool execution.2 | Hard limit on planning turns.2 | Prompt user with options.2 |
 | **Reflection Loop** | Model critiques and updates outputs endlessly.1 | Output similarity score exceeds 0.95 across turns.2 | Hard limit on reflection cycles.2 | Deliver the current output.2 |
 | **Clarification Loop** | Agent repeatedly asks the user for the same inputs.1 | Conversational pattern repetition.12 | Hard limit on clarification requests.12 | Route session to support queues.12 |
@@ -287,51 +401,105 @@ Where S represents the fixed system prompt tokens, u is the new input tokens per
 
 ## **Brittle Chains and Cascading Failures**
 
-AI workflows often fail through quiet, multi-stage state corruptions.1 Because each individual stage appears locally valid, errors can propagate unobserved until they cause a catastrophic failure at the final step.1
+AI workflows often fail through quiet, multi-stage state corruptions. Each individual stage may appear locally valid, while the overall chain drifts away from the intended task. By the time the final response or action is produced, the failure may be difficult to trace unless every boundary preserved explicit verification artifacts.
 
 ### **Table 10: Brittle Chain Failure Model**
 
-\[ Input \] ───\> \[ Preprocessing \] ───\> ───\> \[ Context Assembly \] ───\> \[ Generation \]   
-                                                                                        │  
- \<─── \[ Observation \] \<─── \<─── \<─── \[ Validation \] \<───┘  
-       │  
-       ▼  
- ───\> \[ Citation \] ───\> \[ Logging \]
+```text
++--------------------------------------------------------------------------------
+| BRITTLE CHAIN FAILURE MODEL
++--------------------------------------------------------------------------------
+|
+| [ Input ]
+|     |
+|     v
+| [ Preprocessing ]
+|     |
+|     v
+| [ Retrieval ]
+|     |
+|     v
+| [ Context Assembly ]
+|     |
+|     v
+| [ Generation / Planning ]
+|     |
+|     v
+| [ Validation ]
+|     |
+|     +--> validation failure
+|     |       |
+|     |       v
+|     |  [ Bounded Repair ]
+|     |       |
+|     |       +--> repaired payload returns to Validation
+|     |       +--> repair exhausted -> Managed Failure
+|     |
+|     v
+| [ Tool / Action Gate ]
+|     |
+|     v
+| [ Execution ]
+|     |
+|     v
+| [ Observation ]
+|     |
+|     v
+| [ Verification and State Reconciliation ]
+|     |
+|     v
+| [ Final Response / Citation / Logging ]
+|
++--------------------------------------------------------------------------------
+| Rule:
+|   Each boundary must emit enough evidence for replay.
+|   Silent state corruption becomes catastrophic when the chain lacks checkpoints.
++--------------------------------------------------------------------------------
+```
 
 | Boundary Stage | Expected Contract | Possible Silent Corruption | Telemetry & Validator | Recovery Action |
 | :---- | :---- | :---- | :---- | :---- |
-| **1\. Input** | Clean raw data structure.12 | Unsupported file formats or rotated pages.12 | File check validators, DPI inspections.12 | Upscale file, run preprocessing.12 |
-| **2\. Preprocessing** | Standardized text streams.12 | Collapsed layout structures or OCR drift.12 | Layout IoU match and CER tracking.12 | Fall back to local OCR libraries.12 |
-| **3\. Retrieval** | High-relevance context.12 | Empty results or stale document matching.12 | Retrieval MRR and authority checks.9 | Run backup search queries.12 |
-| **4\. Context** | Compact, grounded prompt.7 | Token overflow or lost system instructions.7 | Context window size monitoring.7 | Prune distractor chunks, rerank.8 |
-| **5\. Generation** | Valid linguistic response.25 | Factual recall errors, confabulations.13 | Semantic and factual evaluations.26 | Re-generate using strict templates.12 |
-| **6\. Validation** | Schema-conforming JSON.3 | Model invents keys, fields contain drift.3 | Pydantic model validation.3 | Trigger repair model routines.3 |
-| **7\. Repair** | Valid corrected payload.1 | Model repeats mistakes, loops endlessly.1 | Repair counter metrics, timeouts.1 | Stop repairs, return default state.3 |
-| **8\. Tool Call** | Valid, secure arguments.3 | Non-idempotent tool called multiple times.1 | Idempotency keys, gate validators.1 | Roll back database transactions.1 |
-| **9\. Observation** | Verified execution result.12 | API returns errors, ignored by model.2 | Exception filters, gateway alerts.2 | Return formatted error responses.3 |
-| **10\. State Update** | Reconciled system state.12 | Cache mismatched with database records.12 | DB status checks against logs.12 | Force state updates, clear cache.12 |
-| **11\. Final Response** | Accurate, grounded text.21 | Claims ungrounded in source documents.21 | Grounding and support evaluations.21 | Suppress response, alert operator.12 |
-| **12\. Citation** | Verifiable references.18 | Cited documents missing or irrelevant.18 | Quote checks, support metrics.12 | Remove ungrounded citations.12 |
-| **13\. Logging** | Complete run record.11 | Traces fail to capture tool payloads.11 | Event logging validation checks.11 | Use recording proxies to capture.11 |
+| **1. Input** | Clean raw data structure. | Unsupported file formats, rotated pages, hostile prompt content, malformed records. | File validators, MIME checks, source trust signals. | Reject, sanitize, quarantine, or route to alternate parser. |
+| **2. Preprocessing** | Standardized text/layout/media representation. | Collapsed layout, OCR drift, lost tables, corrupted encoding. | Layout IoU, CER/WER, parser confidence, structural checks. | Re-render, upscale, alternate OCR/parser, human review. |
+| **3. Retrieval** | Relevant, authorized, fresh context. | Empty results, stale matches, low-authority sources, permission leakage. | Retrieval MRR, authority filters, freshness checks, permission audits. | Re-query, broaden/narrow query, resolve conflicts, refuse if no evidence. |
+| **4. Context Assembly** | Compact, grounded, instruction-safe prompt. | Token overflow, lost system instructions, role confusion, untrusted data collision. | Context budget logs, instruction-invariant checks, role-boundary checks. | Prune, reorder, summarize safely, isolate untrusted content. |
+| **5. Generation / Planning** | Valid response or plan candidate. | Confabulation, contradictions, invented policy, overconfident uncertainty. | Grounding checks, contradiction checks, policy validation. | Suppress, regenerate with constraints, ask clarification, or escalate. |
+| **6. Validation** | Schema, semantic, policy, and grounding validity. | Invented fields, bad enums, logically impossible payloads. | Strict validators, semantic business checks, policy engine. | Bounded repair or managed failure. |
+| **7. Repair** | Corrected payload without policy drift. | Repeated invalid outputs, altered task, hidden assumption insertion. | Repair counters, diff checks, template checksum. | Halt repairs after limit; return structured failure. |
+| **8. Tool / Action Gate** | Valid, authorized, scoped action. | Wrong tool, missing approval, excessive authority, stale intent. | Tool policy, autonomy boundary, approval hash, intent trace. | Block, ask approval, replan, or fail closed. |
+| **9. Execution** | Controlled side-effect attempt. | Duplicate mutation, timeout ambiguity, partial commit. | Idempotency ledger, timeout logs, transaction IDs. | Reconcile before retry; compensate or hold unknown state. |
+| **10. Observation** | Typed result evidence. | API error ignored, stale cache, malformed observation. | Observation schema, freshness/version check, error normalization. | Normalize error, re-query source of record, hold if unknown. |
+| **11. State Reconciliation** | Verified authoritative state. | Local memory diverges from database/tool reality. | Authoritative readback, predicate checks, state-version comparison. | Update state, compensate, escalate, or mark unknown. |
+| **12. Final Response** | Accurate, grounded user-facing output. | Unsupported claim, false completion, unsafe certainty. | Claim-support checks, completion-state checks, uncertainty policy. | Suppress, revise, or return managed status. |
+| **13. Citation** | Verifiable evidence references. | Decorative citations, wrong region, stale source. | Source existence, quote fidelity, coordinate/cell support. | Remove ungrounded citation or regenerate with evidence. |
+| **14. Logging** | Complete replayable trace. | Missing tool payloads, hidden prompts, lost observations. | Trace completeness validator. | Use recording proxies and fail closed for high-impact gaps. |
 
 ## **Contradictory Outputs and Consistency Failures**
 
-A consistency failure occurs when a model generates individually plausible statements that contradict each other.13 These failures must be classified to identify acceptable uncertainty versus true production faults.13
+A consistency failure occurs when a model generates individually plausible statements that cannot all be true at the same time. These failures must be classified to distinguish acceptable variation from production faults.
 
 ### **Table 11: Contradiction and Consistency Framework**
 
 | Contradiction Class | Systemic Origin | Mechanical Validation | Impact on Production | Acceptable vs Failure |
 | :---- | :---- | :---- | :---- | :---- |
-| **Within-Answer Contradiction** | Long context windows 7 | Cross-paragraph semantic entailment checks.13 | User receives conflicting, unusable advice.13 | **Failure:** Confusing statements must be suppressed.31 |
-| **Reasoning-Final Contradiction** | Planning track mismatch 12 | Comparing thought variables against final JSON.12 | System executes tools that mismatch text plan.12 | **Failure:** Mismatched actions must be blocked.12 |
-| **Source-Answer Contradiction** | Context prioritization 21 | NLI checks against source documents.13 | Model outputs claims denied by sources.13 | **Failure:** Ungrounded outputs must be rejected.31 |
-| **Tool-Result Contradiction** | Ignored API exceptions 2 | Comparing tool outputs against generated text.12 | Model reports success when action failed.12 | **Failure:** Spoken status must match API returns.12 |
-| **Memory-State Contradiction** | Cache sync delays 12 | Comparing session memory against database records.12 | Model bases tasks on outdated user data.12 | **Failure:** Stale data actions must be blocked.12 |
-| **Cross-Run Contradiction** | Probabilistic decoding 17 | Multi-run semantic similarity clustering.25 | Inconsistent behavior on identical inputs.25 | **Acceptable:** Minor phrasing variance is tolerated.25 |
-| **Streaming Contradiction** | Speculative tokens 10 | Comparing streaming chunks against finalized text.10 | Model corrects its statements mid-sentence.12 | **Acceptable:** Spoken self-correction is tolerated.12 |
-| **Policy Contradiction** | Weak safety rules 5 | Evaluation of output against guidelines.16 | Output violates compliance parameters.5 | **Failure:** Safety breaches must be blocked.5 |
-| **Citation Contradiction** | Decorative citations 12 | Comparing cited claims against source text.12 | Claims are unaligned with referenced files.18 | **Failure:** Citations must match source facts.29 |
-| **Multimodal Contradiction** | Modality mismatch 12 | Comparing visual charts against text tables.12 | Explanations contradict raw data figures.12 | **Failure:** Text data must match visual images.12 |
+| **Within-Answer Contradiction** | Long contexts, weak synthesis, or conflicting intermediate drafts. | Cross-paragraph semantic entailment checks. | User receives conflicting, unusable guidance. | **Failure:** suppress or repair before output. |
+| **Planner-Final Contradiction** | Structured planner state diverges from final response or tool payload. | Compare structured planner state against final response and tool payloads. | System may execute actions that mismatch the stated plan. | **Failure:** block action or regenerate. |
+| **Source-Answer Contradiction** | Retrieval conflict, poor source ranking, or prior-weight override. | NLI/support checks against cited sources. | Model outputs claims denied by evidence. | **Failure:** reject or surface conflict. |
+| **Tool-Result Contradiction** | Tool errors or observations are ignored. | Compare tool observations with generated status. | Model reports success when action failed or is pending. | **Failure:** user-facing status must match verified state. |
+| **Memory-State Contradiction** | Memory/cache lags source of record. | Compare session memory against authoritative database/tool state. | Agent acts on outdated user or task data. | **Failure:** refresh state before action. |
+| **Cross-Run Contradiction** | Non-deterministic generation or routing differences. | Multi-run semantic clustering and variance measurement. | Inconsistent behavior on identical inputs. | **Acceptable:** minor phrasing variance; **failure:** semantic/action variance. |
+| **Streaming Contradiction** | Speculative tokens emitted before stable result. | Compare spoken/streamed chunks to finalized state. | Model corrects itself mid-response or outruns tool status. | **Contextual:** acceptable for low-risk self-correction; failure for high-impact claims. |
+| **Policy Contradiction** | Weak or stale policy context. | Evaluate output against canonical policy source. | Compliance or safety breach. | **Failure:** block and log. |
+| **Citation Contradiction** | Decorative or misbound citations. | Compare cited claims against exact source text/region. | Claims misrepresent evidence. | **Failure:** citations must support attached claims. |
+| **Multimodal Contradiction** | Text, table, chart, image, or video evidence disagree. | Cross-modal consistency checks. | Explanation contradicts raw visual/tabular evidence. | **Failure:** surface conflict or route to review. |
+
+### **Consistency Rule**
+
+```text
+Phrasing variance is normal.
+Semantic contradiction is a fault.
+Action contradiction is a safety boundary breach.
+```
 
 ## **Non-Deterministic Regressions**
 
@@ -355,84 +523,128 @@ Generative AI systems are inherently non-deterministic.25 Even at temperature 0,
 
 ## **Demo-to-Production Gap**
 
-Curated, short-context development environments often overestimate system reliability because they operate under controlled assumptions.1 Moving systems to production exposes them to a long tail of edge cases.1
+Curated, short-context development environments often overestimate system reliability because they operate under controlled assumptions. Moving systems to production exposes long-tail inputs, asynchronous dependencies, permission boundaries, cost limits, hostile content, stale data, and nondeterministic model behavior.
+
+A demo asks whether the happy path works. A production readiness review asks whether failures are bounded, observable, replayable, and recoverable.
 
 ### **Table 13: Demo-to-Production Pathology Checklist**
 
-| Check Item | Telemetry Domain | Operational Check Requirement | Target Threshold |
+| Check Item | Telemetry Domain | Operational Check Requirement | Production Readiness Target |
 | :---- | :---- | :---- | :---- |
-| **1\. Rare Inputs** | User prompt patterns | Verifies intent routers handle unmapped and raw inputs.5 | \<= 0.50% routing failure rate |
-| **2\. Malformed Data** | File ingestion systems | Checks parsers handle skewed scans, low contrast, and bad encodings.12 | \>= 99.0% text parsing accuracy |
-| **3\. Bad Files** | Ingestion pipeline | Verifies systems isolate truncated and corrupted uploads.12 | Zero parser crashes on corruption |
-| **4\. Long Contexts** | Token memory usage | Tests model accuracy when contexts fill past 50%.7 | \>= 95.0% instruction retention |
-| **5\. Ambiguous Inputs** | Input validation | Checks models resolve unmapped parameters without stalling.12 | \<= 1.0% clarification timeout rate |
-| **6\. Contradictory Sources** | RAG retrieval engines | Tests systems resolve conflicting claims across retrieved sources.12 | 100% detection of conflicts |
-| **7\. Empty Retrieval** | Database indices | Verifies models deliver managed refusals on empty queries.3 | Zero answers on empty search sets |
-| **8\. Low-Quality OCR** | Image preprocessors | Tests preprocessors upscale poor inputs to 300 DPI.12 | CER (Character Error Rate) \< 1.5% |
-| **9\. Noisy Speech** | Voice interfaces | Tests voice systems handle street background noise and clicks.12 | \<= 1.5% false endpoint rate 12 |
-| **10\. UI Drift** | Browser agents | Verifies UI agents handle unexpected elements and shifts.12 | \>= 98.0% step success rate 12 |
-| **11\. Tool Timeouts** | External APIs | Verifies systems catch API hangs and route to fallbacks.2 | \<= 0.10% stalled automated steps |
-| **12\. Network Failures** | Transport layer | Tests exponential backoff with jitter on packet loss.30 | Zero cascading network retries |
-| **13\. Rate Limits** | Provider gateways | Verifies gateway proxies queue calls on provider limits.30 | HTTP 429 rate limit errors block |
-| **14\. Provider Failovers** | API routing proxies | Checks traffic shifts to low-cost backup models on errors.30 | Failover latency penalty \< 150ms |
-| **15\. Simultaneous Users** | Concurrency engines | Tests thread pools under peak transactional volumes.1 | Zero queue saturation crashes |
-| **16\. Cost Ceilings** | Spend ledgers | Verifies gateways block calls when budget limits are breached.1 | 100% blocking of over-spend |
-| **17\. Partial Failures** | State transformations | Checks systems preserve states if steps fail mid-run.1 | Zero orphaned transaction states |
-| **18\. User Corrections** | Session memory | Verifies memory handles correction inputs during sessions.12 | \>= 92.0% repair success rate 12 |
-| **19\. Schema Migration** | Schema registry | Verifies database migrations do not break old model parsers.12 | Zero unmapped field exceptions |
-| **20\. Stale Caches** | Memory caching layers | Checks caching layers invalidate records when database updates.12 | Zero stale data transactions |
-| **21\. Prompt Injection** | Input sanitization | Tests filters block injection payloads inside source documents.5 | 100% blocking of injection text |
-| **22\. Streaming Truncation** | Streaming parsers | Checks systems handle incomplete streaming objects on limits.12 | Zero parser crashes on truncation |
+| **1. Rare Inputs** | User prompt patterns. | Verify routers handle unmapped, malformed, ambiguous, and raw inputs. | Low unresolved-routing rate; managed refusal on unknown intent. |
+| **2. Malformed Data** | File ingestion. | Check parsers handle skewed scans, bad encodings, corrupt files, and hostile content. | No parser crashes; unsafe files quarantined. |
+| **3. Bad Files** | Ingestion pipeline. | Verify truncated, encrypted, binary, and oversized uploads fail safely. | Managed failure object and trace. |
+| **4. Long Contexts** | Context management. | Test instruction retention and answer quality at realistic context utilization. | Instruction invariants remain intact under stress. |
+| **5. Ambiguous Inputs** | Input validation. | Verify missing entities trigger clarification without looping. | Bounded clarification and escalation path. |
+| **6. Contradictory Sources** | Retrieval and grounding. | Detect and surface conflicts across sources rather than flattening them. | Conflicts flagged for high-impact answers. |
+| **7. Empty Retrieval** | Search/retrieval. | Verify empty result sets produce uncertainty/refusal, not invented answers. | No confident answer on empty evidence. |
+| **8. Low-Quality OCR** | Multimodal preprocessing. | Test poor scans, low contrast, small text, and rotated pages. | Evidence adequacy gate blocks unsupported extraction. |
+| **9. Noisy Speech** | Voice interfaces. | Test background speech, coughs, clicks, accents, stutters, and barge-in. | Endpointing and repair stay within profile-specific SLOs. |
+| **10. UI Drift** | Browser/UI agents. | Verify unexpected elements, modals, layout shifts, and stale selectors trigger re-observe/recover. | Bounded recovery; no blind clicking. |
+| **11. Tool Timeouts** | External APIs. | Verify hangs, timeouts, and partial responses produce known states. | Unknown/pending states are preserved and reconciled before retry. |
+| **12. Network Failures** | Transport and gateway. | Test backoff, jitter, queueing, shedding, and managed refusal. | No cascading retry storms. |
+| **13. Rate Limits** | Provider gateway. | Verify rate-limit responses are handled through queueing, backoff, shedding, or managed refusal. | No unbounded retry; user receives clear status. |
+| **14. Provider Failovers** | Model/API routing. | Check backup routes preserve capability, compliance, and quality thresholds. | Fallback route is policy-approved, not merely cheaper. |
+| **15. Simultaneous Users** | Concurrency and serving. | Test queues, worker pools, memory pressure, and isolation under peak load. | Degrade or shed load before saturation collapse. |
+| **16. Cost Ceilings** | Spend controls. | Verify gateway blocks or degrades calls when run/session budgets are breached. | No unbounded spend; managed budget-exceeded state. |
+| **17. Partial Failures** | Workflow state. | Ensure mid-run failures preserve partial, pending, compensated, or unknown states. | No orphaned high-impact transaction states. |
+| **18. User Corrections** | Session memory and dialogue. | Verify corrections update active state and do not preserve stale assumptions. | Bounded repair with visible confirmation when needed. |
+| **19. Schema Migration** | Schema registry. | Verify database/API/schema migrations do not break old prompts, validators, or consumers. | Compatibility tests pass before rollout. |
+| **20. Stale Caches** | Memory/cache layers. | Check cache invalidation after database/source changes. | Stale data cannot authorize actions. |
+| **21. Prompt Injection** | Trust boundary. | Test injection payloads inside documents, pages, tool outputs, OCR text, and user content. | Injection cannot grant tool authority or override policy. |
+| **22. Streaming Truncation** | Streaming parsers. | Check incomplete objects, token limits, and dropped chunks. | No parser crash; incomplete status is preserved. |
+| **23. Human Escalation** | Operations. | Verify escalation packets include context, evidence, failure reason, and safe next options. | Human handoff is actionable and auditable. |
+| **24. Replayability** | Audit/debug. | Verify golden traces can be replayed with mocked tools and frozen inputs. | Divergence points are explicit and diagnosable. |
+
+### **Production Readiness Rule**
+
+```text
+A system is production-ready only when common failures are boring:
+bounded, typed, visible, replayable, and recoverable.
+```
 
 ## **Reliability Operations: Detection, Containment, Replay, and Recovery**
 
-When production pathologies occur, systems must automatically detect the failure, contain the impact, record the trace for debugging, and recover cleanly without dropping sessions.1
+When production pathologies occur, systems must automatically detect the failure, contain impact, preserve replay evidence, and recover without corrupting state. The correct recovery path depends on failure class, side-effect class, transaction boundary, and confidence in authoritative state.
 
 ### **Table 14: Detection-Control-Recovery Matrix**
 
 | Failure Class | Primary Detection Signal | Automatic Containment | Recovery Path | Human Escalation Trigger | Logging Requirement | Regression Test |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Malformed Output** | Parser throws a validation exception.3 | Isolate the parser process, block downstream delivery.3 | Trigger a repair routine using structured error feedback.3 | Repair attempts exceed the safety threshold (\<= 2).3 | Record raw tokens, parsing parameters, and error output.11 | Replay the trace to verify correct parsing.11 |
-| **Citation Failure** | Quote validation fails exact character matching.12 | Suppress statements citing missing documents.12 | Re-run queries, or return a managed refusal.3 | Citation support score drops below 0.85.29 | Log the retrieved documents and citation coordinates.11 | Run support evaluations against the database.31 |
-| **Tool Loop** | State repetition count exceeds limit (C\_rep \> 2).2 | Terminate the active thread, close API connections.1 | Roll back transaction database commits.1 | Tool execution fails twice on identical parameters.2 | Log the tool schema, payloads, and returned exceptions.11 | Replay the trace to check loop termination.11 |
-| **Instruction Loss** | Invariant check detects instruction drift.12 | Reject the generated output, block deployment.12 | Prune context tokens, rebuild prompt layouts.7 | Adherence score drops below threshold in production.12 | Record the complete prompt context and history.11 | Run instruction stress evaluations in CI/CD.31 |
-| **Contradiction** | Semantic check flags opposing statements.13 | Suspend session, suppress output.31 | Prompt user for clarification.12 | Output contains severe safety violations.5 | Log the conflicting claims and cited context.11 | Run semantic alignment tests on prompt options.26 |
-| **Runaway Cost** | Spend ledger flags budget limit breaches.1 | Trigger gateway rejection, block model calls.1 | Demote execution to low-cost fallback models.1 | Cumulative session cost exceeds limits.1 | Record the turn count, tokens used, and cost logs.24 | Verify gateway blocking configurations.30 |
-| **Stochastic Drift** | Canary test scores drop below threshold.25 | Freeze deployment rollout, isolate traffic.31 | Roll back model versions, adjust sampling.25 | Production accuracy drops past acceptable limit.31 | Run stochastic replay against past production traces.11 | Run multi-run regression tests on model variants.25 |
+| **Malformed Output** | Parser or schema validator rejects payload. | Block downstream delivery; preserve raw payload and validation errors. | Bounded repair using structured error feedback; fail closed after limit. | Repair attempts exceed threshold or payload is high-impact. | Raw output, schema version, validator errors, model route. | Replay trace through parser and repair harness. |
+| **Semantic Invalidity** | Business/domain validator rejects schema-valid payload. | Block execution and return typed semantic error. | Ask clarification, replan, or route to review. | High-impact action or repeated semantic mismatch. | Payload, rule ID, validator version, source state. | Domain-rule regression suite. |
+| **Citation Failure** | Citation support, quote fidelity, or source existence check fails. | Suppress unsupported claim or citation. | Re-run retrieval, surface uncertainty/conflict, or refuse. | Support score below policy threshold on high-impact answer. | Retrieved docs, citation coordinates, claim-support scores. | Citation-support evaluation. |
+| **Grounding Failure** | Claim unsupported by retrieved or inspected evidence. | Block confident answer. | Retrieve additional evidence, degrade confidence, or ask user. | Evidence unavailable for regulated/high-impact claim. | Evidence packets, adequacy state, claim IDs. | Grounding and evidence-sufficiency tests. |
+| **Tool Loop** | State repetition count or tool-call budget exceeded. | Stop tool dispatch; freeze run state. | Return managed failure, replan from verified state, or escalate. | Repeated identical parameters, high-cost tool, or mutating action. | Tool schemas, payload hashes, observations, idempotency keys. | Loop-termination replay test. |
+| **Unknown Tool State** | Timeout, lost response, or ambiguous observation after mutating call. | Block blind retry; hold workflow. | Reconcile via idempotency record/source-of-record; compensate or escalate if needed. | High-impact mutation or reconciliation timeout. | Execution attempt, idempotency key, request hash, trace ID. | Unknown-state retry prevention test. |
+| **Instruction Loss** | Invariant or policy check detects system directive drift. | Reject output or stop autonomous step. | Rebuild context, prune noise, restore canonical prompt template. | Safety/policy invariant breach. | Full prompt context, summary history, template versions. | Long-context instruction stress test. |
+| **Contradiction** | Semantic consistency check flags conflict. | Suppress or mark conflicting output. | Regenerate with conflict packet, ask user, or escalate based on risk. | Safety, legal, financial, medical, or operational conflict. | Conflicting claims, sources, tool results, memory state. | Contradiction-resolution suite. |
+| **Runaway Cost** | Spend, token, tool-call, or wall-clock budget threshold reached. | Gateway blocks further model/tool calls. | Degrade, summarize state, ask user, or return managed budget failure. | Budget breach on critical workflow or repeated abuse pattern. | Turn count, token usage, tool calls, cost ledger. | Budget-enforcement test. |
+| **Stochastic Drift** | Canary or replay distribution shifts beyond threshold. | Freeze rollout or isolate traffic slice. | Roll back model/prompt/retrieval/schema route; investigate drift. | User-visible incident or high-risk metric degradation. | Model fingerprint, route, prompts, traces, evaluation deltas. | Multi-run regression and canary replay. |
+| **Prompt Injection** | Untrusted content attempts to override system policy or trigger tools. | Isolate content as data; block unauthorized tool path. | Sanitize, strip hidden content, ask user, or quarantine source. | Credential/tool exfiltration attempt or repeated hostile source. | Source region, payload text, blocked tool, policy decision. | Injection corpus regression test. |
+| **Partial Commit** | Some sub-actions commit while others fail. | Stop dependent actions and preserve partial state. | Compensate before pivot, forward recover after pivot, or escalate. | Compensation fails or state is high-impact. | Sub-action statuses, transaction IDs, compensation attempts. | Saga/partial-failure drill. |
+| **False Success Escape** | User-facing success conflicts with verified state. | Correct status, block downstream dependence, incident if severe. | Reconcile authoritative state and issue corrected user/system status. | External user impact or high-impact side effect. | Spoken/text claim, verification state, source-of-record result. | False-success guard test. |
+
+### **Recovery Rule**
+
+```text
+Retry only when safe.
+Repair only when bounded.
+Rollback only inside a live transaction boundary.
+Compensate when committed state must be reversed.
+Forward recover after pivot when completion is safer than reversal.
+Hold and escalate when state is unknown or high-impact.
+```
 
 ## **Production Pathology Observability and Evaluation Guidance**
 
-Evaluating stateful, probabilistic systems requires tracking explicit runtime metrics across executions.1 Analyzing final responses is not enough; systems must evaluate intermediate transformations and tool executions.2
+Evaluating stateful, probabilistic systems requires tracking explicit runtime metrics across intermediate transformations, not just final responses. Production observability should distinguish formatting failures, semantic failures, grounding failures, tool failures, loop behavior, cost pressure, drift, replayability, and user-visible incidents.
+
+Absolute targets such as “0.00%” are appropriate only for **fail-closed invariant breaches** such as successful sandbox escape or unauthorized irreversible execution. For ordinary stochastic quality metrics, thresholds should be treated as operational SLOs tuned by risk class.
 
 ### **Table 15: Observability Metrics**
 
-| Metric Category | Technical Metric Identifier | Diagnostic Target | Target Threshold |
+| Metric Category | Technical Metric Identifier | Diagnostic Target | Target / Interpretation |
 | :---- | :---- | :---- | :---- |
-| **Formatting** | Malformed Output Rate | Parser exceptions divided by total responses.3 | \< 0.10% |
-| **Formatting** | Schema Rejection Rate | Schema failures divided by total evaluations.3 | 0.00% under FSM decoding |
-| **Formatting** | Repair Attempt Rate | Sessions needing format corrections.1 | \< 2.00% |
-| **Formatting** | Repair Success Rate | Successful repairs divided by total repair attempts.1 | \> 98.0% |
-| **Formatting** | Repair Hallucination Rate | Repairs that inject fabricated data.3 | 0.00% |
-| **Evidence** | Invalid Citation Rate | Unverifiable citations divided by total citations.18 | \< 1.00% |
-| **Evidence** | Citation Support Rate | Verified citations divided by total claims.18 | \> 98.0% |
-| **Evidence** | Unsupported Claim Rate | Generated claims lacking source citations.18 | \< 1.50% |
-| **Agentic** | Hallucinated Tool Rate | Tool calls missing from execution logs.2 | 0.00% |
-| **Agentic** | Tool Call Mismatch Rate | Tool arguments mismatching schemas.2 | \< 0.50% |
-| **Agentic** | Tool Loop Rate | Runs exceeding state repetition limits (C\_rep \> 2).2 | 0.00% |
-| **Agentic** | Repeated State Rate | Sequential turns returning identical parameters.2 | \< 1.00% |
-| **Execution** | Instruction Retention Score | Evaluations passing invariant check tests.7 | \> 99.0% |
-| **Execution** | Harness Drift Rate | Layout templates modified by system updates.12 | 0.00% |
-| **Execution** | Contradiction Rate | Responses with semantic conflicts.13 | \< 0.50% |
-| **Execution** | Cross-Run Variance | Phrasing variance across identical prompts.25 | Variance std dev \< 0.02 |
-| **Grounding** | Grounding Failure Rate | Responses failing semantic entailment checks.21 | \< 1.00% |
-| **Operations** | Action Success Hallucination Rate | Spoken successes mismatching DB states.12 | 0.00% |
-| **Operations** | Runaway Loop Termination Rate | Loops terminated by gateway budget limits.1 | 100% termination accuracy |
-| **Operations** | Cost Overrun Rate | Total spend exceeding budget limits.1 | 0.00% budget breaches |
-| **Operations** | Timeout-to-Success Misclassification | Hanging tools classified as successful runs.2 | 0.00% |
-| **Operations** | Non-Deterministic Regression Delta | Variance between canary and production results.25 | Delta \< 0.02 |
-| **Operations** | Replay Divergence Rate | Replays deviating from original traces.11 | 0.00% on identical code |
-| **Operations** | Human Escalation Rate | Tasks routed to human operators.2 | \< 5.00% |
-| **Operations** | User-Visible Incident Rate | Uncontained failures reaching users.1 | 0.00% |
+| **Formatting** | Malformed Output Rate | Parser exceptions divided by total structured responses. | Low SLO; alerts on regression. |
+| **Formatting** | Schema Rejection Rate | Schema failures divided by total evaluations. | Near-zero under constrained decoding; nonzero triggers investigation. |
+| **Formatting** | Repair Attempt Rate | Sessions needing format correction. | Low; spikes indicate prompt/schema/model drift. |
+| **Formatting** | Repair Success Rate | Successful repairs divided by repair attempts. | High, but repair limit must remain bounded. |
+| **Formatting** | Repair Drift Rate | Repairs that alter task, policy, or evidence unexpectedly. | Fail-closed invariant for high-impact outputs. |
+| **Evidence** | Invalid Citation Rate | Unverifiable citations divided by total citations. | Low; high-impact claims require stricter gate. |
+| **Evidence** | Citation Support Rate | Verified citations divided by total cited claims. | High; unsupported claims suppressed. |
+| **Evidence** | Unsupported Claim Rate | Generated claims lacking adequate evidence. | Risk-class dependent; must be near zero for regulated/high-impact answers. |
+| **Evidence** | Evidence Adequacy Failure Rate | Selected evidence is relevant but insufficient. | Useful signal for retrieval/crop/table/chart failures. |
+| **Agentic** | Hallucinated Tool Claim Rate | Claimed tool executions missing from traces. | Fail-closed invariant. |
+| **Agentic** | Tool Payload Rejection Rate | Tool arguments rejected by schema or policy. | Low; spikes indicate contract drift. |
+| **Agentic** | Tool Loop Rate | Runs exceeding repetition or tool-call limits. | Should terminate automatically; alert on repeated patterns. |
+| **Agentic** | Unknown Tool State Rate | Mutating tool attempts with unresolved outcome. | Low; high-impact unknown states require reconciliation/escalation. |
+| **Execution** | Instruction Retention Score | Evaluations passing instruction-invariant tests. | High; track by context length and task type. |
+| **Execution** | Harness Drift Rate | Prompt/eval templates modified outside manifest. | Fail-closed invariant for release governance. |
+| **Execution** | Contradiction Rate | Responses with semantic conflicts. | Low; severity weighted. |
+| **Execution** | Cross-Run Semantic Variance | Semantic variance across identical inputs under pinned route. | Bounded; distinguish phrasing variance from decision variance. |
+| **Grounding** | Grounding Failure Rate | Responses failing source-support or evidence checks. | Low; gated by risk class. |
+| **Operations** | Action Success Hallucination Rate | Completion claims mismatching authoritative state. | Fail-closed invariant. |
+| **Operations** | Runaway Loop Termination Rate | Loops terminated by gateway or orchestrator budgets. | High; failures indicate budget-control defect. |
+| **Operations** | Cost Overrun Rate | Spend exceeding budget policy. | Fail-closed invariant after gateway controls. |
+| **Operations** | Timeout-to-Success Misclassification | Hanging/pending tools reported as successful. | Fail-closed invariant. |
+| **Operations** | Non-Deterministic Regression Delta | Variance between canary and baseline distributions. | Alert when above release threshold. |
+| **Operations** | Replay Divergence Rate | Replays deviating from recorded traces under unchanged code and mocked dependencies. | Low; divergence must identify first mismatching step. |
+| **Operations** | Human Escalation Rate | Tasks routed to human operators. | Context dependent; spikes indicate automation degradation. |
+| **Operations** | User-Visible Incident Rate | Uncontained failures reaching users. | Fail-closed invariant goal; investigate all verified incidents. |
+| **Security** | Prompt Injection Block Rate | Injection attempts blocked before tool authority. | Nonzero blocks may indicate controls working; spikes require source review. |
+| **Security** | Unauthorized Tool Execution Rate | Tools executed without valid authority/approval. | Fail-closed invariant. |
+| **Security** | Data Exfiltration Attempt Rate | Blocked attempts to expose restricted data. | Track and investigate; successful exfiltration is incident. |
+
+### **Observability Rule**
+
+```text
+Measure every boundary:
+input, retrieval, context, generation, validation, repair,
+tool dispatch, observation, verification, state update, citation, and output.
+```
+
+A final-answer metric alone cannot diagnose where the system failed. It only tells you where the smoke finally escaped.
 
 ## **Cross-Canon Handoff Map**
 
@@ -458,59 +670,87 @@ The AI-ENG-S report establishes the foundational failure atlas that adjacent can
 
 ### **I. Constrain Decoding at the Inference Layer**
 
-Relying on system prompts to enforce formatting constraints is an anti-pattern that introduces unnecessary risks into production environments.4 Syntactic schema compliance must be enforced at the inference layer by compiling schemas into Finite State Machines or Context-Free Grammars.4 This step makes formatting violations mathematically impossible, letting downstream code parse payloads without throwing exceptions.3
+Relying on prompts to enforce formatting constraints is an anti-pattern. When a downstream system expects a strict structure, syntactic compliance should be enforced with constrained decoding, schema-aware generation, or strict post-generation validation. Formatting failures should not reach business logic.
 
 ### **II. Separate Formatting Compliance from Semantic Verification**
 
-Syntactic correctness does not guarantee semantic accuracy.3 A model can generate valid JSON that contains fabricated facts or violates business rules.3 Systems must evaluate outputs using a multi-layered validation pipeline that separates formatting checks from business logic, grounding validation, and safety scans.3
+Syntactic correctness does not guarantee semantic correctness. Valid JSON can contain fabricated facts, impossible dates, unauthorized actions, stale IDs, or invalid business logic. Production systems must validate syntax, schema, semantics, policy, grounding, and downstream usability separately.
 
-### **III. Enforce Run-Level Financial and Execution Budgets**
+### **III. Treat Every Boundary Crossing as a Contract**
 
-Stateful agents can easily enter recursive execution loops, consuming compute credits and API budgets in minutes.1 To prevent financial overruns, execution paths must run within strict, run-level budgets managed by gateway proxies.1 Once a budget is exceeded, the gateway must terminate the run and return managed exceptions.1
+Model outputs, retrieved evidence, citations, tool arguments, tool observations, UI actions, voice transcripts, and final responses are all boundary-crossing artifacts. Each must carry enough structure for validation, authorization, tracing, and recovery.
 
-### **IV. Validate Citations Prior to Output Generation**
+### **IV. Enforce Run-Level Financial and Execution Budgets**
 
-A citation is not valid because it exists; it is valid only if it explicitly supports the claim it is attached to.18 Systems must analyze retrieved context, evaluate citation relevance, and verify quote alignments before delivering answers to users.12 Ungrounded claims must be suppressed or routed to review queues.12
+Stateful agents can enter recursive loops and denial-of-wallet dynamics. Execution paths must run within explicit token, time, tool-call, concurrency, and currency budgets enforced by the gateway or orchestrator, not merely requested in the prompt.
 
-### **V. Build for Complete Observability and Replayability**
+### **V. Verify Citations Before Trusting Claims**
 
-Debugging non-deterministic, multi-turn agents is impossible without tracing their complete execution paths.11 Production environments must capture and record all external interactions, sampling parameters, and state changes in structured logs.11 These traces allow developers to reproduce logic paths verbatim, isolate regressions, and debug failures safely.11
+A citation is not valid because it exists. It is valid only if it points to an existing, fresh, authorized source that supports the attached claim. Unsupported claims must be revised, suppressed, or routed to review.
+
+### **VI. Preserve Unknown State Instead of Guessing**
+
+Timeouts, partial commits, and ambiguous observations must not be flattened into success or failure. Unknown is a first-class state that blocks unsafe retries and requires reconciliation, compensation, or escalation.
+
+### **VII. Use Idempotency for Mutating Boundaries**
+
+Retries are inevitable. Duplicate side effects are optional negligence. Any state-changing boundary should use idempotency keys, request hashes, replay protection, and durable execution records proportional to risk.
+
+### **VIII. Separate Untrusted Data from Authority**
+
+Retrieved documents, webpage text, OCR output, tool responses, user-generated content, and emails are evidence, not instructions. They cannot grant permissions, override policy, or authorize tools.
+
+### **IX. Bound Repair, Retry, Reflection, and Fallback Loops**
+
+Repair is useful only when it terminates. Retry is safe only when idempotent or reconciled. Reflection is useful only with a stop condition. Fallback is safe only when the substitute route preserves capability, compliance, and quality requirements.
+
+### **X. Build for Complete Observability and Replayability**
+
+Debugging nondeterministic, multi-turn agents requires complete traces: prompts, model versions, tool calls, observations, validation results, state changes, budget counters, evidence packets, and policy decisions. If the system cannot replay a failure, it cannot reliably fix it.
+
+### **XI. Fail Closed on Authority, Safety, and High-Impact State**
+
+When authorization, identity, approval, policy, source authority, or high-impact action state cannot be verified, the system should fail closed, degrade safely, or escalate. It should not continue optimistically.
+
+### **XII. Reliability Is a Release Property, Not a Vibe**
+
+Production readiness is established through canaries, regression suites, failure injection, trace replay, schema compatibility checks, and operational SLOs. A working demo is not evidence of production reliability. It is a charming little hallucination with a UI.
 
 #### **Works cited**
 
 1. Runaway Agents, Tool Loops, and Budget Overruns — Cycles, accessed June 10, 2026, [https://runcycles.io/incidents/runaway-agents-tool-loops-and-budget-overruns-the-incidents-cycles-is-designed-to-prevent](https://runcycles.io/incidents/runaway-agents-tool-loops-and-budget-overruns-the-incidents-cycles-is-designed-to-prevent)  
-2. How are you preventing runaway AI agent behavior in production? : r/LangChain \- Reddit, accessed June 10, 2026, [https://www.reddit.com/r/LangChain/comments/1rhwz53/how\_are\_you\_preventing\_runaway\_ai\_agent\_behavior/](https://www.reddit.com/r/LangChain/comments/1rhwz53/how_are_you_preventing_runaway_ai_agent_behavior/)  
+2. How are you preventing runaway AI agent behavior in production? : r/LangChain - Reddit, accessed June 10, 2026, [https://www.reddit.com/r/LangChain/comments/1rhwz53/how_are_you_preventing_runaway_ai_agent_behavior/](https://www.reddit.com/r/LangChain/comments/1rhwz53/how_are_you_preventing_runaway_ai_agent_behavior/)  
 3. Your LLM JSON Is Valid — And Still Wrong | by Rost Glukhov | May ..., accessed June 10, 2026, [https://medium.com/@rosgluk/your-llm-json-is-valid-and-still-wrong-12dbbecf1fdc](https://medium.com/@rosgluk/your-llm-json-is-valid-and-still-wrong-12dbbecf1fdc)  
 4. Beyond JSON Mode: Getting Reliable Structured Outputs from LLMs ..., accessed June 10, 2026, [https://tianpan.co/blog/2025-10-29-structured-outputs-llm-production](https://tianpan.co/blog/2025-10-29-structured-outputs-llm-production)  
-5. LLM06:2025 Excessive Agency \- OWASP Gen AI Security Project, accessed June 10, 2026, [https://genai.owasp.org/llmrisk/llm062025-excessive-agency/](https://genai.owasp.org/llmrisk/llm062025-excessive-agency/)  
-6. LLM05:2025 Improper Output Handling \- OWASP Gen AI Security Project, accessed June 10, 2026, [https://genai.owasp.org/llmrisk/llm052025-improper-output-handling/](https://genai.owasp.org/llmrisk/llm052025-improper-output-handling/)  
+5. LLM06:2025 Excessive Agency - OWASP Gen AI Security Project, accessed June 10, 2026, [https://genai.owasp.org/llmrisk/llm062025-excessive-agency/](https://genai.owasp.org/llmrisk/llm062025-excessive-agency/)  
+6. LLM05:2025 Improper Output Handling - OWASP Gen AI Security Project, accessed June 10, 2026, [https://genai.owasp.org/llmrisk/llm052025-improper-output-handling/](https://genai.owasp.org/llmrisk/llm052025-improper-output-handling/)  
 7. LLM Context Window Management and Long-Context Strategies 2026 | Zylos Research, accessed June 10, 2026, [https://zylos.ai/research/2026-01-19-llm-context-management/](https://zylos.ai/research/2026-01-19-llm-context-management/)  
-8. Lost-in-the-Middle Is Still Real in 2026 (Even on 1M-Token Models) \- DEV Community, accessed June 10, 2026, [https://dev.to/gabrielanhaia/lost-in-the-middle-is-still-real-in-2026-even-on-1m-token-models-2ehj](https://dev.to/gabrielanhaia/lost-in-the-middle-is-still-real-in-2026-even-on-1m-token-models-2ehj)  
-9. \[KNOWLEDGE\] \- AI Engineering \- Volume 2\. D-F Knowledge, Data, and Corpus Engineering.md  
-10. Has anyone actually solved runaway agent costs? Looking for patterns beyond logging \- API, accessed June 10, 2026, [https://community.openai.com/t/has-anyone-actually-solved-runaway-agent-costs-looking-for-patterns-beyond-logging/1383094](https://community.openai.com/t/has-anyone-actually-solved-runaway-agent-costs-looking-for-patterns-beyond-logging/1383094)  
+8. Lost-in-the-Middle Is Still Real in 2026 (Even on 1M-Token Models) - DEV Community, accessed June 10, 2026, [https://dev.to/gabrielanhaia/lost-in-the-middle-is-still-real-in-2026-even-on-1m-token-models-2ehj](https://dev.to/gabrielanhaia/lost-in-the-middle-is-still-real-in-2026-even-on-1m-token-models-2ehj)  
+9. [KNOWLEDGE] - AI Engineering - Volume 2. D-F Knowledge, Data, and Corpus Engineering.md  
+10. Has anyone actually solved runaway agent costs? Looking for patterns beyond logging - API, accessed June 10, 2026, [https://community.openai.com/t/has-anyone-actually-solved-runaway-agent-costs-looking-for-patterns-beyond-logging/1383094](https://community.openai.com/t/has-anyone-actually-solved-runaway-agent-costs-looking-for-patterns-beyond-logging/1383094)  
 11. Deterministic Replay: How to Debug AI Agents That Never Run the ..., accessed June 10, 2026, [https://tianpan.co/blog/2026-04-12-deterministic-replay-debugging-non-deterministic-ai-agents](https://tianpan.co/blog/2026-04-12-deterministic-replay-debugging-non-deterministic-ai-agents)  
-12. \[KNOWLEDGE\] \- AI Engineering \- Volume 6\. P-R Multimodal and Interface-Controlling Systems  
-13. Taxonomy of Hallucinations in AI \- Emergent Mind, accessed June 10, 2026, [https://www.emergentmind.com/topics/taxonomy-of-hallucinations](https://www.emergentmind.com/topics/taxonomy-of-hallucinations)  
-14. Survey and analysis of hallucinations in large language models: attribution to prompting strategies or model behavior \- PMC, accessed June 10, 2026, [https://pmc.ncbi.nlm.nih.gov/articles/PMC12518350/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12518350/)  
-15. I tested structured output from 288 LLM calls and logged every way JSON breaks. Here's what I found : r/Python \- Reddit, accessed June 10, 2026, [https://www.reddit.com/r/Python/comments/1tagc2g/i\_tested\_structured\_output\_from\_288\_llm\_calls\_and/](https://www.reddit.com/r/Python/comments/1tagc2g/i_tested_structured_output_from_288_llm_calls_and/)  
-16. Structured Output Isn't Reliable Output \- Rotascale, accessed June 10, 2026, [https://rotascale.com/blog/structured-output-isnt-reliable-output/](https://rotascale.com/blog/structured-output-isnt-reliable-output/)  
-17. Measuring output stability across LLM runs (JSON drift problem) : r/LocalLLaMA \- Reddit, accessed June 10, 2026, [https://www.reddit.com/r/LocalLLaMA/comments/1qwgu6x/measuring\_output\_stability\_across\_llm\_runs\_json/](https://www.reddit.com/r/LocalLLaMA/comments/1qwgu6x/measuring_output_stability_across_llm_runs_json/)  
-18. Citation Grounding: Detecting and Reducing LLM Citation Hallucinations via Legal Citation Graphs \- arXiv, accessed June 10, 2026, [https://arxiv.org/html/2606.00898v1](https://arxiv.org/html/2606.00898v1)  
-19. CiteGuard: Faithful Citation Attribution for LLMs via Retrieval-Augmented Validation \- arXiv, accessed June 10, 2026, [https://arxiv.org/html/2510.17853v1](https://arxiv.org/html/2510.17853v1)  
-20. A Comparative Analysis of Faithfulness Metrics and Humans in Citation Evaluation \- arXiv, accessed June 10, 2026, [https://arxiv.org/html/2408.12398v1](https://arxiv.org/html/2408.12398v1)  
-21. How do I reduce hallucinations when using search-grounded LLM responses? \- Firecrawl, accessed June 10, 2026, [https://www.firecrawl.dev/glossary/web-search-apis/reduce-hallucinations-search-grounded-llm-responses](https://www.firecrawl.dev/glossary/web-search-apis/reduce-hallucinations-search-grounded-llm-responses)  
-22. Context Rot: Why AI Gets Worse the Longer You Chat (And How to Fix It) \- Product Talk, accessed June 10, 2026, [https://www.producttalk.org/context-rot/](https://www.producttalk.org/context-rot/)  
-23. Intelligence Degradation in Long-Context LLMs: Critical Threshold Determination via Natural Length Distribution Analysis \- arXiv, accessed June 10, 2026, [https://arxiv.org/html/2601.15300v1](https://arxiv.org/html/2601.15300v1)  
-24. AI Agent Loop Token Costs: How to Constrain Context \- Augment Code, accessed June 10, 2026, [https://www.augmentcode.com/guides/ai-agent-loop-token-cost-context-constraints](https://www.augmentcode.com/guides/ai-agent-loop-token-cost-context-constraints)  
-25. Non-Deterministic LLM Prompts in 2026: Practical Guide \- Future AGI, accessed June 10, 2026, [https://futureagi.com/blog/non-deterministic-llm-prompts-2025/](https://futureagi.com/blog/non-deterministic-llm-prompts-2025/)  
-26. You Can't Assert Your Way Out of Non-Determinism: A Practical QA Strategy for LLM Applications | by Venkat Peri \- Medium, accessed June 10, 2026, [https://medium.com/@venkatperi/you-cant-assert-your-way-out-of-non-determinism-a-practical-qa-strategy-for-llm-applications-fd32e617cdec](https://medium.com/@venkatperi/you-cant-assert-your-way-out-of-non-determinism-a-practical-qa-strategy-for-llm-applications-fd32e617cdec)  
-27. OWASP Top 10 LLM, Updated 2025: Examples & Mitigation Strategies \- Oligo Security, accessed June 10, 2026, [https://www.oligo.security/academy/owasp-top-10-llm-updated-2025-examples-and-mitigation-strategies](https://www.oligo.security/academy/owasp-top-10-llm-updated-2025-examples-and-mitigation-strategies)  
-28. LLM Hallucination Examples \- Arize AI, accessed June 10, 2026, [https://arize.com/llm-hallucination-examples/](https://arize.com/llm-hallucination-examples/)  
-29. CiteCheck: Towards Accurate Citation Faithfulness Detection \- arXiv, accessed June 10, 2026, [https://arxiv.org/html/2502.10881v1](https://arxiv.org/html/2502.10881v1)  
+12. [KNOWLEDGE] - AI Engineering - Volume 6. P-R Multimodal and Interface-Controlling Systems  
+13. Taxonomy of Hallucinations in AI - Emergent Mind, accessed June 10, 2026, [https://www.emergentmind.com/topics/taxonomy-of-hallucinations](https://www.emergentmind.com/topics/taxonomy-of-hallucinations)  
+14. Survey and analysis of hallucinations in large language models: attribution to prompting strategies or model behavior - PMC, accessed June 10, 2026, [https://pmc.ncbi.nlm.nih.gov/articles/PMC12518350/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12518350/)  
+15. I tested structured output from 288 LLM calls and logged every way JSON breaks. Here's what I found : r/Python - Reddit, accessed June 10, 2026, [https://www.reddit.com/r/Python/comments/1tagc2g/i_tested_structured_output_from_288_llm_calls_and/](https://www.reddit.com/r/Python/comments/1tagc2g/i_tested_structured_output_from_288_llm_calls_and/)  
+16. Structured Output Isn't Reliable Output - Rotascale, accessed June 10, 2026, [https://rotascale.com/blog/structured-output-isnt-reliable-output/](https://rotascale.com/blog/structured-output-isnt-reliable-output/)  
+17. Measuring output stability across LLM runs (JSON drift problem) : r/LocalLLaMA - Reddit, accessed June 10, 2026, [https://www.reddit.com/r/LocalLLaMA/comments/1qwgu6x/measuring_output_stability_across_llm_runs_json/](https://www.reddit.com/r/LocalLLaMA/comments/1qwgu6x/measuring_output_stability_across_llm_runs_json/)  
+18. Citation Grounding: Detecting and Reducing LLM Citation Hallucinations via Legal Citation Graphs - arXiv, accessed June 10, 2026, [https://arxiv.org/html/2606.00898v1](https://arxiv.org/html/2606.00898v1)  
+19. CiteGuard: Faithful Citation Attribution for LLMs via Retrieval-Augmented Validation - arXiv, accessed June 10, 2026, [https://arxiv.org/html/2510.17853v1](https://arxiv.org/html/2510.17853v1)  
+20. A Comparative Analysis of Faithfulness Metrics and Humans in Citation Evaluation - arXiv, accessed June 10, 2026, [https://arxiv.org/html/2408.12398v1](https://arxiv.org/html/2408.12398v1)  
+21. How do I reduce hallucinations when using search-grounded LLM responses? - Firecrawl, accessed June 10, 2026, [https://www.firecrawl.dev/glossary/web-search-apis/reduce-hallucinations-search-grounded-llm-responses](https://www.firecrawl.dev/glossary/web-search-apis/reduce-hallucinations-search-grounded-llm-responses)  
+22. Context Rot: Why AI Gets Worse the Longer You Chat (And How to Fix It) - Product Talk, accessed June 10, 2026, [https://www.producttalk.org/context-rot/](https://www.producttalk.org/context-rot/)  
+23. Intelligence Degradation in Long-Context LLMs: Critical Threshold Determination via Natural Length Distribution Analysis - arXiv, accessed June 10, 2026, [https://arxiv.org/html/2601.15300v1](https://arxiv.org/html/2601.15300v1)  
+24. AI Agent Loop Token Costs: How to Constrain Context - Augment Code, accessed June 10, 2026, [https://www.augmentcode.com/guides/ai-agent-loop-token-cost-context-constraints](https://www.augmentcode.com/guides/ai-agent-loop-token-cost-context-constraints)  
+25. Non-Deterministic LLM Prompts in 2026: Practical Guide - Future AGI, accessed June 10, 2026, [https://futureagi.com/blog/non-deterministic-llm-prompts-2025/](https://futureagi.com/blog/non-deterministic-llm-prompts-2025/)  
+26. You Can't Assert Your Way Out of Non-Determinism: A Practical QA Strategy for LLM Applications | by Venkat Peri - Medium, accessed June 10, 2026, [https://medium.com/@venkatperi/you-cant-assert-your-way-out-of-non-determinism-a-practical-qa-strategy-for-llm-applications-fd32e617cdec](https://medium.com/@venkatperi/you-cant-assert-your-way-out-of-non-determinism-a-practical-qa-strategy-for-llm-applications-fd32e617cdec)  
+27. OWASP Top 10 LLM, Updated 2025: Examples & Mitigation Strategies - Oligo Security, accessed June 10, 2026, [https://www.oligo.security/academy/owasp-top-10-llm-updated-2025-examples-and-mitigation-strategies](https://www.oligo.security/academy/owasp-top-10-llm-updated-2025-examples-and-mitigation-strategies)  
+28. LLM Hallucination Examples - Arize AI, accessed June 10, 2026, [https://arize.com/llm-hallucination-examples/](https://arize.com/llm-hallucination-examples/)  
+29. CiteCheck: Towards Accurate Citation Faithfulness Detection - arXiv, accessed June 10, 2026, [https://arxiv.org/html/2502.10881v1](https://arxiv.org/html/2502.10881v1)  
 30. How to Prevent Runaway Agent Costs with MLflow AI Gateway, accessed June 10, 2026, [https://mlflow.org/blog/agent-costs-mlflow-gateway/](https://mlflow.org/blog/agent-costs-mlflow-gateway/)  
-31. Monitoring LLM behavior: Drift, retries, and refusal patterns \- VentureBeat, accessed June 10, 2026, [https://venturebeat.com/infrastructure/monitoring-llm-behavior-drift-retries-and-refusal-patterns](https://venturebeat.com/infrastructure/monitoring-llm-behavior-drift-retries-and-refusal-patterns)  
+31. Monitoring LLM behavior: Drift, retries, and refusal patterns - VentureBeat, accessed June 10, 2026, [https://venturebeat.com/infrastructure/monitoring-llm-behavior-drift-retries-and-refusal-patterns](https://venturebeat.com/infrastructure/monitoring-llm-behavior-drift-retries-and-refusal-patterns)  
 32. Recursive Language Models: Could This Be the Real Fix for Long-Context AI in 2026? | by Vinod Polinati | Medium, accessed June 10, 2026, [https://medium.com/@vinodpolinati/recursive-language-models-could-this-be-the-real-fix-for-long-context-ai-in-2026-070328df9329](https://medium.com/@vinodpolinati/recursive-language-models-could-this-be-the-real-fix-for-long-context-ai-in-2026-070328df9329)  
-33. The Essential Guide to the NIST AI Risk Management Framework 1.0 \- Vistrada, accessed June 10, 2026, [https://vistrada.com/resources/insights/nist-ai-risk-management-framework-1-0](https://vistrada.com/resources/insights/nist-ai-risk-management-framework-1-0)
+33. The Essential Guide to the NIST AI Risk Management Framework 1.0 - Vistrada, accessed June 10, 2026, [https://vistrada.com/resources/insights/nist-ai-risk-management-framework-1-0](https://vistrada.com/resources/insights/nist-ai-risk-management-framework-1-0)
 
 ---
 

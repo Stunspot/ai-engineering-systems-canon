@@ -65,48 +65,71 @@ Unnecessary system autonomy is a critical driver of latency, financial waste, an
 
 ## **The Autonomy Boundary Model**
 
-The Autonomy Boundary Model defines the operational limits of what a model can observe, decide, execute, or change at runtime.2 Autonomy is an adjustable dial that must be dynamically calibrated based on the underlying task risk, the sensitivity of the data, and the presence of human oversight.6
+The Autonomy Boundary Model defines the operational limits of what a model may observe, decide, execute, or change at runtime. Autonomy is not a personality trait or a product aesthetic. It is a scoped lease of decision rights granted by the surrounding system under explicit policy, budget, identity, tool, and termination constraints.
 
+A safe autonomy boundary separates five layers of authority:
+
+```text
++--------------------------------------------------------------------------------
+| AUTONOMY BOUNDARY MODEL
++--------------------------------------------------------------------------------
+|
+| Goal:
+|   Grant the model only the minimum decision rights needed for the task,
+|   while deterministic systems, humans, auditors, and infrastructure retain
+|   final authority over safety, permissions, cost, and side effects.
+|
+|   Layer 5: Infrastructure Enforcement
+|     network sandbox | IAM | container limits | gateway rate limits
+|     wall-clock timeout | filesystem sandbox | egress control
+|
+|   Layer 4: Audit and Review Layer
+|     asynchronous human audit | compliance review | trace inspection
+|     incident review | exception records
+|
+|   Layer 3: Human Approval Gates
+|     explicit approval for writes | budget release | external communication
+|     purchase approval | infrastructure mutation approval
+|
+|   Layer 2: Deterministic Policy Layer
+|     schema validators | ACLs | quota checks | tool registry
+|     state guards | output validators | action verifiers
+|
+|   Layer 1: Model Discretion Layer
+|     propose plan | choose next allowed step | draft tool arguments
+|     summarize observations | request clarification | recommend escalation
+|
++--------------------------------------------------------------------------------
+| Rule:
+|   The model may propose. The orchestrator authorizes. Tools execute.
+|   Validators verify. Humans approve high-impact actions. Infrastructure enforces.
++--------------------------------------------------------------------------------
 ```
-┌────────────────────────────────────────────────────────────────────────┐  
-│                        AUTONOMY BOUNDARY TIER                          │  
-├────────────────────────────────────────────────────────────────────────┤  
-│                                                                        │  
-│  - Network sandboxes, IAM token validation, gateway rate-limiting      │  
-├────────────────────────────────────────────────────────────────────────┤  
-│  [ Asynchronous Human Audit Queues ]                                   │  
-│  - Post-action verification, log audits, compliance signatures         │  
-├────────────────────────────────────────────────────────────────────────┤  
-│  [ User / Operator Confirmation Gates ]                                │  
-│  - Active approval buttons, budget releases, path validation checks    │  
-├────────────────────────────────────────────────────────────────────────┤  
-│                                                                        │  
-│  - Immutable schema validators, parameter boundary checkers, ACLs      │  
-├────────────────────────────────────────────────────────────────────────┤  
-│                                                                        │  
-│  - Dynamic step selection, sub-query generation, argument proposals    │  
-└────────────────────────────────────────────────────────────────────────┘
-```
 
-The specific authority boundaries across different system layers are modeled as follows:
+The autonomy boundary is configured through dimensions that describe what the agent may observe, decide, invoke, write, spend, and escalate.
 
-| Boundary Dimension | Model Deliberative Authority | Deterministic System Policy | User Approval Policy | Serving Layer Enforcement |
-| :---- | :---- | :---- | :---- | :---- |
-| **Allowed Observations** | Select which local document index to query.1 | Filter retrieved context for PII and redact sensitive strings.12 | Confirm manual expansion of document search scope.1 | Restrict network requests to localhost using IAM tokens.6 |
-| **Allowed State Writes** | Append step results to the active run scratchpad.7 | Block writes that violate task schema properties.13 | Approve checkpoint saves for long-running workflows.4 | Enforce absolute segment separation of database connections.6 |
-| **Allowed Tools** | Propose calling registered local search tools.1 | Map proposed tools against the allowed execution list.11 | Manually authorize write-capable tool invocations.6 | Terminate execution if tool lacks valid credentials.6 |
-| **Resource Budgets** | Project remaining cost using Progressive Estimation.8 | Monitor step counters and track token usage rates.7 | Approve manual increases to financial or step caps.7 | Sever connection if container exceeds wall-clock limits. |
-| **Escalation Paths** | Flag low-confidence outputs to request help.4 | Halt execution and trigger escalation on validator failure.7 | Choose whether to override, edit, or terminate the plan.1 | Log a high-priority incident and page the active SRE team.18 |
+| Boundary Dimension | Model Deliberative Authority | Deterministic System Policy | User / Human Approval Policy | Serving / Infrastructure Enforcement |
+| :--- | :--- | :--- | :--- | :--- |
+| **Allowed Observations** | Select among authorized read-only sources, request more context, or choose which local index to query. | Filter retrieved context by permission, tenure, freshness, PII policy, and source authority. | Confirm expansion into broader or more sensitive search scopes. | Restrict network access, API credentials, document stores, and retrieval endpoints by active identity. |
+| **Allowed State Writes** | Propose updates to task state, scratchpad summaries, or candidate memory entries. | Reject writes that violate schema, authority, tenure, or observation-grounding rules. | Approve persistent memory writes, external communications, file modifications, or workflow checkpoints when required. | Enforce sandbox boundaries, transactional writes, WORM audit logs, and least-privilege database credentials. |
+| **Allowed Tools** | Propose tool calls from the active tool registry and draft candidate arguments. | Match proposed tool against allowlist, schema, budget, risk class, and user permission. | Approve write-capable, financial, external communication, or infrastructure-changing tools. | Deny unauthorized credentials, block network egress, apply rate limits, and terminate unapproved calls. |
+| **Decision Rights** | Select the next allowed plan step, request repair, choose among permitted tools, or ask for clarification. | Constrain all transitions to compiled graph edges and deterministic guards. | Approve plan changes in high-risk or ambiguous workflows. | Prevent runtime graph mutation, privilege escalation, and unauthorized transition injection. |
+| **Resource Budgets** | Estimate remaining work and recommend continuation, compression, or escalation. | Track tokens, tool calls, wall-clock, cost, retries, context growth, and external API usage. | Approve budget increases for long-running or high-value tasks. | Enforce gateway quotas, container timeouts, billing limits, and circuit breakers. |
+| **Escalation Paths** | Flag low confidence, conflict, missing information, or unsafe uncertainty. | Halt execution on validation failure, source conflict, permission failure, or budget breach. | Review, edit, approve, reject, or terminate the proposed continuation. | Page SRE, Security, Compliance, or workflow owner depending on severity. |
 
 ### **Context and Boundary Adjustments by Risk Profile**
 
-Autonomy boundaries are not static; they change based on the risk profile of the target domain 6:
+Autonomy boundaries are calibrated by task risk, data sensitivity, side-effect severity, and user oversight. A system should not grant the same discretion to a research assistant summarizing public documents and an SRE agent proposing production infrastructure changes.
 
-* **Research Assistant:** High read-only autonomy.6 The model may browse, retrieve, and summarize documents without external side effects.1  
-* **Coding Assistant:** Bounded write autonomy.6 The model may modify files in a local workspace but is prohibited from pushing changes or deploying to production until all unit tests pass and a senior engineer signs off on the pull request.1  
-* **Customer Support Agent:** Bounded action autonomy.6 The model may search documentation and draft replies but requires human review for account adjustments, refunds, or cancellations.6  
-* **Procurement Agent:** High financial risk.6 The model may identify vendors and compare contract items but requires explicit supervisor approval before executing purchases.6  
-* **Incident Remediation SRE Agent:** High operational risk.6 The model can query performance logs and metrics but cannot reboot servers or alter infrastructure configs without human approval.6
+| Risk Profile | Default Autonomy | Allowed Without Human Approval | Requires Human Approval | Fail-Closed Conditions |
+| :--- | :--- | :--- | :--- | :--- |
+| **Research Assistant** | High read-only autonomy | Browse approved sources, retrieve documents, summarize, compare, cite, ask clarifying questions. | Persistent memory writes, sensitive-source expansion, or paid external lookups. | Unauthorized data access, ungrounded claims presented as verified, or source-policy conflict. |
+| **Coding Assistant** | Bounded workspace autonomy | Read files, propose patches, run tests in sandbox, write local draft files when permitted. | Pushes, deployments, credential changes, destructive file operations, production migrations. | Secret exposure, failing tests after mutation, unauthorized repo access, or production-impacting command. |
+| **Customer Support Agent** | Bounded action autonomy | Search documentation, draft replies, classify issues, summarize account state. | Refunds, cancellations, account changes, legal commitments, external communication send actions. | Identity mismatch, payment change, policy exception, or regulated support category. |
+| **Procurement Agent** | Low mutation autonomy | Compare vendors, extract terms, flag risks, prepare recommendation packets. | Purchase orders, invoice release, contract changes, vendor onboarding, payment execution. | Budget breach, missing approval chain, vendor risk conflict, or contract ambiguity. |
+| **Incident Remediation SRE Agent** | High diagnostic / low mutation autonomy | Query logs, inspect metrics, compare deploys, draft runbook steps, recommend rollback. | Restarts, traffic shifts, config changes, data migrations, production rollback. | Security incident, destructive action, uncertain blast radius, or missing operator approval. |
+
+The autonomy boundary should be stored as part of the run manifest. Every tool call, state transition, memory write, and escalation decision must be evaluated against the active boundary version that authorized the run.
 
 ## **The Agent Loop Lifecycle**
 
@@ -123,7 +146,7 @@ The life cycle of an orchestrator run is structured around an iterative control 
 | **7. Tool Eligibility** | Verify tool registration and active user permissions.6 | Tool registry; active Plan Step. | Intercept and block unauthorized tool calls.11 | Authorized Tool List.11 |
 | **8. Action Selection** | Select tool and populate parameter arguments.4 | Plan step; context history.4 | Match generated arguments against target tool schemas.5 | Proposed Action Event.5 |
 | **9. Tool Invocation** | Execute the tool call and capture raw payload.4 | Proposed Action; system secrets.11 | Enforce execution timeouts and catch runtime errors.4 | Raw Tool Output Payload.5 |
-| **10. Obs Grounding** | Ingest tool outputs and verify factual grounding.4 | Raw Tool Payload; system state. | Reject model-hallucinated or assumed tool outcomes.5 | Grounded Observation.5 |
+| **10. Observation Grounding** | Ingest tool outputs and verify factual grounding.4 | Raw Tool Payload; system state. | Reject model-hallucinated or assumed tool outcomes.5 | Grounded Observation.5 |
 | **11. State Update** | Commit observation to the task state.4 | Grounded Observation; Active State.13 | Commit updates to the versioned state database.13 | Updated Task State.13 |
 | **12. Validation Check** | Evaluate step quality against acceptance criteria.5 | Updated Task State; criteria list.7 | Score outputs for compliance and semantic accuracy.5 | Validation Score Card.5 |
 | **13. Reflection Trigger** | Diagnose failures and trigger corrections if needed.7 | Validation Score Card; state logs. | Limit repair attempts to prevent looping.7 | Diagnostic Repair Plan.7 |
@@ -135,22 +158,81 @@ The life cycle of an orchestrator run is structured around an iterative control 
 
 ### **Observation Grounding: Intended, Attempted, Observed, Verified, and Assumed Results**
 
-At the orchestration level, observation grounding is a vital guard against state contamination.5 A failure occurs when an agent treats its *intended* or *attempted* actions as *assumed* realities without waiting for the physical tool execution to return a response.5 The orchestrator must implement strict state boundaries separating execution phases:
+Observation grounding prevents an agent from contaminating task state with actions it merely intended, attempted, or imagined. The orchestrator must distinguish between the model's proposed action, the system's attempted dispatch, the tool's observed response, the validator's verified result, and the committed state update.
 
-```
-  - Model drafts a tool call (e.g., write database record)  
-     │  
-     ▼  
- - Orchestrator sends request to the target API endpoint  
-     │  
-     ▼  
-  - System parses raw bytes returned from the endpoint  
-     │  
-     ▼  
-  - Validator checks if the record was successfully written
+```text
++--------------------------------------------------------------------------------
+| OBSERVATION GROUNDING LADDER
++--------------------------------------------------------------------------------
+|
+| 1. Intended
+|      The model proposes an action.
+|      Example: "Create a database record."
+|
+| 2. Attempted
+|      The orchestrator sends a tool call to the target system.
+|      Example: POST /records with validated parameters.
+|
+| 3. Observed
+|      The tool returns raw bytes, an error, a timeout, or an empty response.
+|      Example: HTTP 201, HTTP 403, timeout, malformed payload.
+|
+| 4. Verified
+|      The system validates the returned payload against expected state.
+|      Example: record exists, ID matches, write confirmed, checksum valid.
+|
+| 5. Committed
+|      The orchestrator updates task state with the verified result.
+|      Example: TaskState.records_created += confirmed_record_id.
+|
+| Prohibited State:
+|
+|   Assumed
+|      The model claims the action succeeded without verified evidence.
+|      This state must never be committed.
+|
++--------------------------------------------------------------------------------
+| Rule:
+|   State may be updated only from verified observations, never from intention,
+|   attempted dispatch, model confidence, or plausible narrative completion.
++--------------------------------------------------------------------------------
 ```
 
-The task state must only be updated using *verified* results.4 If a tool call fails, timeout errors, connection exceptions, or empty payloads must be recorded as-is.5 The model is strictly prohibited from bypassing this return parsing and assuming successful execution.5
+| State Label | Meaning | May Update Task State? | Required Handling |
+| :--- | :--- | :---: | :--- |
+| **Intended** | The model proposes an action or predicts that an action would help. | No | Validate against plan, policy, budget, and tool eligibility. |
+| **Attempted** | The orchestrator dispatched the tool call. | No | Record attempt metadata, request ID, tool name, arguments hash, and timeout policy. |
+| **Observed** | The tool returned a raw response, error, timeout, or exception. | No | Parse, normalize, and preserve the raw observation. Do not summarize away failure details. |
+| **Verified** | The system confirmed the observation satisfies the expected result. | Yes, after validation | Commit only the verified facts, IDs, outputs, or error states. |
+| **Committed** | The verified result has been written to structured task state. | Already committed | Include version, timestamp, source, validator ID, and trace pointer. |
+| **Assumed** | The model infers success without tool evidence. | Never | Halt, repair, or escalate depending on risk. Treat as a grounding violation. |
+
+Grounding applies equally to successful and failed actions. A timeout, permission denial, malformed response, or empty payload is still a real observation. The task state should record that failure exactly rather than allowing the model to convert it into an implied success.
+
+A safe observation update follows this sequence:
+
+```text
+[ Model proposes action ]
+      |
+      v
+[ Orchestrator validates action ]
+      |
+      v
+[ Tool call dispatched ]
+      |
+      v
+[ Raw response captured ]
+      |
+      v
+[ Response parsed and verified ]
+      |
+      +--> verification failed -> record failure; repair, retry, or escalate
+      |
+      v
+[ Verified result committed to task state ]
+```
+
+The model may reason over verified observations. It may not promote intended, attempted, or assumed outcomes into state. This is the core guardrail preventing hallucinated tool success, phantom database writes, imaginary emails, fake deployments, and other delightful little audit-nightmares wearing a trench coat.
 
 ## **Planning and Decomposition Framework**
 
@@ -181,356 +263,734 @@ Reflection must be used as a targeted diagnostic tool, not an automatic step app
 
 ## **Agentic Workflow Graph Model**
 
-Open-ended loops are powerful but introduce high variance and unconstrained execution risk.2 To ensure enterprise-grade reliability, autonomy must be structured within the rigid skeleton of a compiled state machine or workflow graph.6
+Open-ended loops are powerful but introduce high variance and unconstrained execution risk. Enterprise agentic systems should run inside compiled workflow graphs or state machines where transitions are explicit, guarded, logged, and recoverable.
 
+A workflow graph does not eliminate model reasoning. It constrains where that reasoning may occur and which transitions are legal after each state.
+
+```text
++--------------------------------------------------------------------------------
+| AGENTIC WORKFLOW GRAPH MODEL
++--------------------------------------------------------------------------------
+|
+| [ Goal Intake ]
+|      |
+|      v
+| [ Classify Intent ]
+|      |
+|      v
+| [ Resolve Scope / Identity / Policy ]
+|      |
+|      v
+| [ Initialize Task State and Budgets ]
+|      |
+|      v
+| [ Plan Node ]
+|      |
+|      v
+| [ Plan Validation ]
+|      |
+|      +--> invalid / unsafe / over budget -> [ Escalate or Terminate ]
+|      |
+|      v
+| [ Action Selection ]
+|      |
+|      v
+| [ Tool Eligibility and Argument Validation ]
+|      |
+|      +--> missing info ---------------------> [ Ask User ]
+|      |                                           |
+|      |                                           v
+|      |                                      [ Resume Scope or Plan ]
+|      |
+|      +--> unauthorized / high risk ---------> [ Human Approval / Escalation ]
+|      |                                           |
+|      |                                           +--> approved -> [ Action Selection ]
+|      |                                           |
+|      |                                           +--> rejected -> [ Terminate ]
+|      |
+|      v
+| [ Tool Invocation ]
+|      |
+|      v
+| [ Observation Capture ]
+|      |
+|      v
+| [ Observation Verification ]
+|      |
+|      +--> verification failed -> [ Repair Node ]
+|      |                              |
+|      |                              +--> repair budget available -> [ Plan Node ]
+|      |                              |
+|      |                              +--> repair budget exhausted -> [ Escalate or Terminate ]
+|      |
+|      v
+| [ State Update ]
+|      |
+|      v
+| [ Completion / Termination Check ]
+|      |
+|      +--> incomplete and budget available -> [ Plan Node ]
+|      |
+|      +--> source conflict / low confidence -> [ Escalate ]
+|      |
+|      +--> complete -------------------------> [ Finalize ]
+|                                                |
+|                                                v
+|                                           [ Terminate ]
+|
++--------------------------------------------------------------------------------
+| Rule:
+|   Successful completion routes to Finalize, not Escalate. Escalation is an
+|   abnormal or review-required path, not the normal completion path.
++--------------------------------------------------------------------------------
 ```
-                     ┌──────────────────────────────┐  
-                     │          Goal Intake         │  
-                     └──────────────┬───────────────┘  
-                                    │  
-                                    ▼  
-                     ┌──────────────────────────────┐  
-                     │         Classify Node        │  
-                     └──────────────┬───────────────┘  
-                                    │  
-                                    ▼  
-                     ┌──────────────────────────────┐  
-                     │          Scope Node          │  
-                     └──────────────┬───────────────┘  
-                                    │  
-                                    ▼  
-                     ┌──────────────────────────────┐  
-                     │          Plan Node           │  
-                     └──────────────┬───────────────┘  
-                                    │  
-                                    ▼  
-                     ┌──────────────────────────────┐  
-                     │        Retrieve Node         │  
-                     └──────────────┬───────────────┘  
-                                    │  
-                                    ▼  
-                     ┌──────────────────────────────┐  
-                     │        Call Tool Node        │  
-                     └──────────────┬───────────────┘  
-                                    │  
-                                    ▼  
-                     ┌──────────────────────────────┐  
-                     │         Observe Node         │  
-                     └──────────────┬───────────────┘  
-                                    │  
-                                    ▼  
-                       ┌────────────┴────────────┐  
-             Incomplete│        Validate         │   Complete  
-            ┌──────────┤          Node           ├──────────┐  
-            │          │                         │          │  
-            ▼          └─────────────────────────┘          ▼  
-┌────────────────────────┐                     ┌────────────────────────┐  
-│      Repair Node       │                     │     Escalate Node      │  
-└───────────┬────────────┘                     └────────────┬───────────┘  
-            │                                               │  
-            ▼                                               ▼  
-┌────────────────────────┐                     ┌────────────────────────┐  
-│      Reflect Node      │                     │     Finalize Node      │  
-└───────────┬────────────┘                     └────────────┬───────────┘  
-            │                                               │  
-            ▼                                               ▼  
-┌────────────────────────┐                     ┌────────────────────────┐  
-│     Ask User Node      │                     │     Terminate Node     │  
-└────────────────────────┘                     └────────────────────────┘
-```
 
-The specific graph components are modeled as follows:
+The graph components are defined as follows:
 
-| Graph Component | System Role / Node Mapping | Allowable Transitions (Edges) | Guard Conditions |
-| :---- | :---- | :---- | :---- |
-| **Goal Classify** | Determine intent and assign to worker agent.6 | Classify -> Scope.6 | User query must be successfully parsed. |
-| **Scope Resolution** | Set resource and security parameters.1 | Scope -> Plan.1 | Active user session token must be valid.6 |
-| **Plan Task** | Draft step sequence for execution.4 | Plan -> Retrieve.14 | Step count must be within initial limits.7 |
-| **Retrieve Context** | Pull relevant vector knowledge to state.1 | Retrieve -> Call Tool.1 | Context window usage must be under 80%.7 |
-| **Call Tool** | Dispatch request to target API.4 | Call Tool -> Observe.5 | Tool must match active user permissions.6 |
-| **Observe Result** | Capture raw payload returned by the tool.4 | Observe -> Validate.5 | Tool response must be parsed and recorded.5 |
-| **Validate Node** | Verify outcomes against criteria.5 | Validate -> Finalize (if valid); Validate -> Repair (if invalid).5 | Evaluator must confirm factual grounding.5 |
-| **Repair Node** | Execute local code or query fixes.5 | Repair -> Reflect.5 | Cumulative step cost must be under limits.8 |
-| **Reflect Node** | Diagnose step errors to correct plan.7 | Reflect -> Plan.12 | Reflection loop count must be <= 2.7 |
-| **Ask User** | Prompt operator for inputs.7 | Ask User -> Plan.7 | System must suspend execution until input is provided. |
-| **Escalate Node** | Route state to human supervisor.5 | Escalate -> Human Review.6 | Triggered on policy violations or budget alarms.8 |
-| **Finalize Node** | Compile complete task outputs.13 | Finalize -> Terminate.13 | Validator must verify final outputs.7 |
-| **Terminate Node** | Close run, write logs, release resources.4 | End of execution path.13 | Active process state is cleaned up.13 |
+| Graph Component | System Role | Allowable Transitions | Guard Conditions |
+| :--- | :--- | :--- | :--- |
+| **Goal Intake** | Capture user request and convert it into a structured goal object. | Goal Intake -> Classify Intent | Request must be parseable and within platform policy. |
+| **Classify Intent** | Determine task class, risk level, modality, and required capability. | Classify -> Scope | Classification must meet confidence threshold or route to clarification. |
+| **Scope Resolution** | Resolve tenant, identity, permissions, data boundaries, and allowed tools. | Scope -> State Init; Scope -> Terminate | Active user/session token must be valid. |
+| **State Init** | Create task state, trace envelope, budget vector, and autonomy boundary. | State Init -> Plan | Run manifest must be created successfully. |
+| **Plan Node** | Draft or update an execution plan. | Plan -> Plan Validation | Plan must be represented as structured steps, not freeform intention. |
+| **Plan Validation** | Validate plan against scope, budgets, tools, policy, and risk. | Plan Validation -> Action Selection; Escalate; Terminate | Every step must map to an allowed graph edge and budget envelope. |
+| **Action Selection** | Select the next action from the validated plan. | Action Selection -> Tool Eligibility | Selected action must match current state and step dependency rules. |
+| **Tool Eligibility** | Confirm tool registration, permission, schema, cost, and side-effect class. | Tool Eligibility -> Tool Invocation; Ask User; Human Approval; Terminate | Tool must be allowed for the active user, tenant, and autonomy boundary. |
+| **Tool Invocation** | Execute the approved tool call. | Tool Invocation -> Observation Capture | Tool execution must occur through the orchestrator, never directly from the model. |
+| **Observation Capture** | Preserve raw tool output, error, timeout, or exception. | Observation Capture -> Observation Verification | Raw observation must be stored before interpretation. |
+| **Observation Verification** | Validate returned payload against expected state and acceptance criteria. | Verify -> State Update; Repair; Escalate; Terminate | Only verified observations may update task state. |
+| **Repair Node** | Attempt bounded correction after validation or tool failure. | Repair -> Plan; Escalate; Terminate | Repair count, retry count, and budget must remain within limits. |
+| **Ask User** | Request missing information or disambiguation. | Ask User -> Scope; Ask User -> Plan; Ask User -> Terminate | Execution must suspend until user input is received. |
+| **Human Approval / Escalation** | Route state to a human, safer model, or review queue. | Escalate -> Action Selection; Escalate -> Finalize; Escalate -> Terminate | Approval or rejection must be recorded in the trace. |
+| **State Update** | Commit verified observation to versioned task state. | State Update -> Completion Check | Update must be transactional and trace-linked. |
+| **Completion / Termination Check** | Determine whether the goal is complete, incomplete, blocked, or unsafe. | Check -> Plan; Finalize; Escalate; Terminate | Stopping condition must be explicit and externally verifiable. |
+| **Finalize** | Compile validated output from task state and verified observations. | Finalize -> Terminate | Final response must be grounded in committed state. |
+| **Terminate** | Close run, release resources, write trace, and emit terminal status. | End of run | Resources must be released and terminal code recorded. |
 
 ### **Graph Compilation and State Transitions**
 
-Before execution, the graph layout is compiled and validated to detect circular dependencies, unresolvable nodes, or deadlocks.13 Once compiled, the graph structure is immutable; the model cannot dynamically inject new states or rewrite transition rules during runtime.13
+Before execution, the graph layout is compiled and validated. The compiled graph becomes immutable for the duration of the run. The model may choose among allowed transitions but may not inject new states, rewrite guard logic, bypass validators, or mutate terminal behavior at runtime.
 
+```text
++--------------------------------------------------------------------------------
+| GRAPH COMPILATION CHECKPOINT
++--------------------------------------------------------------------------------
+|
+| 1. Verify every node has at least one legal outgoing transition,
+|    except terminal nodes.
+|
+| 2. Verify every non-terminal cycle has an exit condition,
+|    retry limit, budget limit, or escalation path.
+|
+| 3. Verify every edge has a deterministic guard.
+|
+| 4. Verify every tool-capable node has permission, schema,
+|    budget, timeout, and observation-verification rules.
+|
+| 5. Verify every halt, failure, budget-exhaustion, and escalation
+|    path can reach a terminal node.
+|
+| 6. Verify every terminal node writes trace, status, resource-release,
+|    and final-state metadata.
+|
++--------------------------------------------------------------------------------
+| Compilation rule:
+|   A workflow graph is valid only when success, failure, cancellation,
+|   escalation, and budget exhaustion all have explicit terminal paths.
++--------------------------------------------------------------------------------
 ```
-┌────────────────────────────────────────────────────────┐  
-│             GRAPH COMPILATION CHECKPOINT               │  
-├────────────────────────────────────────────────────────┤  
-│  1. Check for circular loops without exit nodes        │  
-│  2. Verify all edge transitions are mapped to guards   │  
-│  3. Confirm every node has an assigned budget gate     │  
-│  4. Ensure terminal nodes are unreachable from halts   │  
-└────────────────────────────────────────────────────────┘
-```
 
-At each transition, state is saved to a persistent, versioned database (such as PostgreSQL or Redis).13 This design isolates failures, prevents race conditions, and allows long-running or interrupted workflows to recover exactly where they stalled without losing context.4  
-Several common multi-agent topology patterns present distinct operational characteristics:
+At each transition, the orchestrator writes a versioned checkpoint to durable state storage. This allows interrupted workflows to resume safely, replay deterministically, or terminate with a complete trace rather than leaving a half-imagined ghost-process rattling chains in the scheduler.
 
-* **Planner-Executor:** A highly capable, high-latency model generates the static execution plan, and a lower-cost, highly responsive executor processes individual steps.12 This layout reduces cost but suffers from plan drift when the environment changes mid-run.12  
-* **Supervisor-Worker:** A central supervisor routes execution steps dynamically to highly specialized sub-agents.14 This model restricts the blast radius of sub-agents by exposing only role-specific tools, but can result in the supervisor becoming a processing bottleneck.13  
-* **Specialist Swarms:** Multiple peer agents communicate directly or post tasks to a shared blackboard.12 This layout provides maximum flexibility, but introduces high risk of coordination failure, state corruption, and runaway token consumption.12
+Several common multi-agent topology patterns have distinct operational characteristics:
+
+| Pattern | Structure | Strength | Primary Risk | Best Fit |
+| :--- | :--- | :--- | :--- | :--- |
+| **Planner-Executor** | A stronger planner drafts steps; a cheaper executor performs bounded actions. | Reduces cost and isolates planning from execution. | Plan drift if environment changes mid-run. | Code tasks, research plans, controlled tool workflows. |
+| **Supervisor-Worker** | A central supervisor routes tasks to specialized workers. | Restricts worker blast radius and tool access. | Supervisor bottleneck or routing failure. | Enterprise agents with domain-specific subagents. |
+| **State-Machine Agent** | Model decisions occur only inside predefined graph nodes. | Strongest operational predictability. | Less flexible under novel tasks. | Production workflows with compliance or reliability constraints. |
+| **Blackboard / Shared Workspace** | Agents coordinate through shared task state. | Good for parallel subproblem solving. | State corruption, duplicate work, coordination loops. | Research or sandboxed exploration with strong budgets. |
+| **Specialist Swarm** | Peer agents communicate or spawn subtasks. | Maximum flexibility and coverage. | Runaway token spend, inconsistent state, circular delegation. | Experimental environments, not default production paths. |
+
+The least-autonomous graph that can complete the task should be preferred. A static workflow graph with two guarded model calls is usually superior to a majestic swarm of tiny bureaucrats burning tokens in a circle.
 
 ## **Loop Budgets, Tool Budgets, and SRE Timeout Policies**
 
-Operational budget enforcement is the single most critical line of defense against runaway agentic behavior.8 Real-world incidents demonstrate that unconstrained agentic loops can enter high-frequency retry cycles when encountering minor API failures, generating tens of thousands of dollars in model invoice costs in a matter of hours.8  
-The orchestrator must implement a formal Loop Budget Framework that treats budget metrics as active control signals rather than post-hoc reports.8  
-Let an agent A operate on a task T within an environment E.8 The total computational budget B allocated to the run is defined as:  
-B = B_internal + B_external  
-where B_internal is the internal cognitive budget consumed by model inference (measured in input and output tokens), and B_external is the external execution budget consumed by environmental actions (measured in tool executions, database transactions, or monetary cost).8  
-The remaining budget R_t at any discrete execution step t is formulated as:  
-R_t = B - sum(C_i for i = 1 to t)  
-where C_i represents the verified cost incurred at step i.8  
-To prevent agents from spending resources on hopeless execution trajectories, the orchestrator should run a Progressive Interval Estimation (PIE) protocol.8 At each step t of the execution plan, the system queries the agent (or a specialized budget-estimator model) to predict a confidence-aware interval representing the lower (L) and upper (U) bounds of remaining cost-to-completion 8:  
-PIE_t = [L_t, U_t]  
-The orchestrator triggers a priority alert and initiates early termination (A_t = 1) the moment the remaining budget is lower than the projected lower bound of completion cost 8:  
-A_t = 1 if R_t < L_t  
-This proactive halting mechanism saves between 28% and 64% of total token and execution expenditures on failed trajectories.8  
-Every agentic loop must be subjected to a multi-tiered budget cap matrix, with default thresholds adapted to the task risk profile:
+Operational budget enforcement is the primary defense against runaway agentic behavior. A loop budget is not a post-hoc billing report. It is an active control signal that determines whether an agent may continue, compress context, downgrade capability, request approval, or terminate.
 
-| Budget Type | Metric Unit | Default Cap: Research Assistant | Default Cap: Code Workspace | Default Cap: Incident SRE Agent | Infrastructure Enforcement Guard |
-| :---- | :---- | :---- | :---- | :---- | :---- |
-| **Step Budget** | Integer count | 15 steps.11 | 30 steps. | 10 steps. | Model-side increment tracker halts execution loop. |
-| **Tool-Call Budget** | Integer count | 30 calls.12 | 50 calls. | 15 calls. | Gateway proxy interceptor blocks further tool dispatches.24 |
-| **Token Budget** | Input/Output tokens | 5,000,000 tokens.11 | 8,000,000 tokens. | 1,000,000 tokens. | Gateway drops requests once session quota is exceeded.18 |
-| **Wall-Clock Budget** | Seconds | 300 seconds.11 | 600 seconds. | 120 seconds. | SRE connection timeout drops the container.4 |
-| **Inference Budget** | Monetary USD | $2.00.11 | $5.00. | $1.00. | Router blocks further API calls on token credit drain.8 |
-| **Retry Budget** | Consecutive attempts | 3 attempts.5 | 5 attempts. | 2 attempts. | Gateway blocks identical requests to prevent retry storms.5 |
-| **Context Growth** | Token count | 100,000 tokens.7 | 200,000 tokens. | 50,000 tokens. | Orchestrator prunes history if context exceeds 80% limit.7 |
-| **Memory-Write Budget** | Integer commits | 2 database writes.3 | 5 database writes. | 0 database writes. | Memory database restricts write access during active runs.3 |
-| **External API Budget** | Integer calls | 5 calls. | 10 calls. | 2 calls. | Rate-limiters enforce strict endpoint quotas per session.11 |
-| **Side-Effect Budget** | Monitored mutations | 0 mutations. | 2 local file updates. | 0 mutations. | Sandbox blocks any unauthorized write operations.6 |
+Agentic budgets must be modeled as a vector, not a single scalar, because tokens, tool calls, dollars, wall-clock time, retries, memory writes, and side effects are different resource dimensions. They can be converted into dollars for cost accounting, but the orchestrator should still enforce each dimension independently.
 
-To enforce these budgets at the systems level, SREs must configure the serving gateway with strict timeout policies.18 This includes deploying circuit breakers that detect repeated identical tool calls (such as 3+ redundant executions of the same endpoint), rate-limiting tool dispatch, and applying exponential backoff on connection retry storms to prevent models from hammering external microservices.18
+Let an agent run `R` be assigned a budget vector:
+
+```text
+B = {
+  input_tokens_max,
+  output_tokens_max,
+  tool_calls_max,
+  external_api_calls_max,
+  wall_clock_seconds_max,
+  inference_cost_usd_max,
+  retry_count_max,
+  reflection_passes_max,
+  context_tokens_max,
+  memory_writes_max,
+  side_effects_max
+}
+```
+
+At step `t`, the orchestrator tracks observed consumption:
+
+```text
+U_t = {
+  input_tokens_used,
+  output_tokens_used,
+  tool_calls_used,
+  external_api_calls_used,
+  wall_clock_seconds_used,
+  inference_cost_usd_used,
+  retry_count_used,
+  reflection_passes_used,
+  context_tokens_used,
+  memory_writes_used,
+  side_effects_used
+}
+```
+
+Remaining budget is computed per dimension:
+
+```text
+R_t[d] = B[d] - U_t[d]
+```
+
+The run must halt, degrade, compress, or escalate when any required budget dimension is exhausted:
+
+```text
+TerminateOrEscalate if exists d such that R_t[d] <= 0
+```
+
+### **Scalar Cost Accounting**
+
+For business reporting, budget dimensions may also be scalarized into a common monetary cost estimate:
+
+```text
+Cost_t =
+  input_tokens_used  * price_per_input_token
++ output_tokens_used * price_per_output_token
++ tool_calls_used    * price_per_tool_call
++ api_calls_used     * price_per_external_api_call
++ gpu_seconds_used   * price_per_gpu_second
++ human_review_used  * price_per_review_unit
+```
+
+Scalar cost is useful for billing and cost-per-success analysis. It must not replace independent hard caps on safety-critical dimensions such as side effects, memory writes, wall-clock time, or privileged tool calls.
+
+### **Progressive Interval Estimation**
+
+To prevent agents from spending resources on hopeless trajectories, the orchestrator should run a Progressive Interval Estimation protocol. At each step, the system estimates the remaining resource cost required to complete the task.
+
+```text
+PIE_t[d] = [L_t[d], U_t[d]]
+```
+
+Where:
+
+| Symbol | Meaning |
+| :--- | :--- |
+| `L_t[d]` | Lower-bound estimate for remaining cost in dimension `d`. |
+| `U_t[d]` | Upper-bound estimate for remaining cost in dimension `d`. |
+| `R_t[d]` | Remaining budget in dimension `d`. |
+
+The orchestrator should stop or escalate when the remaining budget is below the lower-bound estimated completion cost:
+
+```text
+EarlyStop if exists d such that R_t[d] < L_t[d]
+```
+
+For example, if a task has only two tool calls remaining but the lower-bound estimate requires at least four more tool calls, the loop should not continue pretending optimism is a scheduling policy.
+
+### **Budget Cap Matrix**
+
+The following caps are illustrative policy defaults. Real values must be calibrated by model price, tenant tier, task criticality, data sensitivity, latency SLO, and expected business value.
+
+| Budget Type | Unit | Research Assistant | Code Workspace | Incident SRE Agent | Enforcement Owner |
+| :--- | :--- | ---: | ---: | ---: | :--- |
+| **Step Budget** | Completed graph transitions | 15 | 30 | 10 | Orchestrator state machine |
+| **Tool-Call Budget** | Tool invocations | 30 | 50 | 15 | Tool gateway / policy interceptor |
+| **External API Budget** | Paid or networked calls | 5 | 10 | 2 | API gateway and tool proxy |
+| **Input Token Budget** | Input tokens per run | 200,000 | 400,000 | 100,000 | Gateway and context compiler |
+| **Output Token Budget** | Output tokens per run | 30,000 | 60,000 | 15,000 | Model router / gateway |
+| **Wall-Clock Budget** | Seconds | 300 | 600 | 120 | Orchestrator timeout controller |
+| **Inference Cost Budget** | USD | `$2.00` | `$5.00` | `$1.00` | Billing and quota controller |
+| **Retry Budget** | Consecutive attempts | 3 | 5 | 2 | Circuit breaker and retry policy |
+| **Reflection Budget** | Diagnostic passes | 1 | 2 | 1 | Orchestrator |
+| **Context Growth Budget** | Active context tokens | 100,000 | 200,000 | 50,000 | Context compiler |
+| **Memory-Write Budget** | Persistent writes | 2 | 5 | 0 | Memory write gate |
+| **Side-Effect Budget** | Mutating actions | 0 | 2 local workspace mutations | 0 | Tool policy layer and sandbox |
+
+### **SRE Timeout and Circuit-Breaker Policies**
+
+Budget enforcement should occur at multiple layers so no single model instruction, tool bug, or gateway failure can create an unbounded loop.
+
+| Control | Trigger | Enforcement Action | Recovery Path |
+| :--- | :--- | :--- | :--- |
+| **Wall-Clock Timeout** | Run exceeds allowed duration. | Terminates the run, releases resources, and records timeout state. | Return partial result or escalation packet. |
+| **Repeated Tool Call Breaker** | Same tool and argument hash repeats beyond threshold. | Blocks additional identical calls. | Enter repair, ask user, or escalate. |
+| **Retry Storm Breaker** | Repeated transient failures or client retries. | Applies exponential backoff with jitter and caps retries. | Resume only after cooldown or operator approval. |
+| **Budget Exhaustion Gate** | Any budget vector dimension reaches zero. | Stops execution before next model or tool call. | Return budget-exhausted status or request budget approval. |
+| **Context Pressure Gate** | Active context exceeds configured threshold. | Runs compression node or halts if compression is unsafe. | Resume with compressed state and trace pointer. |
+| **Privileged Action Gate** | Proposed write, financial action, communication, or infrastructure mutation. | Suspends execution pending approval. | Continue after approval or terminate on rejection. |
+| **Safety Circuit Breaker** | Injection, unauthorized access, data leakage, or policy breach. | Fails closed and preserves trace. | Security review, policy update, or user-facing denial. |
+
+Budget doctrine:
+
+```text
+The model may estimate cost.
+The orchestrator measures cost.
+The gateway enforces cost.
+The trace records cost.
+The user or supervisor approves budget expansion.
+```
 
 ## **Scratchpads, Memory, and State Governance**
 
-Uncontrolled state growth is a primary driver of agentic degradation.7 As an agent loop executes, the accumulation of raw tool outputs, intermediate planning drafts, and validation critiques causes context bloat.7 This context accumulation degrades the model's performance, increases latency, and elevates the risk of retrieval-related omissions. Systems must implement a rigorous state governance model that separates and manages memory along strict lines of tenure and authority.
+Uncontrolled state growth is a primary driver of agentic degradation. As an agent loop executes, raw tool outputs, intermediate plans, reflection notes, partial failures, and validation critiques accumulate. Without governance, this material bloats context, contaminates memory, increases latency, and encourages the model to reuse stale or unverified assumptions.
 
+Agentic systems must separate memory by tenure, authority, mutability, and audit purpose.
+
+```text
++--------------------------------------------------------------------------------
+| STATE GOVERNANCE PLATFORM
++--------------------------------------------------------------------------------
+|
+| Ephemeral Scratchpad
+|   - step-local working notes
+|   - model-readable and model-writable
+|   - discarded or compressed after step transition
+|
+| Structured Task State
+|   - machine-readable run state
+|   - system-owned, model-readable
+|   - versioned after each verified transition
+|
+| Retrieved Evidence
+|   - source-grounded contextual material
+|   - read-only to the model
+|   - scoped by permission, freshness, and task relevance
+|
+| Tool Observations
+|   - raw and parsed tool results
+|   - system-owned, append-only
+|   - never editable by the model
+|
+| Persistent Memory
+|   - long-term user or organizational memory
+|   - write-gated after verification
+|   - not directly writable by active model loops
+|
+| Execution Trace / Audit Record
+|   - immutable chronological run record
+|   - read-only after write
+|   - used for replay, audit, incident response, and evaluation
+|
++--------------------------------------------------------------------------------
+| Rule:
+|   Scratchpads help the model think. Task state tells the system what is true.
+|   Tool observations prove what happened. Audit traces preserve why it happened.
++--------------------------------------------------------------------------------
 ```
-┌────────────────────────────────────────────────────────────────────────┐  
-│                       STATE GOVERNANCE PLATFORM                        │  
-├────────────────────────────────────────────────────────────────────────┤  
-│                                                                        │  
-│  - Temporal working memory      - Machine-readable tracking table      │  
-│  - Discarded on step change     - Persists over entire active run      │  
-├─────────────────────────────────┴──────────────────────────────────────┤  
-│  [ Persistent Memory ]                                                 │  
-│  - Promoted via write gates     - Immutable execution record           │  
-│  - Long-term storage (DB)       - Read-only; SRE / Auditor access      │  
-└────────────────────────────────────────────────────────────────────────┘
-```
 
-The specific properties of each state component are defined as follows:
-
-| Memory / State Category | Tenure and Lifespan | Access Permissions | Storage Medium | State Tenure and Update Rules |
-| :---- | :---- | :---- | :---- | :---- |
-| **Ephemeral Scratchpad** | Short-term; scoped to active step.7 | Model: Read/Write.7 | Local memory cache.7 | Discarded or compressed the moment the active plan step transitions to completed.7 |
-| **Structured Task State** | Medium-term; active run lifespan.4 | System: Read/Write; Model: Read.13 | Redis / PostgreSQL.15 | Maintained throughout the run; updated using immutable, versioned schemas.13 |
-| **Persistent Memory** | Long-term; spans user sessions.1 | System: Read/Write; Model: Read.1 | Vector Database.1 | Direct model writes are blocked; updates require post-run verification gates.3 |
-| **Retrieved Evidence** | Step-level; cached during active run.1 | Model: Read-only.1 | Temp memory cache.1 | Retained for step evaluation; cleared during context compression passes.7 |
-| **Tool Observations** | Step-level; cached during active run.4 | System: Read/Write; Model: Read.5 | Versioned run log.13 | Ingested directly from tool APIs; cannot be edited by the model.5 |
-| **Execution Trace** | Permanent; archived after run completion.1 | Read-only access for auditing.1 | Secure document store.1 | Written once at step transitions; serves as the execution record.1 |
-| **Audit Record** | Permanent; compiled after termination.1 | Read-only access for compliance.1 | WORM storage drive.1 | Immutable history of execution; remains unalterable.1 |
+| Memory / State Category | Tenure and Lifespan | Access Permissions | Storage Medium | Update Rules |
+| :--- | :--- | :--- | :--- | :--- |
+| **Ephemeral Scratchpad** | Step-local; expires at step transition or compression boundary. | Model read/write; system may inspect and discard. | Runtime context or local cache. | May contain working notes, but cannot be treated as ground truth. |
+| **Structured Task State** | Active run lifespan. | System read/write; model read; model proposes changes indirectly. | Redis, PostgreSQL, durable checkpointer. | Updated only through validated state transitions using immutable schema versions. |
+| **Retrieved Evidence** | Step-level or run-level depending on source tenure. | Model read-only. | Context cache, retrieval packet store. | Must retain source ID, timestamp, permission scope, and freshness metadata. |
+| **Tool Observations** | Step-level during run; archived after termination. | System append-only; model read-only after parsing. | Versioned run log. | Ingested directly from tool APIs; records success, failure, timeout, and raw payload pointer. |
+| **Persistent Memory** | Long-term across sessions. | System write-gated; model read through retrieval; model cannot directly write. | Vector DB, relational DB, document store. | Writes require post-run verification, source support, and tenure metadata. |
+| **Execution Trace** | Permanent or retention-policy-bound. | Append-only during run; read-only after termination. | Secure trace store. | Captures prompts, model versions, tool calls, observations, state transitions, budgets, and terminal code. |
+| **Audit Record** | Permanent for regulated workflows. | Compliance/SRE/security read-only. | WORM or tamper-evident storage. | Captures approval events, policy versions, exception records, and accountability boundaries. |
 
 ### **State Contamination and Context Compression**
 
-State contamination occurs when an agent references stale observations or unverified assumptions in subsequent plan steps.3 To prevent this, the orchestrator must enforce context compression limits.7 If active context usage exceeds 80% of the model's limit, the system pauses execution, runs a compression node to summarize progress, retains only the active plan and grounded facts, and discards historical planning drafts before resuming.7
+State contamination occurs when an agent references stale observations, unverified assumptions, discarded scratchpad notes, or failed tool attempts as if they were verified facts. The orchestrator prevents this through state-tenure rules and compression gates.
+
+When active context usage exceeds a configured threshold, such as 80% of the model context limit, the system should pause execution and run a compression node.
+
+A safe compression node must preserve:
+
+| Must Preserve | Reason |
+| :--- | :--- |
+| Active goal and acceptance criteria | Prevents goal drift. |
+| Current plan and dependency state | Allows execution to resume correctly. |
+| Verified observations | Maintains factual grounding. |
+| Open questions and blocked steps | Prevents premature completion. |
+| Budget state | Prevents hidden overruns. |
+| Tool-call IDs and trace pointers | Preserves replayability. |
+| Escalation and approval state | Prevents bypassing human gates. |
+
+A compression node must discard or demote:
+
+| Should Discard or Demote | Reason |
+| :--- | :--- |
+| Raw deliberation drafts | They are not durable state. |
+| Failed plans superseded by verified state | Prevents stale plan reuse. |
+| Redundant tool outputs already summarized into verified observations | Reduces context bloat. |
+| Unsupported model assumptions | Prevents memory poisoning. |
+| Low-value reflection chatter | Avoids over-reflection loops. |
+
+Compression is not memory promotion. Compression summarizes active run state; persistent memory promotion requires separate verification gates after the run.
 
 ## **Tool Selection Policy Model**
 
-The orchestrator, not the model, is the ultimate authority governing tool dispatch.6 To prevent tool overreach and uncontrolled executions, the system must apply a rigorous selection and validation policy.11
+The orchestrator, not the model, is the authority governing tool dispatch. The model may propose a tool and draft arguments, but the system must validate eligibility, permissions, schemas, budgets, risk class, and side-effect boundaries before execution.
 
+```text
++--------------------------------------------------------------------------------
+| TOOL SELECTION POLICY MODEL
++--------------------------------------------------------------------------------
+|
+| [ Model proposes tool call ]
+|      |
+|      v
+| [ Tool Registry Lookup ]
+|      |
+|      +--> tool not registered -> [ Block / Repair / Ask User ]
+|      |
+|      v
+| [ Schema Validation and Argument Normalization ]
+|      |
+|      +--> malformed args -> [ Repair Attempt or Clarification ]
+|      |
+|      v
+| [ Security and Permission Check ]
+|      |
+|      +--> unauthorized -> [ Fail Closed or Escalate ]
+|      |
+|      v
+| [ Budget and Rate-Limit Check ]
+|      |
+|      +--> over budget -> [ Terminate, Defer, or Request Approval ]
+|      |
+|      v
+| [ Side-Effect Risk Classification ]
+|      |
+|      +--> read-only / low risk -> [ Dispatch ]
+|      |
+|      +--> write / financial / external comms / infra -> [ Human Approval Gate ]
+|                                                        |
+|                                                        +--> approved -> [ Dispatch ]
+|                                                        |
+|                                                        +--> rejected -> [ Terminate or Revise ]
+|      |
+|      v
+| [ Tool Dispatch ]
+|      |
+|      v
+| [ Observation Capture and Verification ]
+|
++--------------------------------------------------------------------------------
+| Rule:
+|   Tool failure does not always mean immediate hard stop. The response depends
+|   on risk: repair low-risk schema issues, ask for missing inputs, degrade when
+|   safe, and fail closed for unauthorized or high-impact actions.
++--------------------------------------------------------------------------------
 ```
-┌────────────────────────────────────────────────────────────────────────┐  
-│                        TOOL SELECTION PLATFORM                         │  
-├────────────────────────────────────────────────────────────────────────┤  
-│                          1. Model Suggestion                           │  
-│     - Model requests tool call with parameter arguments                │  
-└───────────────────────────────────┬────────────────────────────────────┘  
-                                    ▼  
-┌────────────────────────────────────────────────────────────────────────┐  
-│                        2. Schema Serialization                         │  
-│     - Validates types, ranges, and structures of parameters            │  
-└───────────────────────────────────┬────────────────────────────────────┘  
-                                    ▼  
-┌────────────────────────────────────────────────────────────────────────┐  
-│                         3. Security Validation                         │  
-│     - Verifies session tokens, user boundaries, and sanitizes strings  │  
-└───────────────────────────────────┬────────────────────────────────────┘  
-                                    ▼  
-┌────────────────────────────────────────────────────────────────────────┐  
-│                          4. Policy Interceptor                         │  
-│     - Evaluates write-safety and budget checks                         │  
-└───────────────────────────────────┬────────────────────────────────────┘  
-                                    ▼  
-                            ┌───────┴───────┐  
-                     Pass   │  Gatekeeper   │   Fail  
-                 ┌──────────┤  Evaluation   ├──────────┐  
-                 │          │               │          │  
-                 ▼          └───────────────┘          ▼  
-┌─────────────────────────────┐            ┌─────────────────────────────┐  
-│       TOOL DISPATCH         │            │      BLOCK & RETRY/HALT     │  
-│  - System executes action   │            │  - Drops request immediately│  
-└─────────────────────────────┘            └─────────────────────────────┘
-```
 
-The system evaluates the eligibility of a tool using several criteria:
+The system evaluates tool eligibility through a policy matrix.
 
-| Tool Category | Allowed Actions | Permission Scope | Side-Effect Risk | Latency & Cost | Grounding & Verification Check |
-| :---- | :---- | :---- | :---- | :---- | :---- |
-| **Read-Only Lookup** | Document searches; system diagnostic logs.1 | Standard User Role.1 | None.6 | Low latency; low token cost.21 | Match output strings against index signatures. |
-| **Retrieval Vectors** | Querying corporate vector databases.1 | Active Session Scope.1 | None.6 | Low latency; moderate token cost.21 | Verify retrieval source metadata.1 |
-| **Live API Lookups** | Fetching active exchange rates, prices, or orders. | Authorized API Key.6 | None. | High latency; moderate monetary cost.11 | Enforce schema parsing on returned payloads.5 |
-| **Calculators** | Arithmetic calculations; matrix operations. | Local Sandbox Scope. | None. | Low latency; zero token cost. | Run computations on deterministic code engines. |
-| **File System** | Read workspace files; write local diagnostic logs. | Workspace sandbox.23 | Moderate; local file changes.23 | Low latency; low cost. | Verify file signatures before and after changes.4 |
-| **Database Queries** | Querying local workspace schemas. | Read-Only database connection.6 | None. | Low latency; low cost. | Parse queries against SQL whitelist filters. |
-| **Email/Calendar** | Draft messages; check schedule calendars.6 | User Session Scope.6 | High; external communications.6 | High latency; low cost. | Require human sign-off before sending.6 |
-| **Procurement API** | Check item costs; propose invoice releases.6 | Secure Billing API Scope.6 | High; financial transactions.6 | High latency; high monetary cost.11 | Block execution until supervisor approves.6 |
-| **Review Queues** | Route tasks to manual inspection queues.6 | System Level Admin Scope.6 | None. | Bounded by human queue latency. | Log compliance signatures on tasks. |
+| Tool Category | Allowed Actions | Permission Scope | Side-Effect Risk | Validation and Grounding Check | Default Approval Policy |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Read-Only Lookup** | Search documentation, logs, public sources, or approved internal indexes. | Active user or tenant read scope. | None to low. | Verify source metadata, permission scope, and freshness. | No human approval unless sensitive source expansion is requested. |
+| **Retrieval Vectors** | Query corporate vector databases or evidence stores. | Active session and corpus permission scope. | None. | Verify document IDs, access policy, retrieval timestamp, and citation packet. | No human approval for authorized read-only retrieval. |
+| **Live API Lookups** | Fetch active prices, order status, exchange rates, tickets, or inventory. | Authorized API key and user entitlement. | Low to moderate depending on endpoint. | Parse returned payload against schema and preserve raw observation. | No approval for read-only calls; approval for state-changing calls. |
+| **Calculators / Code Sandbox** | Execute arithmetic, deterministic scripts, tests, parsers, or local transformations. | Local sandbox. | Low unless writing files or executing untrusted code. | Capture code, inputs, outputs, errors, and runtime limits. | No approval for read-only sandbox execution; approval for file mutation if policy requires. |
+| **File System** | Read workspace files, propose edits, write local diagnostic artifacts. | Workspace sandbox. | Moderate. | Verify path allowlist, diff, file signatures, and post-write state. | Approval required for destructive, broad, or nonlocal writes. |
+| **Database Queries** | Query approved schemas or write gated records. | Read-only or scoped write connection. | None for read-only; high for writes. | SQL allowlist, row-level security, transaction log, and post-action verification. | Writes require approval unless explicitly preauthorized. |
+| **Email / Calendar** | Draft messages, inspect schedules, create draft events, propose replies. | User session scope. | High for external communication. | Verify recipients, content, timing, and user intent. | Human approval required before sending or creating external commitments. |
+| **Procurement / Payment API** | Compare vendors, prepare purchase requests, inspect invoices. | Secure billing or procurement scope. | High financial risk. | Validate amount, vendor, approval chain, contract terms, and budget. | Human or supervisor approval required before execution. |
+| **Infrastructure Tools** | Inspect metrics, logs, deploy state, or propose remediation. | SRE diagnostic scope. | High for mutations. | Verify blast radius, command target, rollback path, and approval record. | Mutating actions require operator approval. |
+| **Review Queues** | Route tasks to manual inspection, approval, compliance, or escalation queues. | System workflow scope. | Low direct side-effect; may affect process latency. | Log reason, target queue, severity, and evidence packet. | No approval required to request review. |
 
 ### **Cognitive Emulation vs. Explicit Tool Execution**
 
-Models are prone to calculation errors, factual hallucinations, and spatial reasoning errors when generating raw tokens sequentially.11 To mitigate this, system architectures must prioritize *explicit tool execution* over *cognitive emulation*.11 The model must never calculate values or fetch records through raw generation; it must call deterministic calculators, structured code interpreters, or database search APIs to obtain precise values.11
+Models can perform simple reasoning directly, but they are unreliable substitutes for deterministic systems when precision, external state, auditability, or side effects matter. The orchestrator must decide when a model may answer from reasoning and when it must call a tool.
+
+| Task Type | Direct Model Reasoning Acceptable? | Tool Required? | Reason |
+| :--- | :---: | :---: | :--- |
+| **Low-stakes arithmetic estimate** | Yes | No | Approximation is acceptable and no external state is involved. |
+| **Exact arithmetic, finance, engineering, or compliance calculation** | No | Yes | Precision and replayability are required. |
+| **Current external fact lookup** | No | Yes | External state may have changed. |
+| **Database or account status** | No | Yes | Must reflect authoritative system state. |
+| **Code execution or test result** | No | Yes | Generated claims must be verified by execution. |
+| **Tool availability or API result** | No | Yes | The model cannot infer whether an external call succeeded. |
+| **High-stakes recommendation** | Limited | Usually | Requires source grounding, validation, and often review. |
+| **Creative drafting or summarization from provided context** | Yes | No, unless source retrieval is needed | The task is generative and low side-effect. |
+
+The rule is not “the model must never calculate.” The rule is stricter and more useful:
+
+```text
+Use model reasoning for low-risk synthesis.
+Use tools for precision, current facts, external state, code execution,
+financial or legal implications, audit requirements, and side effects.
+```
+
+This prevents cognitive emulation from masquerading as verified action. A model may suggest that a database update should happen. Only the tool can prove that it did.
 
 ## **Termination and Escalation Framework**
 
-An agentic loop must not be allowed to run until it self-terminates based on internal logic. Termination and escalation are formal programmatic contracts that determine when a run must cease and how the system should handle edge-case failures.6  
-Every agentic workflow must explicitly configure and monitor conditions across a comprehensive catalog:
+An agentic loop must never rely on the model's internal judgment as the sole stopping mechanism. Termination and escalation are programmatic contracts that determine when a run succeeds, pauses, degrades, requests help, fails closed, or releases resources.
 
-| Termination Code | System Classification | Underlying Root Cause / Trigger | Required Orchestrator Action |
-| :---- | :---- | :---- | :---- |
-| **SUCCESS** | Normal | Output meets all validation and safety criteria.7 | Closes task state, writes trace logs, and returns output.4 |
-| **PARTIAL_SUCCESS** | Graceful Degradation | Primary goal achieved, but secondary actions timed out.5 | Compiles completed steps and returns partial output.11 |
-| **IMPOSSIBLE** | Explicit Handback | Model determines required input fields are missing.7 | Stops execution and prompts user for missing inputs.7 |
-| **BUDGET_EXHAUSTED** | System Intercept | Accumulated run costs exceed step or monetary caps.7 | Terminates active execution threads and logs budget breach.5 |
-| **TIMEOUT** | System Intercept | Execution duration exceeds wall-clock bounds.4 | Drops container execution and alerts active SRE teams.4 |
-| **UNSAFE_DETECTION** | Safety Guard | Content scanner flags injection or policy violation. | Halts execution, blocks the session, and triggers security alarm. |
-| **MISSING_INFO** | Explicit Handback | System detects missing parameters during planning.7 | Switches node to Ask User state and awaits input.7 |
-| **AMBIGUOUS_INTENT** | Explicit Handback | User query maps to multiple conflicting plans.7 | Stops execution and requests plan verification.1 |
-| **LOW_CONFIDENCE** | Quality Scorer Halt | Verification score drops below safety threshold.5 | Suspends task state and routes to supervisor queue.22 |
-| **REPEATED_FAILURE** | Resilience Failure | Tool calls return exceptions after maximum retries.5 | Trips the circuit breaker and triggers escalation.5 |
-| **SOURCE_CONFLICT** | Validation Scorer Halt | Retrieved document facts directly contradict. | Freezes progress and logs the discrepancy for review.5 |
-| **VALIDATION_FAIL** | Quality Scorer Halt | Output fails format or schema compliance checks.5 | Runs 1 repair pass; escalates if failure persists.5 |
-| **PERMISSION_DENIED** | Security Guard | Model attempts to access an unauthorized tool.24 | Blocks the active run and registers a security ticket.24 |
-| **UNAVAILABLE_DEP** | System Intercept | Vital external API endpoint is offline.5 | Switches system to degraded mode using static fallbacks.5 |
-| **CONFIRM_REQUIRED** | Human-in-the-Loop | Model proposes executing a write-capable tool.6 | Suspends execution and presents parameters to operator.4 |
-| **REVIEW_REQUIRED** | Human-in-the-Loop | Task outcome falls under compliance auditing.22 | Routes final plan and outputs to asynchronous audit queue.22 |
-| **USER_CANCEL** | Explicit Handback | Operator manually aborts the execution run.7 | Halts container and archives the execution history.4 |
+Every agent run should terminate through an explicit terminal code.
 
-When these termination parameters are triggered, or when high-risk operations are requested, the orchestrator maps the current state to the appropriate remediation path using an Escalation Trigger Matrix:
+| Termination Code | Classification | Trigger | Required Orchestrator Action |
+| :--- | :--- | :--- | :--- |
+| **SUCCESS** | Normal completion | Output meets goal, validation, grounding, and safety criteria. | Finalize response, close task state, release resources, and write trace. |
+| **PARTIAL_SUCCESS** | Graceful degradation | Primary goal achieved but secondary actions failed, timed out, or were unavailable. | Return completed work, disclose limitations, record unresolved items, and close or defer remainder. |
+| **IMPOSSIBLE** | Explicit handback | Required condition cannot be satisfied with available tools, data, authority, or budget. | Stop and explain the blocking condition. |
+| **MISSING_INFO** | Explicit handback | Required input fields or choices are absent. | Suspend loop and ask user or operator for specific missing information. |
+| **AMBIGUOUS_INTENT** | Explicit handback | User goal maps to multiple conflicting plans or risk classes. | Request clarification or route to human review. |
+| **CONFIRM_REQUIRED** | Human approval | Proposed action requires approval due to write, cost, communication, or risk. | Suspend execution and present approval packet. |
+| **REVIEW_REQUIRED** | Human review | Workflow is regulated, low-confidence, disputed, or policy-sensitive. | Route state, evidence, and recommendation to review queue. |
+| **BUDGET_EXHAUSTED** | System intercept | Any required budget dimension reaches zero. | Stop before next model/tool call and record budget state. |
+| **TIMEOUT** | System intercept | Wall-clock duration exceeds configured limit. | Terminate run, release resources, and return timeout status or escalation packet. |
+| **VALIDATION_FAIL** | Quality halt | Output, observation, schema, or action result fails validation after allowed repair attempts. | Stop, repair once if allowed, or escalate based on risk. |
+| **LOW_CONFIDENCE** | Quality halt | Scorer or verifier falls below configured confidence threshold. | Suspend autonomous execution and route to safer model, user, or human review. |
+| **SOURCE_CONFLICT** | Validation halt | Retrieved or observed sources directly conflict on task-critical facts. | Freeze affected claim, preserve evidence, and request review or additional source resolution. |
+| **REPEATED_FAILURE** | Resilience halt | Tool calls, plan repair, or retries fail beyond configured limits. | Trip circuit breaker and return failure or escalation packet. |
+| **PERMISSION_DENIED** | Security guard | Requested tool, data, action, or state write exceeds active permission scope. | Block action; continue only if safe alternative exists. Escalate repeated or suspicious attempts. |
+| **UNSAFE_DETECTION** | Safety guard | Injection, exfiltration, unsafe content, unauthorized mutation, or policy breach is detected. | Fail closed for high-severity cases; preserve trace and route to security review when warranted. |
+| **UNAVAILABLE_DEP** | Dependency failure | Required tool, database, provider, or service is unavailable. | Use safe degraded mode when possible; otherwise stop and report dependency failure. |
+| **USER_CANCEL** | Explicit cancellation | User or operator aborts the run. | Halt execution, release resources, record cancellation, and preserve trace. |
 
+### **Escalation Routing Model**
+
+```text
++--------------------------------------------------------------------------------
+| ESCALATION ROUTING MODEL
++--------------------------------------------------------------------------------
+|
+| [ Trigger Detected ]
+|      |
+|      v
+| [ Classify Trigger ]
+|      |
+|      +--> Safety / security / unauthorized action
+|      |       |
+|      |       v
+|      |   [ Fail Closed ]
+|      |       preserve trace | block action | notify security if severity warrants
+|      |
+|      +--> Write / purchase / communication / infrastructure mutation
+|      |       |
+|      |       v
+|      |   [ Human Approval Gate ]
+|      |       render action packet | await approval | continue or terminate
+|      |
+|      +--> Missing information / ambiguous intent
+|      |       |
+|      |       v
+|      |   [ Ask User / Operator ]
+|      |       suspend run | request specific input | resume after answer
+|      |
+|      +--> Low confidence / source conflict / validation uncertainty
+|      |       |
+|      |       v
+|      |   [ Review Queue or Safer Model ]
+|      |       preserve evidence | route to specialist | continue only after validation
+|      |
+|      +--> Dependency outage / capacity constraint
+|              |
+|              v
+|          [ Degraded Mode / Safe Fallback ]
+|              downgrade | defer | cached-safe response | clean unavailable status
+|
++--------------------------------------------------------------------------------
+| Rule:
+|   Escalation is not failure. It is controlled transfer of decision authority
+|   from the autonomous loop to a safer actor, policy, or execution path.
++--------------------------------------------------------------------------------
 ```
-                          ┌────────────────────────┐  
-                          │    TRIGGER DETECTED    │  
-                          └───────────┬────────────┘  
-                                      │  
-            ┌─────────────────────────┼─────────────────────────┐  
-            ▼                         ▼                         ▼  
-          [ Human Intervention ]      
-┌────────────────────────┐┌────────────────────────┐┌────────────────────────┐  
-│    FAIL-CLOSED STOP    ││    HUMAN-IN-THE-LOOP   ││   DEGRADED ROADMAPPING │  
-│  - High-risk security  ││  - Plan confirmation   ││  - Temporary system    │  
-│    violation or cost   ││    or missing inputs   ││    timeout or service  │  
-│    cap blowout         ││    requested           ││    outage detected     │  
-└────────────────────────┘└────────────────────────┘└────────────────────────┘
+
+### **Escalation Trigger Matrix**
+
+| Failure / Risk State | Severity | Target Escalation Endpoint | System Recovery Action |
+| :--- | :--- | :--- | :--- |
+| **High-Impact Mutation** | High | User or operator confirmation gate | Suspend execution; render proposed action, parameters, blast radius, and rollback path. |
+| **Financial Commitment** | High | Manager or procurement approval queue | Freeze action until budget and approval chain are confirmed. |
+| **External Communication** | Moderate to high | User approval gate | Draft only; send only after explicit approval. |
+| **Missing Input Data** | Low | User clarification | Pause loop and request specific missing field. |
+| **Ambiguous Goal** | Low to moderate | User or supervisor clarification | Present candidate interpretations and await selection. |
+| **Low Scorer Confidence** | Moderate | Specialist model or review queue | Route state to stronger verifier or human reviewer. |
+| **Tool Failure Exceptions** | Moderate | Local repair path or dependency fallback | Retry within budget, switch equivalent tool, or return degraded status. |
+| **Budget Limit Reached** | Moderate to high | Budget approval queue | Freeze run and require explicit budget release. |
+| **Database or Provider Outage** | Moderate to high | SRE or degraded-mode controller | Switch to read-only backup, fallback provider, cached-safe response, or unavailable status. |
+| **Security Guard Breach** | High | Security Operations Center | Kill or suspend run, preserve trace, revoke credentials only for confirmed compromise. |
+| **Repeated Permission Denial** | Moderate to high | Security or compliance review | Block further privileged attempts and inspect trace for prompt injection or abuse. |
+
+Termination doctrine:
+
+```text
+Every loop must have a finish line.
+Every failure must have a terminal path.
+Every escalation must identify who receives authority next.
+Every terminal state must release resources and write trace.
 ```
-
-The specific escalation triggers are mapped to their corresponding system actions:
-
-| Failure / Risk State | Severity Level | Target Escalation Endpoint | System Recovery Action |
-| :---- | :---- | :---- | :---- |
-| **High-Impact Mutation** | High Risk | User Confirmation Gate.4 | Suspend active execution; render approval UI.1 |
-| **Missing Input Data** | Low Risk | Operator Clarification.7 | Pause active loop; prompt user for parameter.7 |
-| **Low Scorer Confidence** | Low Risk | Specialist Worker Model.6 | Route current task to a larger model block.6 |
-| **Tool Failure Exceptions** | Moderate Risk | Local System Repair.5 | Execute fallback schema or alternate local tools.5 |
-| **Budget Limit Reached** | High Risk | Manager Approval Queue.7 | Freeze state; require manual budget release.7 |
-| **Database Outage** | High Risk | SRE Incident Management.5 | Switch database connection to read-only backup replica.5 |
-| **Security Guard Breach** | High Risk | Security Operations Center. | Kill container instantly; revoke user API session keys. |
 
 ## **Failure Modes and Agentic Pathologies**
 
-Agentic architectures introduce emergent system-level failure surfaces that do not exist in traditional software development.2 Robust system design requires analyzing these pathologies, identifying their telemetry signals, and deploying automated SRE-grade containment strategies.
+Agentic systems introduce failure surfaces that do not exist in traditional request-response software. The system can fail not only by producing a wrong answer, but by taking the wrong path, calling the wrong tool, spending too much, escalating too late, writing bad memory, or refusing to stop.
 
 | Pathology Family | Observed Symptom | Underlying Root Cause | Telemetry Indicator | Immediate Containment | Long-Term Architectural Remedy |
-| :---- | :---- | :---- | :---- | :---- | :---- |
-| **Runaway Loops** | System repeats identical planning steps.7 | Vague termination rules or parsing failures.7 | Identical transition hashes in task state.24 | Force-terminate the active container.24 | Enforce strict workflow graph loops with hard step caps.11 |
-| **Tool Spam** | Spikes in tool call frequencies.12 | Aggressive keyword triggers spawning agents.12 | API requests exceed 50 calls/min.18 | Suspend session access to the tool gateway.11 | Implement tool budgets and concurrency caps.8 |
-| **Plan / Goal Drift** | Plan strays from primary task goals.7 | Broad planning prompts; context accumulation.7 | Semantic divergence in planning vector checks. | Pause run and run plan validation steps.5 | Restrict planning steps to pre-compiled graph nodes.13 |
-| **Context Bloat** | High latency; model ignores instructions.7 | raw tool output logs are appended to history.7 | Active context window usage exceeds 80%. | Summarize progress and compress active history.7 | Implement scratchpad garbage collection routines.7 |
-| **Memory Poisoning** | Model references inaccurate facts in later steps.3 | Stale or unverified facts are committed to memory.3 | Discrepancies between database records and logs.5 | Clear active memory cache and reload from trace logs. | Route persistent memory writes through validation gates.3 |
-| **Hallucinated Obs** | Model claims tool ran and succeeded.3 | Model bypasses return parsers to output answers.5 | Tool registry reports zero actual invocations.5 | Halt active loop and trigger quality score failure. | Enforce schema parsing on returned payloads.5 |
-| **Premature Term** | Loop halts before completing the goal.7 | Broad or missing plan validation checks.7 | Validation node returns false after stop command.7 | Return status to active and resume execution steps.7 | Require verified physical evidence before termination.7 |
-| **Refusal to Stop** | Loop continues despite goal validation.7 | Over-reflection loops ignore success states.7 | Step counter exceeds initial plan bounds.11 | Force state change to final and return response.11 | Build independent validation nodes into the graph.7 |
-| **Over-Reflection** | High token spend on minor formatting checks.7 | Prompts force continuous self-criticism passes.7 | High token consumption with zero state changes.7 | Skip reflection and continue to next plan step.7 | Limit sequential reflection steps to <= 2 passes.7 |
-| **Redundant Decomp** | Model breaks tasks into duplicate subtasks.18 | Weak plan tracking; missing dependency trees.18 | Identical subtask signatures in the active plan.18 | Consolidate tasks and clear duplicate plan entries. | Restrict recursive task decomposition depth to D <= 2.18 |
-| **Duplicate Actions** | Identical API requests sent to target.18 | Parsing errors; missing transaction locks.5 | High-frequency matching API call signatures.18 | Block API requests and run recovery logic.5 | Enforce client-side transaction locks on dispatches.5 |
-| **Budget Blowout** | Invoice spikes over a short duration.8 | Unconstrained loops run without active caps.8 | Monetary cost exceeds target threshold.8 | Kill active execution and revoke tenant access.18 | Enforce loop and token budget controls on runs.8 |
-| **Stale State** | Model plans based on outdated observations.3 | Missing cache invalidation; state update gaps.6 | Active state timestamps lag tool executions.5 | Invalidate active state caches and rerun lookups.5 | Implement state tenure rules and validation steps.6 |
-| **Permission Creep** | Model attempts to access restricted tools.24 | Broad system credentials leaked to model context.6 | Access denial events in tool registry logs.24 | Terminate session and regenerate API tokens.18 | Ensure model actions inherit active user session credentials.6 |
-| **Tool Overreach** | Model calls complex APIs for simple steps.11 | Inefficient routing rules; missing heuristic paths.12 | Non-critical tools called for simple lookups.11 | Reject tool call and route to local code block.11 | Force simple tasks to run on deterministic code paths.12 |
-| **Coordination Fail** | Peer workers stall waiting for outputs.13 | Circular dependencies in multi-agent designs.13 | Workflow graph state remains unchanged.13 | Terminate the workflow run and log coordinating errors. | Enforce static DAG execution rules on multi-agent structures.13 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Runaway Loops** | System repeats identical planning or repair steps. | Vague termination rules, missing exit edge, or parser failure. | Repeated transition hashes; step count exceeds plan bound. | Force terminal state and preserve trace. | Compile graph loops with hard step caps and explicit exits. |
+| **Tool Spam** | Tool-call frequency spikes. | Aggressive triggers, weak tool-selection policy, or reflection loop. | Tool calls per run/minute exceed threshold. | Suspend tool access for run; enter repair or terminate. | Enforce tool budgets, duplicate-call detection, and policy gates. |
+| **Plan / Goal Drift** | Plan strays from user goal or acceptance criteria. | Broad planning prompt, stale context, or unbounded decomposition. | Semantic distance from goal increases across plan revisions. | Pause and rerun plan validation. | Anchor plan to structured goal object and compiled graph nodes. |
+| **Context Bloat** | Latency rises; model ignores instructions or loses key facts. | Raw outputs, drafts, and reflections appended without compression. | Context usage exceeds threshold; retrieval omissions rise. | Run compression node or halt if unsafe. | Govern scratchpad lifecycle and preserve only active verified state. |
+| **Memory Poisoning** | Later steps cite inaccurate or unsupported facts. | Unverified observations or assumptions committed to memory. | Memory entries lack source support or validator ID. | Quarantine memory write; reload from verified trace. | Route persistent memory writes through post-run verification gates. |
+| **Hallucinated Observation** | Model claims a tool ran or succeeded when it did not. | Model bypasses tool return parser or infers success. | Tool registry shows no matching invocation or no verified result. | Halt loop and mark grounding violation. | Separate intended, attempted, observed, verified, and committed states. |
+| **Premature Termination** | Loop stops before goal is complete. | Weak completion check or model-declared success without evidence. | Terminal code conflicts with failed validation state. | Reopen run only through orchestrator; resume from checkpoint. | Require verified acceptance criteria before SUCCESS. |
+| **Refusal to Stop** | Loop continues after success or terminal condition. | Reflection loop ignores completion state or graph lacks terminal edge. | Step count rises after success criteria already met. | Force Finalize -> Terminate transition. | Independent completion validator and hard terminal guards. |
+| **Over-Reflection** | High token spend on minor critique without state improvement. | Reflection invoked automatically after every step. | Reflection tokens high; state delta near zero. | Skip reflection and continue or terminate. | Trigger reflection only on specific diagnostic conditions. |
+| **Redundant Decomposition** | Duplicate subtasks appear in plan. | Missing dependency map or subtask signature tracking. | Identical subtask hashes in active plan. | Merge duplicates and update dependency tree. | Limit recursive decomposition depth and require unique subtask IDs. |
+| **Duplicate Actions** | Identical API requests sent repeatedly. | Missing transaction locks, idempotency keys, or retry controls. | Matching API call signatures within short interval. | Block duplicates and inspect run state. | Enforce idempotency keys and duplicate-dispatch guards. |
+| **Budget Blowout** | Token, tool, or dollar spend spikes. | Unbounded loop, retry storm, or missing budget enforcement. | Cost exceeds run budget or projected completion cost. | Terminate or freeze pending approval. | Enforce vector budgets and progressive interval estimation. |
+| **Stale State** | Agent plans from outdated observations. | Missing cache invalidation or state-tenure rules. | State timestamp lags latest tool observation. | Invalidate active state and rerun lookup. | Bind state entries to source tenure, timestamp, and authority. |
+| **Permission Creep** | Model attempts unauthorized tools or data access. | Broad credentials exposed to model context or weak policy gate. | Permission denial events, tool mismatch, suspicious escalation attempts. | Block action and inspect for injection. | Use least-privilege credentials and active user session scope. |
+| **Tool Overreach** | Complex or costly APIs used for simple tasks. | Missing deterministic path or weak tool-use heuristic. | High-cost tool used for low-risk lookup or calculation. | Reject tool call and route to local deterministic method. | Add least-tool policy and cheap deterministic alternatives. |
+| **Coordination Failure** | Peer workers stall waiting for each other. | Circular dependencies or missing blackboard state rules. | Workflow graph state unchanged while workers remain active. | Terminate or collapse to supervisor path. | Enforce static DAGs, dependency tracking, and supervisor arbitration. |
+| **Validator Retry Storm** | Outputs repeatedly fail schema or safety checks and trigger retries. | Bad prompt contract, incompatible model, or over-strict validator. | Retry count, validator CPU, and latency spike together. | Cap retries and fail closed or escalate. | Add schema-specialized route and validator regression tests. |
+| **Human-Review Queue Saturation** | Runs pile up waiting for approvals. | Too many workflows route to human gates or approval policy is too broad. | Review queue age and pending count exceed threshold. | Defer low-priority reviews and fail closed for high-risk expired approvals. | Calibrate approval thresholds and add specialized reviewer queues. |
+| **Memory-Write Poisoning** | Bad long-term memory persists across sessions. | Weak memory promotion gate or unsupported summary. | Future runs retrieve low-grounding memory entry. | Quarantine memory block and rebuild from trace. | Require evidence-backed memory writes with expiration and source links. |
+| **Tool Credential Expiry** | Valid plan fails because tool auth expires mid-run. | Long-running workflow outlives credential TTL. | 401/403 tool errors after previous success. | Refresh token through approved path or pause run. | Bind credential tenure to run duration and renew safely before expiry. |
+| **Observation Parser Drift** | Tool output is misread after API/schema changes. | Parser version no longer matches tool response. | Parse errors, missing fields, or wrong normalized state. | Halt affected tool path and preserve raw payload. | Version tool schemas and test parsers against provider changes. |
+| **Idempotency Failure** | Retry performs side effect multiple times. | Missing idempotency keys or transaction locks. | Duplicate external records, charges, messages, or writes. | Stop retries and reconcile external state. | Require idempotency keys for all mutating tools. |
+| **Escalation Bypass** | High-risk action proceeds without approval. | Tool risk misclassification or policy guard missing. | Mutating action lacks approval trace. | Revoke action path and open incident. | Make approval state a required transition guard. |
+
+Pathology doctrine:
+
+```text
+A wrong final answer is only one failure mode.
+A wrong trajectory, wrong tool, wrong state write, wrong escalation,
+or wrong budget decision can be just as damaging.
+```
 
 ## **Agent Evaluation and Observability Guidance**
 
-Evaluating agentic systems is fundamentally different from scoring traditional request-response engines.2 Since the execution path is synthesized dynamically at runtime, testing cannot be restricted to checking final outputs.2 Evaluation must analyze the entire trajectory, measuring the efficiency, safety, and validity of each state transition.5  
-To support comprehensive auditing, every run must compile an immutable Agent Run Trace.1 This trace serves as the foundational artifact for system debugging, regression testing, and compliance replays.4
+Evaluating agentic systems is different from scoring traditional request-response engines. The final answer matters, but so does the path taken to reach it. A run can produce an acceptable final answer while wasting budget, calling unauthorized tools, skipping validation, contaminating memory, or narrowly avoiding a dangerous action.
 
-| Target Metric | Measurement Unit | Ideal Target Score | Evaluation Collection Method |
-| :---- | :---- | :---- | :---- |
-| **Task Success Rate** | Percentage | >= 98.0%.5 | Offline regression testing on golden validation sets.12 |
-| **Trajectory Quality** | Path variance score | <= 1.15 variance. | Compute path alignment against reference paths. |
-| **Correct Termination** | Match accuracy | 100% accuracy.7 | Verify runs halt with correct catalog status codes.7 |
-| **Escalation Accuracy** | Precision/Recall | >= 95.0% precision.5 | Inject validation anomalies to test human routes.5 |
-| **Step Count Efficiency** | Average integer count | <= 8 steps per task. | Monitor telemetry logs for average steps completed.3 |
-| **Loop Depth Limit** | Integer count | Max depth <= 2.18 | Track parent-child spawning limits in tracing logs.18 |
-| **Tool-Call Count** | Average integer count | <= 12 calls per task. | Monitor api gateway logs for invocation counts.12 |
-| **Failed Tool Calls** | Count per session | <= 1 call per session.5 | Track returned exceptions and 4xx/5xx API codes.5 |
-| **Retry Count Rate** | Percentage | <= 5.0% of dispatches. | Track total retries vs first-time tool successes.5 |
-| **Timeout Rate** | Percentage | <= 1.0% of runs.5 | Monitor SRE runtime alerts for wall-clock drops.4 |
-| **Budget Adherence** | Percentage | 100% adherence.8 | Track budget overrun exceptions at the gateway level.8 |
-| **Cost per Success** | Monetary USD | Within plan budget.8 | Compare average successful cost vs total project margins.8 |
-| **System Latency** | Milliseconds | <= 15,000 ms (p95).21 | Track overall time-to-first-token and task finish.21 |
-| **Repair Success Rate** | Percentage | >= 90.0% recovery.5 | Track runs that complete after executing repair states.5 |
-| **Memory Write Quality** | Grounding score | 100% grounding.3 | Verify memory blocks are supported by observations.3 |
-| **Human Override Rate** | Percentage | <= 2.0% of approvals. | Track operator rejection rates in review queues.6 |
-| **User Correction Rate** | Percentage | <= 5.0% of sessions. | Monitor session context for user revision loops.7 |
-| **Trace Completeness** | Telemetry coverage | 100% coverage.1 | Audit trace files for missing state steps.1 |
+Agent evaluation must therefore measure both end-state quality and trajectory quality.
+
+### **Agent Run Trace Requirements**
+
+Every run must produce an immutable Agent Run Trace. This trace is the foundation for debugging, regression testing, compliance replay, incident response, and cost-per-success analysis.
+
+| Trace Field | Purpose |
+| :--- | :--- |
+| `run_id` | Stable identifier for the full agent run. |
+| `tenant_id` / `user_scope` | Binds execution to authority, quota, and audit context. |
+| `goal_object` | Captures the structured target the agent was trying to satisfy. |
+| `autonomy_boundary_version` | Records which decision rights were active. |
+| `workflow_graph_version` | Identifies the compiled graph used for transitions. |
+| `model_versions` | Records planner, executor, verifier, and routing model versions. |
+| `prompt_template_versions` | Supports replay and prompt-regression analysis. |
+| `tool_registry_version` | Identifies which tools and schemas were available. |
+| `state_checkpoints` | Captures task state after each verified transition. |
+| `tool_calls` | Records tool name, arguments hash, request ID, result status, and observation pointer. |
+| `budget_vector` | Tracks tokens, cost, calls, retries, time, context, and memory writes. |
+| `validation_results` | Records schema, safety, grounding, and acceptance checks. |
+| `escalation_events` | Captures approval requests, human decisions, and review outcomes. |
+| `terminal_code` | Explains how and why the run ended. |
 
 ### **Trajectory Evaluation vs. End-State Scans**
 
-Relying solely on end-state scans introduces severe risks:
+End-state scans alone are insufficient. A final answer may be correct even though the agent:
 
-* An agent can return a valid final answer even after executing redundant tools or exceeding budget limits.8  
-* System designers must deploy *trajectory-level validation*.5 This approach analyzes intermediate steps to identify inefficiencies, tool misuse, and near-violations before they lead to production failures.8
+* exceeded budget
+* called redundant tools
+* used stale observations
+* skipped a required approval
+* wrote unsupported memory
+* silently failed a tool call
+* reached the answer through an unsafe or non-replayable path
+
+Trajectory-level validation analyzes intermediate steps to identify inefficiencies, tool misuse, near-violations, and unsafe patterns before they become production incidents.
+
+### **Agent Evaluation Metric Matrix**
+
+The targets below are policy targets, not universal constants. Each platform should calibrate thresholds by task type, risk class, tenant tier, latency SLO, model family, and workflow complexity.
+
+| Target Metric | Measurement Unit | Example Policy Target | Evaluation Collection Method | What It Detects |
+| :--- | :--- | :--- | :--- | :--- |
+| **Task Success Rate** | Percentage | `>= 98%` for stable workflows | Golden task set and production-labeled outcomes | Whether the agent completes the requested task. |
+| **Correct Termination** | Percentage | `100%` for regulated workflows | Terminal-code audit against expected outcomes | Premature stops, refusal to stop, wrong terminal code. |
+| **Trajectory Validity** | Percentage of legal transitions | `100%` | Replay trace against compiled workflow graph | Illegal edges, skipped guards, runtime graph mutation. |
+| **Trajectory Efficiency** | Actual steps / reference steps | `<= 1.25x` reference path for stable workflows | Compare run path against golden or expert path | Redundant decomposition, tool spam, over-reflection. |
+| **Escalation Accuracy** | Precision / recall | `>= 95%` on injected anomalies | Fault-injection and review-set tests | Missed approvals, excessive human review, unsafe autonomy. |
+| **Step Count Efficiency** | Average steps per task | Workflow-specific | Trace logs and golden path comparison | Excessive planning, repair, or recursion. |
+| **Loop Depth Limit** | Max recursive depth | `<= 2` unless explicitly approved | Parent-child task trace analysis | Runaway decomposition and swarm proliferation. |
+| **Tool-Call Count** | Calls per task | Workflow-specific | Tool gateway logs | Tool overuse and missed deterministic paths. |
+| **Failed Tool Calls** | Count or percentage | Low and bounded by retry policy | Tool result telemetry | Bad arguments, unavailable dependencies, parser drift. |
+| **Retry Rate** | Retries / tool dispatches | `<= 5%` for stable tools | Tool gateway and circuit-breaker logs | Retry storms and brittle tool contracts. |
+| **Timeout Rate** | Percentage of runs | `<= 1%` for interactive workflows | Orchestrator timeout records | Capacity, dependency, or loop-bound failures. |
+| **Budget Adherence** | Percentage | `100%` hard cap compliance | Budget-vector telemetry | Budget overruns and ineffective enforcement. |
+| **Cost per Success** | USD per successful run | Within tenant plan and margin | Billing ledger plus terminal status | Whether cost savings survive failures and retries. |
+| **Observation Grounding Rate** | Verified state updates / total state updates | `100%` | State checkpoint audit | Hallucinated observations and assumed tool success. |
+| **Memory Write Quality** | Supported memory writes / total writes | `100%` for persistent memory | Memory write-gate audit | Memory poisoning and unsupported long-term facts. |
+| **Human Override Rate** | Overrides / approvals | Workflow-specific | Review queue outcomes | Over-trusting automation or over-escalating trivial cases. |
+| **User Correction Rate** | User corrections / sessions | Workflow-specific | Conversation trace analysis | Misunderstood intent or poor final synthesis. |
+| **Trace Completeness** | Required trace fields present | `100%` for production | Trace schema audit | Non-replayable runs and missing incident evidence. |
+
+### **Evaluation Harness Design**
+
+Agent evaluation requires multiple test modes:
+
+| Test Mode | Purpose |
+| :--- | :--- |
+| **Golden Trajectory Tests** | Compare run path against expert-approved reference trajectories. |
+| **Fault Injection** | Simulate tool failures, malformed observations, timeouts, and permission denials. |
+| **Budget Stress Tests** | Verify termination before token, cost, wall-clock, or tool-call caps are exceeded. |
+| **Escalation Tests** | Confirm high-risk operations route to approval or fail closed. |
+| **Replay Tests** | Reconstruct past runs from trace and verify deterministic state transitions. |
+| **Long-Run Soak Tests** | Detect memory bloat, retry storms, queue buildup, and context compression failures. |
+| **Policy Regression Tests** | Verify autonomy boundaries after tool, prompt, model, or policy changes. |
+
+Agent observability should make every run answerable in one sentence:
+
+```text
+The agent was allowed to do X, chose path Y, called tools Z,
+spent budget B, updated state S from verified observations,
+and terminated because condition T was met.
+```
 
 ## **Cross-Canon Handoff Map**
 
-Agentic orchestration does not exist in isolation. It relies on, and provides vital context to, other core systems across the AI Engineering Canon.
+Agentic orchestration does not exist in isolation. AI-ENG-M defines how autonomous loops are bounded, budgeted, traced, terminated, escalated, and evaluated. Those orchestration contracts feed directly into downstream tool, verification, security, evaluation, incident, governance, and reference-architecture systems across the Canon.
 
-| Downstream Target Report | Handoff Artifact | Underling System Implication | Downstream Architectural Owner |
-| :---- | :---- | :---- | :---- |
-| **AI-ENG-N (Tool Contracts)** | Dynamic tool payload request signatures.6 | Enforces strict type checking and schema matching.5 | Platform Gateway / Serialization Engine. |
-| **AI-ENG-O (Action Verification)** | Grounded observation cache.4 | Reconciles state changes and handles recovery.5 | Post-Action Verification Scorer. |
-| **AI-ENG-S (Production Pathologies)** | System trace files and retry histories.5 | Documents runtime failure loops and tool overreach.18 | Site Reliability Engineering (SRE) Teams. |
-| **AI-ENG-T (Permissions & Injection)** | Active session scope metadata.1 | Restricts model capabilities to authorized boundaries.1 | Identity & Access Management (IAM) Gateway. |
-| **AI-ENG-V (Resource Abuse)** | Loop and token budget allocations.7 | Terminates runs that violate resource limits.8 | Resource Quota / Gateway Rate-Limiter. |
-| **AI-ENG-W (Fallback Modes)** | Targeted recovery policy structures.5 | Governs system behavior during downstream outages.5 | Incident Management Router. |
-| **AI-ENG-X (Trust & Control)** | Proposed planning schedules.1 | Renders interactive approval interfaces for users.1 | User Interface (UI) Presentation Layer. |
-| **AI-ENG-Y (Human-in-the-Loop)** | Transition escalation requests.6 | Manages human review and approval workflows.6 | Human-in-the-Loop (HITL) Queue. |
-| **AI-ENG-Z (Telemetry)** | Step count and execution latency logs.4 | Streams active session metrics to dashboards.3 | Prometheus / Datadog Monitoring Routers. |
-| **AI-ENG-AA (Agent Evaluations)** | Golden trajectory testing sets.5 | Evaluates regression issues and model capabilities.12 | CI/CD Automated Test Runner. |
-| **AI-ENG-AB (Replay Traces)** | Versioned state database checkpoints.13 | Replicates and debugs failures in sandboxes.1 | Developer Testing Environment. |
-| **AI-ENG-AC (Incident Response)** | System halt and error traces.5 | Supports rapid system diagnostics during incidents.18 | Active On-Call SRE Support Systems. |
-| **AI-ENG-AJ (Reference Architectures)** | Orchestrator state machine code. | Serves as the blueprint for scalable agent systems.6 | Systems Engineering and Architecture. |
+| Downstream Target Report | Handoff Artifact | Underlying System Implication | Downstream Architectural Owner |
+| :--- | :--- | :--- | :--- |
+| **AI-ENG-N — Tool Contracts** | Dynamic tool payload request signatures, tool eligibility decisions, argument schemas, and repair traces. | Enforces strict type checking, schema matching, tool authorization, and structured error handling. | Platform Gateway / Serialization Engine. |
+| **AI-ENG-O — Action Verification** | Grounded observation cache, attempted/observed/verified state distinctions, and post-action validation requirements. | Reconciles state changes, confirms external side effects, and prevents assumed tool success. | Post-Action Verification Scorer. |
+| **AI-ENG-S — Production Pathologies** | Run traces, retry histories, loop failures, budget breaches, and pathologies. | Documents runtime loops, tool overreach, cache issues, and orchestration failures. | Site Reliability Engineering Teams. |
+| **AI-ENG-T — Permissions & Injection** | Active session scope metadata, autonomy boundaries, tool allowlists, and permission-denial traces. | Restricts model capabilities to authorized user and tenant boundaries. | Identity & Access Management Gateway. |
+| **AI-ENG-V — Resource Abuse** | Loop budgets, token budgets, tool budgets, retry caps, and side-effect limits. | Terminates runs that violate resource limits or denial-of-wallet controls. | Resource Quota / Gateway Rate Limiter. |
+| **AI-ENG-W — Fallback Modes** | Escalation routes, degraded-mode triggers, dependency-failure states, and safe terminal paths. | Governs behavior during tool outages, provider failures, capacity limits, and validation failure. | Incident Management Router. |
+| **AI-ENG-X — Trust & Control** | Human approval packets, proposed plans, risk explanations, and user-facing confirmation states. | Renders interactive approval, clarification, and override interfaces. | User Interface / Trust Control Layer. |
+| **AI-ENG-Y — Human-in-the-Loop** | Escalation requests, review queues, approval records, and reviewer decisions. | Manages human review, approval workflows, and asynchronous audit outcomes. | Human-in-the-Loop Queue. |
+| **AI-ENG-Z — Telemetry** | Step counts, route IDs, budget vectors, tool latency, terminal codes, and execution metrics. | Streams active session metrics to dashboards and reliability monitors. | Prometheus / Datadog / OpenTelemetry Routers. |
+| **AI-ENG-AA — Agent Evaluations** | Golden trajectory sets, fault-injection scenarios, replay tests, budget tests, and escalation tests. | Evaluates regression issues, path quality, task success, and model capability. | CI/CD Automated Test Runner. |
+| **AI-ENG-AB — Replay Traces** | Versioned state checkpoints, model versions, prompt versions, tool calls, observations, and terminal states. | Reconstructs and debugs failures in sandboxes and audit environments. | Developer Testing / Audit Environment. |
+| **AI-ENG-AC — Incident Response** | System halt traces, error states, circuit-breaker events, stuck runs, and budget breaches. | Supports rapid diagnosis during orchestration incidents and runaway-loop events. | Active On-Call SRE Systems. |
+| **AI-ENG-AD — Governance, Policy, Compliance & Accountability** | Autonomy boundary versions, approval policies, exception records, audit traces, and accountable decision owners. | Ensures delegated decision rights, escalation policies, memory writes, and tool actions comply with organizational governance. | Governance / Risk / Compliance Owner. |
+| **AI-ENG-AJ — Reference Architectures** | Orchestrator state-machine patterns, graph templates, budget controllers, and trace schemas. | Serves as the blueprint for scalable agentic systems. | Systems Engineering and Architecture. |
+
+The durable handoff is this:
+
+```text
+AI-ENG-M exports the runtime contract for bounded autonomy:
+what the model may decide, which tools it may use, how much it may spend,
+when it must stop, when it must escalate, and how its full trajectory
+can be replayed after the fact.
+```
 
 ## **Durable Principles for Agentic Orchestration**
 

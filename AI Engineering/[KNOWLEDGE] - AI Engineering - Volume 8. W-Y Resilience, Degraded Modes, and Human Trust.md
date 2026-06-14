@@ -21,41 +21,40 @@ where beta is a normalization parameter representing user sensitivity to delay.8
 
 ### **Conceptual Glossary**
 
-This glossary defines the core operational metrics and terms governing high-dimensional UX resilience and degraded-mode orchestration:
+This glossary defines the core operational metrics and terms governing UX resilience and degraded-mode orchestration:
 
 | Term | Technical Definition | Primary Operational Metric | Standard Production Target |
 | :---- | :---- | :---- | :---- |
-| **UX Resilience** | The systematic preservation of task progress, data integrity, and user trust during backend service failures.1 | User-Visible Incident Rate (R_inc) 1 | 0.00% of automated transaction pipelines 1 |
-| **Degraded Mode** | A designed, stateful product condition that communicates reduced platform capability while guiding the user toward task completion.2 | Active Degradation Exposure (D_exp) | < 2.0% of rolling monthly sessions |
-| **Fallback Chain** | A declarative, ordered sequence of alternative execution paths triggered automatically when primary paths fail.6 | Fallback Trigger Rate (R_fallback) 1 | < 1.0% of peak hourly transactions |
-| **Model Routing** | The real-time, pre-generation or post-generation decision of directing a query to a specific model based on task demands.11 | Routing Accuracy (A_route) 12 | > 95.0% of evaluated incoming queries 13 |
-| **Quality Floor** | The minimum acceptable threshold of model capability, accuracy, and safety below which a task must fail-closed.1 | Floor Breach Rate (R_floor_breach) | 0.00% under strict compliance auditing |
-| **Cached Answer** | A previously generated, verified model response stored with structural metadata and used to fulfill equivalent queries.14 | Cache Return Rate (R_cache_hit) 14 | 20.0% to 30.0% of repeat query volumes 14 |
-| **Stale Answer** | A retrieved cached response whose lifetime has exceeded its configured time-to-live but is served under emergency conditions.16 | Stale Cache Rate (R_stale) | < 1.5% of active fallback sessions |
-| **Partial Answer** | A response that isolates and delivers successfully generated components while declaring failed or unexecuted dependencies.17 | Partial Answer Rate (R_partial) | < 3.0% of multi-agent workflows 1 |
-| **Graceful Error** | A state-preserving terminal feedback condition that details what failed, what remains safe, and how the user can proceed.5 | Lost-Progress Rate (R_lost_state) | 0.00% of disrupted user inputs |
-| **Retry UX** | An interactive user interface pattern that manages backoff delays and prevents duplicate actions during automatic recovery.4 | Duplicate Transaction Count (C_dup) 1 | 0 duplicate writes on stateful APIs 1 |
-| **Continuity State** | The serialized matrix of session variables, user files, and task progress that must survive backend failures and transitions.16 | State Preservation Accuracy (A_state) | 100% data recovery on session resume |
-| **Escalation Package** | A structured metadata payload containing dialogue history, tool traces, and state data compiled to brief a human reviewer.19 | Post-Escalation Resolution Time (T_res) 21 | < 45 seconds total review window |
-| **Fail-Closed Mode** | A protective system state where execution halts entirely because safe fallback or degraded options cannot satisfy safety floors.1 | Uncontained Exploit Rate (R_leak) | 0.00% under active threat injection |
+| **UX Resilience** | The systematic preservation of task progress, data integrity, user orientation, and trust during backend service failures or degraded capability. | User-Visible Incident Rate | User-visible degradation is disclosed, state-preserving, and bounded by severity policy. |
+| **Degraded Mode** | A designed, stateful product condition that communicates reduced platform capability while guiding the user toward safe task continuation. | Active Degradation Exposure | Exposure remains within service SLO; high-impact tasks preserve explicit status and controls. |
+| **Fallback Chain** | A declarative, ordered sequence of alternative execution paths triggered when the primary path fails, slows, exceeds budget, or loses required capability. | Fallback Trigger Rate | Fallbacks are observable, tested, and policy-preserving. |
+| **Model Routing** | The real-time decision to direct a request to a model or provider based on task requirements, latency, cost, safety, context size, and system health. | Routing Accuracy | Routing decisions satisfy task capability and safety floors under evaluation. |
+| **Quality Floor** | The minimum acceptable level of model capability, grounding, structure, safety, privacy, and action verification required for a task. | Floor Breach Rate | Breaches block, escalate, or enter managed degraded mode. |
+| **Cached Answer** | A previously generated and verified response stored with freshness, scope, source, policy, and permission metadata. | Cache Return Rate | Cache is served only when freshness, permission, source version, and task risk allow. |
+| **Stale Answer** | A cached response whose freshness window has expired but may be shown under emergency or low-risk conditions with clear labeling. | Stale Cache Rate | Stale answers are blocked for high-impact/current tasks unless explicitly approved and disclosed. |
+| **Partial Answer** | A response that delivers verified completed components while clearly declaring failed, skipped, unavailable, or unexecuted dependencies. | Partial Answer Rate | Partial answers preserve truth boundaries and do not imply task completion. |
+| **Graceful Error** | A state-preserving terminal feedback condition explaining what failed, what succeeded, what is saved, and what the user can safely do next. | Lost-Progress Rate | Critical user inputs, drafts, files, and action state are preserved or explicitly marked unrecoverable. |
+| **Retry UX** | A user-facing pattern that coordinates retries, backoff, cancellation, idempotency, and duplicate-action prevention. | Duplicate Transaction Count | State-changing actions are not automatically retried without idempotency and verification. |
+| **Continuity State** | The serialized state required to resume a task across route switches, degraded modes, retries, or human escalation. | State Preservation Accuracy | Critical task state is preserved and verified across transitions. |
+| **Escalation Package** | A structured, redacted, scoped payload containing the information a human reviewer needs to continue or resolve a degraded workflow. | Post-Escalation Resolution Time | Escalation packets are complete enough for review without exposing unnecessary sensitive data. |
+| **Fail-Closed Mode** | A protective terminal state where execution halts because no available fallback can satisfy safety, privacy, quality, evidence, or verification requirements. | Uncontained Unsafe Completion Rate | Unsafe fallback completion is blocked; user receives saved-state and recovery options. |
 
 ## **Degraded Mode Taxonomy**
 
-When high-dimensional AI platforms operate at scale, failures are rarely binary.1 The system must identify the precise class of degradation, isolate the affected component, and deploy targeted user-facing mitigations. Under degradation, security and compliance protocols must remain active: the system must never compromise tenant isolation, data protection, or audit trails to keep a feature running.2  
-The system's degraded states are classified across ten distinct operational dimensions:
+Failures in AI systems are rarely binary. A platform may still respond while losing freshness, grounding, tool capability, latency guarantees, multimodal fidelity, or action authority. Degraded-mode handling must therefore identify which capability changed, preserve state, disclose the change when it affects user expectations, and prevent unsafe fallback.
 
 | Degraded Mode | Trigger Condition | User-Visible Symptom | Safe Fallback Option | Unacceptable Fallback | Required Disclosure | Continuity Requirement | Telemetry Event | Escalation Path |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Model Degradation** 1 | Primary model returns 429/5xx, timeouts, or high-latency spikes.4 | Extended response delays; subtle drops in language style or detail.4 | Route request to a smaller, faster model with similar safety alignment.10 | Route to a model lacking required tool-use or safety capabilities.1 | Display subtle UI banner: "Running in efficient mode." 5 | Preserve exact system prompts, chat history, and variables.1 | model_downgrade_triggered 1 | Route to human queue if task accuracy falls below floor.1 |
-| **Retrieval Degradation** 1 | Vector index returns timeouts, empty sets, or database disconnects.1 | Missing citations, general answers drawn from pre-trained weights.1 | Fall back to semantic cache or local database keyword search.1 | Generate speculative ungrounded answers without warning.1 | Display inline indicator: "Searching cached references only." 25 | Retain original user search query and filtering parameters.1 | retrieval_fallback_active 1 | Route session to manual research desk.1 |
-| **Tool Degradation** 1 | External tool API timeout, quota exhaust, or schema mismatch.1 | Functional options grayed out; inline action blocks.3 | Mock tool output with stale cached data or present draft payload.16 | Silently ignore failed tool actions and claim success.1 | Contextual warning: "External service offline. Review draft." 5 | Preserve populated tool arguments and draft inputs.3 | tool_execution_failed 1 | Suspend task; escalate draft to supervisor.19 |
-| **Parser Degradation** 1 | Document converter throws layout errors, OCR drift, or crashes.1 | "Document processing failed" banner; raw unformatted text views.1 | Switch to local heuristic text parser or native PDF extractor.1 | Stop document import entirely and discard upload.1 | Contextual banner: "Complex layout unreadable. Using text-only." | Retain raw uploaded document file and metadata.1 | parser_fallback_engaged 1 | Route file to manual verification queue.3 |
-| **Multimodal Degradation** 3 | High-resolution image/video VLM APIs hit rate limits or timeout.3 | Missing image descriptions; frozen video frames.3 | Fall back to local lightweight OCR or metadata summaries.3 | Invent visual details or ignore image presence.3 | Indicator: "High-resolution analysis delayed. Using OCR." | Retain raw media uploads and timestamp markers.3 | multimodal_pathway_degraded | Route to human verification desk.3 |
-| **Voice Degradation** 3 | High WebRTC packet loss, STT instability, or TTS server timeout.3 | Audio gaps; phonetic miscaptures; laggy responses.3 | Switch user stream to DTMF keypad inputs or text-chat fallback.3 | Force user to repeat speech over a degraded channel.3 | Verbal prompt: "I'm having trouble hearing. Let's try typing." 3 | Retain conversation transcript and active task intent.3 | voice_channel_degraded 3 | Transfer active audio stream to a live agent.3 |
-| **UI-Agent Degradation** 3 | DOM elements unmount mid-action; browser sandbox crashes.3 | Paused screen automations; spinning loaders.3 | Switch to visual coordinate targeting or re-plan the task.3 | Execute click actions blindly on outdated coordinates.3 | UI overlay: "Automation paused. Dynamic element shift." 3 | Preserve navigation history, cookie states, and inputs.3 | ui_automation_drift_detected 3 | Pause run; hand over screen control to user.3 |
-| **Quota Degradation** 1 | Tenant budget exhausted; model rate limits hit (HTTP 429).1 | "Rate limit reached" notification; temporary cool-offs.4 | Throttle request rates, route to cheaper local model adapters.1 | Accept requests and throw unhandled API crashes.1 | Standardized banner: "Rate limit reached. Adjusting performance." | Retain queue position and active input states.1 | tenant_quota_throttled 1 | Prompt user to upgrade subscription tier.10 |
-| **Cache Degradation** 1 | Cache available but contains stale or expired entries.16 | Outdated inventory or old policy answers.1 | Serve stale cache value annotated with clear freshness warning.16 | Serve stale data as fresh without a timestamp disclosure.1 | Inline warning: "Serving cached data from [timestamp]." 5 | Preserve active session identifiers and parameters.1 | stale_cache_served 1 | Force fresh model generation on user request.15 |
-| **Human-Review Degradation** 1 | Escalation queues are full; manual verification delayed.1 | Extended "Awaiting Review" states; processing delays.1 | Apply safe, low-impact default states and alert user.1 | Auto-approve unverified high-risk mutations.1 | Warning card: "Verification queues delayed. Expect wait times." | Retain complete escalation package and logs.1 | escalation_queue_saturated 1 | Route to high-priority backup supervisor.1 |
+| **Model Degradation** | Primary route returns 429/5xx, times out, exceeds latency budget, or fails quality checks. | Slower response, shorter answer, reduced reasoning depth, or lower formatting fidelity. | Route to an approved model that satisfies the task’s quality, safety, schema, context, and tool requirements. | Route to a cheaper model that lacks required capabilities. | Disclose when quality, latency, citations, structure, or tools materially change. | Preserve prompt state, user intent, files, tool state, and active constraints. | `model_route_degraded` | Escalate if no model satisfies quality floor. |
+| **Retrieval Degradation** | Vector index, keyword index, citation service, or document store times out or returns insufficient evidence. | Missing citations, narrower evidence set, slower research, or “cached references only.” | Use authorized lexical search, verified cache, narrower search, or ask clarification. | Generate unsupported current/policy/legal/financial claims as if grounded. | Disclose evidence limitation and freshness status. | Preserve original query, filters, tenant scope, and evidence requirements. | `retrieval_degraded` | Route to research/review queue for high-impact answers. |
+| **Tool Degradation** | External API, connector, browser, or database tool times out, hits quota, or fails schema/policy validation. | Action buttons disabled, draft saved, status pending, or tool-specific warning. | Preserve draft payload, show last verified read-only data, or let user retry after verification. | Mock execution, invent tool results, or claim success without verified state. | State whether the action was not executed, pending, failed, or unknown. | Preserve tool arguments, idempotency keys, approval state, and verification status. | `tool_degraded` | Escalate high-impact pending/unknown states. |
+| **Parser Degradation** | Document converter, OCR, layout parser, table extractor, or media parser fails. | Basic preview, missing tables, unavailable layout, lower confidence extraction. | Use text-only extraction, metadata preview, sampled pages, or request better file. | Discard upload, hallucinate unread content, or treat low-confidence extraction as verified. | Disclose parser limitation and affected evidence. | Preserve raw file, source metadata, parser errors, and upload state. | `parser_degraded` | Route to manual verification for high-impact documents. |
+| **Multimodal Degradation** | Image, video, audio, or chart analysis route is unavailable, overloaded, or low confidence. | Missing visual details, delayed media analysis, text-only mode, sampled frames. | Use bounded OCR, metadata, sampled frames, or defer analysis. | Invent visual details or ignore media while implying it was inspected. | Disclose what was and was not visually inspected. | Preserve raw media, timestamps, frame/page references, and extracted evidence. | `multimodal_degraded` | Human verification for safety-critical visual evidence. |
+| **Voice Degradation** | STT instability, TTS outage, packet loss, endpointing failures, or noisy input. | Audio gaps, repeated confirmations, text fallback, muted automation. | Switch to text input, keypad/card confirmation, or slower confirmation mode. | Force repeated speech over a degraded channel for high-impact actions. | Tell the user the voice channel is unreliable and offer a fallback. | Preserve transcript, task intent, confirmations, and interruption state. | `voice_degraded` | Transfer or hold for live operator when needed. |
+| **UI-Agent Degradation** | DOM drift, browser crash, stale selector, occlusion, unsafe origin, or automation uncertainty. | Automation pauses, user handoff, re-observe indicator, disabled click automation. | Re-observe the UI, re-plan, ask user to take over, or switch to instruction-only mode. | Blind clicking, stale coordinates, or continuing after origin uncertainty. | Disclose automation uncertainty and paused state. | Preserve form inputs, navigation history, screenshots, and verified UI state. | `ui_agent_degraded` | Handoff to user/operator for high-risk interfaces. |
+| **Quota Degradation** | Tenant budget exhausted, provider rate limit hit, or gateway circuit breaker open. | Cooldown, queue wait, reduced mode, quota banner. | Queue, throttle, offer lower-cost approved mode, or return managed capacity status. | Bypass policy, use unapproved route, or continue until provider errors cascade. | Show quota/rate-limit state and available options. | Preserve queue position, active input, drafts, and budget decision. | `quota_degraded` | Admin/support escalation for business-critical workloads. |
+| **Cache Degradation** | Fresh route unavailable and verified cache exists, or cache is stale/partial. | Timestamped cached answer, freshness warning, limited interaction. | Serve cache only if permission, source version, policy version, freshness, and task risk allow. | Serve stale or cross-scope cache as fresh. | Display timestamp, source/freshness status, and limitation. | Preserve query parameters, source IDs, cache key scope, and freshness metadata. | `cache_degraded` | Force fresh route or review for high-impact/current tasks. |
+| **Human-Review Degradation** | Escalation queue full, reviewer unavailable, or review SLA exceeded. | “Awaiting review,” delayed completion, limited automation. | Pause high-impact decisions, triage low-risk cases, or provide saved-state options. | Auto-approve unverified high-risk mutations or fabricate review outcome. | Explain review delay and what remains blocked. | Preserve escalation package, evidence, approvals, and user-visible status. | `review_degraded` | Route to priority queue or accountable owner. |
 
 ## **Model Routing Policy**
 
@@ -87,68 +86,144 @@ A fallback chain must operate as a declarative, testable, and observable softwar
 Primary Model Route --> Context Pruning --> Efficient Model Route --> Cache Lookup --> Partial Answer --> Human Escalation --> Fail-Closed  
 By formalizing this sequence, the system avoids random model-switching loops.1 Each transition is governed by a strict, declarative schema that preserves the user's context across different platforms and providers.6 The following YAML manifest defines a resilient fallback chain contract managed centrally at the gateway:
 
-YAML  
-route_id: "rt_contract_audit_v1"  
-tenant_scope: "tenant_enterprise_standard"  
-primary_target:  
-  model: "claude-3-5-sonnet-20241022"  
-  provider: "anthropic"  
-  timeout_ms: 5000  
-  retry_policy:  
-    max_attempts: 2  
-    backoff_factor: 1.5  
-    jitter: true  
-    on_status_codes:   
-fallback_chain:  
-  - step: 1  
-    trigger: "context_overflow_limit"  
-    target: "context_pruning_filter"  
-    lost_capability: "full_history_retention"  
-    quality_floor: "exact_citation_match"  
-    disclosure_rule: "none"  
-    state_preservation: "chat_history_summarized"  
-  - step: 2  
-    trigger: "primary_model_exhausted"  
-    target: "claude-3-5-haiku-20241022"  
-    lost_capability: "complex_formatting"  
-    quality_floor: "basic_syntax_compliance"  
-    disclosure_rule: "banner_warning"  
-    state_preservation: "serialize_session_variables"  
-  - step: 3  
-    trigger: "fallback_model_exhausted"  
-    target: "semantic_cache_index"  
-    lost_capability: "realtime_freshness"  
-    quality_floor: "similarity_threshold_0_85"  
-    disclosure_rule: "badge_warning"  
-    state_preservation: "freeze_session_state"  
-  - step: 4  
-    trigger: "cache_miss_or_offline"  
-    target: "partial_answer_generator"  
-    lost_capability: "complete_task_resolution"  
-    quality_floor: "unaffected_subtasks_resolved"  
-    disclosure_rule: "detailed_card_view"  
-    state_preservation: "isolate_unexecuted_steps"  
-  - step: 5  
-    trigger: "partial_generation_unverified"  
-    target: "human_review_queue_escalation"  
-    lost_capability: "instantaneous_response"  
-    quality_floor: "manual_expert_commit"  
-    disclosure_rule: "modal_overlay"  
-    state_preservation: "serialize_escalation_package"
+```yaml
+route_id: "contract_audit_resilience_v1"
+tenant_scope: "tenant_enterprise_standard"
+task_profile: "high_risk_document_analysis"
+primary_target:
+  route: "primary_reasoning_route"
+  timeout_ms: 5000
+  retry_policy:
+    max_attempts: 2
+    backoff_factor: 1.5
+    jitter: true
+    on_status_codes:
+      - 429
+      - 500
+      - 502
+      - 503
+      - 504
+
+quality_floors:
+  schema_validity: "strict"
+  evidence_support: "required"
+  citation_fidelity: "required"
+  tenant_isolation: "required"
+  tool_authority: "required"
+  high_impact_action_verification: "required"
+
+fallback_chain:
+  - step: 1
+    trigger: "context_overflow_or_latency_risk"
+    target: "context_pruning_filter"
+    allowed_loss:
+      - "low_priority_history"
+      - "redundant_retrieval_chunks"
+    preserved:
+      - "system_policy"
+      - "tenant_scope"
+      - "user_goal"
+      - "active_constraints"
+      - "approvals"
+      - "evidence_requirements"
+    disclosure_rule: "subtle_status_if_user_relevant"
+
+  - step: 2
+    trigger: "primary_route_unavailable"
+    target: "approved_capability_equivalent_route"
+    allowed_loss:
+      - "minor_style_variation"
+      - "nonessential_verbosity"
+    preserved:
+      - "schema_support"
+      - "safety_profile"
+      - "tool_policy"
+      - "context_window_requirement"
+      - "evidence_support"
+    disclosure_rule: "none_if_equivalent_else_banner"
+
+  - step: 3
+    trigger: "equivalent_route_unavailable"
+    target: "approved_degraded_route"
+    allowed_loss:
+      - "answer_depth"
+      - "number_of_citations"
+      - "advanced_formatting"
+    preserved:
+      - "safety_floor"
+      - "tenant_scope"
+      - "schema_validity"
+      - "privacy_policy"
+      - "truthful_disclosure"
+    disclosure_rule: "banner_warning"
+
+  - step: 4
+    trigger: "fresh_generation_unavailable"
+    target: "verified_cache_lookup"
+    allowed_loss:
+      - "freshness"
+      - "interactive_followup"
+    preserved:
+      - "cache_scope_match"
+      - "source_version_match"
+      - "policy_version_match"
+      - "permission_check"
+      - "timestamp_disclosure"
+    disclosure_rule: "freshness_badge_required"
+
+  - step: 5
+    trigger: "cache_miss_or_cache_not_allowed"
+    target: "partial_answer_generator"
+    allowed_loss:
+      - "complete_task_resolution"
+      - "unverified_subtasks"
+    preserved:
+      - "known_unknown_boundary"
+      - "completed_step_status"
+      - "unexecuted_step_status"
+      - "no_false_completion_claim"
+    disclosure_rule: "detailed_status_card"
+
+  - step: 6
+    trigger: "partial_answer_not_safe_or_review_required"
+    target: "human_review_queue"
+    allowed_loss:
+      - "instant_response"
+    preserved:
+      - "redacted_session_context"
+      - "evidence_ids"
+      - "tool_ledger"
+      - "approval_state"
+      - "user_goal"
+    disclosure_rule: "review_status_card"
+
+  - step: 7
+    trigger: "no_safe_fallback_available"
+    target: "fail_closed"
+    allowed_loss:
+      - "availability"
+    preserved:
+      - "saved_progress"
+      - "security_state"
+      - "audit_trace"
+      - "recovery_options"
+    disclosure_rule: "managed_failure_message"
+```
 
 ### **Fallback Chain Contract Table**
 
-The execution of this fallback sequence is defined by the following contract model:
+The fallback chain is safe only when every transition preserves the relevant quality floor. The system should not move “down” the chain merely to get any answer. It should move only to a route that can still satisfy the task’s required safety, evidence, privacy, and action-verification constraints.
 
-| Step | Trigger Event | Fallback Target | Lost Capability | Quality Floor | User Disclosure | Retry Policy | State Preservation | Evidence Handling | Safety Constraints | Telemetry Event | Escalation Rule |
-| :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| **0** | Session Initialization | **Primary Model** (e.g., Flagship Deliberative) 11 | None; full platform capabilities active.1 | 100% compliance with strict JSON schemas.1 | None; normal system state. | 2 attempts with exponential backoff and jitter.4 | Complete session variables and history active.1 | Fresh document retrieval and full citation indexing.1 | All system prompts and safety gates active.1 | primary_route_active | Escalate to Step 1 if primary returns 429/5xx or times out.10 |
-| **1** | Step 0 retries exhausted or context size > 50K tokens.1 | **Context Pruning** (Primary Model + Reduced Context).1 | Historical chat context beyond 5 turns; minor search results. | Primary model deliberative capabilities active; citations limited to top-5.1 | Subtle notification: "Condensing context to improve speed." | 1 attempt with immediate retry. | Rolling chat history summarized and saved.10 | Prune lowest-scoring retrieval chunks from prompt.1 | System prompts and safety boundaries unchanged.1 | context_pruning_engaged | Escalate to Step 2 if pruned primary remains unreachable.10 |
-| **2** | Step 1 fails or returns persistent timeouts.10 | **Efficient Model** (e.g., Smaller Model).11 | Elaborate formatting; detailed summaries; stylistic nuances. | Standard syntax parsing; basic code execution.1 | Contextual header: "Running in high-speed efficient mode." 5 | 1 attempt with linear backoff. | Session parameters serialized and passed to target model.1 | Citations converted to basic document titles and text snippets.3 | Standard safety filters and system templates active.1 | efficient_model_fallback | Escalate to Step 3 if efficient model errors or is throttled.10 |
-| **3** | Step 2 fails or hits global quota limits.1 | **Semantic Cache** (Cached Database Answer).14 | Real-time data freshness; interactive dialogue turns. | Exact or highly similar semantic match in vector cache.15 | Banner disclosure: "Showing verified cached answer from [timestamp]." | None; instant cache lookup. | Session state frozen at current turn.1 | Citations locked to cached document coordinates.3 | Cache entry verified against original safety rules.1 | cache_hit_fallback | Escalate to Step 4 if cache lookup returns a miss.10 |
-| **4** | Step 3 returns a cache miss.10 | **Partial Answer** (Fragmented Generation).17 | Unfinished tool steps; ungrounded claims; failed subtasks. | Delivers completed components; lists unexecuted blocks.17 | Status card: "Task partially completed. Review unexecuted steps." | None; no automated retries. | State of completed tools saved; unexecuted blocks flagged.1 | Citations limited strictly to successfully parsed blocks.3 | Block downstream executions of failed tools.1 | partial_answer_delivered | Escalate to Step 5 if partial output fails safety checks.1 |
-| **5** | Step 4 output fails safety checks or task requires approval.1 | **Human Escalation** (Live Review Queue).19 | Automated real-time response generation. | Propuesta generated by AI; manual review and commit active.19 | Dialogue message: "Routing your request to a specialist for verification." | None; process enters synchronous hold state.32 | Complete session history and tool logs packaged and saved.19 | Full evidence trace and document coordinates transferred.19 | Human operator reviews inputs against policies.1 | human_escalation_triggered | Escalate to Step 6 if review queue is saturated.1 |
-| **6** | Step 5 queue saturated or fallback paths exhausted.1 | **Fail-Closed Mode** (Managed Failure).1 | All generation, execution, and transaction capabilities. | Zero automated actions; secure system freeze.1 | Error overlay: "System temporarily unavailable. Your progress is saved." | Disabled; blocks automated requests. | In-memory session state written securely to database.1 | Revoke temporary document access permissions.1 | All access keys and tool scopes revoked immediately.1 | system_fail_closed_active | None; terminal state. Surface administrator support options. |
+| Step | Trigger Event | Fallback Target | Acceptable Loss | Preserved Floor | User Disclosure | Retry Policy | State Preservation | Evidence Handling | Escalation Rule |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| **0** | Normal session start. | Primary route. | None. | Full task capability. | None. | Profile-specific retry with backoff. | Full active state. | Fresh retrieval and normal citation validation. | Move to Step 1 on overflow, latency risk, or primary-route failure. |
+| **1** | Context too large, latency risk, or low-priority evidence overflow. | Context pruning / compaction. | Redundant history, low-priority chunks, nonessential verbosity. | System policy, user goal, active constraints, approvals, evidence requirements. | Subtle status only if visible quality changes. | One bounded attempt. | Summarize or externalize low-priority state; do not drop unresolved constraints. | Preserve high-authority and task-critical evidence. | Move to Step 2 if primary remains unavailable or task cannot fit safely. |
+| **2** | Primary model/provider unavailable or throttled. | Capability-equivalent approved route. | Minor style or latency variation. | Safety profile, schema support, context window, tool policy, privacy scope. | None if truly equivalent; otherwise banner. | Bounded retry. | Serialize session variables and route manifest. | Citation/evidence handling must remain equivalent. | Move to Step 3 if no equivalent route exists. |
+| **3** | Equivalent route unavailable. | Approved degraded route. | Depth, advanced formatting, number of citations, nonessential elaboration. | Safety, tenant isolation, schema validity, privacy, truthful limitation disclosure. | Required. | No repeated downgrade loops. | Preserve task state and show changed capability. | Use only evidence the degraded route can validate. | Move to Step 4 if generation is unavailable or not safe. |
+| **4** | Fresh generation unavailable or over capacity. | Verified cache lookup. | Freshness and interactivity. | Permission scope, source version, policy version, cache key scope, task suitability. | Timestamp/freshness badge required. | No generation retry. | Freeze state at cache-serving point. | Cached citations must still be valid and authorized. | Move to Step 5 if cache misses, is stale-for-risk, or lacks scope match. |
+| **5** | Cache unavailable or insufficient. | Partial answer. | Complete task resolution. | Completed/uncompleted boundary, no unsupported claims, no false completion. | Detailed status card. | No automated retries unless read-only and bounded. | Save completed steps and mark unexecuted steps. | Cite only verified completed evidence. | Move to Step 6 if task requires review or partial answer fails safety. |
+| **6** | High-impact uncertainty, policy block, failed verification, or review requirement. | Human review. | Instant automated completion. | Redacted context, evidence IDs, action ledger, user goal, approval state. | Review status card. | None; enters review workflow. | Package minimum necessary context. | Provide reviewer evidence links, not uncontrolled raw dumps. | Move to Step 7 if review is unavailable and no safe automated option exists. |
+| **7** | No safe fallback path remains. | Fail-closed managed state. | Availability. | Saved progress, security, privacy, audit trace, recovery options. | Required. | Disabled until recovery path exists. | Save state and block risky execution. | Preserve evidence trace for replay. | Terminal; surface support/retry options. |
 
 ## **Quality, Cost, and Latency Tradeoff Model**
 
@@ -178,24 +253,33 @@ The operating boundaries of these seven quality bands are defined in the followi
 
 ## **Cached Answer Validity Model**
 
-Serving cached answers is a highly effective way to maintain service continuity and reduce token costs during high-traffic events or primary model outages.10 However, using a semantic cache introduces key security and data freshness challenges.14  
-A primary security concern in shared caching environments is the timing side-channel exploit.37 Modern LLM runtimes often use Automatic Prefix Caching (APC) to reuse calculated Key-Value (KV) attention states across requests.37 In multi-tenant environments, an attacker can exploit this optimization by sending crafted prompts and measuring the Time-to-First-Token (TTFT).37 A significant drop in TTFT indicates a cache hit, which can allow an attacker to reconstruct private prompt prefixes from other tenants token-by-token.37  
-To block this timing leak without losing the performance benefits of prefix reuse, the system implements selective prefix isolation (such as the CacheSolidarity or PrefixWall framework).37 The cache engine extends each prefix entry with dynamic metadata tracking its creator (OwnerID) and security status (AttackFlag).39 If a request hits a prefix created by a different tenant, the system flags the entry as isolated, forcing a full model recomputation for non-owners and neutralizing timing probes.37  
-To ensure data security and freshness, the cache validates every lookup against a multi-dimensional validity model:
+Serving cached answers can preserve continuity and reduce cost during outages, rate limits, or repeated queries. But cached answers are not automatically safe. A cache entry can be stale, cross-scoped, unsupported by current policy, or semantically similar while being wrong for the user’s actual task.
+
+Shared prefix and semantic caching can also create side-channel risks in multi-tenant systems. Defenses such as tenant-scoped keys, permission-aware cache lookup, selective prefix isolation, timing padding, and cache-key versioning should be selected according to serving architecture and threat model. The point is not that one named framework must always be used; the point is that cache reuse must be scoped, fresh enough, and honest.
 
 ### **Cached Answer Validity Matrix**
 
-The validity and security of cached responses are enforced using these strict parameters:
+| Cache Class | Typical TTL Profile | Permission Scope | Source / Policy Versioning | Must Block When | User UI Labeling |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **Static Policies & Docs** | Hours to days, depending on release cadence. | Global, tenant, role, or workspace scoped. | Policy repository version, release manifest, source hash. | Policy version changed, user lacks scope, or answer affects high-impact decision without current validation. | “Using verified policy answer from [timestamp/version].” |
+| **Product Catalogs** | Minutes to hours. | Tenant, group, or storefront scoped. | Catalog timestamp, inventory version, pricing version. | Price/inventory freshness is required or source version changed. | “Showing product details cached [duration] ago.” |
+| **General Q&A** | Short to medium TTL. | User, workspace, or public scope depending on content. | Prompt template version, safety policy version, model route. | Query is materially different, safety policy changed, or answer requires current facts. | “Showing cached answer for a similar repeat question.” |
+| **Real-Time Inventory / Status** | Very short TTL or disabled. | Tenant/workspace scoped. | Transactional record timestamp and source-of-record version. | User is about to act on availability, finance, legal, medical, security, or operational state. | “Showing cached status from [timestamp]; refresh recommended before acting.” |
+| **Active Session State** | Session TTL. | Private user/session scope. | Session sequence, tool ledger, approval state. | New user message, changed parameters, changed approval payload, or tool state update. | “Restoring your saved draft/session state.” |
+| **Generated Drafts** | Session or workspace TTL. | User/workspace scoped. | Draft version and editing history. | Draft contains stale tool results or unverified claims. | “Restored draft from [timestamp]. Review before sending/submitting.” |
+| **Evidence Snippets** | Bound to source lifecycle. | Same scope as source document. | Source ID, source version, coordinates/section IDs. | Source document changed, permissions changed, or coordinates no longer match. | “Using saved evidence from [source/version].” |
 
-| Cache Class | Max TTL | Permission Scope | Source Versioning | Invalidation Rules | Confidence Threshold | User UI Labeling |
-| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Static Policies & Docs** | 24 Hours 35 | Global or Tenant Role 1 | Release manifest version tag.1 | Any update to the primary policy document repository.1 | >= 0.85 semantic similarity 15 | "Using verified answer from yesterday's policy version." |
-| **Product Catalogs** | 12 Hours 35 | Tenant Group 1 | Catalog update timestamp | Modification of the tenant database inventory table.1 | >= 0.90 semantic similarity 15 | "Showing product details cached [duration] ago." |
-| **General Q&A** | 4 Hours 35 | Individual User ID 1 | Prompt template version hash.1 | Major updates to system instruction templates.1 | >= 0.80 semantic similarity 15 | "Showing cached response for similar repeat query." |
-| **Real-time Inventory** | 5 Minutes 35 | Tenant Workspace 1 | Live transactional record timestamp | Any change in local store inventory stock levels.1 | >= 0.98 exact string match 15 | "Showing cached stock levels from 5 minutes ago." |
-| **Active Session Memory** | 30 Minutes 35 | Private User Session 1 | Active session sequence number | New user message input or tool state change.1 | 1.00 exact session sequence match.1 | "Restoring your active draft state." 7 |
+Cache eligibility checks should include:
 
-*User-Facing Labeling Rule*: The system must never display technical cache metadata (such as "cache hit on vector HNSW field") to the end user.1 The interface should translate these events into clear, plain-language statements detailing the source and freshness of the data (e.g., "Using verified answer from yesterday's policy version").1
+| Check | Purpose |
+| :--- | :--- |
+| **Tenant/User/Role Scope** | Prevent cross-user or cross-tenant leakage. |
+| **Source Version** | Prevent stale evidence after document or database updates. |
+| **Policy Version** | Prevent outdated safety/compliance behavior. |
+| **Prompt/Schema Version** | Prevent structurally incompatible cached responses. |
+| **Task Risk Class** | Block stale/cache-only answers for high-impact tasks. |
+| **Freshness Requirement** | Ensure current questions receive current answers. |
+| **Disclosure Requirement** | Make freshness and degraded state visible to the user. |
 
 ## **Partial Answer Policy**
 
@@ -208,13 +292,14 @@ The system's generation layer must clearly separate and label different informat
 
 ### **Partial Answer Formulation Model**
 
-When a multi-step workflow displays a partial failure, the system structures the response using this fallback model:
-
-| Ingestion/Execution Failure | What Is Known | What Is Unavailable | User Disclosure Prompt | Continuity Action | Retry Safety |
+| Ingestion / Execution Failure | What Is Known | What Is Unavailable | User Disclosure Prompt | Continuity Action | Retry Safety |
 | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Retrieval Database Timeout** 1 | System answers the query using pre-trained parametric knowledge.1 | Verified source documents; clickable citation coordinates.1 | "I can answer conceptually, but my live retrieval database is offline. I cannot verify specific policy changes." | Keep session active; display unverified draft response.1 | Safe to retry; does not trigger state-changing mutations.1 |
-| **Accounting Tool Crash** 1 | System displays the current billing statement and draft invoice details.26 | Processing of the direct payment transaction.1 | "I've drafted your invoice details, but the payment tool is temporarily offline. Click 'Review Draft' to submit manually." 26 | Save the validated invoice parameters to the user's active workspace.1 | **Unsafe to retry automatically**; requires transaction verification.1 |
-| **Document Parser Failure** 1 | System displays the document's basic file metadata, name, and size.1 | Extracted structured text; layout-aware tables and content.1 | "I can see your uploaded file, but my advanced layout parser is offline. I am displaying a basic text preview." 3 | Maintain the file upload link inside the active session workspace.16 | Safe to retry; file parsing is a read-only idempotent action.1 |
+| **Retrieval Database Timeout** | Any answerable low-risk conceptual material already available in current context. | Fresh source documents, current policy checks, citation verification. | “I can give a limited conceptual answer, but I cannot verify it against live sources right now.” | Preserve query, filters, and evidence requirements for retry. | Safe to retry; no side effects. |
+| **Current / Regulated Evidence Unavailable** | The user’s question and required evidence scope. | Verified current answer. | “I can’t safely answer this without current verified sources.” | Offer retry, narrower query, or escalation. | Safe to retry; do not produce speculative answer. |
+| **Accounting Tool Crash** | Draft invoice/payment fields already entered and validation status. | Verified execution of the payment or accounting mutation. | “I saved the draft details, but the accounting tool is offline. No payment/update has been confirmed.” | Save validated draft payload and idempotency state. | Unsafe to retry automatically; requires verification or user approval. |
+| **Document Parser Failure** | File name, size, type, upload status, and any successfully extracted low-confidence preview. | Verified structured text, tables, layout, or citations. | “Your file is saved, but I couldn’t reliably read its layout.” | Preserve raw upload and parser trace. | Safe to retry; file parsing is read-only. |
+| **Partial Tool Workflow Failure** | Completed tool steps and verified results. | Failed, pending, or unverified tool steps. | “Some steps completed; the remaining steps were not executed or could not be verified.” | Save action ledger with completed/pending/failed statuses. | Retry depends on idempotency and verification status. |
+| **Human Review Delayed** | Escalation package status and submitted time. | Reviewer decision or approval. | “Your request is waiting for review. I won’t complete the high-impact action until it is approved.” | Preserve escalation packet and notify when status changes. | Not automatically retryable; waits for reviewer or user decision. |
 
 ## **Graceful Error State Model**
 
@@ -251,14 +336,15 @@ To manage this, the system enforces a strict division between interaction types:
 
 ### **Retry UX Model**
 
-The platform coordinates retry states and interface components using the following schema:
-
 | Interaction Type | Idempotency Key Required | UI State Transition | Waiting Indicator | User Interruption Path | Max Retries | Fail-Through Target |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Stateless Text Generation** | No | active -> retrying -> complete | Micro-spinner inside input field.25 | Click "Stop Generation" button to cancel.3 | 3 attempts 31 | Serve stale cached answer.10 |
-| **Read-Only Document Search** 1 | No | active -> searching -> complete | Skeleton card view over result region.25 | Click "Cancel Search" link.25 | 2 attempts 24 | Fall back to local keyword index.1 |
-| **Stateful CRM Update** 1 | Yes; IDEMP- | draft -> verifying -> committed | Progress bar showing transaction status.36 | None; click "Pause Automation" blocks subsequent steps.36 | 0 automated retries; requires user confirmation.1 | Save draft payload; alert administrator.26 |
-| **Financial Disbursement** 1 | Yes; TXN- 1 | draft -> authorizing -> settled | Full-screen overlay with lock icon.3 | None; transaction locked once authorized.3 | 0 automated retries; requires manual PIN verification.3 | Block execution; freeze form state.1 |
+| **Stateless Text Generation** | No | active -> retrying -> complete or failed | Inline spinner or streaming status. | “Stop generation” cancels remaining attempts. | Profile-specific bounded retries. | Managed error or verified cache only if task-safe. |
+| **Read-Only Document Search** | No, but request hash recommended. | active -> searching -> results or limited mode | Skeleton result cards. | “Cancel search” returns to draft/query state. | Bounded retries with backoff. | Local keyword search, narrower query, or retrieval-limit status. |
+| **Document Parsing / OCR** | No, but file hash required. | uploaded -> parsing -> preview or failed | File processing indicator. | User can cancel parsing while preserving upload. | Bounded retries on read-only parser paths. | Text-only preview, metadata-only view, or manual entry option. |
+| **Stateful CRM / Database Update** | Yes. | draft -> verifying -> committed / failed / unknown | Transaction progress indicator. | User may pause subsequent steps; committed request cannot be casually canceled. | No blind automated retries. | Save draft payload; reconcile state before retry. |
+| **Financial Disbursement / Payment** | Yes, signed and scoped. | draft -> authorizing -> submitted -> verified / pending / failed | Full-screen or high-salience transaction state. | User can cancel before authorization; after submission system reconciles state. | No automated retry without idempotency and source-of-record check. | Hold pending state; route to manual verification if unknown. |
+| **Email Send / External Message** | Yes for send operation. | draft -> reviewing -> sending -> sent / failed / unknown | Send status with recipient summary. | User can cancel before send; after send verify provider status. | No duplicate send retries without provider/idempotency verification. | Preserve draft and delivery status. |
+| **Browser Automation** | Action/session ID required. | observing -> acting -> verifying -> paused / complete | Visible automation status. | “Pause automation” stops future actions. | Bounded retries only after re-observation. | Pause and hand control to user. |
 
 ## **Continuity State Model**
 
@@ -303,18 +389,30 @@ The structure and data parameters of the escalation package are defined below:
 Maintaining platform reliability requires comprehensive, real-time observability of degraded states.2 When an AI system shifts traffic to fallback routes, serves cached answers, or generates partial responses, platform teams must track these transitions using detailed telemetry.1 This observability prevents silent failures from going unnoticed, where the platform continues responding but at a significantly reduced level of accuracy or utility.5  
 Every degraded response must emit a structured trace containing the following metadata parameters:
 
-JSON  
-{  
-  "trace_id": "TR-99210-A",  
-  "trigger": "http_429_openai_billing",  
-  "route_before": "gpt-4o-reasoning",  
-  "route_after": "gpt-4o-mini-efficient",  
-  "lost_capabilities": ["multi_step_tool_planning", "long_context_retrieval"],  
-  "user_disclosure_shown": true,  
-  "preserved_state_size_bytes": 14202,  
-  "fallback_status": "200_fallback_model",  
-  "recovery_time_ms": 112  
+```json
+{
+  "trace_id": "TR-99210-A",
+  "trigger": "provider_rate_limit",
+  "route_before": "primary_reasoning_route",
+  "route_after": "approved_efficient_route",
+  "degradation_class": "model_degradation",
+  "lost_capabilities": [
+    "extended_reasoning_depth",
+    "full_citation_expansion"
+  ],
+  "preserved_capabilities": [
+    "tenant_scope",
+    "safety_policy",
+    "schema_validation",
+    "session_state"
+  ],
+  "user_disclosure_shown": true,
+  "disclosure_type": "banner_warning",
+  "preserved_state_size_bytes": 14202,
+  "fallback_status": "degraded_success",
+  "recovery_time_ms": 112
 }
+```
 
 This trace telemetry allows platform SREs to monitor system health and detect service anomalies before they impact the user experience.2
 
@@ -340,34 +438,51 @@ The platform tracks and evaluates these key reliability metrics:
 
 ## **Degraded-Mode Test Matrix**
 
-To verify that fallback logic and degraded states function correctly under pressure, engineering teams must conduct regular chaos testing.34 Chaos testing should be automated inside staging environments, simulating provider outages, database failures, and network congestion to assert that user-facing continuity remains unbroken.1  
-The platform's resilience boundaries are validated using this testing schema:
+To verify fallback logic and degraded states under pressure, teams should run degraded-mode and chaos tests in staging. Tests should assert not only that the backend recovers, but that the user experience remains honest, state-preserving, and safe.
 
 | Simulated Failure | Injected Chaos Trigger | Expected System Behavior | UX Assertion Target | Verification Tooling |
 | :---- | :---- | :---- | :---- | :---- |
-| **Primary Model Outage** 1 | Ingest mock network responses returning HTTP 503 on primary endpoint.4 | Central gateway intercepts failure, steps down fallback chain, and routes to efficient model.6 | UI displays efficient-mode banner; preserves complete user chat history.5 | Bifrost Gateway CLI Chaos Suite.46 |
-| **Retrieval Database Failure** 1 | Block pgvector database network ports inside Kubernetes cluster.3 | System catches database timeout, bypasses retrieval, and queries semantic cache.10 | UI renders contextual warning; citation coordinates are hidden gracefully.25 | LitmusChaos Network Disrupter. |
-| **State-Changing Tool Timeout** 1 | Delay billing lookup API responses by 15000 ms in mock gateway.1 | Orchestrator halts tool execution, cancels the thread, and saves draft state.1 | UI displays graceful timeout card; "Pay" button remains locked.3 | Gremlin Latency Injection Suite. |
-| **Document Parser Crash** 1 | Upload corrupted file stream designed to trigger local parser exceptions.1 | Ingestion pipeline catches parsing exception, deletes temp RAM disk, and loads fallback text OCR.1 | UI displays text-only warning; raw file metadata is saved.3 | Docling-project fuzz testing harness.3 |
-| **Semantic Cache Stale State** 1 | Seed Redis cache with values whose custom TTL has expired by > 1 Hour.16 | Cache engine retrieves stale entry, appends freshness warnings, and logs metrics.16 | UI displays stale-cache warning banner with exact data timestamp.5 | Chaos Mesh Redis Disrupter. |
-| **Upstream Provider Rate Limit** 1 | Inject HTTP 429 responses with Retry-After: 15 header on model requests.4 | Gateway reads header, pauses subsequent requests, and triggers backoff.4 | UI displays rate-limit notification card with exact cooldown timer.7 | Toxiproxy Rate-Limiting Harness. |
-| **Tenant Quota Exhaustion** 1 | Set active Redis token bucket balances to 0 for target tenant ID.1 | Budget-aware gateway blocks API calls instantly, returning HTTP 429.1 | UI displays quota warning card; blocks form input submissions gracefully.1 | Redis-cli script injection harness.3 |
-| **Review Queue Saturated** 1 | Set mock database reviewed states to pending; flood active queue registries.1 | Escalation controller catches queue overflow, pauses vacancies, and applies defaults.1 | UI displays queue delay warning; displays support fallback details.7 | k6 Load Testing Harness. |
+| **Primary Model Outage** | Mock 503/timeout from primary route. | Gateway moves only to an approved fallback satisfying the task profile. | UI preserves chat state and discloses degradation if capability changed. | Gateway chaos test / provider mock. |
+| **Equivalent Route Unavailable** | Disable all capability-equivalent fallback models. | System blocks or moves to disclosed degraded mode; no silent unsafe downgrade. | User sees limitation and safe next options. | Routing policy test. |
+| **Retrieval Database Failure** | Block vector/keyword DB or induce timeout. | System uses verified cache, narrower retrieval, or limited conceptual mode depending on risk. | Citations are hidden or marked unavailable; no unsupported grounded claim. | Network fault injection / retrieval mock. |
+| **State-Changing Tool Timeout** | Delay tool response past timeout. | Orchestrator marks action as pending/unknown and prevents duplicate retry. | UI shows unverified state and locks unsafe resubmission. | Tool gateway latency injection. |
+| **Document Parser Crash** | Upload malformed/corrupted file. | Parser sandbox fails safely; raw upload and forensic trace are preserved per policy. | UI shows file saved and parser limitation; no hallucinated extraction. | Parser fuzzing harness. |
+| **Semantic Cache Stale State** | Seed cache with expired or old-policy answer. | Cache is blocked or served only with timestamp/freshness disclosure if task-safe. | UI displays freshness warning or requests refresh. | Cache TTL/source-version test. |
+| **Upstream Rate Limit** | Inject 429 with `Retry-After`. | Gateway backs off, queues, or returns managed capacity status. | UI shows cooldown/queue state and preserves draft. | Provider mock / proxy fault test. |
+| **Tenant Quota Exhaustion** | Set tenant budget/token bucket to zero. | Gateway blocks new cost-incurring calls and preserves active inputs. | UI shows quota warning and recovery options. | Quota service test. |
+| **Review Queue Saturated** | Simulate full human-review queue. | High-impact decisions remain paused; low-risk cases use triage only if policy allows. | UI shows review delay and preserved escalation package. | Queue load test. |
+| **Cache Scope Mismatch** | Attempt cache lookup with different tenant/user/policy scope. | Cache refuses hit and recomputes or fails safely. | No cross-scope data appears in UI. | Cache isolation regression test. |
+| **UI-Agent Drift** | Change DOM between observe and click. | Agent re-observes, re-plans, or pauses. | UI shows automation paused; no blind click occurs. | Browser automation chaos test. |
+| **Voice Degradation** | Inject noisy audio or STT instability. | System switches to confirmation/text fallback for important fields. | User is told voice capture is unreliable; task state preserved. | Audio/STT fault simulation. |
 
 ## **Cross-Canon Handoff Map**
 
-The user experience resilience architecture establishes the structural, state-preserving interface controls that adjacent engineering disciplines leverage to protect trust, verify actions, and manage incidents.  
-These system integrations and parameters are mapped below:
+The UX resilience architecture establishes user-facing degraded states, fallback contracts, continuity-state requirements, retry UX, partial answer policy, graceful error handling, and escalation packaging. These patterns connect broadly across the canon because degraded mode is where backend failures become user-visible product behavior.
 
 | Target Canon Report | Domain Area | Core Dependency | Operational Rule | Fallback Protocol |
 | :---- | :---- | :---- | :---- | :---- |
-| **AI-ENG-X** | User Trust & Transparency | Clickable citation coordinate arrays and grounding heatmaps.3 | Highlight exact document page bounding boxes directly in the user interface.3 | Display source document title and paragraph text snippet only.3 |
-| **AI-ENG-Y** | Human Review & Approvals | Structured escalation packages and serialized state checkpoints.19 | Route tasks with confidence scores below 0.70 directly to human verification queues.21 | Apply safe, low-impact default states; block further automated execution.1 |
-| **AI-ENG-Z** | Telemetry and Metrics | Standardized OpenTelemetry schemas and trace event parameters.3 | Redact credentials and PII from log streams before writing to central SIEM stores.1 | Purge log files automatically if unmasked sensitive fields are detected.1 |
-| **AI-ENG-AA** | Reliability Evaluations | Golden datasets, validation checklists, and regression suites.1 | Block production software releases if safety or accuracy scores drop below baselines.3 | Revert the active release branch to the last stable container image.3 |
-| **AI-ENG-AB** | Audit & Replay Debugging | Cryptographically signed C2PA manifests and database transaction hashes.3 | Store complete variable dependency graphs alongside session history records.3 | Log unhashed transaction details inside local syslog volumes.3 |
-| **AI-ENG-AC** | Incident Response Protocols | Index quarantine playbooks and credential revocation paths.3 | Rebuild HNSW vector indexes from safe backups if poisoning or hubness is flagged.1 | Terminate active vector search; fall back to relational database keyword query.3 |
-| **AI-ENG-AJ** | Secure Reference Architectures | Multi-tenant pgvector schema configurations and database policies.3 | Enforce database-enforced Row-Level Security on every similarity query.3 | Separate active customer data into physically isolated database partitions.3 |
+| **AI-ENG-B** | Context Tenure & State Governance | Continuity state, task state, memory scope, compaction. | Route switches must preserve active constraints, approvals, and unresolved state. | Save/restore scoped session state before changing route. |
+| **AI-ENG-E** | Retrieval Pipeline | Retrieval fallback, citation availability, cache eligibility. | Degraded retrieval must disclose missing freshness or citation support. | Use verified cache, lexical fallback, narrower query, or managed no-evidence response. |
+| **AI-ENG-F** | Freshness & Conflict Detection | Stale-answer labeling and source-version checks. | Cached/degraded answers must preserve freshness and conflict status. | Block stale high-impact answers or require refresh/review. |
+| **AI-ENG-L** | Serving Architecture | Model routing, provider failover, gateway status. | Backend fallback is not user success unless quality floors are preserved. | Route to equivalent model, degraded route, cache, partial answer, review, or fail-closed. |
+| **AI-ENG-M** | Agentic Orchestration | Loop state, task plans, partial completion. | Degraded mode must not lose plan state or duplicate agent actions. | Pause, replan, serialize state, or escalate. |
+| **AI-ENG-N** | Tool Contracts | Tool failure, schema mismatch, scoped credentials. | Tool degradation must preserve arguments, idempotency, and verification status. | Save draft, block unsafe retry, reconcile unknown state. |
+| **AI-ENG-O** | Action Verification | Post-action status, unknown/pending/failed state. | User-facing success requires verified state. | Show pending/unknown status; hold, reconcile, compensate, or escalate. |
+| **AI-ENG-P** | Multimodal Understanding | Parser/VLM degradation, evidence adequacy. | If visual/layout evidence is unavailable, the UI must disclose what was not inspected. | Text-only preview, sampled evidence, manual verification, or fail safely. |
+| **AI-ENG-Q** | Speech and Realtime Interaction | Voice fallback, confirmation, transcript continuity. | Voice degradation must not force high-impact action through unreliable audio. | Switch to text/card/keypad confirmation or live handoff. |
+| **AI-ENG-R** | UI Agents | Automation pause, drift handling, user handoff. | UI-agent fallback must not blind-click or rely on stale coordinates. | Re-observe, re-plan, pause, or hand control to user. |
+| **AI-ENG-S** | Production Pathologies | False success, malformed output, brittle chains. | Degraded UX must prevent production failures from appearing as success. | Surface partial/failed/unknown states honestly. |
+| **AI-ENG-T** | Boundary Defense | Tenant scope, cache scope, prompt-injection resistance. | Fallback must not bypass authorization, cache isolation, or policy boundaries. | Fail closed when security scope cannot be preserved. |
+| **AI-ENG-U** | Supply Chain Security | Parser/tool/model dependency degradation. | Fallback components must be approved, isolated, and observable. | Use approved fallback components or block. |
+| **AI-ENG-V** | Resource Abuse | Quota degradation, rate limits, budget-aware routing. | Resource limits should become clear UX states, not unexplained failure. | Queue, throttle, degrade, or show managed capacity status. |
+| **AI-ENG-X** | User Trust & Transparency | Status language, disclosures, evidence visibility. | Users must know what changed, what is saved, and what remains unsafe/unavailable. | Plain-language degraded-mode cards and freshness/status labels. |
+| **AI-ENG-Y** | Human Review & Approval | Escalation packages, reviewer workflows. | Human escalation must transfer enough scoped context to avoid forcing user restart. | Redacted escalation package with evidence IDs and action ledger. |
+| **AI-ENG-Z** | Telemetry and Metrics | Degraded-mode events and user-visible incident metrics. | Every fallback/degraded state emits structured telemetry. | Alert on fallback spikes, lost-state rates, or silent degradation. |
+| **AI-ENG-AA** | Reliability Evaluations | Degraded-mode regression tests. | Releases must test fallback chains, cache freshness, partial answers, and retry safety. | Block releases on unsafe degradation regressions. |
+| **AI-ENG-AB** | Audit & Replay Debugging | Fallback trace, state checkpoint, route manifest. | Degraded sessions must be replayable from trace and state artifacts. | Preserve route decisions, disclosure state, and continuity checkpoints. |
+| **AI-ENG-AC** | Incident Response Protocols | User-visible incidents, degraded-mode comms. | Incidents require user-facing status, containment, recovery, and trust repair. | Escalate to incident playbook when degradation exceeds threshold. |
+| **AI-ENG-AD** | Governance & Accountability | Policy for disclosure, fallback eligibility, and user choice. | Governance defines which degraded states need disclosure, consent, review, or blocking. | Route policy exceptions to accountable owner. |
+| **AI-ENG-AJ** | Reference Architectures | Resilience gateway, state store, fallback manifest, review queue. | Reference systems should include degraded-mode UX as a first-class architecture component. | Implement declarative fallback contracts and state-preserving error flows. |
 
 ## **Strategic Conclusions and Architectural Recommendations**
 
@@ -379,6 +494,44 @@ To implement a robust, production-grade UX Resilience architecture, organization
 * **Secure Caching Layers Against Timing Side-Channels**: Sharing semantic or prefix caches globally across mutually untrusted tenants introduces timing side-channel risks.37 All cache keys must be cryptographically bound to tenant identity and user permissions, and serving runtimes must deploy selective prefix isolation (CacheSolidarity) to block adversarial timing probes.37  
 * **Enforce Strict Least-Privilege Tool Credentials**: Model-driven agents must never run with broad administrative service tokens or "god-mode" database accounts.3 Every tool invocation must be mediated by a secure credential broker that validates user identity and mints short-lived, highly restricted OAuth tokens (validity < 900 seconds) specifically for that single execution.3  
 * **Treat Escalation and Partial States as First-Class Workflows**: Human-in-the-loop review and partial answer delivery are not system exceptions; they are designed, stateful product phases.32 Ensure every escalation is accompanied by a structured evidence package, preserving the user's progress and orientation without forcing them to restart their journey.19
+
+## **Durable Principles of UX Resilience**
+
+1. **Fallback Is Not Success**  
+   A fallback succeeds only when it preserves the task’s safety, quality, state, privacy, evidence, and user expectations.
+
+2. **Degraded Mode Must Be Designed, Not Discovered**  
+   Users should not experience degraded capability as random weirdness. Degraded states need labels, continuity, safe options, and clear next steps.
+
+3. **Silent Routing Is Allowed Only for Equivalent Capability**  
+   If the fallback changes quality, freshness, latency, cost, evidence, or action authority, the user or UI needs to know.
+
+4. **Never Trade Safety for Availability**  
+   Tenant isolation, privacy, authorization, action verification, and consent are non-sacrificable. A system that stays “up” by dropping those is not resilient. It is just failing with jazz hands.
+
+5. **Preserve State Before Changing Route**  
+   Route switches, retries, partial answers, and escalations must preserve user goal, active constraints, files, drafts, approvals, and action ledger state.
+
+6. **Unknown Action State Must Be Shown as Unknown**  
+   Tool timeouts, payment uncertainty, browser crashes, and partial commits must not become conversational success claims.
+
+7. **Cached Answers Require Scope, Freshness, and Disclosure**  
+   Cache reuse must respect tenant/user scope, source version, policy version, and task risk. Stale cache must be labeled or blocked.
+
+8. **Partial Answers Must Preserve Boundaries**  
+   A partial answer should clearly separate what is known, unavailable, failed, pending, unverified, and safe to retry.
+
+9. **Human Escalation Is a Product State**  
+   Escalation should transfer scoped, redacted, actionable context—not dump raw chat history into a queue and call it “support.”
+
+10. **Graceful Errors Should Reduce User Work**  
+   A graceful error tells the user what failed, what succeeded, what was saved, whether retry is safe, and what options remain.
+
+11. **Retry UX Must Prevent Duplicate Harm**  
+   Read-only retries may be automated within limits. State-changing retries require idempotency, verification, and sometimes explicit user approval.
+
+12. **Degradation Must Be Observable**  
+   Every fallback, cache response, partial answer, retry sequence, fail-closed event, and escalation should emit traceable telemetry.
 
 #### **Works cited**
 
@@ -525,6 +678,7 @@ The Uncertainty Display Ladder maps ten distinct classes of system uncertainty t
 | **Level 4: Approval Gate** | Action / Tool-State Uncertainty 4 | Model attempts to execute non-idempotent tool over ambiguous parameters.3 | Orange border highlights; modal window displaying complete parameter diffs and costs.3 | Explicit confirmation; user must slide or click a dual-control confirmation gate.4 | Halt execution; save populated arguments to the session state; flag for manual review.3 |
 | **Level 5: Fail-Closed** | Security / Permission / Quota Breach 4 | Robust z-score hubness check flags indexing poison; tenant ID mismatch.4 | Full-screen red error overlay; unclickable, locked controls; explicit failure disclosure.3 | Complete cessation; user escalates to platform administrator.3 | Revoke all temporary session credentials, flush local caches, and close WebSocket threads.3 |
 
+```
 [Level 5: Fail-Closed] ─── (Uncertainty > Threshold) ───> System Blocks Action & Logs Trace   
          ▲  
 [Level 4: Approval Gate] ─── (Uncertainty + Action Risk) ───> Multi-Factor Gesture Gate   
@@ -534,6 +688,7 @@ The Uncertainty Display Ladder maps ten distinct classes of system uncertainty t
  ─── (Probabilistic Logits Entropy) ───> Dotted Underlines & Tooltips   
          ▲  
  ─── (Deterministic Verification) ───> Sharp Borders & Standard Saturation 
+```
 
 Implementing this ladder requires the interface controller to dynamically intercept the model's generation stream, evaluating the metadata context before tokens are rendered on the viewport.4 For example, when processing a complex document containing low-contrast text scans (extraction uncertainty), the layout parser raises an ocr_low_confidence event, which automatically demotes the rendering engine from Level 1 to Level 3, turning the text container’s styling to a muted gray and overlaying a sketchy outline to communicate the underlying structural fragility.10 If the model then attempts to send an email based on this unverified extraction (action-state uncertainty), the system triggers a Level 4 gate, freezing the execution thread until the user completes a slide-to-confirm gesture.4
 
@@ -662,6 +817,7 @@ The Explanation Design Model must be built around support for critical human dec
 
 To manage cognitive load, these explanation layers must deploy a pattern of *progressive disclosure*, preventing information density from overwhelming novice users while remaining fully inspectable for experts.23
 
+```
  ───> Subtle color change / icon on the primary viewport   
           │  
           ▼ (User Clicks Element)  
@@ -669,6 +825,7 @@ To manage cognitive load, these explanation layers must deploy a pattern of *pro
           │  
           ▼ (User Clicks "Verify")  
  ───> Displays full coordinate highlights and secure API transaction ledgers 
+```
 
 This structural progression ensures that the system provides sufficient context without introducing unnecessary interaction friction.64
 
@@ -861,6 +1018,44 @@ Product design decisions must be informed by behavioral reliance telemetry rathe
 
 Never compromise data isolation, tenant partitioning, or security boundaries to maintain system availability during degraded modes.3 Multi-tenant SaaS deployments must enforce database Row-Level Security, separate vector index partitions, and cryptographically bind semantic cache keys to prevent thundering herd loops or prefix-caching side-channel timing exploits across users.3 The system must degrade gracefully along explicit quality bands, preserving user intent and session variables across all fallback states.3
 
+## **Durable Principles of UX Resilience**
+
+1. **Fallback Is Not Success**  
+   A fallback succeeds only when it preserves the task’s safety, quality, state, privacy, evidence, and user expectations.
+
+2. **Degraded Mode Must Be Designed, Not Discovered**  
+   Users should not experience degraded capability as random weirdness. Degraded states need labels, continuity, safe options, and clear next steps.
+
+3. **Silent Routing Is Allowed Only for Equivalent Capability**  
+   If the fallback changes quality, freshness, latency, cost, evidence, or action authority, the user or UI needs to know.
+
+4. **Never Trade Safety for Availability**  
+   Tenant isolation, privacy, authorization, action verification, and consent are non-sacrificable. A system that stays “up” by dropping those is not resilient. It is just failing with jazz hands.
+
+5. **Preserve State Before Changing Route**  
+   Route switches, retries, partial answers, and escalations must preserve user goal, active constraints, files, drafts, approvals, and action ledger state.
+
+6. **Unknown Action State Must Be Shown as Unknown**  
+   Tool timeouts, payment uncertainty, browser crashes, and partial commits must not become conversational success claims.
+
+7. **Cached Answers Require Scope, Freshness, and Disclosure**  
+   Cache reuse must respect tenant/user scope, source version, policy version, and task risk. Stale cache must be labeled or blocked.
+
+8. **Partial Answers Must Preserve Boundaries**  
+   A partial answer should clearly separate what is known, unavailable, failed, pending, unverified, and safe to retry.
+
+9. **Human Escalation Is a Product State**  
+   Escalation should transfer scoped, redacted, actionable context—not dump raw chat history into a queue and call it “support.”
+
+10. **Graceful Errors Should Reduce User Work**  
+   A graceful error tells the user what failed, what succeeded, what was saved, whether retry is safe, and what options remain.
+
+11. **Retry UX Must Prevent Duplicate Harm**  
+   Read-only retries may be automated within limits. State-changing retries require idempotency, verification, and sometimes explicit user approval.
+
+12. **Degradation Must Be Observable**  
+   Every fallback, cache response, partial answer, retry sequence, fail-closed event, and escalation should emit traceable telemetry.
+
 #### **Works cited**
 
 1. Adaptive Cognitive Mechanisms to Maintain Calibrated Trust and Reliance in Automation, accessed June 11, 2026, [https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2021.652776/full](https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2021.652776/full)  
@@ -889,7 +1084,7 @@ Never compromise data isolation, tenant partitioning, or security boundaries to 
 24. Explanations Can Reduce Overreliance on AI Systems During Decision-Making - Stanford HCI Group, accessed June 11, 2026, [https://hci.stanford.edu/publications/2023/xai-cscw-2023.pdf](https://hci.stanford.edu/publications/2023/xai-cscw-2023.pdf)  
 25. Compensating Transaction Pattern - Azure Architecture Center | Microsoft Learn, accessed June 11, 2026, [https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction](https://learn.microsoft.com/en-us/azure/architecture/patterns/compensating-transaction)  
 26. Sungdeok Cha · Richard N. Taylor Kyochul Kang Editors - School of Computing e-Library | Federal University of Technology Akure, accessed June 11, 2026, [https://soclibrary.futa.edu.ng/books/Handbook%20of%20Software%20Engineering%20by%20Sungdeok%20Cha,%20Richard%20N.%20Taylor,%20Kyochul%20Kang%20(z-lib.org).pdf](https://soclibrary.futa.edu.ng/books/Handbook%20of%20Software%20Engineering%20by%20Sungdeok%20Cha,%20Richard%20N.%20Taylor,%20Kyochul%20Kang%20\(z-lib.org).pdf)  
-27. Software Evolution - Computer Science, accessed June 11, 2026, [https://web.cs.ucla.edu/~miryung/Publications/Chapter-SoftwareEvolution-Kim-et-al.pdf](https://web.cs.ucla.edu/~miryung/Publications/Chapter-SoftwareEvolution-Kim-et-al.pdf)  
+27. Software Evolution - Computer Science, accessed June 11, 2026, [https://web.cs.ucla.edu/\~miryung/Publications/Chapter-SoftwareEvolution-Kim-et-al.pdf](https://web.cs.ucla.edu/~miryung/Publications/Chapter-SoftwareEvolution-Kim-et-al.pdf)  
 28. Saga patterns - AWS Prescriptive Guidance, accessed June 11, 2026, [https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga.html](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga.html)  
 29. Saga Pattern for Microservices Distributed Transactions | by Mehmet Ozkaya - Medium, accessed June 11, 2026, [https://medium.com/design-microservices-architecture-with-patterns/saga-pattern-for-microservices-distributed-transactions-7e95d0613345](https://medium.com/design-microservices-architecture-with-patterns/saga-pattern-for-microservices-distributed-transactions-7e95d0613345)  
 30. microservices-recipes-a-free-gitbook/chapters/05-deployment-and-operations.md at master - GitHub, accessed June 11, 2026, [https://github.com/vaquarkhan/microservices-recipes-a-free-gitbook/blob/master/chapters/05-deployment-and-operations.md](https://github.com/vaquarkhan/microservices-recipes-a-free-gitbook/blob/master/chapters/05-deployment-and-operations.md)  
@@ -920,7 +1115,7 @@ Never compromise data isolation, tenant partitioning, or security boundaries to 
 55. KnowledgeTrail: Generative Timeline for Exploration and Sensemaking of Historical Events and Knowledge Formation - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2510.12113v2](https://arxiv.org/html/2510.12113v2)  
 56. C2PA Implementation Guidance, accessed June 11, 2026, [https://spec.c2pa.org/specifications/specifications/2.4/guidance/Guidance.html](https://spec.c2pa.org/specifications/specifications/2.4/guidance/Guidance.html)  
 57. Explainable AI in Clinician-Facing Clinical Decision Support: A Critical Systematic Review and Evidence Map of Human-Centered Evaluations - InfoScience Trends, accessed June 11, 2026, [https://www.isjtrend.com/article_243223.html](https://www.isjtrend.com/article_243223.html)  
-58. To Trust or to Think: Cognitive Forcing Functions Can Reduce Overreliance on AI in AI-assisted Decision-making - Computer Science, accessed June 11, 2026, [https://www.eecs.harvard.edu/~kgajos/papers/2021/bucinca21trust.pdf](https://www.eecs.harvard.edu/~kgajos/papers/2021/bucinca21trust.pdf)  
+58. To Trust or to Think: Cognitive Forcing Functions Can Reduce Overreliance on AI in AI-assisted Decision-making - Computer Science, accessed June 11, 2026, [https://www.eecs.harvard.edu/\~kgajos/papers/2021/bucinca21trust.pdf](https://www.eecs.harvard.edu/~kgajos/papers/2021/bucinca21trust.pdf)  
 59. Cognitive Forcing Functions: Enhancing AI Decisions - Emergent Mind, accessed June 11, 2026, [https://www.emergentmind.com/topics/cognitive-forcing-functions-cffs](https://www.emergentmind.com/topics/cognitive-forcing-functions-cffs)  
 60. Impacts of cognitive forcing and need for cognition on biased AI-assisted decision making about mental health emergencies - PMC, accessed June 11, 2026, [https://pmc.ncbi.nlm.nih.gov/articles/PMC12779943/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12779943/)  
 61. Emerging Reliance Behaviors in Human-AI Content Grounded Data Generation: The Role of Cognitive Forcing Functions and Hallucinations - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2409.08937v2](https://arxiv.org/html/2409.08937v2)  
@@ -960,8 +1155,6 @@ To transition from passive check-the-box compliance to active, meaningful human 
 
 For example, Article 14 of the European Union Artificial Intelligence Act (EU AI Act) mandates that high-risk systems be designed with appropriate human-machine interface tools to enable natural persons to understand system capacities, remain aware of automation bias, correctly interpret outputs, and intervene or safely halt operations.22 Similarly, the ISO/IEC 42001 standard and the NIST AI Risk Management Framework (NIST AI RMF) require formal governance structures with documented authority, real-time intervention capabilities, and clear traceability of human decisions.19
 
-## 
-
 ## **The Behavioral Credibility Trilemma and Calibrated Autonomy**
 
 The human decision to delegate agency to an autonomous system is governed by a fundamental impossibility frontier: the Behavioral Credibility Trilemma.27 This trilemma states that no reinforcement learning policy with confidence-gated autonomy can simultaneously achieve maximum helpfulness (H), optimal calibration (C), and full autonomy (A) under rational oversight, whenever some tasks exceed the agent's reliable competence: the Behavioral Credibility Trilemma.27
@@ -996,28 +1189,69 @@ To maintain system integrity, architects must consciously sacrifice one corner o
 
 The trilemma demonstrates that calibrated autonomy cannot be achieved globally.28 To resolve this tension, architectures must establish constructive resolution pathways.29 The system can implement commitment via feasibility maps (pre-registering the agent's competence boundaries across specific domains) or domain separation via a critic (utilizing an independent, non-agentic validation layer to score confidence, removing the self-reporting conflict).32 This mathematical framework provides the formal justification for the human-oversight mandates of the EU AI Act, which explicitly compel the ask-permission mode for high-risk applications.27
 
-## 
-
 ## **The SARC Architecture: Translating Constraints into Runtime Controls**
 
 To enforce operational and compliance boundaries programmatically, architectures implement the State, Action Space, Reward, Constraints (SARC) framework.33 Traditional AI implementations attach safety parameters and policy rules to prompts, system instructions, or post-hoc dashboards.33 This approach represents a critical system vulnerability: large language models are probabilistic generators that cannot reliably police their own execution path, especially when confronted with context flooding, role confusion, or malicious injections.5  
 SARC decouples policy enforcement from the model's cognitive boundary by treating constraints (C) as first-class software objects that run compiled validation logic over the agent's interaction loop.33 Each constraint is defined by a declarative schema containing its source, class, predicate, verification point, response protocol, and active operating point.33
 
-                 SARC RUNTIME ENFORCEMENT LOOP  
-                   
-              
-                           │  
-                           ▼  
-                  [ Pre-Action Gate ]  (phi_PAG)  
-                           │  
-         ┌─────────────────┴─────────────────┐  
-         ▼ (Pass)                            ▼ (Fail: Block / Escalate)  
-                  
-         │                                   ▲  
-         ├─> (phi_ATM) ┤  
-         │                                   │  
-         ▼ (Complete)                        │  
-[ Post-Action Auditor ] (phi_PAA) ─────────────┘
+```
+SARC RUNTIME ENFORCEMENT LOOP
+
+[ Current State s ]
+        |
+        v
+[ Planner / Policy-Aware Proposal ]
+  proposes action a with parameters, purpose, subject, tenant, resource
+        |
+        v
+[ Pre-Action Gate: phi_PAG(s, a) ]
+  schema checks
+  authorization checks
+  risk-tier checks
+  budget checks
+  approval requirements
+        |
+        +--> fail
+        |       block, request confirmation, or route to Escalation Router
+        |
+        v
+[ Tool / Action Executor ]
+  action runs with scoped credentials and timeout limits
+        |
+        v
+[ Action-Time Monitor: phi_ATM(stream, partial_state) ]
+  streaming PII scan
+  spend/latency limits
+  partial-output safety checks
+  cancellation triggers
+        |
+        +--> fail
+        |       interrupt execution, revoke scoped credential if needed,
+        |       preserve trace, route to Escalation Router
+        |
+        v
+[ Observed Post-State s' ]
+        |
+        v
+[ Post-Action Auditor: phi_PAA(s, a, s') ]
+  readback verification
+  side-effect reconciliation
+  ledger update
+  drift detection
+        |
+        +--> verified
+        |       update agent state and continue
+        |
+        +--> unknown / failed / unsafe
+                hold state, reconcile or compensate where possible,
+                route to Escalation Router
+
+[ Escalation Router ]
+  freezes the autonomous loop
+  packages minimum necessary evidence
+  redacts sensitive material
+  assigns review queue and accountable owner
+```
 
 The SARC compiler translates these declarations into executable reference monitors attached at four distinct enforcement sites inside the agent's execution loop 35:
 
@@ -1030,17 +1264,18 @@ The SARC Constraint Taxonomy maps specific operational boundaries to these enfor
 
 | Constraint Name | Source Authority | Constraint Class | Enforcement Point | Verification Predicate | Failure Response Protocol |
 | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Transaction Spend Cap** 5 | Corporate FinOps Policy 5 | Hard (C_h) 35 | Pre-Action Gate (PAG) 35 | proposed_amount <= max_authorized_limit | Block action; log budget-exhaustion event.5 |
-| **Token Cost Velocity** 5 | System Rate Limits 5 | Soft (C_s) 35 | Action-Time Monitor (ATM) 35 | cumulative_tokens <= allocated_run_tokens | Throttle model execution; inject efficient-mode template.2 |
-| **Tenant Data Boundary** 5 | GDPR / HIPAA Compliance 1 | Hard (C_h) 35 | Pre-Action Gate (PAG) 35 | action_target_tenant_id == active_session_tenant_id 5 | Abort run; immediately revoke all tool access tokens.2 |
-| **PII Exfiltration Scan** 5 | Privacy Policy 5 | Hard (C_h) 35 | Action-Time Monitor (ATM) 35 | regex_matches(pii_patterns, streaming_tokens) == 0 | Interrupt stream mid-flight; purge active socket buffers.5 |
-| **Model Grounding Drift** 5 | Quality SLA 2 | Soft (C_s) 35 | Post-Action Auditor (PAA) 35 | nli_entailment(claim, retrieved_chunks) >= 0.85 1 | Demote routing pathway to local semantic cache lookup.2 |
-| **Consequence Boundary** 24 | Corporate Risk Matrix 31 | Escalation (C_e) 35 | Pre-Action Gate (PAG) 35 | action_is_irreversible == true AND transaction_value > $5000 24 | Suspend execution; route context to Escalation Router.2 |
-| **Logical Side-Effect Drift** 5 | Database Schema 5 | Escalation (C_e) 35 | Post-Action Auditor (PAA) 35 | db_checksum_match(pre_state, post_state) == true | Revert transaction; compile escalation package.1 |
+| **Transaction Spend Cap** | Corporate FinOps Policy | Hard | Pre-Action Gate | `proposed_amount <= max_authorized_limit` | Block action; log budget event; offer approval path if policy allows. |
+| **Token Cost Velocity** | System Rate Limits | Soft / Escalation | Action-Time Monitor | `cumulative_tokens <= allocated_run_tokens` | Throttle, summarize, or terminate generation at budget boundary. |
+| **Tenant Data Boundary** | Privacy / Tenant-Isolation Policy | Hard | Pre-Action Gate | `action_target_tenant_id == active_session_tenant_id` | Abort action; preserve trace; revoke only credentials implicated in the attempted boundary crossing. |
+| **PII Exfiltration Scan** | Privacy Policy | Hard / Escalation | Action-Time Monitor | `pii_or_secret_leak_detected == false` | Interrupt stream or block output; redact where safe; route to review for high-impact leakage. |
+| **Model Grounding Drift** | Quality / Evidence Policy | Soft / Escalation | Post-Action Auditor | `evidence_support_score >= required_floor` | Mark output as unverified, request evidence refresh, or escalate. Do not silently demote to cache. |
+| **Consequence Boundary** | Corporate Risk Matrix | Escalation | Pre-Action Gate | `irreversible_action == false OR approved_high_impact_path == true` | Suspend execution and route to approval/review. |
+| **Logical Side-Effect Drift** | Database / Action Verification Policy | Escalation | Post-Action Auditor | `observed_post_state matches intended_post_state` | Hold, reconcile, compensate where possible, and compile escalation package. |
+| **Reviewer Separation** | Maker-Checker Policy | Hard | Escalation Router / Approval Gateway | `checker_id != maker_id` | Reject approval attempt and log segregation-of-duties violation. |
+| **Approval Freshness** | Governance Policy | Hard | Pre-Action Gate | `approval_payload_hash == current_payload_hash AND now() < approval_expires_at` | Require renewed approval. |
+| **Break-Glass Scope** | Emergency Access Policy | Escalation | Access Broker | `break_glass_reason_valid AND ttl <= max_ttl AND session_recording_enabled` | Deny elevation or route to incident commander. |
 
 By formalizing safety boundaries as executable invariants, SARC ensures that the agent's execution matches its policy specifications.33 Residual policy violations scale with the error rate of the software-enforced verification stack rather than the model's probabilistic performance, providing a provable, fail-closed audit path.33
-
-## 
 
 ## **Centralized Queue-Based Maker-Checker Architecture**
 
@@ -1049,72 +1284,183 @@ For high-impact, state-changing mutations, organizations enforce the segregation
 Legacy systems implemented this control by embedding approval columns (e.g., is_approved, approved_by) directly inside individual business entity tables.41 This pattern is highly brittle.41 Adding dual-control validation to a new entity requires altering the database schema, rewriting CRUD logic, and generating fragmented audit logs across multiple scattered tables.41  
 Modern high-assurance architectures invert this design, implementing a centralized, queue-based Maker-Checker architecture.41 The application intercepts state-changing operations at the API gateway layer using middleware interceptors.41 The original transaction is suspended, serialized into a standardized JSONB payload, and routed to a dedicated approval_requests queue ledger, leaving the target business tables completely untouched and clean.41
 
-                 CENTRALIZED APPROVAL LIFECYCLE  
-                   
-                       (Maker Submits)  
-                           │  
-          ┌────────────────┼────────────────┐  
-          ▼ (Checker OK)   ▼ (Checker No)   ▼ (Maker Recalls)  
-              
-          │  
-          ▼  
-    ───> / (Saga Execution)
+```text
+CENTRALIZED APPROVAL LIFECYCLE
+
+[ Maker / Agent Drafts Operation ]
+        |
+        v
+[ API Gateway Interceptor ]
+  detects high-impact or policy-controlled mutation
+        |
+        v
+[ Approval Request Ledger ]
+  stores payload hash, policy version, maker, risk tier,
+  idempotency key, expiry, and required checker class
+        |
+        v
+[ PENDING ]
+        |
+        +--> maker recalls before review
+        |       status = CANCELLED
+        |
+        +--> approval expires
+        |       status = EXPIRED
+        |
+        +--> checker rejects with rationale
+        |       status = REJECTED
+        |
+        +--> checker approves
+                status = APPROVED
+                |
+                v
+        [ Saga / Execution Worker Claims Row ]
+          lock row
+          verify approval freshness
+          verify checker != maker
+          verify payload hash unchanged
+                |
+                v
+        [ PROCESSING ]
+                |
+                +--> execution verified
+                |       status = COMPLETED
+                |
+                +--> execution failed or unknown
+                        status = FAILED or REVIEW_REQUIRED
+                        preserve action ledger and reconciliation state
+```
 
 The database model is designed to support transactional consistency, strict auditing, and code-level role separation:
 
-SQL  
--- PostgreSQL DDL for Centralized Maker-Checker Approval Ledger  
-CREATE TYPE approval_status_type AS ENUM (  
-    'PENDING',   
-    'APPROVED',   
-    'REJECTED',   
-    'CANCELLED',   
-    'PROCESSING',   
-    'COMPLETED',   
-    'FAILED'  
+```sql
+-- PostgreSQL DDL for a centralized Maker-Checker approval ledger.
+-- This is a teaching/reference schema; production systems should add
+-- organization-specific RLS, retention, encryption, and partitioning.
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE TYPE approval_status_type AS ENUM (
+    'PENDING',
+    'APPROVED',
+    'REJECTED',
+    'CANCELLED',
+    'EXPIRED',
+    'PROCESSING',
+    'COMPLETED',
+    'FAILED',
+    'REVIEW_REQUIRED'
 );
 
-CREATE TYPE risk_tier_type AS ENUM (  
-    'LOW',   
-    'MEDIUM',   
-    'HIGH',   
-    'CRITICAL'  
+CREATE TYPE risk_tier_type AS ENUM (
+    'LOW',
+    'MEDIUM',
+    'HIGH',
+    'CRITICAL'
 );
 
-CREATE TABLE approval_requests (  
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),  
-    operation_type VARCHAR(100) NOT NULL, -- e.g., 'WIRE_TRANSFER', 'USER_PROVISION'  
-    action_type VARCHAR(50) NOT NULL, -- e.g., 'CREATE', 'UPDATE', 'DELETE'  
-    request_payload JSONB NOT NULL, -- Serialized target parameters for execution  
-    status approval_status_type DEFAULT 'PENDING' NOT NULL,  
-    risk_tier risk_tier_type DEFAULT 'MEDIUM' NOT NULL,  
-    idempotency_key VARCHAR(128) UNIQUE NOT NULL, -- Prevents duplicate submission replays  
-    maker_id UUID NOT NULL, -- UUID of the initiating agent or session  
-    checker_id UUID, -- UUID of the approving natural person  
-    maker_rationale TEXT, -- Model-generated justification for the action  
-    checker_comments TEXT, -- Checker-entered audit notes  
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,  
-    reviewed_at TIMESTAMP WITH TIME ZONE,  
-    executed_at TIMESTAMP WITH TIME ZONE,  
-    CONSTRAINT chk_no_self_approval CHECK (maker_id <> checker_id) -- Database-level role segregation  
+CREATE TYPE subject_type AS ENUM (
+    'HUMAN',
+    'SERVICE',
+    'AGENT'
 );
 
-CREATE INDEX idx_approval_pending_list ON approval_requests(status) WHERE status = 'PENDING';  
-CREATE INDEX idx_approval_idempotency_lookup ON approval_requests(idempotency_key);
+CREATE TABLE approval_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    tenant_id UUID NOT NULL,
+    operation_type VARCHAR(100) NOT NULL,
+    action_type VARCHAR(50) NOT NULL,
+    target_resource_type VARCHAR(100),
+    target_resource_id TEXT,
+
+    request_payload JSONB NOT NULL,
+    request_payload_hash TEXT NOT NULL,
+    policy_version TEXT NOT NULL,
+    approval_profile TEXT NOT NULL,
+
+    status approval_status_type NOT NULL DEFAULT 'PENDING',
+    risk_tier risk_tier_type NOT NULL DEFAULT 'MEDIUM',
+
+    idempotency_key VARCHAR(128) NOT NULL UNIQUE,
+
+    maker_id UUID NOT NULL,
+    maker_subject_type subject_type NOT NULL,
+    maker_rationale TEXT,
+
+    checker_id UUID,
+    checker_subject_type subject_type,
+    checker_comments TEXT,
+
+    required_checker_role TEXT,
+    approval_expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at TIMESTAMPTZ,
+    executed_at TIMESTAMPTZ,
+
+    execution_claimed_by UUID,
+    execution_claimed_at TIMESTAMPTZ,
+    execution_error_class TEXT,
+    execution_error_summary TEXT,
+
+    final_state_hash TEXT,
+    audit_chain_hash TEXT,
+
+    CONSTRAINT chk_no_self_approval CHECK (
+        checker_id IS NULL OR maker_id <> checker_id
+    ),
+
+    CONSTRAINT chk_checker_required_for_approved CHECK (
+        status NOT IN ('APPROVED', 'PROCESSING', 'COMPLETED')
+        OR checker_id IS NOT NULL
+    )
+);
+
+CREATE INDEX idx_approval_pending_list
+ON approval_requests (tenant_id, risk_tier, created_at)
+WHERE status = 'PENDING';
+
+CREATE INDEX idx_approval_status
+ON approval_requests (tenant_id, status, created_at);
+
+CREATE INDEX idx_approval_idempotency_lookup
+ON approval_requests (idempotency_key);
+
+CREATE INDEX idx_approval_payload_hash
+ON approval_requests (request_payload_hash);
+
+CREATE TABLE approval_audit_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    approval_request_id UUID NOT NULL REFERENCES approval_requests(id),
+    event_type TEXT NOT NULL,
+    actor_id UUID,
+    actor_subject_type subject_type,
+    event_payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+    previous_event_hash TEXT,
+    event_hash TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_approval_audit_request
+ON approval_audit_events (approval_request_id, created_at);
+```
 
 The execution lifecycle of this queue-based model enforces five strict state transitions:
 
 | Source State | Target State | Triggering Mechanism | System Action & Side Effects | Transactional Invariants |
 | :---- | :---- | :---- | :---- | :---- |
-| **None** | **PENDING** 43 | Maker invokes API endpoint annotated with @MakerCheckerEnabled.41 | Interceptor catches request; serializes payload to JSONB; generates idempotency key; inserts row.41 | Business database is completely un-modified; transaction parameters are quarantined.41 |
-| **PENDING** 43 | **APPROVED** 43 | Checker invokes approval endpoint with valid session JWT.41 | Validates roles; checks OIDC signatures; updates status to APPROVED.41 | checker_id must not match maker_id (enforced via database constraint).41 |
-| **APPROVED** 43 | **PROCESSING** 43 | Background Saga Orchestrator claims the approved transaction block.1 | Locks transaction row; initiates background tool executions and DB writes.1 | Idempotency key prevents concurrent executors from claiming the same payload.1 |
-| **PENDING** 43 | **REJECTED** 43 | Checker rejects the request, submitting a mandatory audit comment.43 | Updates status; unlocks target resources; logs rejection rationale.43 | Payload is permanently marked dead; no mutations occur.41 |
-| **PENDING** 43 | **CANCELLED** 43 | Maker explicitly withdraws the pending transaction.43 | Updates status; removes entry from active reviewer queues.43 | Only the original maker_id is authorized to cancel the request.43 |
+| **None** | **PENDING** | Maker/agent invokes protected API operation. | Gateway intercepts operation, serializes payload, computes payload hash, assigns idempotency key, inserts approval request. | Business tables remain unchanged; request payload is quarantined in approval ledger. |
+| **PENDING** | **APPROVED** | Authorized checker approves before expiry. | System validates checker role, checker identity, payload hash, policy version, and no-self-approval rule. | `checker_id != maker_id`; approval is bound to exact payload hash. |
+| **PENDING** | **REJECTED** | Checker rejects with rationale. | Status changes to rejected; rejection event is appended to audit trail. | No mutation occurs; payload remains preserved for audit. |
+| **PENDING** | **CANCELLED** | Maker recalls request before approval. | Status changes to cancelled; active reviewer queue item is removed. | Only original maker or authorized supervisor may cancel. |
+| **PENDING** | **EXPIRED** | Approval window elapses. | Request becomes inactive and cannot be executed. | Expired approvals require fresh request and payload hash. |
+| **APPROVED** | **PROCESSING** | Execution worker claims row. | Worker obtains row lock, revalidates payload hash, policy version, approval freshness, and idempotency key. | Only one worker may claim; approval must still match current payload. |
+| **PROCESSING** | **COMPLETED** | Execution succeeds and post-action verification passes. | Business mutation is committed; final state hash and audit event are recorded. | Completion requires verified post-state, not just tool success. |
+| **PROCESSING** | **FAILED** | Execution fails before confirmed side effect. | Failure class and summary are recorded; request exits active execution. | System must not claim completion. |
+| **PROCESSING** | **REVIEW_REQUIRED** | Action state is unknown, partial, or reconciliation fails. | Execution pauses; action ledger and evidence are routed to human review. | Unknown state remains unknown until reconciled. |
+| **FAILED** | **PENDING** | Authorized operator resubmits corrected payload. | New request or new version is created with new payload hash. | Prior failed request remains immutable. |
 
 By organizing mutations through this centralized ledger, the architecture ensures that no single probabilistic agent or compromised user can unilaterally execute a state change in production, establishing a clean, auditable operational checkpoint.
-
-## 
 
 ## **Cognitive Forcing Functions and Review Interface Design**
 
@@ -1126,17 +1472,29 @@ Recent human-computer interaction (HCI) research has evaluated how different CFF
 * **WhatIf CFF (Hypothesis Testing):** Forces the reviewer to reason through hypothetical modifications to the environment or inputs.14 The interface prompts: "How does the estimated processing fee change if the currency shifts to USD?".47  
 * **Both / Stacked CFF:** Combines both interventions, displaying the Assumptions evaluation followed immediately by the WhatIf scenario form.14
 
-                 CFF ERROR-DETECTION MISMATCH  
-                   
-               (Assumptions CFF: 22% Overreliance)  
-  OBJECTIVE    ================  
-  ACCURACY     (WhatIf CFF: 42% Overreliance)  
-               ================================  
-                 
-               (Assumptions CFF: Rated Less Helpful)  
-  SUBJECTIVE   ================================  
-  PREFERENCE   (WhatIf CFF: Rated Highly Helpful)  
-               ================
+```
+CFF EFFECTIVENESS PATTERN
+
+Observed pattern from plan-review experiments:
+
+Assumptions CFF
+  - lower overreliance
+  - better error detection
+  - often rated as less pleasant
+
+WhatIf CFF
+  - higher subjective helpfulness
+  - weaker error-detection performance
+
+Stacked CFFs
+  - more friction
+  - higher mental demand
+  - no guaranteed additive benefit
+
+Design implication:
+  use targeted cognitive forcing at high-risk decision points;
+  do not stack friction everywhere just because the interface owns a clipboard.
+```
 
 The experimental findings reveal a significant mismatch between subjective user preference and objective decision accuracy 14:
 
@@ -1147,132 +1505,277 @@ The experimental findings reveal a significant mismatch between subjective user 
 The effectiveness of these interventions is modulated by user traits, specifically the Need for Cognition (NFC).16 High-NFC operators (individuals who naturally enjoy complex cognitive tasks) experience significant performance gains under CFFs.16 Low-NFC operators show minimal improvement and higher frustration, indicating that system-wide deployment must calibrate the intensity of cognitive friction to prevent workflow abandonment.16  
 To design an optimal, high-assurance review screen, architects combine plan-focused Assumptions CFFs with a digital adaptation of the industrial *Shisa Kanko* (Point and Call) protocol.
 
-┌─────────────────────────────────────────────────────────────┐  
-│                       AUDIT INTERFACE                       │  
-│  ┌───────────────────────────────────────────────────────┐  │  
-│  │                     Visual Crop                       │  │  
-│  │                       │  │  
-│  │                  Machinery:  [14.2%]                  │  │  
-│  └───────────────────────────────────────────────────────┘  │  
-│  (Point & Call: Hover pointer inside crop boundary to unlock)│  
-│  ┌───────────────────────────────────────────────────────┐  │  
-│  │                    Assumptions CFF                    │  │  
-│  │  Identify the implicit premise behind this value:    │  │  
-│  │  [ ] A. Operating margins match gross revenue.        │  │  
-│  │  [x] B. Industrial segment matches Machinery segment. │  │  
-│  └───────────────────────────────────────────────────────┘  │  
-│ ]     │  
-└─────────────────────────────────────────────────────────────┘
+```
+HIGH-IMPACT REVIEW INTERFACE
 
-The interface enforces active physical and cognitive engagement before unlocking action controls 7:
++----------------------------------------------------------+
+| Review Task: Validate extracted financial field          |
++----------------------------------------------------------+
+| Source Evidence                                          
+|  document: Q4_operating_report.pdf                       
+|  page: 14                                                
+|  highlighted region: machinery margin table              
+|                                                          
+|  [ Rendered crop / source excerpt shown here ]           
++----------------------------------------------------------+
+| Proposed System Interpretation                           
+|  extracted_value: 14.2%                                  
+|  field_name: machinery_operating_margin                  
+|  confidence: medium                                      
+|  policy_check: requires human verification               
++----------------------------------------------------------+
+| Cognitive Forcing Prompt                                 
+|  Which assumption must be true for this value to be used?
+|                                                          
+|  [ ] The value refers to gross revenue.                  
+|  [ ] The value refers to company-wide operating margin.  
+|  [x] The value refers to the machinery segment.          
+|                                                          
+|  Reviewer note required for override or uncertainty.     
++----------------------------------------------------------+
+| Action Controls                                          
+|  [Reject] [Request More Evidence] [Approve Verified Value]
+|                                                          
+|  Approve button remains disabled until evidence viewed,   
+|  prompt answered, and required note supplied if needed.   
++----------------------------------------------------------+
+```
 
-1. **Visual Focus Restraints:** The system displays spatially grounded crops of the source document directly adjacent to the parsed fields.1 The reviewer must physically move their pointer over the target coordinates.1 Research indicates that pointing narrows the visual field to within approximately 5 degrees, excluding peripheral distractions and focusing central vision on the specific numbers being validated.7  
-2. **Motor and Auditory Loops:** The interface requires the reviewer to vocalize the status or type the key verified numbers manually into a validation block rather than clicking "Yes".7 This kinesthetic and verbal feedback activates the motor and auditory cortices, breaking the autopilot trance of repetitive reviews and cutting manual verification errors by up to 85%.7
+The interface should enforce targeted physical and cognitive engagement before unlocking high-impact action controls. The goal is not to annoy reviewers into enlightenment—magnificent though that product strategy would be—but to break automatic approval patterns at the exact points where mistakes are costly.
 
-## 
+1. **Evidence Focus:** The reviewer should see the source evidence adjacent to the proposed value, action, or recommendation. For document tasks this may be a visual crop, table region, citation span, or source excerpt. For non-document tasks it may be a database diff, transaction preview, policy check, or tool-state readback.
+
+2. **Active Verification:** The reviewer should perform a small task that demonstrates inspection: selecting the governing assumption, comparing proposed and source values, typing a key figure, explaining an override, or marking uncertainty. These cognitive forcing functions should be reserved for high-impact decision points so they do not become background noise.
+
+3. **Unlock Conditions:** Approval controls should remain disabled until required evidence has been viewed, required checks have been completed, and any uncertainty or override rationale has been recorded.
+
+4. **Friction Calibration:** The system should vary review friction by risk tier, reviewer expertise, prior error patterns, task novelty, and queue pressure. More friction is not automatically more safety.
 
 ## **Escalation Packaging and Queue Capacity Planning**
 
 When an active SARC reference monitor triggers an escalation, the system halts the autonomous agent and invokes the Escalation Router to compile a standardized Escalation Package. Human review must be designed as a first-class, stateful model route, ensuring the human operator receives complete contextual evidence without requiring the end user to repeat their request.  
 The Escalation Package must contain the following structural properties:
 
-┌─────────────────────────────────────────────────────────────┐  
-│                      ESCALATION PACKAGE                     │  
-├──────────────────────────────┬──────────────────────────────┤  
-│      Identity Context        │      Dialogue History        │  
-│  (Tenant ID, Session JWT,   │    (Complete conversation    │  
-│     Scope Metadata)    │    traces, redacted)   │  
-├──────────────────────────────┼──────────────────────────────┤  
-│      Attempted Plan          │     Failed Component Trace   │  
-│   (Target steps, completed   │   (Exact stack traces, API   │  
-│      actions ledger)   │      error parameters) │  
-├──────────────────────────────┼──────────────────────────────┤  
-│       Partial Output         │      Grounded Evidence       │  
-│  (Successfully generated drafts│  (Spatially grounded crops,  │  
-│      and data tables)  │     source document coordinates)│  
-└──────────────────────────────┴──────────────────────────────┘
+```
+ESCALATION PACKAGE
 
-The physical assembly of this package must route through the ARGUS redaction engine to enforce compliance boundaries.1 ARGUS runs pre-flight Named Entity Recognition (NER) and regex parsing passes to redact PII, security credentials, and system API keys from the dialogue history and tool log blocks, protecting audit logs and reviewer screens from data leakage.1  
++----------------------------------------------------------+
+| Identity and Scope                                       
+|  tenant_id, subject_id, role/scope metadata,             
+|  approval context, risk tier                             
++----------------------------------------------------------+
+| User Goal and Current Task State                         
+|  concise goal summary, active constraints,               
+|  pending/failed/completed steps                          
++----------------------------------------------------------+
+| Minimum Necessary Conversation Context                   
+|  redacted excerpts, relevant turns, unresolved questions 
++----------------------------------------------------------+
+| Evidence Packet                                          
+|  source IDs, citations, document regions, database diffs,
+|  tool observations, confidence/verification status       
++----------------------------------------------------------+
+| Action Ledger                                            
+|  proposed actions, executed actions, pending actions,    
+|  idempotency keys, post-action verification state        
++----------------------------------------------------------+
+| Failure / Escalation Reason                              
+|  redacted error class, component ID, request ID,         
+|  policy trigger, diagnostic summary                      
++----------------------------------------------------------+
+| Reviewer Controls                                        
+|  approve, reject, request evidence, modify draft,        
+|  escalate further, or mark unknown                       
++----------------------------------------------------------+
+```
+
+The Escalation Package must contain enough context for the reviewer to continue the task without forcing the user to restart, but it must not dump uncontrolled raw session data into a helpdesk queue. Escalation is a privileged data-transfer boundary.
+
+Package assembly should follow these rules:
+
+| Package Element | Include | Avoid |
+| :--- | :--- | :--- |
+| **Identity and Scope** | Tenant ID, subject ID, role/scope metadata, approval context. | Raw session JWTs, OAuth tokens, API keys. |
+| **Conversation Context** | Minimum necessary redacted excerpts and relevant unresolved turns. | Complete raw chat history by default. |
+| **Evidence** | Source IDs, citations, document regions, database diffs, tool observations. | Unscoped documents, unrelated user files, raw vector chunks. |
+| **Failure Trace** | Redacted error class, component ID, request ID, diagnostic summary. | Exact stack traces with secrets, internal paths, or credentials. |
+| **Action Ledger** | Proposed, completed, pending, failed, and unknown actions. | Flattening unknown action state into success/failure. |
+| **Reviewer Controls** | Approve, reject, request more evidence, modify draft, escalate, mark unknown. | One-click approval without evidence inspection. |
+
+Redaction should run before the package enters the reviewer interface. PII, payment data, credentials, secrets, internal tokens, and unrelated tenant data should be masked or excluded according to policy. The reviewer should receive evidence IDs and scoped views, not a firehose of raw context wearing a tiny compliance hat.
+
+protecting audit logs and reviewer screens from data leakage.1  
 To manage these escalation packages without creating operational backlogs or exceeding service-level agreements (SLAs), platform teams apply queueing-theoretic models to review desk capacity planning.35  
 The human review desk is modeled as an M/M/N (or Erlang-C) queueing network, where escalations arrive according to a Poisson process with rate lambda, and N parallel human checkers process requests with an exponential service rate of mu.52
 
-                 ERLANG-C QUEUE CAPACITY MODEL  
-                   
-Escalations (lambda) ───> [ Queue ] ───> [ Checker 1 (mu) ]  
-                                              ───> [ Checker 2 (mu) ]  
-                                              ───> [ Checker N (mu) ]
+```
+HUMAN REVIEW QUEUE CAPACITY MODEL
+
+Escalation arrivals
+  rate = lambda
+        |
+        v
++-------------------+
+| Review Queue      |
+| priority classes  |
+| SLA timers        |
+| abandonment risk  |
++-------------------+
+        |
+        v
++-------------------+     +-------------------+     +-------------------+
+| Checker 1         |     | Checker 2         | ... | Checker N         |
+| service rate mu   |     | service rate mu   |     | service rate mu   |
++-------------------+     +-------------------+     +-------------------+
+        |
+        v
+Reviewed outcome:
+  approve | reject | request evidence | escalate | mark unknown
+```
 
 The probability that an arriving escalation must wait in the queue (P_C) is calculated via the Erlang-C formula:  
 P_C(N, u) = ((u^N / N!) * (N / (N - u))) / (Sum_{k=0}^{N-1} (u^k / k!) + (u^N / N!) * (N / (N - u)))  
 where u = lambda / mu represents the offered load, and stability requires u < N.52 The expected waiting time in the queue (W_q) is then defined as:  
 W_q = P_C(N, u) / (N * mu - lambda)  
+
+The Erlang-C model is useful as a planning approximation, but it assumes stationary arrivals, independent service times, and exponential service distributions. Human review often violates those assumptions: cases vary in difficulty, reviewers specialize, escalations cluster during incidents, and rework can re-enter the queue. Capacity planning should therefore combine queueing formulas with observed arrival distributions, service-time histograms, priority classes, abandonment rates, and incident surge tests.
+
 The **Safe Operating Throughput (SOT)** is the maximum sustained escalation arrival rate lambda_max at which the system can maintain its latency SLO (W_q <= SLO_delay) under realistic production conditions.56 Utilizing Little's Law, the expected queue length (L_q) is mapped directly to this arrival rate 56:  
 L_q = lambda * W_q  
 An crucial capacity trap arises when designing automated "LLM judges" or screening classifiers to filter escalations before they reach human checkers.58
 
-                  THE AUTOMATED JUDGE REWORK TRAP  
-                    
-                                          ┌──(Pass)──>  
-Arriving Tasks ───> [ LLM Judge ] ────────┤  
-                         ▲                └──(Fail)──>  
-                         │                                   │  
-                         └───────────────────────────────────┘
+```
+AUTOMATED JUDGE REWORK TRAP
+
+[ Arriving Cases ]
+        |
+        v
+[ Automated Triage / LLM Judge ]
+        |
+        +--> pass to normal workflow
+        |       risk: false accept
+        |
+        +--> send to human review
+        |       risk: false escalation
+        |
+        +--> reject / request rework
+                |
+                v
+        [ Rework or Regeneration ]
+                |
+                +--> returns to triage
+                     increasing effective arrival rate
+
+If false rejects or low-quality rework are common,
+the triage system increases total workload instead of reducing it.
+```
 
 Modeling the workflow as a reentrant queue reveals that while the screening judge is intended to amplify human capacity, false rejections generate an internal feedback loop (rework).53 Let r represent the probability that the judge incorrectly rejects a valid output, forcing a manual rebuild or re-generation.58 The effective arrival rate at the human review station scales non-linearly:  
 lambda_e = lambda / (1 - r)  
 When human reviewers are stretched thin, this rework cycle creates a congestion collapse.58 The feedback loop of false rejections crowds out the capacity to handle new arriving tasks, trapping the system in a saturated state even if the overall arrival volume remains below the nominal staffing limit.58
-
-## 
 
 ## **Just-in-Time Access and Break-Glass Procedures**
 
 In high-assurance enterprise software, model-driven agents and system operators must never operate with permanent, high-privilege credentials.1 Standardizing on standing administrative privileges is a primary delivery vector for privilege escalation and malicious tool manipulation.5 The system must enforce **Just-in-Time (JIT) access**, where roles are eligible but unassigned by default.59 When a task or emergency arises, the actor requests temporary elevation, assumes the credential for a strictly bounded session duration, and is automatically de-provisioned upon expiration.59  
 To ensure JIT access remains resilient during critical production incidents—where standard, multi-stage approval pathways are unavailable—the system implements a programmatic **Break-Glass Procedure**.59 Break-glass accounts bypass conventional approval manager loops to grant instant, pre-authorized elevation, but are constrained by strict physical and cryptographic guardrails to prevent abuse.59
 
-┌─────────────────────────────────────────────────────────────┐  
-│                    BREAK-GLASS GATEWAY                      │  
-├─────────────────────────────────────────────────────────────┤  
-│  [ Vaulted Credentials ] ──> Offline HSM Storage      │  
-├─────────────────────────────────────────────────────────────┤  
-│        ──> PagerDuty / SecOC Trigger │  
-├─────────────────────────────────────────────────────────────┤  
-│  [ Keystroke Logging ]   ──> Complete Session Capture   │  
-├─────────────────────────────────────────────────────────────┤  
-│          ──> Hard Cap < 900s   │  
-├─────────────────────────────────────────────────────────────┤  
-│  [ Post-Incident Audit ] ──> Mandatory 24h Review    │  
-└─────────────────────────────────────────────────────────────┘
+```text
+BREAK-GLASS ACCESS FLOW
+
+[ Emergency Condition ]
+  production outage, safety incident, security containment
+        |
+        v
+[ Break-Glass Request ]
+  actor identity
+  incident ID
+  requested scope
+  justification
+  maximum TTL
+        |
+        v
+[ Emergency Access Broker ]
+  verifies eligibility
+  checks incident state
+  records justification
+  notifies SecOps / incident commander
+        |
+        +--> denied
+        |       log denial and route to normal access process
+        |
+        v
+[ Scoped Temporary Credential ]
+  least privilege
+  short TTL
+  session recording
+  command / API audit
+        |
+        v
+[ Isolated Administrative Session ]
+  monitored shell or console
+  restricted network and resource scope
+  no standing credential exposure
+        |
+        v
+[ Expiry / Revocation ]
+  token revoked
+  session closed
+  evidence sealed
+        |
+        v
+[ Post-Incident Review ]
+  reconcile actions
+  inspect logs
+  approve exceptions
+  rotate credentials if needed
+```
 
 The security requirements and operational parameters for break-glass governance are defined below:
 
 | Guardrail Dimension | Technical Implementation Standard | Enforcement Mechanism | Operational Target | Incident Trigger Condition |
 | :---- | :---- | :---- | :---- | :---- |
-| **Credential Vaulting** 59 | Vault keys within an offline, hardware-backed Key Management Service (KMS) or physical safe.44 | Hardware Security Module (HSM) private key isolation.44 | 0 standing admin keys in active environment configs.5 | Attempted direct access to vaulted database ports.5 |
-| **Immediate Alerting** 59 | Direct integration with SIEM and active PagerDuty escalation streams.59 | Invariant trigger on the Break-Glass Gateway endpoint.61 | < 30 seconds notification delivery to SecOC on-call teams. | Keystroke pattern anomaly or un-correlated invocation.20 |
-| **Keystroke Logging** 59 | Stream session inputs, outputs, and system commands to an immutable ledger.59 | Kernel-level syscall interception inside the sandboxed gVisor container.5 | 100% auditable terminal playback traces.5 | Initiation of any sudo or administrative write shell operations.5 |
-| **Session TTL Limit** 59 | Hardware-enforced expiration of STS/OAuth session tokens.59 | Durable timer triggers programmatic token revocation.5 | Hard cap **< 900 seconds** (15-minute window).5 | Expiration of the dynamic timer thread.62 |
-| **Reconciliation Audit** 59 | Mandatory, multi-party forensic review of session logs.59 | central queue routing; requires signatures from compliance and SecOps.19 | Completed report published within **24 hours** of session close.59 | Any break-glass session transition to completed state.59 |
+| **Credential Vaulting** | Store privileged credentials in KMS/Vault/HSM-backed systems; never in prompts, repos, or runtime configs. | Credential broker mints scoped temporary credentials. | No standing admin keys in active application environments. | Request for privileged access outside normal approval path. |
+| **Eligibility and Scope** | Predefine who may request emergency access and which scopes are allowed. | Access broker checks role, incident ID, and requested resource scope. | Break-glass is emergency-scoped, not general admin access. | Declared incident or approved emergency condition. |
+| **Immediate Alerting** | Notify SecOps, incident commander, and audit channel on every invocation. | SIEM/PagerDuty/incident-system integration. | Alert emitted at session start and close. | Any break-glass session creation. |
+| **Session Recording** | Capture commands/API calls, outputs, timestamps, and target resources. | Monitored shell, proxy, bastion, or admin gateway. | Reviewable session transcript for privileged actions. | Administrative command/API call. |
+| **Session TTL Limit** | Short-lived STS/OAuth/session token with hard expiry. | Broker-enforced token expiry and revocation. | TTL defined by emergency policy, commonly minutes not hours. | Expiry timer or incident commander revocation. |
+| **Least Privilege** | Scope credential to resource, action class, and incident purpose. | Policy engine and credential broker. | No broad standing administrative session by default. | Request exceeds emergency scope. |
+| **Post-Incident Reconciliation** | Mandatory review of actions, side effects, and residual access. | Audit queue with security/compliance signoff. | Review completed within policy-defined incident window. | Session closure or incident resolution. |
 
-The system coordinates break-glass execution using ephemeral, hypervisor-isolated container runtimes (such as AWS Firecracker or gVisor).5 When an emergency command is initiated, the Break-Glass Gateway requests the KMS to mint a short-lived token.5 This token is injected into an isolated, read-only filesystem where a volatile RAM disk captures all outputs and session states, ensuring that when the 900-second TTL expires, the container is destroyed, leaving zero persistent credentials or un-audited state modifications in production.5
-
-## 
+Break-glass execution should use the strongest isolation practical for the operational environment: a monitored bastion, privileged access gateway, isolated administrative console, hardened container, or microVM. The key properties are scoped credentials, short TTL, recording, immediate alerting, revocation, and post-incident reconciliation. No design should claim “zero persistent credentials” unless the credential lifecycle, logs, caches, shells, and downstream systems have all been verified against that claim.
 
 ## **Cryptographic Audit Trails and Distributed Ledger Consistency**
 
 To meet compliance-grade standards in highly regulated environments, the system must generate audit trails that are inherently tamper-evident and resistant to administrator-level manipulation.44  
-The active-governance engine achieves this by implementing a cryptographic hash chain over all interaction blocks.44 Each block contains a serialized representation of the active state transition (including user intent, model-generated thoughts, SARC validation results, and human signatures).33
+The active-governance engine can implement tamper-evident audit records using an append-only event log and cryptographic hash chain. Each event should contain the decision-relevant artifacts needed to reconstruct what happened: user intent summary, policy checks, SARC validation results, tool calls, approval records, evidence references, payload hashes, reviewer decisions, and post-action verification state.
 
- Block N-1                           Block N  
-┌─────────────────────────────┐     ┌─────────────────────────────┐  
-│ Data:      │     │ Data:        │  
-│ Prev Hash: [Hash N-2]       │     │ Prev Hash: [Hash N-1]       │  
-│ Curr Hash: [Hash N-1] ──────┼────>│ Curr Hash: [Hash N]         │  
-└─────────────────────────────┘     └─────────────────────────────┘
+The audit log should not store private chain-of-thought, raw hidden reasoning, raw credentials, or unnecessary personal data. If a model produces a user-visible rationale or structured decision artifact, that artifact may be logged. Hidden reasoning should not be treated as an audit primitive.
 
-The cryptographic coupling of blocks is defined by:  
-Hash_n = SHA-256(Block_n |  
-| Hash_(n-1))  
-Because each block incorporates the hash of its predecessor, modifying any historical record (such as altering an approval amount or backdating an authorization timestamp) breaks the chain, rendering subsequent block hashes invalid and immediately triggering SIEM alert systems.44  
+```text
+TAMPER-EVIDENT AUDIT HASH CHAIN
+
+Event N-1
+  payload_hash: H(payload_N-1)
+  previous_hash: H(event_N-2)
+  event_hash: H(payload_hash || previous_hash || metadata)
+
+        |
+        v
+
+Event N
+  payload_hash: H(payload_N)
+  previous_hash: H(event_N-1)
+  event_hash: H(payload_hash || previous_hash || metadata)
+```
+
+The cryptographic coupling of events is defined as:
+
+```text
+event_hash_n = SHA256(payload_hash_n || event_hash_(n-1) || metadata_n)
+```
+
+Because each event incorporates the hash of its predecessor, later alteration of an approval amount, timestamp, payload hash, or reviewer decision breaks the chain. Hash chains are tamper-evident, not magically tamper-proof; high-assurance systems should protect signing keys, restrict audit-write permissions, replicate logs, and optionally anchor checkpoints externally.44  
+
 To verify the legal identity and intent of both makers and checkers, approval records are bound to digital signatures utilizing RS256 with X.509 certificates. When a checker approves a pending transaction:
 
 1. The client browser hashes the standardized JSONB approval block.  
@@ -1280,21 +1783,99 @@ To verify the legal identity and intent of both makers and checkers, approval re
 3. The signature is appended to the reviewed_requests log alongside the public certificate.  
 4. The API gateway verifies the certificate chain against the trusted Certification Authority (CA) root, proving that a specific, authorized individual executed the transaction.1
 
-To prevent data synchronization anomalies across different operational data stores, vector indices, and audit ledgers, high-assurance architectures consolidate these layers within a single transactionally consistent database (e.g., PostgreSQL or YugabyteDB).42
+To reduce synchronization anomalies across operational records, vector indexes, caches, and audit logs, high-assurance systems should define an explicit consistency model. Some state must be strongly consistent: approvals, execution ledgers, identity, authorization, and source-of-record mutations. Other state may be derived or eventually consistent: embeddings, semantic caches, search indexes, and reviewer convenience views.
 
-┌─────────────────────────────────────────────────────────────┐  
-│                    YUGABYTEDB DATA LAYER                    │  
-├─────────────────────────────────────────────────────────────┤  
-│  [ Operational Master ]  <── ACID Consistency               │  
-├─────────────────────────────────────────────────────────────┤  
-│  [ policy_corpus ]       <── Vector Embeddings (pgvector)   │  
-├─────────────────────────────────────────────────────────────┤  
-│  [ semantic_cache ]      <── Cache Key & Tenant Scope       │  
-├─────────────────────────────────────────────────────────────┤  
-│  [ audit_ledger ]        <── Cryptographic Hash Chain        │  
-└─────────────────────────────────────────────────────────────┘
+```text
+HIGH-ASSURANCE GOVERNANCE DATA LAYER
 
-By bringing all states together within a single ACID-compliant database layer, retrieval, validation, human reviews, and final executions are committed as unified, atomic transactions.42 A failure in any sub-step or validation gate triggers an immediate rollback across the entire data layer, eliminating the risk of mismatched states or un-grounded transaction claims, and ensuring complete auditability for years to come.1
+[ Source-of-Record Database ]
+  approvals
+  action ledger
+  identity / tenant scope
+  policy version
+  transaction state
+        |
+        +--> append-only audit log
+        |      tamper-evident event chain
+        |
+        +--> derived retrieval/index layer
+        |      embeddings, vector index, search cache
+        |
+        +--> semantic / response cache
+        |      scoped by tenant, user, policy, source version
+        |
+        +--> reviewer workspace
+               redacted package views and evidence links
+```
+
+The source-of-record database should own the authoritative state transitions. Vector indexes and caches should be treated as derived artifacts that can be rebuilt from canonical records. A failure in an index, cache, or reviewer view should not corrupt the approval ledger or action state. When a high-impact action spans multiple systems, the platform should use sagas, idempotency keys, post-action verification, compensation procedures, and explicit unknown-state handling rather than assuming every component can participate in a single atomic transaction.1
+
+## **Cross-Canon Handoff Map**
+
+High-impact workflow design provides the governance, review, approval, escalation, break-glass, and audit patterns used when autonomous execution becomes risky. It connects deeply to action verification, tool contracts, UX resilience, boundary defense, telemetry, audit, and incident response.
+
+| Target Report ID | Target Domain | Handoff | Integration Rule |
+| :---- | :---- | :---- | :---- |
+| **AI-ENG-B** | Context and State Governance | Continuity state, approval context, memory eligibility. | High-impact approvals must preserve active constraints and scoped state. |
+| **AI-ENG-D** | Corpus Engineering | Source authority and evidence provenance. | Reviewer evidence must retain source lineage and authority metadata. |
+| **AI-ENG-E** | Retrieval Pipeline | Evidence retrieval and citation packets. | Review packages should include authorized evidence, not raw unscoped corpus dumps. |
+| **AI-ENG-F** | Freshness and Conflict Detection | Currentness and conflict status. | Human reviewers must see stale/conflicting evidence flags. |
+| **AI-ENG-M** | Agentic Orchestration | Loop halt, escalation router, autonomy boundaries. | Agents must pause when SARC constraints trigger review. |
+| **AI-ENG-N** | Tool Contracts | Tool schema, idempotency, scoped credentials. | High-impact tool actions require pre-action gates and post-action verification. |
+| **AI-ENG-O** | Action Verification | Unknown state, reconciliation, compensation. | Review workflows must not flatten unknown action state into success. |
+| **AI-ENG-P** | Multimodal Understanding | Visual/document evidence packages. | Document or image evidence must be coordinate/source grounded where relevant. |
+| **AI-ENG-Q** | Voice Interaction | Voice confirmation and fallback. | High-impact voice actions require reliable confirmation or alternate channel. |
+| **AI-ENG-R** | UI Agents | UI handoff and automation pause. | High-impact UI automation must stop on uncertainty and transfer state. |
+| **AI-ENG-S** | Production Pathologies | False success, malformed output, runaway repair. | Human oversight must catch system failure modes before action commit. |
+| **AI-ENG-T** | Boundary Defense | Tenant isolation, prompt injection, data leakage. | Review packages must preserve boundary labels and avoid leaking secrets. |
+| **AI-ENG-U** | Supply Chain Security | Tool/server/parser trust. | Human review cannot approve actions through untrusted execution substrates. |
+| **AI-ENG-V** | Resource Abuse | Review queue capacity and escalation budgets. | Human review is a scarce resource with admission control and SLOs. |
+| **AI-ENG-W** | UX Resilience | Degraded mode, partial answer, graceful error. | High-impact workflows need user-visible pending, blocked, review, and unknown states. |
+| **AI-ENG-X** | User Trust and Transparency | Trust calibration and contestability. | Users need clear status, evidence, override paths, and right-to-contest flows. |
+| **AI-ENG-Z** | Telemetry and Metrics | Review, approval, escalation, and break-glass events. | Every high-impact transition must emit structured, redacted telemetry. |
+| **AI-ENG-AA** | Evaluations | HITL, CFF, approval, and escalation tests. | Release gates should test reviewer overreliance and unsafe approval paths. |
+| **AI-ENG-AB** | Audit and Replay | Approval ledger, evidence packet, event hash chain. | High-impact decisions must be replayable from durable artifacts. |
+| **AI-ENG-AC** | Incident Response | Break-glass and emergency review. | Emergency access requires containment, revocation, and post-incident review. |
+| **AI-ENG-AD** | Governance and Accountability | Policy ownership, authority, review accountability. | Governance defines who may approve, override, contest, and audit high-impact actions. |
+| **AI-ENG-AJ** | Reference Architecture | Approval ledger, SARC gates, reviewer queue, break-glass gateway. | Reference systems should include active-governance controls by default. |
+
+## **Durable Principles of High-Impact Workflow Design**
+
+1. **Human-in-the-Loop Is Not a Checkbox**  
+   Human oversight must be an active control system with evidence, authority, friction, accountability, and intervention power.
+
+2. **Self-Reported Confidence Cannot Be the Approval Gate**  
+   Agents have incentives to appear more capable when autonomy is rewarded. Approval gates need independent validation, not model self-confidence theater.
+
+3. **High-Impact Actions Need Pre-Action Gates**  
+   Authorization, tenant scope, risk tier, budget, consent, and approval requirements must be checked before tool execution.
+
+4. **Unknown Action State Must Stay Unknown**  
+   Pending, partial, failed, and unreconciled states must remain visible until verified. Conversational smoothing is not governance.
+
+5. **Maker and Checker Must Be Separated**  
+   The actor proposing or preparing a high-impact action should not be the same actor approving final execution.
+
+6. **Review Interfaces Must Fight Automation Bias**  
+   Review screens should force attention to evidence, assumptions, deltas, and consequences—not merely ask reviewers to admire an AI-generated paragraph and click “Approve.”
+
+7. **Escalation Packages Must Be Minimal and Scoped**  
+   Reviewers need enough context to decide, not a raw dump of every prompt, secret, trace, and unrelated document the system has ever touched.
+
+8. **Human Review Has Capacity Limits**  
+   Escalation queues require SLOs, staffing models, triage, rework tracking, and saturation behavior. A review queue can fail just like a database.
+
+9. **Break-Glass Is Emergency-Scoped, Not Approval-Free**  
+   Emergency access must be preauthorized, short-lived, monitored, recorded, and reconciled after the incident.
+
+10. **Audit Trails Should Be Tamper-Evident and Privacy-Aware**  
+   Logs should preserve decision artifacts, evidence, policy checks, approvals, and tool traces—not raw hidden reasoning or unnecessary personal data.
+
+11. **Derived Systems Are Not Sources of Record**  
+   Vector indexes, caches, and reviewer views may support decisions, but approval ledgers and action state must remain tied to authoritative records.
+
+12. **Governance Must Compile into Runtime Controls**  
+   Policies matter only when they become enforceable gates, monitors, ledgers, review queues, revocation paths, and replayable evidence.
 
 #### **Works cited**
 
@@ -1363,3 +1944,5 @@ By bringing all states together within a single ACID-compliant database layer, r
 63. AmudFin - Financial Intelligence Platform, accessed June 11, 2026, [https://amudfin.com/](https://amudfin.com/)
 
 ---
+
+[← Back to Canon Map](../canon-map.md)

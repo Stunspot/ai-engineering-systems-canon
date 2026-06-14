@@ -21,7 +21,7 @@ To avoid overlapping execution profiles, systems must separate programmatic scri
 | :---- | :---- | :---- | :---- | :---- |
 | **Browser Automation Script** | A programmatic instruction sequence designed to run a predefined path over a known web page.12 | Assumes static elements, fixed timeouts, and unyielding DOM targets.10 | Zero-tolerance; fails immediately on layout shifts or selector changes.10 | Pre-defined CSS selectors and XPaths.14 |
 | **Test Runner** | A scripted execution environment that runs test cases alongside repeatable fixtures and assertions.5 | Assumes isolated local servers, repeatable mock data, and test environments.5 | Fails loudly; prioritizes pinpointing discrepancies over recovery.5 | Explicit test IDs and DOM elements.14 |
-| **RPA Workflow** | A robotic process automation macro that automates semi-structured business workflows across legacy interfaces.1 | Assumes stable application windows, consistent screen coordinates, and fixed layouts.1 | Brittle; requires manual re-engineering on minor application updates.1 | Coordinate-based coordinates, Win32 controls, and legacy properties.1 |
+| **RPA Workflow** | A robotic process automation macro that automates semi-structured business workflows across legacy interfaces.1 | Assumes stable application windows, consistent screen coordinates, and fixed layouts.1 | Brittle; requires manual re-engineering on minor application updates.1 | screen coordinates, Win32 controls, and legacy properties, Win32 controls, and legacy properties.1 |
 | **Browser Agent** | A model-driven agent that uses dynamic planning to operate web interfaces under variable layouts and flows.4 | Operates under dynamic layouts, changing user states, and unannounced redirects.4 | High; handles dynamic layout changes and performs automated recovery.4 | DOM structures, accessibility trees, and visual viewports.4 |
 | **Desktop Agent** | A model-driven controller that plans and executes tasks across operating system windows and applications.1 | Operates across local files, multiple native windows, and global system settings.1 | High; manages focus transitions and handles system alerts.1 | Native OS accessibility APIs, system cursors, and display graphics.1 |
 | **Computer-Use Agent** | A platform-agnostic agent that interacts with host operating systems via visual screenshots and synthetic inputs.1 | Assumes no direct DOM access, relying on pixel coordinates and screenshots.1 | Variable; handles visual elements but is susceptible to coordinate offsets.1 | Visual viewports and global screen coordinates.1 |
@@ -36,14 +36,14 @@ The state representation must capture fifteen distinct dimensions to provide a c
 | **1. Navigation State** | String (URI / App ID) 18 | browsingContext.get via WebDriver BiDi.18 | Confirms target domain alignment, tracking redirects and browser origins.7 | Matches the active URL path against expected domain patterns.5 |
 | **2. Structural Graph** | Hierarchical markup tree 17 | CDP DOM extraction / raw XML traversal.19 | Maps parent-child element nodes and extracts HTML attributes.17 | Confirms that the target element is attached to the active DOM.5 |
 | **3. Semantic Substrate** | Accessible role & name graph 8 | Native OS APIs (UIA, AX, AT-SPI2).8 | Resolves element roles, names, states, and descriptions.8 | Validates that roles match active application properties.8 |
-| **4. Visual Capture** | 300 DPI high-res PNG byte array 17 | Page.captureScreenshot / OS screen capture.1 | Analyzes raw pixels to check for visual changes and layout overlays.1 | Confirms rendering contrast and verifies element layouts.17 |
+| **4. Visual Capture** | viewport screenshot or rendered frame buffer 17 | Page.captureScreenshot / OS screen capture.1 | Analyzes raw pixels to check for visual changes and layout overlays.1 | Confirms rendering contrast and verifies element layouts.17 |
 | **5. Spatial Coordinates** | Normalized array: [x1, y1, x2, y2]17 | getBoundingClientRect / AX position query.11 | Coordinates element bounds for visual click fallbacks.1 | Bounding box has a non-zero area and maps inside the viewport.5 |
 | **6. Focus Element** | Element reference ID 11 | activeElement traversal via CDP Runtime.13 | Pinpoints the active input cursor location, preventing blind typing.5 | Focus matches the target element's active DOM reference.5 |
 | **7. Input Values Map** | Map: Selector -> String 5 | Traverses input element attributes in the DOM.5 | Tracks field text to confirm data entry and clear operations.5 | Input strings match the expected field values.5 |
 | **8. Validation Alerts** | Map: Selector -> String 5 | Evaluates aria-invalid attributes and text.5 | Identifies inline input errors and block constraints.5 | Error containers are absent or hidden after correction.5 |
 | **9. Modal & Overlay State** | Map: Selector -> BoundingBox | Checks z-index layers and visible overlays.5 | Detects blocking dialogs, consent pop-ups, and screens.5 | Ensures the target element is not obscured by other layers.5 |
 | **10. Viewport Offset** | Tuple: (Scroll_x, Scroll_y) 11 | Queries window scroll coordinates.11 | Checks scroll position to confirm element visibility.5 | Target element is positioned within the active viewport bounds.5 |
-| **11. Network Traffic** | Integer (active request count) | Monitors requests via WebDriver BiDi.18 | Identifies loading states and pending transactions.5 | Active network requests drop to zero (network idle).9 |
+| **11. Network Traffic** | Integer (active request count) | Monitors requests via WebDriver BiDi.18 | Identifies loading states and pending transactions.5 | active requests settle or an app-specific readiness signal is observed.9 |
 | **12. Runtime Console Logs** | List: ConsoleMessage 22 | LogInspector / console listener connections.22 | Catches Javascript exceptions and resource failures.22 | Zero uncaught runtime errors during action execution.22 |
 | **13. Session Profile** | Map (cookies and local storage) 18 | storage.getCookies via BiDi.18 | Tracks login states, sessions, and tenant scopes.18 | Active session cookies match target auth configurations.7 |
 | **14. Action History** | List: ActionRecord | Internal tracing logs. | Saves the sequence of completed steps to prevent loops. | Verifies execution progress matches the planned path. |
@@ -51,43 +51,145 @@ The state representation must capture fifteen distinct dimensions to provide a c
 
 ## **Dual-Channel UI Perception Model and Fusion Rules**
 
-A robust UI agent cannot rely on a single channel for perception. DOM-only agents fail when elements are visually occluded, offscreen, hidden behind overlays, or rendered on custom HTML Canvases.5 Conversely, screenshot-only agents fail when semantic labels are missing, text characters are small or low-contrast, or keyboard accessibility relationships are hidden from the raw pixels.1 The agent must implement a Dual-Channel UI Perception Model that integrates semantic and visual data.
+A robust UI agent cannot rely on a single channel for perception. DOM-only agents fail when elements are visually occluded, offscreen, hidden behind overlays, rendered in canvas, or detached during client-side re-rendering. Screenshot-only agents fail when semantic labels are missing from pixels, small text is unreadable, or keyboard/accessibility relationships are invisible to the visual model.
 
-```
-+---------------------------------------------------------------------------------------------------------+  
-|                                    DUAL-CHANNEL PERCEPTION MODEL                                        |  
-+---------------------------------------------------------------------------------------------------------+  
-|                                                                                                         |  
-|                                                                                                         |  
-|         |                                                                                               |  
-|         +-----------------------------------------+                                                     |  
-|         v (Semantic Channel)                      v (Visual Channel)                                    |  
-|                                                                                                         |  
-|         +-- HTML DOM attributes [19]            +-- 300 DPI Viewport PNG                        |  
-|         +-- ARIA role descriptions         +-- Deep bounding-box OCR                       |  
-|         +-- Active focus state             +-- Icon recognition models                           |  
-|         |                                         |                                                     |  
-|         +--------------------+--------------------+                                                     |  
-|                              v (Perception Fusion Engine)                                               |  
-|                                                                                                         |  
-|                              |                                                                          |  
-|                              +--------------- (No Occlusions) ----> Safe Target Verification            |  
-|                              +--------------- (Z-Index Overlays) --> Invoke Modal Playbooks             |  
-|                                                                                                         |  
-+---------------------------------------------------------------------------------------------------------+
+The agent must combine semantic, structural, visual, spatial, and runtime signals into a unified state model before choosing targets.
+
+```text
++--------------------------------------------------------------------------------
+| DUAL-CHANNEL UI PERCEPTION MODEL
++--------------------------------------------------------------------------------
+|
+| [ Active Interface State ]
+|          |
+|          +-------------------------------+
+|          |                               |
+|          v                               v
+| [ Semantic / Structural Channel ]   [ Visual / Spatial Channel ]
+|   DOM tree                          screenshot / framebuffer
+|   accessibility tree                OCR boxes
+|   roles and names                   icon detection
+|   labels and form relations         visual bounding boxes
+|   focus and enabled state           occlusion and contrast
+|   selectors and test IDs            viewport coordinates
+|          |                               |
+|          +---------------+---------------+
+|                          |
+|                          v
+| [ Perception Fusion Engine ]
+|   reconcile DOM, AX, screenshot, hit-test, focus, and runtime signals
+|                          |
+|          +---------------+---------------+
+|          |                               |
+|          v                               v
+| [ Verified Actionable Target ]   [ Conflict / Drift / Ambiguity ]
+|   unique target                    re-observe, dismiss overlay,
+|   visible                          re-query, inspect visually,
+|   enabled                          or escalate
+|   stable
+|   receives events
+|
++--------------------------------------------------------------------------------
+| Invariant:
+|   A target is actionable only when semantic identity, visual presence,
+|   spatial coordinates, and event-receiving state agree.
++--------------------------------------------------------------------------------
 ```
 
 To resolve structural conflicts, the fusion engine enforces five rules during state construction:
 
 | Rule Category | Conflict Scenario | Detection Diagnostic | Unified Resolving Algorithm | Expected Outcome |
 | :---- | :---- | :---- | :---- | :---- |
-| **1. Visibility Guard** | DOM element exists but is hidden from the viewport. | DOM has display: none or element size is 0. | Exclude element from targeting; mark as non-actionable. | Prevents misclicks on hidden layout elements. |
-| **2. Occlusion Verification** | Target coordinates are covered by another DOM node. | Hit-test fails; overlay captures events. | Trace coordinate z-indexes; map overlay boundaries. | Identifies blocking overlays and routes to dismiss routines. |
-| **3. Status Cross-Check** | DOM shows element as enabled, but pixels are grayed out. | Pixel analysis finds low-contrast grayout styling. | Query accessibility tree status (aria-disabled). | Confirms true element status before action dispatch. |
-| **4. Canvas Resolution** | Target element is rendered on an HTML Canvas layer. | DOM shows canvas node with zero children. | Runs OCR and applies Snappy relevance propagation over the region. | Resolves coordinate offsets for custom canvas controls. |
-| **5. Accessibility Audit** | DOM elements lack text labels or identifiers. | Null values for id and descriptive attributes. | Scans the accessibility tree for roles and labels. | Resolves labels for unnamed controls. |
+| **1. Visibility Guard** | DOM element exists but is hidden from the viewport. | DOM visibility, computed style, zero size, offscreen position. | Exclude element from targeting; mark as non-actionable. | Prevents actions on hidden layout elements. |
+| **2. Occlusion Verification** | Target coordinates are covered by another element. | Hit-test returns another node; overlay captures pointer events. | Trace z-index and overlay boundaries; route to modal or overlay playbook. | Prevents misclicks into blocking dialogs or banners. |
+| **3. Status Cross-Check** | DOM shows enabled, but rendered UI appears disabled. | Pixel grayout, disabled styling, AX disabled state, aria-disabled. | Query DOM, AX, and visual status; require agreement before action. | Prevents clicks on disabled or inert controls. |
+| **4. Canvas Resolution** | Control is rendered inside canvas or custom graphics. | DOM exposes canvas or opaque container with no child controls. | Run OCR/icon detection and spatial matching over rendered region. | Produces coordinate target with lower confidence and stricter verification. |
+| **5. Accessibility Audit** | DOM element lacks usable labels or stable identifiers. | Missing ID, text, placeholder, aria-label, or test ID. | Query accessibility tree for role, name, description, and relations. | Resolves semantic targets that DOM serialization misses. |
 
 ## **Semantic Targeting and Accessibility Tree Models**
+
+UI agents should prefer stable semantic targets over volatile visual coordinates. A button’s accessible role and name usually survive layout shifts better than a pixel coordinate. A form field’s associated label is safer than a nearby text guess. A test ID is safer than a generated CSS class. Visual coordinates remain useful, but they should usually serve as verification and fallback rather than the primary identity of the target.
+
+Windows, macOS, Linux, and browsers expose interface semantics through different APIs. A production UI agent should normalize these channels into a common semantic target object.
+
+```json
+{
+  "$schema": "https://ai-engineering.canon/schemas/semantic-target-v1.json",
+  "target_id": "tgt_2026_06_10_00412",
+  "source_context": {
+    "context_type": "browser",
+    "origin": "https://billing.internal.enterprise",
+    "viewport_id": "vp_001",
+    "snapshot_id": "snap_2026_06_10_00412"
+  },
+  "role_descriptor": {
+    "standardized_role": "button",
+    "html_role": "button",
+    "win32_uia_control": "ButtonControlPattern",
+    "macos_ax_role": "AXButton",
+    "linux_at_spi_role": "ROLE_PUSH_BUTTON"
+  },
+  "name_descriptor": {
+    "accessible_name": "Place order",
+    "visible_text": "Place order",
+    "placeholder_text": null,
+    "aria_label_value": "Submit and finalize your transaction"
+  },
+  "locators": {
+    "test_id_selector": "data-testid=order-checkout-button",
+    "role_selector": "getByRole('button', { name: 'Place order' })",
+    "label_selector": null,
+    "css_selector": "button.btn-submit-order",
+    "xpath_selector": "//button[@type='submit' and contains(., 'order')]"
+  },
+  "spatial_metadata": {
+    "bounding_box": [642, 518, 814, 568],
+    "coordinate_system": "viewport_css_pixels",
+    "device_pixel_ratio": 1.0,
+    "viewport_attached": true,
+    "center_point": [728, 543]
+  },
+  "actionability": {
+    "is_visible": true,
+    "is_stable": true,
+    "is_enabled": true,
+    "is_editable": false,
+    "receives_pointer_events": true,
+    "is_occluded": false
+  },
+  "risk": {
+    "risk_classification": "critical_mutation",
+    "confirmation_required": true,
+    "post_action_verification_required": true
+  },
+  "targeting_heuristics": {
+    "ambiguity_score": 0.0,
+    "confidence_rating": 0.985,
+    "resolution_channel": "test_id_plus_accessible_name",
+    "fallback_channels": [
+      "role_name",
+      "visual_ocr",
+      "spatial_neighborhood"
+    ]
+  }
+}
+```
+
+### **Locator Robustness and Selection Strategy**
+
+The targeting engine should evaluate element locators using a reliability hierarchy:
+
+| Locator Strategy | Reliability | Best Use | Failure Mode |
+| :--- | :---: | :--- | :--- |
+| **Explicit Test IDs** | Highest | Production-owned interfaces, testable workflows, stable internal apps. | Missing if the app was not instrumented for automation. |
+| **Accessible Roles and Names** | High | Buttons, links, menus, dialogs, checkboxes, form controls. | Breaks when accessibility metadata is poor or localized unexpectedly. |
+| **Associated Form Labels** | High | Text fields, selects, checkboxes, radio groups. | Breaks when labels are missing or visually detached from fields. |
+| **Stable Text Content / Placeholder** | Medium | Content pages, search boxes, simple forms. | Sensitive to localization, A/B copy, and dynamic text changes. |
+| **DOM Structure / CSS Selector** | Medium-Low | Fallback when semantic locators are unavailable. | Brittle under component refactors and generated class names. |
+| **XPath** | Low | Legacy pages or emergency fallback. | Brittle under hierarchy changes. |
+| **Visual Coordinate Targeting** | Lowest as identity, useful as fallback | Canvas apps, remote desktops, screenshots, native apps with poor semantics. | Vulnerable to layout shift, scaling, viewport movement, and occlusion. |
+
+Target selection should prefer the strongest available locator but verify the final candidate with visual and actionability checks. A valid locator is not enough if the target is hidden, overlapped, disabled, or outside the viewport.
 
 UI agents should prefer stable semantic targets over volatile visual coordinates to prevent layout shifts or resolution differences from breaking automated workflows.1 By utilizing accessibility names, roles, and structural attributes, agents construct robust targets that survive minor interface changes.8  
 Windows, macOS, and Linux manage accessibility trees using distinct, platform-specific APIs.1 To support cross-platform targeting, systems must abstract these variations into a unified semantic target schema:
@@ -157,45 +259,72 @@ The browser control layer acts as the physical link between the agent's planning
 
 ## **Desktop Automation Boundary Model**
 
-Operating outside the browser sandbox introduces critical safety concerns. A desktop automation agent operates in an environment with access to local applications, filesystem structures, terminal prompts, and active system windows.1 The system must implement a multi-layered boundary model to control system inputs and isolate local processes:
+Operating outside the browser sandbox introduces critical safety concerns. A desktop automation agent may interact with local applications, filesystems, native dialogs, terminals, credential prompts, system settings, and global clipboard state. The system must therefore isolate execution, restrict host access, filter network egress, and verify native UI state before dispatching input events.
 
-```
-+-----------------------------------------------------------------------------------------+  
-|                               DESKTOP BOUNDARY ISOLATION                                |  
-+-----------------------------------------------------------------------------------------+  
-|                                                                                         |  
-|                                                                                         |  
-|         |                                                                               |  
-|         v (Enforces process boundaries)                                                 |  
-|   [ Hypervisor Layer: Firecracker MicroVM / KVM ] ------------------> [ Hardware MAC ]  |  
-|         |                                                                               |  
-|         v (Restricts graphical output)                                                  |  
-|   ----------------> [ No Host Leak ]                                                    |  
-|         |                                                                               |  
-|         v (Traverses platform structures)                                               |  
-|                                                                                         |  
-|         +-- Windows: COM / IUIAutomation7 [8, 31]                                       |  
-|         +-- macOS: CoreFoundation / AXUIElement                                  |  
-|         +-- Linux: DBus / AT-SPI2                                                    |  
-|         |                                                                               |  
-|         v (Filters network connections)                                                 |  
-|   [ Egress Filtering Gateway / Proxy ] --------------------------->|  
-|                                                                                         |  
-+-----------------------------------------------------------------------------------------+
+```text
++--------------------------------------------------------------------------------
+| DESKTOP AUTOMATION BOUNDARY MODEL
++--------------------------------------------------------------------------------
+|
+| [ User / Orchestrator ]
+|          |
+|          v
+| [ Policy and Permission Gate ]
+|   allowed apps | allowed files | allowed domains | action risk class
+|          |
+|          v
+| [ Isolated Execution Environment ]
+|   VM / container / remote desktop / disposable user profile
+|          |
+|          +--> [ Filesystem Boundary ]
+|          |      read/write workspace only
+|          |      no ambient host home-directory access
+|          |
+|          +--> [ Credential Boundary ]
+|          |      brokered credentials
+|          |      no raw secrets in model context
+|          |
+|          +--> [ Network Boundary ]
+|          |      egress allowlist
+|          |      logging and block rules
+|          |
+|          +--> [ Clipboard Boundary ]
+|          |      isolated clipboard
+|          |      no host clipboard leakage
+|          |
+|          v
+| [ Native UI Bridge ]
+|   Windows UIA | macOS AX | Linux AT-SPI2 | screenshot fallback
+|          |
+|          v
+| [ Action Dispatcher ]
+|   click | type | shortcut | drag | file picker | app command
+|          |
+|          v
+| [ Post-Action Verification ]
+|   focus | window state | file state | app state | visual state
+|
++--------------------------------------------------------------------------------
+| Invariant:
+|   Desktop control must never inherit ambient host authority.
+|   It operates inside a bounded, observable, revocable environment.
++--------------------------------------------------------------------------------
 ```
 
-To coordinate interaction across different operating systems, desktop bridges use native APIs that present distinct structural features:
+To coordinate interaction across operating systems, desktop bridges use native APIs that present distinct structural features:
 
 | Platform API | Win32 UI Automation (UIA) | macOS AXUIElement API | Linux AT-SPI2 Bridge |
 | :---- | :---- | :---- | :---- |
-| **Interface Technology** | COM interface via uiautomationclient.h.8 | CoreFoundation C wrapper and Objective-C bindings.8 | DBus-based messaging layer over system bus.8 |
-| **Role Categorization** | Strongly typed roles mapping to fixed enums.8 | Untyped role and subrole string classifications.8 | Standardized enums with custom registration support.8 |
-| **Query Mechanism** | Supports bulk querying and prefetching (FindFirstBuildCache).32 | Single element-by-element queries with multiple copy calls.8 | Element-by-element DBus messaging.8 |
-| **Performance Profile** | High; batch queries minimize cross-process calls.32 | Moderate; batching helps optimize multiple copy operations.8 | Slow; D-Bus round-trips introduce millisecond-level latency per node read.8 |
-| **Query Optimization** | Uses TreeScope properties and cache filters.31 | Implements multi-attribute copy operations to batch requests.8 | Employs lazy evaluation to query attributes on matching nodes.8 |
-| **Element Verification** | Validates roles against the active UIA cache properties.33 | Inspects elements for structural actions like AXPress.16 | Checks elements for conventional action strings.8 |
-| **Stable Reference** | Tracked via cached snapshots.8 | String-based references; susceptible to stale nodes.2 | High-frequency node changes require locator re-querying.8 |
-| **Execution Tool** | Microsoft UFO / xa11y Windows backend.1 | Browser Control Layer (BCL) / xa11y macOS.8 | Daytona / xa11y Linux backend.4 |
+| **Interface Technology** | COM interface via UI Automation client APIs. | CoreFoundation / AXUIElement interfaces. | DBus-based messaging layer over accessibility bus. |
+| **Role Categorization** | Strongly typed roles mapping to fixed enums. | Role and subrole string classifications. | Standardized roles with custom application exposure. |
+| **Query Mechanism** | Supports cache requests and bulk property fetching. | Element-by-element calls, with batching possible for attributes. | Element-by-element DBus messaging. |
+| **Performance Profile** | Strong when cache requests are used. | Moderate; depends on batching and app responsiveness. | Can be slow due to DBus round trips. |
+| **Query Optimization** | Cache filters and scoped tree queries. | Multi-attribute copy operations and subtree pruning. | Lazy evaluation and targeted role queries. |
+| **Element Verification** | Validates roles, patterns, properties, and bounding rectangles. | Verifies supported actions such as press, focus, or value set. | Verifies available action strings and state sets. |
+| **Stable Reference** | Cached snapshots can stale after UI changes. | AX references can stale after window/app updates. | Node changes require re-querying. |
+| **Execution Tooling** | UIA clients, automation bridges, remote desktop controllers. | AX clients, app-specific scripting, remote desktop controllers. | AT-SPI2 clients and desktop automation bridges. |
+
+Desktop automation is inherently higher-risk than browser-only automation because the control surface is broader. The default posture should be disposable session, least privilege, blocked host leakage, and strict post-action verification.
 
 ## **UI Action Taxonomy and Bounded Planning**
 
@@ -224,40 +353,70 @@ To simplify action planning, UI interactions are categorized into an exhaustive 
 
 ### **The Bounded Action Planning Model**
 
-To prevent unverified execution paths, the planning engine evaluates interactions using a structured Bounded Action Planning Model. This schema maps preconditions and verification checks to target actions:
+To prevent unverified execution paths, the planning engine evaluates every UI operation as a bounded action record. The record defines target identity, preconditions, execution payload, risk controls, post-action expectations, timeout policy, and recovery playbook.
 
+```json
+{
+  "plan_record_id": "act_2026_06_10_00412",
+  "target_domain": "billing.internal.enterprise",
+  "active_action_type": "Click",
+  "risk_class": "critical_mutation",
+  "target": {
+    "semantic_target_id": "tgt_confirm_payment",
+    "preferred_locator": "getByRole('button', { name: 'Confirm payment' })",
+    "fallback_locator": "data-testid=btn_confirm_payment",
+    "expected_role": "button",
+    "expected_name": "Confirm payment",
+    "bounding_box": [642, 518, 814, 568],
+    "coordinate_system": "viewport_css_pixels"
+  },
+  "preconditions": [
+    "target.is_visible == true",
+    "target.is_stable == true",
+    "target.is_enabled == true",
+    "target.receives_pointer_events == true",
+    "target.is_occluded == false",
+    "active_origin == 'https://billing.internal.enterprise'",
+    "payload_hash == approved_payload_hash"
+  ],
+  "execution_payload": {
+    "dispatch_method": "CDP:Input.dispatchMouseEvent",
+    "click_point": [728, 543],
+    "button": "left",
+    "click_count": 1
+  },
+  "confirmation": {
+    "required": true,
+    "approval_id": "appr_2026_06_10_7781",
+    "approval_scope": "single_execution",
+    "expires_at": "2026-06-10T18:35:00Z"
+  },
+  "post_action_expectations": [
+    "payment_request_submitted == true",
+    "network_request_contains_idempotency_key == true",
+    "success_or_pending_status_visible == true",
+    "duplicate_warning_absent == true",
+    "action_ledger_entry_created == true"
+  ],
+  "verification_policy": {
+    "timeout_ms": 10000,
+    "readiness_signal": "network_quiet_or_app_specific_completion",
+    "requires_backend_verification": true,
+    "requires_visual_verification": true
+  },
+  "error_recovery_playbook": "PLY_RECV_CLICK_NO_EFFECT",
+  "stop_conditions": [
+    "target_ambiguous",
+    "approval_expired",
+    "payload_mismatch",
+    "cross_origin_redirect",
+    "duplicate_transaction_warning"
+  ]
+}
 ```
-+-----------------------------------------------------------------------------------------+  
-|                                BOUNDED ACTION PLAN RECORD                               |  
-+-----------------------------------------------------------------------------------------+  
-|                                                                                         |  
-|   Target Domain: billing.internal.enterprise                                            |  
-|   Active Action Type: Click                                                             |  
-|   Target Element: button[id="btn_confirm_payment"]                                      |  
-|                                                                                         |  
-|   Execution Parameters:                                                                 |  
-|   {                                                                                     |  
-|     "preconditions": [                                                                  |  
-|       "is_visible == true",                                                             |  
-|       "is_stable == true",                                                              |  
-|       "is_enabled == true",                                                             |  
-|       "receives_pointer_events == true"                                                 |  
-|     ],                                                                                  |  
-|     "execution_payload": {                                                              |  
-|       "coordinates": ,                                              |  
-|       "dispatched_method": "CDP:Input.dispatchMouseEvent"                               |  
-|     },                                                                                  |  
-|     "post_action_expectations": [                                                       |  
-|       "url_redirected == true",                                                         |  
-|       "success_toast_visible == true",                                                  |  
-|       "network_activity == idle"                                                        |  
-|     ],                                                                                  |  
-|     "timeout": 10000,                                                                   |  
-|     "error_recovery_playbook": "PLY_RECV_CLICK_NO_EFFECT"                               |  
-|   }                                                                                     |  
-|                                                                                         |  
-+-----------------------------------------------------------------------------------------+
-```
+
+A bounded action may dispatch only after all preconditions pass. If a precondition fails, the agent must re-observe, repair, ask for confirmation, or escalate. It must not improvise a nearby coordinate and hope the browser is feeling generous.
+
 ## **Click and Type Verification Framework**
 
 The Click and Type Verification Framework acts as the system's execution-level gate. It ensures that inputs are verified directly against resulting UI state transitions before subsequent actions are permitted.
@@ -305,47 +464,75 @@ This race window is typically under 50 milliseconds. The race condition is mitig
 
 ## **Form Submission Safety Model**
 
-Form submissions represent critical action boundaries because they trigger side effects that often cannot be programmatically rolled back (e.g., database writes, financial transactions, or message dispatches).7 The Form Submission Safety Model establishes a rigorous verification protocol before executing any form actions:
+Form submissions are critical action boundaries because they often trigger durable side effects: database writes, purchases, message sends, file uploads, account changes, legal acknowledgments, or financial transactions. A UI agent must treat a form submit as a tool-like mutation, not as “just another click.”
 
-```
-+---------------------------------------------------------------------------------------------------------+  
-|                                      FORM SUBMISSION SAFETY CONTROL                                     |  
-+---------------------------------------------------------------------------------------------------------+  
-|                                                                                                         |  
-|                                                                                                         |  
-|         |                                                                                               |  
-|         v (Verification Gate 1: Origin Validation)                                                      |  
-|   [ Confirms domain matches allowed list; blocks third-party framing ] ----------------> [ Passed ]     |  
-|         |                                                                                               |  
-|         v (Verification Gate 2: Structural Integrity Check)                                             |  
-|   [ Audits input values, scans for errors & verifies required fields ] ----------------> [ Passed ]     |  
-|         |                                                                                               |  
-|         v (Verification Gate 3: Payload Risk Evaluation)                                                |  
-|   [ Calculates transactional cost thresholds and evaluates destinatary endpoints ]                       |  
-|         +------- (Below Risk Threshold) --> Direct Automated Submission Event                           |  
-|         +------- (Above Risk Threshold) -->                                                |  
-|                                                     |                                                   |  
-|                                                     v (Requires manual signature clearance)             |  
-|                                                 [ User-in-the-Loop PIN Verification ]                   |  
-|                                                     |                                                   |  
-|                                                     v                                                   |  
-|                                                                                     |  
-|                                                                                                         |  
-+---------------------------------------------------------------------------------------------------------+
+```text
++--------------------------------------------------------------------------------
+| FORM SUBMISSION SAFETY MODEL
++--------------------------------------------------------------------------------
+|
+| [ Draft Form State ]
+|          |
+|          v
+| [ Field Verification ]
+|   required fields | labels | values | masks | validation errors
+|          |
+|          v
+| [ Origin and Frame Verification ]
+|   allowed domain | frame ancestry | HTTPS | tenant/session scope
+|          |
+|          v
+| [ Payload Compilation ]
+|   normalized payload | target endpoint | recipient | amount | file list
+|          |
+|          v
+| [ Duplicate and Idempotency Check ]
+|   action history | idempotency key | prior submissions | warning banners
+|          |
+|          v
+| [ Risk Evaluation ]
+|   low | medium | high | critical
+|          |
+|          +--> low risk
+|          |       submit after verification
+|          |
+|          +--> medium / high / critical
+|                  render payload review
+|                  require approval or out-of-band confirmation
+|                  submit only if payload and approval match
+|          |
+|          v
+| [ Submit Action ]
+|   click | keyboard submit | programmatic form submit if allowed
+|          |
+|          v
+| [ Post-Submit Verification ]
+|   DOM state | network response | app status | backend/API/ledger when available
+|
++--------------------------------------------------------------------------------
+| Rule:
+|   A form submit is complete only when the resulting state is verified.
+|   A success toast is evidence, not proof.
++--------------------------------------------------------------------------------
 ```
 
 To coordinate forms across processing states, the validation engine maps actions to distinct submission stages:
 
-| Submission Stage | Required Verification Controls | Core Processing Algorithm | Expected Verification Signals | Exception Mitigation Protocols |
+| Submission Stage | Required Verification Controls | Core Processing Algorithm | Expected Verification Signals | Exception Mitigation Protocol |
 | :---- | :---- | :---- | :---- | :---- |
-| **1. Draft** | Scans fields to confirm focus and checks input values.5 | Verifies input fields match planned schemas.5 | Initial form containers are attached and visible.5 | Resets inputs if data entry errors are flagged.11 |
-| **2. Ready** | Evaluates required inputs and checks for errors.5 | Verifies all required fields are populated.5 | Form state shows zero validation errors.5 | Populates empty fields and re-evaluates validation states.5 |
-| **3. Confirmation** | Evaluates cost limits and targets.7 | Invokes the Payload Review Pattern for high-risk actions.7 | Signed permission token is generated.24 | Halts and escalates to user for approval.7 |
-| **4. Submitted** | Monitors click events and tracks context navigations.5 | Sends click events to submit buttons.5 | Navigation starts; submit buttons show loading state.5 | Retries click if target elements remain attached.10 |
-| **5. Accepted** | Monitors network responses via WebSocket connections.18 | Extracts HTTP status codes from API endpoints.9 | Network confirms success response (HTTP 200/201).9 | Displays error state if request returns error codes.7 |
-| **6. Successful** | Audits DOM mutations and success toast elements.5 | Scans target elements for success indicators.5 | Success toast is visible; URL path is updated.5 | Fallback to checking database records.7 |
-| **7. Failed** | Scans for inline errors or system alerts.5 | Extracts error text and logs response payloads.5 | Inline error text or modal alert is visible.5 | Invokes specialized recovery playbooks. |
-| **8. Duplicate** | Checks action history logs before submitting. | Compares active payloads against past transactions.7 | Preventative block triggered before click. | Cancels submit and flags transaction as duplicate.7 |
+| **1. Draft** | Confirm active form, labels, focus order, and field editability. | Inspect form structure and bind labels to inputs. | Form container attached, visible, and scoped to expected origin. | Re-observe form or halt if structure diverges. |
+| **2. Field Entry** | Verify field values, masks, dropdown states, checkboxes, and file attachments. | Compare normalized values against planned payload. | Input values match expected values after client-side formatting. | Clear and re-enter values; preserve validation errors. |
+| **3. Ready** | Check required fields, inline errors, disabled submit state, and hidden required controls. | Evaluate DOM, accessibility state, and visible validation text. | Submit control is enabled; validation errors absent. | Resolve missing fields or route to repair. |
+| **4. Payload Review** | Compile target recipient, amount, destination, endpoint, files, terms, and side-effect class. | Hash payload and compare against intended action. | Payload hash matches plan and user-visible summary. | Halt if payload differs from plan. |
+| **5. Duplicate Guard** | Check action history, idempotency key, warning banners, and prior backend state. | Compare active payload to previous submissions. | No duplicate warning; no prior identical terminal transaction unless idempotent. | Cancel or escalate on duplicate risk. |
+| **6. Confirmation** | Apply risk-based approval policy. | Require lightweight, explicit, strict readback, or dual-control confirmation. | Valid approval token bound to payload hash. | Halt if approval missing, expired, or mismatched. |
+| **7. Submitted** | Dispatch submit action through verified target. | Click verified submit control or invoke allowed submit mechanism. | Submit event fires; UI enters loading/pending state. | Do not retry blindly; inspect for no-effect or duplicate state. |
+| **8. Accepted** | Observe request acceptance or application acknowledgment. | Monitor network response, page transition, or server acknowledgment. | HTTP success, accepted status, or pending transaction ID. | Treat accepted as pending, not completed. |
+| **9. Successful** | Verify durable state change. | Check DOM, app-specific state, backend/API/ledger where available. | Success state satisfies expected predicates. | Commit task progress only after verification. |
+| **10. Failed** | Extract inline, modal, network, or server-side error. | Normalize failure into repairable/non-repairable category. | Error text, failed response, validation state, or unchanged backend state. | Repair, replan, or escalate. |
+| **11. Unknown** | Execution result cannot be verified. | Preserve trace, payload hash, and possible submission state. | Timeout, lost connection, ambiguous UI, or unavailable backend. | Block duplicate submit until reconciliation. |
+
+The submit button is not a magic portal to truth. It is a dangerous little rectangle and should be treated accordingly.
 
 ## **Browser Sandboxing, Permissions, and Containment**
 
@@ -368,50 +555,65 @@ When interacting with untrusted websites, the agent's browser runtime must be is
 
 ## **Interface Drift Detection and Recovery**
 
-Interface drift is a primary cause of automation failures, occurring when layout shifts, A/B tests, modal dialogs, or selector changes diverge from the agent's planned expectations.1 The system's central recovery principle is: **When the UI changes, the plan is stale. Re-observe before acting.**
+Interface drift is a primary cause of automation failures. Layout shifts, A/B tests, localization changes, modal dialogs, session expiration, client-side re-rendering, and selector changes can all invalidate a previously valid plan.
 
-```
-+---------------------------------------------------------------------------------------------------------+  
-|                                    INTERFACE DRIFT RECOVERY PROTOCOL                                    |  
-+---------------------------------------------------------------------------------------------------------+  
-|                                                                                                         |  
-|                                                                                                         |  
-|         |                                                                                               |  
-|         v (Stage 1: Classification & Assessment)                                                        |  
-|                                                            |  
-|         |                                                                                               |  
-|         v (Stage 2: Execution Pause)                                                                    |  
-|                                                                  |  
-|         |                                                                                               |  
-|         v (Stage 3: Element Re-Evaluation)                                                              |  
-|                                                           |  
-|         +------- (Target Resolved) --> Resume Action Sequence                                           |  
-|         +------- (Target Ambiguous) --->                                          |  
-|                                                     |                                                   |  
-|                                                     v                                                   |  
-|                                                 [ Visual & Neighborhood Check ]                         |  
-|                                                     +-- (Success) -> Update Locator & Resume            |  
-|                                                     +-- (Fail) ----> Escalate to Human / Halt           |  
-|                                                                                                         |  
-+---------------------------------------------------------------------------------------------------------+
+The central recovery principle is:
+
+**When the UI changes, the plan is stale. Re-observe before acting.**
+
+```text
++--------------------------------------------------------------------------------
+| INTERFACE DRIFT RECOVERY PROTOCOL
++--------------------------------------------------------------------------------
+|
+| [ Planned Next Action ]
+|          |
+|          v
+| [ Pre-Action Verification Fails ]
+|   missing target | ambiguity | occlusion | stale selector | unexpected page
+|          |
+|          v
+| [ Pause Execution ]
+|   stop dispatching input events
+|   preserve current trace and action history
+|          |
+|          v
+| [ Re-Observe Interface State ]
+|   DOM | AX tree | screenshot | URL | focus | network | overlays
+|          |
+|          v
+| [ Classify Drift Variant ]
+|   selector | layout | modal | session | localization | network | A/B
+|          |
+|          v
+| [ Recovery Attempt ]
+|   re-query locator | dismiss overlay | wait | scroll | replan | ask user
+|          |
+|          +--> target resolved and verified
+|          |       update plan and resume
+|          |
+|          +--> target unresolved or unsafe
+|                  halt, escalate, or transfer control
+|
++--------------------------------------------------------------------------------
 ```
 
 To coordinate drift recovery, the system executes a structured Interface Drift Recovery Model:
 
 | Drift Variant | Visual/DOM Root Cause | Detection Diagnostic Signal | First-Line Automated Recovery | Fallback Resolution Channel | Stop Condition Threshold |
 | :---- | :---- | :---- | :---- | :---- | :---- |
-| **1. Stale Selector** | Dynamic class names change or element hierarchies shift after system updates.2 | Locator fails to resolve inside the active DOM tree.5 | Re-queries using accessible names and user-facing roles.10 | Fallback to visual coordinate matching via OCR.1 | Timeout exceeded or 3 failed query attempts.4 |
-| **2. Layout Shift** | Responsive styling or dynamic advertisements reposition elements.1 | Bounding box coordinates change during actionability checks.5 | Pauses action loop and waits for element position to stabilize.1 | Re-calculates element coordinates relative to viewport bounds.1 | Target remains unstable after 2 seconds.5 |
-| **3. A/B Variant** | Page routing or workflow structure changes unexpectedly.3 | URL matches base domain but layout structures diverge.5 | Re-evaluates page elements using visual layout models.17 | Re-plans the task execution path starting from the current page state.4 | Re-planning loops fail to resolve a valid path. |
-| **4. Localization Shift** | Target labels change language based on location or browser settings. | Locators match role structures but text strings are missing.14 | Identifies elements using stable test IDs or ARIA roles.14 | Resolves elements using structural placement and visual positions.17 | Element matching confidence drops below 0.75. |
-| **5. Responsive Hide** | Navigation menus collapse on narrow or mobile viewports. | Selector is present in DOM but hidden from visual viewport.5 | Maximizes browser window size or scrolls target into view.5 | Triggers menu expansion buttons to expose hidden links.5 | Target remains invisible after maximize and scroll.5 |
-| **6. Dynamic Rearrange** | Search results or table rows reorder during task execution. | Target data row positions shift dynamically.4 | Locates target row using unique cell key value strings.17 | Filters the data table to isolate the target row element.14 | Target row is missing from the search space. |
-| **7. Cookie Banner** | Consent dialogs load asynchronously, blocking interactions.1 | Hit-test indicates pointer events will be intercepted by overlay nodes.5 | Scans DOM for close buttons or consent actions.5 | Programmatically dismisses the overlay using direct AXPress commands.16 | Overlay remains visible after 2 dismissal attempts. |
-| **8. Modal Block** | Dialog windows pop up, intercepting viewport controls.1 | DOM z-index analysis confirms modal layer is active.5 | Scans for modal cancel buttons, close icons, or escape keys.5 | Programmatically executes close commands on the modal wrapper. | Modal blocks interactions after 2 dismissal attempts. |
-| **9. Progress Spinner** | Async network requests delay content loading and page updates.1 | Progress indicator elements remain attached to DOM.5 | Suspends action loop; waits for spinner elements to unmount.9 | Polls target element status until actionability checks pass.5 | Spinner remains visible after 15 seconds.5 |
-| **10. Session Expired** | Navigation redirects to login or registration form. | Active session cookies expire or page redirects to login URL.18 | Scans for login selectors and inputs saved credentials.7 | Suspends execution and escalates to user for manual login.7 | Redirect loops repeatedly to the login form. |
-| **11. Input Mask Shift** | JavaScript formatting masks dynamically update typed values.5 | Value verification finds mismatch after typing actions.5 | Clears field, resets cursor position, and types slowly.1 | Submits raw unmasked strings directly to input properties.11 | Values diverge after 2 typing attempts. |
-| **12. Multi-Label Match** | Multiple identical buttons appear in layout containers.6 | Locator query returns more than 1 matching node.14 | Filters targets using parent container scopes.6 | Selects the target element based on spatial proximity.1 | Ambiguity remains after applying filters.14 |
+| **1. Stale Selector** | Dynamic class names or element hierarchy changed. | Locator fails to resolve in active DOM. | Re-query using accessible role/name and test IDs. | Visual coordinate matching with OCR/neighborhood check. | Timeout or 3 failed query attempts. |
+| **2. Layout Shift** | Responsive styling, ads, lazy loading, or animation moves target. | Bounding box changes during actionability checks. | Wait for element position to stabilize. | Recalculate viewport-relative coordinates. | Target remains unstable after 2 seconds. |
+| **3. A/B Variant** | Workflow structure or route changes unexpectedly. | URL is plausible but page structure diverges. | Re-evaluate visible workflow elements. | Replan from current state. | Replanning loop fails. |
+| **4. Localization Shift** | Labels change language or copy. | Role structure exists but expected text missing. | Use test IDs, roles, and layout relations. | Resolve by structural placement and visual text. | Confidence below threshold. |
+| **5. Responsive Hide** | Menus collapse on narrow/mobile viewport. | Element exists but is hidden/offscreen. | Resize, scroll, or open menu container. | Switch to mobile-specific workflow. | Target remains invisible. |
+| **6. Dynamic Rearrange** | Search/table rows reorder during execution. | Row coordinates shift or unique key moves. | Locate row by stable cell key. | Filter/search table to isolate target row. | Target key missing. |
+| **7. Cookie Banner** | Consent overlay blocks interaction. | Hit-test returns overlay element. | Find and dismiss allowed banner control. | Ask user or apply site policy. | Overlay persists after attempts. |
+| **8. Modal Block** | Dialog intercepts viewport controls. | Active modal layer or z-index overlay. | Close/cancel if safe; otherwise ask user. | Escalate if modal is security/payment/permission related. | Modal remains or action risk rises. |
+| **9. Progress Spinner** | Async requests delay content. | Spinner or loading state remains active. | Wait using readiness policy. | Refresh or re-observe after timeout. | Spinner exceeds timeout. |
+| **10. Session Expired** | Redirect to login or auth page. | URL/cookies indicate auth failure. | Use approved credential broker or ask user. | Suspend workflow. | Login loops or MFA required. |
+| **11. Input Mask Shift** | JS formats typed values. | Value verification mismatch. | Clear and retype using slower path or direct value set if safe. | Ask user or use alternate input mode. | Diverges after retries. |
+| **12. Multi-Label Match** | Multiple identical controls. | Locator returns multiple nodes. | Scope by parent container and nearby labels. | Human review or visual selection. | Ambiguity remains after filters. |
 
 ## **UI Recovery Playbook Library**
 
@@ -443,174 +645,277 @@ The UI Recovery Playbook Library provides developers with predefined, determinis
 
 ## **UI Prompt Injection and Interface Instruction Collision**
 
-UI agents read dynamic, untrusted page content, including comments, ads, and user-generated text.40 This introduces a critical vulnerability: indirect prompt injection (IDPI), where attackers embed malicious instructions in web pages to hijack the agent's prompt context.40
+UI agents read dynamic, untrusted page content: comments, ads, help text, documents, emails, chat messages, form labels, OCR text, hidden DOM nodes, and user-generated content. This creates a critical vulnerability: indirect prompt injection, where attacker-controlled interface content attempts to override the agent’s instructions, exfiltrate data, or trigger unauthorized actions.
 
-```
-+---------------------------------------------------------------------------------------------------------+  
-|                                    INDIRECT PROMPT INJECTION LIFECYCLE                                  |  
-+---------------------------------------------------------------------------------------------------------+  
-|                                                                                                         |  
-|                                                                                                         |  
-|         |                                                                                               |  
-|         v (Stage 1: Delivery & Pre-processing)                                                          |  
-|                |  
-|         |                                                                                               |  
-|         v (Stage 2: Parsing & Serialization)                                                            |  
-|   [ Visual concealment (zero-sizing, hidden divs) stripped; raw text is serialized ]                    |  
-|         |                                                                                               |  
-|         v (Stage 3: Context Concatenation)                                                              |  
-|   [ Untrusted page text is combined with developer system prompts ]                                     |  
-|         |                                                                                               |  
-|         v (Stage 4: Execution Override)                                                                 |  
-|   [ LLM misinterprets data text as system-level instructions ]                                          |  
-|         +------- (Exploit Prevented) --> Target processes as clean text                                 |  
-|         +------- (Exploit Succeeds) ---> Compromised tool use, data exfiltration, or leaks              |  
-|                                                                                                         |  
-+---------------------------------------------------------------------------------------------------------+
+The core security rule is:
+
+**Page content is evidence, not authority.**
+
+```text
++--------------------------------------------------------------------------------
+| INDIRECT PROMPT INJECTION LIFECYCLE
++--------------------------------------------------------------------------------
+|
+| [ Attacker-Controlled UI Content ]
+|   visible text | hidden DOM | comments | SVG | ads | documents | OCR text
+|          |
+|          v
+| [ Extraction / Serialization ]
+|   DOM text | accessibility tree | OCR | screenshot captions | page summary
+|          |
+|          v
+| [ Context Assembly Risk ]
+|   untrusted data placed near instructions or tool descriptions
+|          |
+|          v
+| [ Instruction Collision ]
+|   model may confuse page text with developer/system authority
+|          |
+|          +--> unsafe design
+|          |       tool misuse | data exfiltration | credential leak | unauthorized action
+|          |
+|          +--> safe design
+|                  data is delimited, sanitized, policy-gated,
+|                  and blocked from granting tool authority
+|
++--------------------------------------------------------------------------------
+| Invariant:
+|   Untrusted UI text can describe the world.
+|   It cannot grant permissions, redefine goals, or authorize tools.
++--------------------------------------------------------------------------------
 ```
 
-To secure the agent's prompt boundary, developers must analyze the typical delivery vectors used in injection attacks:
+Attack delivery vectors:
 
 | Attack Delivery Vector | Programmatic Concealment Method | Parser Extraction Vulnerability | Core System Security Guard |
 | :---- | :---- | :---- | :---- |
-| **1. Zero-Sizing** | Hiding text elements by setting font-size: 0px and line-height: 0 inside container styles.40 | Text extractors capture hidden strings; vision encoders miss the tiny characters.40 | Pre-processing parsers must strip elements with computed height or width of zero.5 |
-| **2. CSS Hidden Divs** | Hiding elements from rendering using styles like display: none or visibility: hidden.40 | Heuristic parsers extract raw text from the DOM; visual checks fail to identify the hidden elements.42 | Ensure pre-flight parsers evaluate computed styles and filter hidden elements.5 |
-| **3. HTML Comments** | Placing malicious payloads inside standard HTML comments (``).40 | Comment tags are parsed into text strings; models ingest comments as instruction contexts.42 | Strip all HTML comments from the DOM tree before serializing text inputs.42 |
-| **4. SVG CDATA** | Encapsulating malicious instructions inside character data (CDATA) blocks in SVG images.40 | OCR engines extract instructions; security scanners miss the embedded code.40 | Sanitize SVG inputs and block OCR text extraction over untrusted vector images.40 |
-| **5. Semantic Blend** | Weaving malicious instructions directly into legitimate page text or help articles.42 | Models cannot distinguish between page content to process and instructions to follow.42 | Enforce strict role isolation, wrapping data inside untrusted text markers.7 |
-| **6. Multilingual Override** | Repeating malicious instructions across multiple languages to bypass single-language filters.40 | Simple string matchers fail on alternative languages; models process instructions normally.40 | Enforce language identification filters and use multilingual model guardians. |
-| **7. XML/JSON Breaks** | Injecting syntax characters (e.g., }}, </untrusted-data>) to break out of data blocks.40 | Models parse injected characters as structural breaks, exposing system prompts to hijack.40 | Escape and sanitize all syntax characters before serializing content.7 |
+| **1. Zero-Sizing** | Text hidden with `font-size: 0`, zero width/height, or offscreen positioning. | DOM extractors capture hidden strings; visual models miss them. | Filter by computed visibility, size, viewport intersection, and role relevance. |
+| **2. CSS Hidden Divs** | `display: none`, `visibility: hidden`, opacity, clipping, or transform tricks. | Raw DOM serialization may include invisible instructions. | Exclude non-visible content unless specifically requested as code/data evidence. |
+| **3. HTML Comments** | Payload placed inside `<!-- malicious instruction -->`. | Naive HTML-to-text pipelines may serialize comments. | Strip comments before model context unless auditing source markup. |
+| **4. SVG / XML / CDATA** | Payload embedded inside SVG, XML metadata, or CDATA. | OCR or XML parsers may extract instructions without provenance. | Sanitize vector assets and mark extracted text as untrusted data. |
+| **5. Semantic Blend** | Malicious instruction woven into normal page copy. | Model cannot separate content from authority by text alone. | Role separation, data delimiters, and tool-policy enforcement outside the model. |
+| **6. Multilingual Override** | Same instruction repeated across languages. | Single-language filters miss alternate phrasing. | Multilingual classification and invariant policy enforcement. |
+| **7. Serialization Breakout** | Payload contains strings such as `</untrusted-data>` or JSON/XML delimiters. | Context wrapper can be broken if text is not escaped. | Escape delimiters and serialize untrusted content as data, never raw control markup. |
+| **8. Visual Prompt Injection** | Instructions rendered in image, screenshot, ad, or document. | OCR text enters prompt as if it were user/developer instruction. | Treat OCR output as evidence with source label and zero authority. |
 
 ### **Principles of System-Data Separation**
 
-To prevent indirect prompt injections from hijacking agent execution, pipelines must treat page content as untrusted evidence rather than executive authority 7:
+| Control | Purpose |
+| :--- | :--- |
+| **Role Separation** | System/developer instructions, user goals, page content, and tool results must remain distinct channels. |
+| **Delimited Evidence Blocks** | Untrusted UI content should be wrapped as data with source labels and escaped syntax. |
+| **Capability Sandboxing** | A read-only browsing task should not possess write, email, filesystem, or payment tools. |
+| **Policy Enforcement Outside the Model** | Tool permissions, egress controls, credential access, and filesystem access must be enforced by runtime policy. |
+| **Computed Visibility Filtering** | Hidden page text should not silently become instruction context. |
+| **Source-Aware Summarization** | Summaries should retain whether content came from page text, OCR, metadata, or user instruction. |
+| **Action Gating** | Page content cannot authorize actions; only user/system policy and verified approvals can. |
+| **Injection Telemetry** | Suspected prompt injection payloads should be logged with source region and blocked capability path. |
 
-* **System Dominance Training**: Models must be explicitly fine-tuned to prioritize system prompts and developer policies over instructions found in page data.48  
-* **Delimited Data Contexts**: Untrusted page content must be wrapped in strict XML or markdown delimiters (e.g., <untrusted-web-data>) with system instructions stating that the enclosed text is data to be processed, not commands to be followed.7  
-* **Capability Sandboxing**: Security must be enforced at the API and sandbox layers, not through text filtering.7 If an agent is summarized as a read-only scraper, it must not possess the system credentials or tools needed to write data, send emails, or execute transactions.7
+A model trained to “ignore malicious instructions” is helpful. It is not a security boundary. Runtime authority boundaries are the boundary. The model is the intern with a clipboard; the sandbox is the locked door.
 
 ## **Deceptive Interface Risk Model**
 
-UI agents can be tricked by deceptive design patterns, phishing pages, lookalike domains, and visual spoofing designed to manipulate browser and desktop operations.47
+UI agents can be tricked by deceptive design patterns, phishing pages, lookalike domains, fake browser chrome, clickjacking layers, hidden costs, and visual spoofing. A state-verifying UI agent must distinguish between genuine platform state and webpage-rendered imitation.
 
-```
-+-----------------------------------------------------------------------------------------+  
-|                                DECEPTIVE INTERFACE MODEL                                |  
-+-----------------------------------------------------------------------------------------+  
-|                                                                                         |  
-|                                                                                         |  
-|         |                                                                               |  
-|         v (Security Gate 1: DNS & SSL Origin Check)                                     |  
-|   [ Verifies domains and audits network endpoints; blocks unauthorized redirects ]      |  
-|         |                                                                               |  
-|         v (Security Gate 2: Semantic-Visual Validation)                                 |  
-|                   |  
-|         |                                                                               |  
-|         v (Security Gate 3: Interactive Verification)                                    |  
-|   [ Probes targets for pointer focus and checks visibility for clickjacking traps ]     |  
-|         |                                                                               |  
-|         v (Security Gate 4: Execution Enforcement)                                      |  
-|   [ Limits action capabilities; requests human approval for critical steps ]            |  
-|                                                                                         |  
-+-----------------------------------------------------------------------------------------+
+```text
++--------------------------------------------------------------------------------
+| DECEPTIVE INTERFACE RISK MODEL
++--------------------------------------------------------------------------------
+|
+| [ Candidate Interface Action ]
+|          |
+|          v
+| [ Origin and Transport Verification ]
+|   URL | scheme | certificate | frame ancestry | redirect chain
+|          |
+|          v
+| [ Native-vs-Web Prompt Classification ]
+|   browser/OS dialog or webpage imitation?
+|          |
+|          v
+| [ Semantic-Visual Consistency Check ]
+|   DOM role | AX role | screenshot | hit-test | visible labels
+|          |
+|          v
+| [ Interaction Safety Check ]
+|   occlusion | clickjacking | hidden charges | prechecked options
+|          |
+|          v
+| [ Execution Policy ]
+|   allow | require confirmation | block | escalate
+|
++--------------------------------------------------------------------------------
 ```
 
 To secure agents against deceptive designs, developers must implement a multi-layered verification model:
 
 | Threat Category | Spoofing Mechanism | Primary Detection Method | Core System Mitigation |
 | :---- | :---- | :---- | :---- |
-| **Phishing Pages** | Lookalike login screens designed to steal credentials.47 | Matches active context URLs against domain whitelists and SSL certificate registries.7 | Blocks credential autofill on unverified or third-party domains.24 |
-| **Clickjacking** | Transparent elements overlaid on legitimate buttons to intercept clicks.36 | Evaluates element visibility and checks hit targets during pre-action verification.5 | Rejects clicks on elements obscured by overlapping layers.5 |
-| **Hidden Costs** | Pre-checked optional charges or terms hidden behind small visual fonts.40 | Scans the DOM for hidden check state properties (aria-checked="true").5 | Unchecks options by default and flags unannounced changes to users.7 |
-| **Spoofed Prompts** | Webpages rendering fake OS alerts or browser security warnings.50 | Checks active elements against the browser's native window handles.37 | Ignores dialogs rendered inside web context wrappers.37 |
-| **Malicious Downloads** | Automated drive-by file downloads initiated upon page load.36 | Monitors browser context download events via WebSocket APIs.18 | Configures sandboxes to block download executions by default.34 |
+| **Phishing Pages** | Lookalike login screens steal credentials. | Verify active URL, domain allowlist, certificate, frame ancestry, and redirect chain. | Block credential broker on unverified origins. |
+| **Clickjacking** | Transparent overlays intercept legitimate clicks. | Hit-test target coordinates and compare event receiver with intended target. | Reject clicks when another element receives pointer events. |
+| **Hidden Costs** | Prechecked options, fees, or terms are visually minimized. | Scan form state, checkboxes, fine print, totals, and changed values. | Surface payload review and require approval for cost changes. |
+| **Spoofed Native Prompts** | Webpage imitates OS/browser dialogs or security warnings. | Compare active dialog to native window handles / browser prompt APIs. | Ignore webpage-rendered fake system prompts; route real native prompts through permission policy. |
+| **Malicious Downloads** | Drive-by file downloads or disguised executable files. | Monitor browser download events and file metadata. | Restrict downloads to sandbox; block execution and unsafe extensions. |
+| **Credential Harvest Forms** | Page asks for passwords, tokens, MFA codes, or API keys outside approved flow. | Compare form origin and field purpose to credential policy. | Use credential broker only on allowlisted domains and workflows. |
+| **Domain Confusion** | Unicode/homograph, typo-squat, or embedded third-party frame. | Normalize domain, inspect eTLD+1, detect punycode and frame origin mismatch. | Block or require explicit user confirmation. |
+| **Visual Misdirection** | Buttons or labels visually imply one action while DOM submits another. | Compare visible text, form action, network endpoint, and click target. | Halt on mismatch and require review. |
+| **Dark Pattern Confirmation** | UI nudges agent into unwanted add-ons, subscriptions, or consent. | Detect prechecked options, hidden recurring terms, and opt-out language. | Default to conservative choices and present user review. |
+
+The agent should never enter credentials, approve payments, accept terms, download files, or submit forms on a page whose origin, prompt type, and payload semantics have not been verified.
 
 ## **UI Agent Evaluation and Observability Guidance**
 
-Evaluating and debugging UI agents is challenging because interactions are highly dynamic and non-deterministic.2 Standard task-completion metrics are insufficient; comprehensive evaluation requires tracking detailed telemetry across perception, targeting, execution, and safety domains.1
+Evaluating and debugging UI agents is difficult because interfaces are dynamic, nondeterministic, and partially observable. Task success rate alone is insufficient. A system can complete a task while misclicking, leaking credentials, relying on brittle selectors, ignoring prompt injection, or failing to verify the final state.
 
-```
-+-----------------------------------------------------------------------------------------+  
-|                                UI OBSERVABILITY ARCHITECTURE                            |  
-+-----------------------------------------------------------------------------------------+  
-|                                                                                         |  
-|                                                                                         |  
-|         |                                                                               |  
-|         +------------------> [ Automated Metrics Evaluator ]                            |  
-|         |                          +-- Task Success Rate (TSR)                    |  
-|         |                          +-- Click Precision Rate                      |  
-|         |                          +-- Locator Resolution Failures               |  
-|         |                                                                               |  
-|         +------------------>                               |  
-|         |                          +-- Base URL, HTML snapshots & screenshots     |  
-|         |                          +-- Bounded plan schema parameters            |  
-|         |                          +-- Visual pointer coordinates                 |  
-|         |                                                                               |  
-|         +------------------>                                        |  
-|                                    +-- Chronological slide deck rendering               |  
-|                                    +-- Network intercept HAR logs                |  
-|                                    +-- Integrity check verification              |  
-|                                                                                         |  
-+-----------------------------------------------------------------------------------------+
+Production observability must track perception, targeting, execution, verification, safety, recovery, and replay.
+
+```text
++--------------------------------------------------------------------------------
+| UI AGENT OBSERVABILITY ARCHITECTURE
++--------------------------------------------------------------------------------
+|
+| [ Agent Run Trace ]
+|          |
+|          +--> [ Perception Artifacts ]
+|          |      screenshots | DOM snapshots | AX tree | OCR boxes | focus state
+|          |
+|          +--> [ Targeting Artifacts ]
+|          |      locator attempts | bounding boxes | hit-test results | ambiguity
+|          |
+|          +--> [ Execution Artifacts ]
+|          |      clicks | typing | navigation | uploads | downloads | shortcuts
+|          |
+|          +--> [ Verification Artifacts ]
+|          |      post-action DOM | visual diff | network result | app state | backend check
+|          |
+|          +--> [ Safety Artifacts ]
+|          |      sandbox blocks | egress blocks | prompt-injection detections | approvals
+|          |
+|          +--> [ Replay Package ]
+|                 ordered snapshots | action records | timing | browser profile | artifacts
+|
++--------------------------------------------------------------------------------
+| Invariant:
+|   A UI-agent trace should let an auditor replay what the agent saw,
+|   what it targeted, what it did, and how it knew the action worked.
++--------------------------------------------------------------------------------
 ```
 
-To support systematic audits and regression tests, developers must implement eighteen observability metrics:
+Metrics:
 
 | Metric Category | Technical Metric Identifier | Diagnostic Target | Standard Production Target |
 | :---- | :---- | :---- | :---- |
-| **Perception** | Character Error Rate (CER) | General phonetic text extraction accuracy over dynamic fonts.17 | < 1.5% CER on prioritized text views. |
-|  | Bounding Box IoU Accuracy 17 | Precision of spatial element localization and grounding.1 | IoU >= 0.85 on target controls.17 |
-|  | Context Volume Reduction | Optimization of visual tokens passed to the generator. | > 50% reduction in token consumption.17 |
-|  | DOM-Screenshot Agreement | Matches DOM-extracted inputs against visual views. | > 98% agreement on visible text nodes.17 |
-| **Targeting** | Grounding Hit Rate | Accuracy of finding targets using semantic locators.10 | > 95% target resolution rate.14 |
-|  | Selector Timeout Frequency | Frequency of locator resolution timeouts.5 | < 2% of active execution steps.5 |
-|  | Locator Resolution Delta | Latency added during selector re-querying steps.10 | < 15ms overhead per re-query.4 |
-| **Execution** | Step Success Rate (SSR) | Percentage of interface actions completed without errors. | > 98% per individual workflow step. |
-|  | Click Precision Rate | Percentage of clicks that land on valid hit targets.5 | < 0.1% misclick rate in active viewports. |
-|  | Type Fidelity Rate | Percentage of inputs where values match target strings.5 | 100% value matching accuracy.5 |
-|  | Pre-Action Check Failures | Percentage of actions blocked by pre-action checks.5 | < 5% of planned system steps.5 |
-| **Verification** | State-Transition Match Rate | Matches post-action states against plans.5 | > 95% transition agreement.5 |
-|  | Focus Verification Rate | Confirms field focus before sending typing actions.5 | 100% of interactive typing steps.5 |
-|  | Form Submission Error Rate | Frequency of validation errors triggered by submits.5 | < 1% of active submit attempts.7 |
-| **Safety** | Sandbox Isolation Violations | Attempts to access forbidden local files or settings.34 | Zero sandbox violations.34 |
-|  | Egress Policy Blocks | Attempts to access unapproved domains.34 | Zero egress policy blocks.34 |
-|  | Credential Access Violations | Attempts to extract secrets from password forms.7 | Zero credential access violations.7 |
-| **Telemetry** | Average Task Duration | Time taken to complete a user task. | < 45s across multi-step flows. |
+| **Perception** | UI OCR Character Error Rate | Accuracy of text extraction from rendered interfaces. | Task-specific threshold; lower for financial/legal fields. |
+| **Perception** | Bounding Box IoU Accuracy | Precision of spatial element localization and grounding. | IoU >= 0.85 on target controls. |
+| **Perception** | DOM-Screenshot Agreement | Agreement between DOM-visible text and rendered screenshot text. | > 98% on visible text nodes in controlled apps. |
+| **Perception** | Accessibility Coverage Rate | Fraction of actionable controls with usable roles and names. | High for controlled apps; alert on regression. |
+| **Targeting** | Grounding Hit Rate | Accuracy of selecting intended UI targets. | > 95% target resolution rate. |
+| **Targeting** | Locator Resolution Failure Rate | Frequency of failed or ambiguous locator resolution. | < 2% of active execution steps where locators are expected. |
+| **Targeting** | Locator Resolution Latency | Overhead from dynamic re-querying. | Kept within step latency budget. |
+| **Targeting** | Occlusion Block Rate | Actions blocked because target is covered. | Nonzero is acceptable; spikes indicate UI drift or modal issues. |
+| **Execution** | Step Success Rate | Percentage of interface actions completed without recovery. | > 98% per individual workflow step in stable apps. |
+| **Execution** | Misclick Rate | Clicks whose event receiver differs from intended target. | Near zero. |
+| **Execution** | Type Fidelity Rate | Inputs where final field values match expected strings. | 100% for controlled strings. |
+| **Execution** | Action Retry Rate | Frequency of retries per action type. | Low and bounded; alert on loops. |
+| **Verification** | State-Transition Match Rate | Post-action state satisfies expected predicates. | > 95%, task dependent. |
+| **Verification** | Focus Verification Rate | Field focus confirmed before typing. | 100% of typing steps. |
+| **Verification** | Form Submission Verification Rate | Submitted forms verified through UI/network/backend signal. | 100% for high-impact submits. |
+| **Verification** | Unknown-State Rate | Actions where result could not be verified. | Must be low; high-impact unknown states require escalation. |
+| **Safety** | Sandbox Isolation Violation Attempts | Attempts to access forbidden host resources. | Zero successful violations; attempted blocks should be investigated. |
+| **Safety** | Egress Policy Block Count | Attempts to access unapproved domains. | Blocks may indicate controls working; alert on unexpected spikes. |
+| **Safety** | Credential Exposure Events | Secrets exposed to model context, logs, screenshots, or page text. | Zero. |
+| **Safety** | Prompt Injection Detection Rate | Suspected page instruction attacks. | Tracked; spikes trigger source review. |
+| **Recovery** | Drift Recovery Success Rate | Automated recovery from layout, selector, or modal drift. | High on known apps; bounded attempts. |
+| **Recovery** | Human Escalation Rate | Runs requiring user/operator intervention. | Context dependent; spikes indicate automation fragility. |
+| **Replay** | Trace Completeness Rate | Runs with screenshots, DOM/AX state, action records, and verification artifacts. | 100% for production actions. |
+| **Replay** | Deterministic Replay Success | Ability to reconstruct action sequence from stored artifacts. | Required for regulated or high-impact workflows. |
+| **Telemetry** | Average Task Duration | End-to-end time to complete workflow. | Task-specific; monitor regressions. |
+
+Evaluation harnesses should include:
+
+| Test Class | Purpose |
+| :--- | :--- |
+| **Locator Drift Tests** | Verify target selection under class/name/layout changes. |
+| **Occlusion Tests** | Confirm the agent blocks clicks under overlays. |
+| **Re-render Race Tests** | Verify stale references are re-queried before dispatch. |
+| **Prompt Injection Tests** | Ensure page content cannot grant tool authority. |
+| **Sandbox Escape Tests** | Confirm filesystem, clipboard, credential, and egress boundaries. |
+| **Form Submit Tests** | Validate duplicate prevention, confirmation, and post-submit verification. |
+| **Replay Tests** | Confirm traces reconstruct perception, action, and verification. |
 
 ## **Cross-Canon Handoff Map**
 
-The systems architecture of AI-ENG-R integrates with adjacent disciplines across the AI Engineering Systems Canon. This mapping defines the structural dependencies and operational handoff boundaries:
+The systems architecture of AI-ENG-R integrates with adjacent disciplines across the AI Engineering Systems Canon. Its durable handoff is verified interface state: what the agent saw, what it targeted, what it did, what changed, what failed, and what evidence proves the UI transition.
 
 | Target Canon Report | Domain Area | Technical Handoff Parameters | Engineering Integration Rules |
 | :---- | :---- | :---- | :---- |
-| **AI-ENG-B** | Context-Tenure & State | Session token timeouts and cache profiles.18 | Enforces memory-clearing rules, wipes browser cookies, and clears local caches upon task completion.34 |
-| **AI-ENG-C** | Latency-Margin Management | Execution time limits and budgets. | Coordinates dynamic step delays with active network and frame stability metrics.1 |
-| **AI-ENG-L** | Serving Mechanics | Bidirectional serving backpressure | Terminate WebRTC packets at dynamic transceiver edge proxy containers.41 |
-| **AI-ENG-M** | Autonomy Boundaries | Timeout parameters and limits.34 | Enforces retry budgets, restricts action loops, and triggers manual escalations on errors.4 |
-| **AI-ENG-N** | Tool Contracts | API schemas and parameter controls. | Matches dispatched browser commands against validated execution schemas.5 |
-| **AI-ENG-O** | Action Verification | Transition verification logs.5 | Ensures post-action interface states are verified before executing subsequent steps.5 |
-| **AI-ENG-P** | Multimodal Understanding | Coordinate coordinates and crops.17 | Integrates visual segmentation and OCR engines for fallback coordinate matching.1 |
-| **AI-ENG-Q** | Real-Time Interaction | Stream processing and inputs.52 | Manages input throttling and coordinate scaling for voice-driven browser contexts.52 |
-| **AI-ENG-S** | Production Pathologies | Telemetry and crash logs.22 | Monitors and logs layout drift, unmounting errors, and browser process crashes.10 |
-| **AI-ENG-T** | Prompt Security | Content filters and bounds.7 | Implements input sanitization and context limits to block indirect prompt injections.7 |
-| **AI-ENG-U** | Dependency Risk | Sandboxing and isolation limits.34 | Hardens sandbox containers and isolates local directories to prevent resource leaks.34 |
-| **AI-ENG-V** | Resource Protection | Request tracking and blocks.34 | Prevents request abuse, blocks recursive navigations, and limits action volumes.34 |
-| **AI-ENG-W** | Fallback Operations | Fallback triggers and playbooks.4 | Activates visual coordinate matching when DOM engines fail.1 |
-| **AI-ENG-X** | User Trust | Visual status indicators.17 | Renders real-time action steps and bounding boxes to keep users informed.6 |
-| **AI-ENG-Y** | Human Review | Escalation queues and context transfer. | Suspends execution and transfers session context to users on verification failures.7 |
-| **AI-ENG-Z** | Telemetry | Telemetry schemas and formats.43 | Formats and exports trace logs and session metrics using standardized telemetry schemas.43 |
-| **AI-ENG-AA** | Evaluation | Automation test suites and metrics. | Runs automated regression tests against standard evaluation benchmarks (e.g., WebArena).41 |
-| **AI-ENG-AB** | Replay & Debugging | Signed traces and replays.17 | Stores signed, timestamped session records to support offline audits and debugger replays.17 |
-| **AI-ENG-AC** | Incident Response | Sandbox quarantine protocols.44 | Isolates and quarantines compromised container hosts and revokes active session credentials.34 |
-| **AI-ENG-AJ** | Reference Blueprint | Production layouts and diagrams. | Integrates remote browser isolation hosts and containerized desktop clusters.34 |
+| **AI-ENG-B** | Context Tenure & State Governance | UI snapshots, browser profile state, cookies, local storage, action history. | Enforce retention, redaction, and cleanup rules for session artifacts and browser state. |
+| **AI-ENG-C** | Cost, Latency & Margin Management | Step timeouts, rendering latency, locator retries, browser/session costs. | Coordinate action budgets with network readiness, rendering stability, and recovery loops. |
+| **AI-ENG-L** | Serving Architecture | Stateful browser/desktop sessions, remote browser pools, backpressure controls. | Coordinate browser and desktop sessions with low-latency serving pools, queues, and capacity limits. |
+| **AI-ENG-M** | Agentic Orchestration | UI action loops, stop states, retry budgets, escalation states. | Enforce bounded action sequences and terminate loops on repeated drift or ambiguity. |
+| **AI-ENG-N** | Tool Contracts | Browser/desktop action schemas, dispatch payloads, side-effect class. | Treat UI actions as tool contracts with validation, authorization, idempotency, and traceability. |
+| **AI-ENG-O** | Action Verification | Post-action UI state, backend/API verification, unknown-state handling. | Dispatch is not completion; state transition verification gates subsequent actions. |
+| **AI-ENG-P** | Multimodal Understanding | UI element coordinates, screenshots, crops, OCR regions, visual grounding. | Use visual segmentation and OCR for fallback targeting and evidence citation. |
+| **AI-ENG-Q** | Speech and Realtime Interaction | Voice-driven UI commands, spoken confirmations, transcript-to-target mapping. | Bind voice-derived actions to finalized transcript, UI target verification, and confirmation policy. |
+| **AI-ENG-S** | Production Pathologies | Layout drift, stale selectors, browser crashes, prompt injection, recovery loops. | Monitor UI-specific failure modes and route recurring issues to incident/problem management. |
+| **AI-ENG-T** | Prompt Injection and Trust Boundaries | Untrusted page text, hidden DOM, OCR instructions, data/authority separation. | Treat UI content as evidence, not instructions; enforce tool authority outside the model. |
+| **AI-ENG-U** | Dependency Risk | Browser engines, automation protocols, OCR/VLM parsers, accessibility bridges. | Track protocol compatibility, parser drift, and sandbox dependency health. |
+| **AI-ENG-V** | Resource Protection | Navigation loops, download abuse, egress blocks, sandbox violations. | Limit action volumes, domain access, file access, downloads, and recursive browsing. |
+| **AI-ENG-W** | Fallback and Degraded Modes | DOM failure, visual fallback, human handoff, read-only degraded mode. | Activate visual coordinate matching, text-only fallback, or manual control when UI perception degrades. |
+| **AI-ENG-X** | User Trust and Control | Action preview, visible target boxes, confirmation cards, progress display. | Let users inspect, approve, interrupt, and understand interface actions. |
+| **AI-ENG-Y** | Human Review | Escalation packets, screenshots, target candidates, ambiguity records. | Transfer session context to users/operators on unresolved targeting or high-risk confirmation. |
+| **AI-ENG-Z** | Telemetry and Metrics | UI traces, action spans, screenshots, DOM/AX snapshots, verification results. | Export standardized telemetry for perception, targeting, execution, verification, safety, and replay. |
+| **AI-ENG-AA** | Evaluation | UI task benchmarks, drift tests, sandbox tests, injection tests. | Evaluate agents against web, desktop, visual targeting, and safety regression suites. |
+| **AI-ENG-AB** | Audit and Replay | Signed traces, screenshots, DOM/AX snapshots, action records, verification artifacts. | Store replayable UI sessions for debugging, audits, and incident review. |
+| **AI-ENG-AC** | Incident Response | Sandbox quarantine, credential exposure, malicious downloads, unsafe submits. | Isolate compromised sessions, revoke credentials, preserve evidence, and trigger UI-agent incident playbooks. |
+| **AI-ENG-AD** | Governance, Policy, Compliance & Accountability | Approval rules, credential-use policy, data retention, regulated UI workflows. | Govern high-impact UI actions, credential handling, audit obligations, and accountability boundaries. |
+| **AI-ENG-AJ** | Reference Architecture | Remote browser isolation, desktop sandbox clusters, UI state model, recovery library. | Provide implementation blueprints for production UI-agent platforms. |
+
+The durable handoff is this:
+
+```text
+AI-ENG-R exports verified interface action state:
+observed UI, selected target, dispatched action, resulting transition,
+verification evidence, recovery path, and replay artifacts.
+```
 
 ## **Durable Principles of UI Agents**
 
-1. **Interfaces are State Machines**: A user interface is a partially observable, drift-prone state machine. Interaction events (clicks, inputs, submissions) are hypotheses that must be visually, semantically, and structurally verified against resulting state transitions before execution can proceed.4  
-2. **Dynamic Locators are Mandatory**: Storing raw, static element references causes automation failures during client-side rendering.10 To prevent race conditions, agents must use dynamic locators that re-query and resolve target elements immediately before event dispatch.10  
-3. **Plausible Visuals Lack Structure**: Vision models can analyze global trends but struggle to extract small characters, read overlapping labels, or resolve semantic focus. Robust agents must combine visual analysis with semantic accessibility tree traversal to ensure accurate targeting.1  
-4. **Data is Evidence, Not Authority**: Untrusted page content, ads, and comments represent data context, not commands.7 Executing actions based on unverified content introduces prompt injection vulnerabilities. Security boundaries must be enforced at the API, credential, and sandbox layers.7  
-5. **Containment by Default**: UI agents must operate within disposable virtual environments, isolated framebuffers, and restricted networks.4 No agent should have ambient access to the developer's default browser profile, corporate filesystem, or host credentials.16
+1. **Interfaces are State Machines**  
+   A user interface is a partially observable, drift-prone state machine. Clicks, typing, uploads, downloads, and submits are hypotheses that must be verified against resulting visual, semantic, structural, application, or backend state before execution can proceed.
+
+2. **Dispatch Is Not Completion**  
+   A click event, keyboard event, or navigation request is not task progress by itself. Progress is established only when the expected interface transition has been verified.
+
+3. **Dynamic Locators Are Mandatory**  
+   Static element references stale under client-side rendering. Agents must re-query dynamic locators immediately before dispatch and verify actionability at the moment of execution.
+
+4. **Semantic Targets Beat Coordinates Until They Don’t**  
+   Roles, names, labels, test IDs, and accessibility structures should be preferred over raw coordinates. Coordinates remain necessary for canvas, remote desktop, screenshots, and visual fallback, but they require stricter verification.
+
+5. **Visual State and Structural State Must Reconcile**  
+   DOM truth, accessibility truth, and screenshot truth can diverge. Robust UI agents fuse all available channels and halt when the target is ambiguous, hidden, occluded, stale, or visually inconsistent.
+
+6. **Forms Are Tool-Like Mutation Boundaries**  
+   Form submissions can send money, messages, files, credentials, legal approvals, or irreversible account changes. They require payload review, duplicate prevention, approval policy, and post-submit verification proportional to risk.
+
+7. **Untrusted UI Text Is Data, Not Authority**  
+   Page content, comments, ads, OCR text, emails, documents, and hidden DOM nodes may contain hostile instructions. They can inform the task, but they cannot redefine policy, grant permissions, or authorize tools.
+
+8. **Containment Is the Default Runtime Posture**  
+   UI agents should run in disposable, isolated browser or desktop environments with restricted filesystem, clipboard, credential, permission, and network access. No agent should inherit the user’s ambient host authority.
+
+9. **Recovery Must Be Bounded**  
+   Interface drift, missing elements, modals, and stale selectors should trigger deterministic recovery playbooks with attempt limits. Infinite “try another click” loops are not resilience. They are chaos in a trench coat.
+
+10. **High-Risk Actions Require Human-Visible Review**  
+   Payments, submissions, deletes, credential operations, external messages, and regulated workflows require payload review and explicit approval when policy demands it.
+
+11. **Every Production UI Action Should Be Replayable**  
+   A production trace should preserve screenshots, DOM/AX snapshots, locators, bounding boxes, dispatched actions, timing, verification signals, recovery decisions, and final state.
+
+12. **The Agent Controls the Interface; Policy Controls the Agent**  
+   The model may plan and propose. The runtime validates, authorizes, dispatches, verifies, contains, logs, and stops. Authority lives in the system boundary, not in whatever the webpage whispered into the prompt.00
 
 #### **Works cited**
 

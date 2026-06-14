@@ -92,6 +92,7 @@ The Uncertainty Display Ladder maps ten distinct classes of system uncertainty t
 | **Level 4: Approval Gate** | Action / Tool-State Uncertainty 4 | Model attempts to execute non-idempotent tool over ambiguous parameters.3 | Orange border highlights; modal window displaying complete parameter diffs and costs.3 | Explicit confirmation; user must slide or click a dual-control confirmation gate.4 | Halt execution; save populated arguments to the session state; flag for manual review.3 |
 | **Level 5: Fail-Closed** | Security / Permission / Quota Breach 4 | Robust z-score hubness check flags indexing poison; tenant ID mismatch.4 | Full-screen red error overlay; unclickable, locked controls; explicit failure disclosure.3 | Complete cessation; user escalates to platform administrator.3 | Revoke all temporary session credentials, flush local caches, and close WebSocket threads.3 |
 
+```
 [Level 5: Fail-Closed] ─── (Uncertainty > Threshold) ───> System Blocks Action & Logs Trace   
          ▲  
 [Level 4: Approval Gate] ─── (Uncertainty + Action Risk) ───> Multi-Factor Gesture Gate   
@@ -101,6 +102,7 @@ The Uncertainty Display Ladder maps ten distinct classes of system uncertainty t
  ─── (Probabilistic Logits Entropy) ───> Dotted Underlines & Tooltips   
          ▲  
  ─── (Deterministic Verification) ───> Sharp Borders & Standard Saturation 
+```
 
 Implementing this ladder requires the interface controller to dynamically intercept the model's generation stream, evaluating the metadata context before tokens are rendered on the viewport.4 For example, when processing a complex document containing low-contrast text scans (extraction uncertainty), the layout parser raises an ocr_low_confidence event, which automatically demotes the rendering engine from Level 1 to Level 3, turning the text container’s styling to a muted gray and overlaying a sketchy outline to communicate the underlying structural fragility.10 If the model then attempts to send an email based on this unverified extraction (action-state uncertainty), the system triggers a Level 4 gate, freezing the execution thread until the user completes a slide-to-confirm gesture.4
 
@@ -229,6 +231,7 @@ The Explanation Design Model must be built around support for critical human dec
 
 To manage cognitive load, these explanation layers must deploy a pattern of *progressive disclosure*, preventing information density from overwhelming novice users while remaining fully inspectable for experts.23
 
+```
  ───> Subtle color change / icon on the primary viewport   
           │  
           ▼ (User Clicks Element)  
@@ -236,6 +239,7 @@ To manage cognitive load, these explanation layers must deploy a pattern of *pro
           │  
           ▼ (User Clicks "Verify")  
  ───> Displays full coordinate highlights and secure API transaction ledgers 
+```
 
 This structural progression ensures that the system provides sufficient context without introducing unnecessary interaction friction.64
 
@@ -427,6 +431,44 @@ Product design decisions must be informed by behavioral reliance telemetry rathe
 ### **VI. Decouple Quota, Cache, and Security Boundaries Programmatically**
 
 Never compromise data isolation, tenant partitioning, or security boundaries to maintain system availability during degraded modes.3 Multi-tenant SaaS deployments must enforce database Row-Level Security, separate vector index partitions, and cryptographically bind semantic cache keys to prevent thundering herd loops or prefix-caching side-channel timing exploits across users.3 The system must degrade gracefully along explicit quality bands, preserving user intent and session variables across all fallback states.3
+
+## **Durable Principles of UX Resilience**
+
+1. **Fallback Is Not Success**  
+   A fallback succeeds only when it preserves the task’s safety, quality, state, privacy, evidence, and user expectations.
+
+2. **Degraded Mode Must Be Designed, Not Discovered**  
+   Users should not experience degraded capability as random weirdness. Degraded states need labels, continuity, safe options, and clear next steps.
+
+3. **Silent Routing Is Allowed Only for Equivalent Capability**  
+   If the fallback changes quality, freshness, latency, cost, evidence, or action authority, the user or UI needs to know.
+
+4. **Never Trade Safety for Availability**  
+   Tenant isolation, privacy, authorization, action verification, and consent are non-sacrificable. A system that stays “up” by dropping those is not resilient. It is just failing with jazz hands.
+
+5. **Preserve State Before Changing Route**  
+   Route switches, retries, partial answers, and escalations must preserve user goal, active constraints, files, drafts, approvals, and action ledger state.
+
+6. **Unknown Action State Must Be Shown as Unknown**  
+   Tool timeouts, payment uncertainty, browser crashes, and partial commits must not become conversational success claims.
+
+7. **Cached Answers Require Scope, Freshness, and Disclosure**  
+   Cache reuse must respect tenant/user scope, source version, policy version, and task risk. Stale cache must be labeled or blocked.
+
+8. **Partial Answers Must Preserve Boundaries**  
+   A partial answer should clearly separate what is known, unavailable, failed, pending, unverified, and safe to retry.
+
+9. **Human Escalation Is a Product State**  
+   Escalation should transfer scoped, redacted, actionable context—not dump raw chat history into a queue and call it “support.”
+
+10. **Graceful Errors Should Reduce User Work**  
+   A graceful error tells the user what failed, what succeeded, what was saved, whether retry is safe, and what options remain.
+
+11. **Retry UX Must Prevent Duplicate Harm**  
+   Read-only retries may be automated within limits. State-changing retries require idempotency, verification, and sometimes explicit user approval.
+
+12. **Degradation Must Be Observable**  
+   Every fallback, cache response, partial answer, retry sequence, fail-closed event, and escalation should emit traceable telemetry.
 
 #### **Works cited**
 

@@ -2,812 +2,1487 @@
 
 ## **I. Doctrinal Foundations: The Evidence-Grounded Paradigm**
 
-The structural integrity of a high-dimensional artificial intelligence system depends on a fundamental law of information representation: visual, spatial, and temporal structure is semantic content.1 Traditional natural language processing architectures treat documents, tables, charts, images, and videos as flat streams of serialized text tokens.1 This reductionist approach introduces systemic errors, as flattening multi-dimensional layouts into unstructured text destroys spatial coordinates, relational groupings, and chronological sequences.4  
+The structural integrity of a multimodal AI system depends on a fundamental rule:
 
-Multimodal understanding is therefore defined as an evidence-grounded discipline of selecting, parsing, inspecting, and citing the precise visual, spatial, tabular, document, or temporal evidence unit before generating any text.6 A system has not understood an input unless it can isolate the coordinates of the supporting evidence, preserve the visual structure that contextualizes that evidence, and ground its claims back to page coordinates, structural cells, axis labels, temporal frames, or localized bounding boxes.6  
+**Visual, spatial, tabular, and temporal structure is semantic content.**
 
-This paradigm establishes a clear distinction between seeing, parsing, retrieving, inspecting, extracting, grounding, and citing:
+Documents, images, charts, tables, diagrams, forms, screenshots, and videos are not merely containers for text. Their meaning is carried by coordinates, layout, sequence, grouping, scale, orientation, color, timing, and visual adjacency. Flattening these artifacts into unstructured text destroys evidence.
 
-* A system may ingest a file without parsing its layout.  
-* It may parse text without preserving spatial relationships.5  
-* It may retrieve a page without inspecting the specific region containing the answer.6  
-* It may inspect a cropped image without sufficient resolution to resolve small characters.2  
-* It may extract a numerical data point without preserving its column headers, units, or footnotes.10  
-* It may describe a chart without reading its axis scales.13  
-* It may sample a video without capturing the specific temporal event that makes a claim true.15  
-* It may synthesize a highly plausible, fluent textual answer that lacks any grounding in actual visual evidence.8
+A multimodal system has not understood an artifact merely because the artifact entered the model context. Understanding requires the system to identify the precise evidence unit supporting a claim and preserve the coordinate chain back to the source.
 
-Plausible text is not visual grounding. To build resilient retrieval-augmented generation systems and interface-controlling agents, the system must enforce strict evidence selection before text generation. This report inherits the core doctrines of prior canon reports to maintain structural and conceptual continuity across the systems stack:
+That evidence unit may be:
 
-* **Context-Tenure and State-Governance (AI-ENG-B):** Applied here to visual and document evidence. The system must manage how long visual artifacts remain in the active reasoning context and track state transitions of document elements during multi-stage processing.  
-* **Knowledge Hygiene and Source-Authority (AI-ENG-D):** Applied to multimodal artifacts. The system must prevent low-quality, unverified, or conflicting visual inputs from contaminating the reasoning loop.  
-* **Retrieval-Pipeline Principles (AI-ENG-E):** Extended to multi-index visual routing. The system must select the optimal modality-specific retrieval pathway based on query profiles.  
-* **Serving and Observability (AI-ENG-L):** Tailored for heavy multimodal workloads, managing token budgets, and tracing rendering latencies.  
-* **Verification and User-Facing Status Discipline (AI-ENG-O):** Enforcing the rule that user-facing claims must never outrun verified visual reality. The system must refuse to assert a claim unless it preserves a continuous, auditable coordinate chain back to the source artifact.7
+* a page region
+* a paragraph bounding box
+* a table cell plus row and column headers
+* a form label-value pair
+* a chart axis, legend, tick, and mark
+* a visual object bounding box
+* a video frame or timestamp interval
+* a UI element coordinate
+* a multi-page continuation structure
+* a suppressed-but-retained header, footer, footnote, caption, or watermark
 
-The architectural progression through these states of multimodal processing is outlined in the primary conceptual glossary.
+The evidence-grounded paradigm distinguishes several operations that are often blurred together:
+
+| Operation | Meaning | Failure if Conflated |
+| :--- | :--- | :--- |
+| **Ingest** | Load the artifact and identify its media type. | The system may possess the file but understand nothing about its structure. |
+| **Route** | Select the correct processing path by modality and quality. | Text-native documents may be over-processed; visual documents may be under-processed. |
+| **Parse** | Extract text, layout, visual objects, tables, charts, or temporal events. | Structure may collapse into misleading text. |
+| **Localize** | Identify coordinates of relevant evidence. | The answer may cite a document but not the supporting region. |
+| **Inspect** | Verify the crop, page, frame, or region is adequate for the task. | Tiny text, missing headers, or cropped footnotes may produce false certainty. |
+| **Extract** | Convert evidence into structured data. | A number may be separated from its units, headers, or footnotes. |
+| **Verify** | Check that the extracted data supports the claim. | A plausible summary may outrun the visual evidence. |
+| **Cite** | Return source coordinates and provenance. | The result becomes unauditable. |
+| **Replay** | Preserve enough artifacts to reproduce the claim. | Regression testing and incident review become impossible. |
+
+Plausible text is not visual grounding. A system that describes a chart without reading the axes, summarizes a table without binding headers, or answers from a video without locating the relevant event is producing ungrounded synthesis.
+
+This report extends prior canon doctrines into multimodal evidence systems:
+
+| Prior Canon Module | Multimodal Extension |
+| :--- | :--- |
+| **AI-ENG-B — Context Tenure and State Governance** | Visual artifacts, page crops, frame selections, and coordinate maps require lifespan, versioning, and authority boundaries. |
+| **AI-ENG-D — Corpus Engineering and Source Authority** | Multimodal sources require provenance, file hashes, rendering versions, parser versions, and media-quality metadata. |
+| **AI-ENG-E — Retrieval Pipelines** | Retrieval must select modality-appropriate evidence packets rather than flattening all evidence into text chunks. |
+| **AI-ENG-L — Serving Architecture** | Multimodal rendering, OCR, visual retrieval, and video sampling create distinct latency, memory, and cost envelopes. |
+| **AI-ENG-O — Action Verification** | User-facing claims must not outrun verified visual, spatial, tabular, or temporal evidence. |
+| **AI-ENG-AB — Auditability and Replay** | Multimodal claims require replayable coordinate chains, page images, crops, parser versions, and extraction records. |
 
 ### **Artifact 1: Conceptual Glossary**
 
-| Term | Definition | Operational Metric |
-| :---- | :---- | :---- |
-| **Multimodal Understanding** | The evidence-grounded discipline of selecting, parsing, inspecting, and citing spatial, structural, visual, or temporal evidence before generating text. | Claim-to-Evidence Grounding Ratio (G_ratio) |
-| **Late-Interaction Retrieval** | A retrieval paradigm matching multi-vector representations of visual page layouts against query tokens using fine-grained patch-level operations.1 | NDCG@5, MRR, Recall@k 1 |
-| **MaxSim Operator** | A late-interaction scoring function computing the sum of the maximum cosine similarities between query token vectors and all page patch vectors.6 | MaxSim Score (S_MaxSim) 6 |
-| **Spatially-Grounded Retrieval** | A hybrid retrieval method mapping visual patch-level similarity scores to OCR-extracted coordinate regions to isolate specific crops.6 | Localization Hit Rate at IoU@0.5 7 |
-| **Relevance Propagation** | Aggregating visual patch-level similarity scores into localized OCR bounding boxes via spatial overlap calculations.6 | Intersection-over-Union (IoU) Weighting 7 |
-| **Page-Object Table Transformer** | A parallel-decoded, DETR-based graph prediction model trained to recognize and relate tabular elements in full-page context.12 | Grid Table Similarity Content Score (GriTS_Con) 21 |
-| **Split-Merge TSR** | A top-down table structure recognition method using sequence labeling to split grids and encoder-only transformers to classify merge cells.23 | Tree Edit Distance Similarity (TEDS_Struc) 24 |
-| **Modality Conversion** | Translating a visually encoded plot or chart into a linearized structured table for downstream symbolic reasoning.13 | Relative Error Tolerance Table Match Score 13 |
-| **VideoITG Framework** | An instruction-driven temporal grounding model adaptively altering video frame-sampling strategies based on query reasoning profiles.15 | Frame-Selection Recall / Temporal Grounding Accuracy 15 |
-| **Event-Anchored Frame Selection** | A training-free video pipeline segmenting video streams into coherent visual events and selecting query-relevant anchors via adaptive MMR.26 | Downstream Video QA Accuracy Delta 26 |
-| **Frame Selection Sensitivity** | A diagnostic measuring how much model accuracy changes when the most relevant frames are replaced with the least relevant frames.28 | FSS Delta (Delta FSS) 28 |
-| **Language Independence Score** | A metric evaluating the baseline accuracy of a video question answering system operating strictly on textual queries without frame inputs.28 | LIS Accuracy (A_LIS) 28 |
-
-The flow of evidence from initial file ingestion to final audited, cited answer generation is represented in the primary pipeline architecture. The system must maintain a continuous visual-spatial-temporal coordinate chain throughout this lifecycle.
+| Term | Definition | Operational Signal |
+| :--- | :--- | :--- |
+| **Multimodal Understanding** | Evidence-grounded interpretation of visual, spatial, tabular, document, image, or temporal artifacts. | Claim-to-evidence grounding ratio. |
+| **Evidence Unit** | The smallest source region sufficient to support a claim. | Page box, cell, chart mark, frame range, object box. |
+| **Coordinate Chain** | The preserved mapping from generated claim back to source artifact coordinates. | Source ID -> page/frame -> region -> crop -> extraction. |
+| **Layout Preservation** | Retaining page hierarchy, reading order, columns, captions, headers, footnotes, and object relations. | Reading-order F1, layout IoU, hierarchy preservation rate. |
+| **Spatial Grounding** | Binding claims to explicit coordinates or bounding boxes. | IoU@threshold, region hit rate, localization precision. |
+| **Tabular Grounding** | Binding values to table cells, row headers, column headers, units, captions, and footnotes. | Cell-header binding accuracy, GriTS/TEDS, numeric exactness. |
+| **Chart Derendering** | Converting chart pixels into structured series, axes, legends, and values. | Relative error tolerance, axis/legend extraction accuracy. |
+| **Temporal Grounding** | Binding video claims to timestamp ranges, selected frames, and event boundaries. | Temporal IoU, frame selection sensitivity, event recall. |
+| **Inspection Adequacy** | Determining whether selected evidence is sufficiently complete, legible, and contextualized. | Resolution, crop coverage, header/footnote inclusion, uncertainty flags. |
+| **Citation Fidelity** | Precision of attribution from claim to source evidence. | Document, page, region, cell, mark, frame, or timestamp-level citation. |
+| **Modality Routing** | Selecting the correct parser/retriever based on file properties and query intent. | Route accuracy, fallback rate, cost avoided, failure rate. |
 
 ### **Artifact 2: Multimodal Evidence Pipeline**
 
+```text
++--------------------------------------------------------------------------------
+| MULTIMODAL EVIDENCE PIPELINE
++--------------------------------------------------------------------------------
+|
+| [ Source Artifact ]
+|   PDF | scan | image | form | table | chart | screenshot | video
+|        |
+|        v
+| [ Ingestion and Fingerprinting ]
+|   file hash | media type | page count | duration | embedded text | image coverage
+|        |
+|        v
+| [ Modality Routing ]
+|   text-native path | visual document path | table path | chart path | video path
+|        |
+|        v
+| [ Parsing and Structural Extraction ]
+|   text spans | layout graph | OCR boxes | objects | cells | axes | frames
+|        |
+|        v
+| [ Coordinate Registry ]
+|   page boxes | cell boxes | chart marks | object boxes | timestamp ranges
+|        |
+|        v
+| [ Retrieval and Localization ]
+|   lexical | dense | multi-vector | spatial | table | chart | temporal
+|        |
+|        v
+| [ Inspection Adequacy Gate ]
+|   resolution | crop coverage | context completeness | uncertainty | fallback
+|        |
+|        v
+| [ High-Precision Extraction ]
+|   form fields | table cells | chart data | visual objects | temporal events
+|        |
+|        v
+| [ Evidence Verification ]
+|   headers | units | axis scale | labels | tenant/source | version | time range
+|        |
+|        v
+| [ Grounded Synthesis ]
+|   answer generated only from selected, adequate, cited evidence
+|        |
+|        v
+| [ Citation and Replay Package ]
+|   source hash | page/frame | coordinates | crops | parser version | evidence map
+|
++--------------------------------------------------------------------------------
+| Invariant:
+|   No factual multimodal claim should be emitted without a coordinate-bearing
+|   evidence packet or an explicit uncertainty/degraded-mode statement.
++--------------------------------------------------------------------------------
 ```
-+---------------------------------------------------------------------------------------------------------+  
-|                                     MULTIMODAL EVIDENCE PIPELINE                                        |  
-+---------------------------------------------------------------------------------------------------------+  
-|                                                                                                         |  
-|  [ Ingestion ]                                                                                          |  
-|       │                                                                                                 |  
-|       ▼                                                                                                 |  
-|  ──> ( Native Text Parser, > 100 characters ) ──>            |  
-|       │ ( Scanned / Visual Page, < 100 characters )                                                     |  
-|       ▼                                                                                                 |  
-|  ──> ( 300 DPI High-Resolution Rasterization ) ──>             |  
-|       │                                                                                                 |  
-|       ├─────────────────────────────────────────┐                                                       |  
-|       ▼                                         ▼                                                       |  
-|  [ Late-Interaction Indexing ]                                          |  
-|  ( ColPali Page-Patch Embedding )       ( Structural Entity Detection, DocTags )                        |  
-|       │                                         │                                                       |  
-|       ▼                                         ▼                                                       |  
-|  ────────────────>                     |  
-|  ( ANN Mean Pool -> MaxSim Rerank )     ( Paragraph, Table, Form Bounding Boxes )                       |  
-|       │                                         │                                                       |  
-|       └────────────────────┬────────────────────┘                                                       |  
-|                            ▼                                                                            |  
-|              [ Coordinate Alignment & Propagation ]                                                     |  
-|              ( IoU Bounding Box Score Aggregation )                                                     |  
-|                            │                                                                            |  
-|                            ▼                                                                            |  
-|              [ Evidence Validation Engine ]                                                             |  
-|              ( Inspection Adequacy & Resolution Checks )                                                |  
-|                            │                                                                            |  
-|                            ▼                                                                            |  
-|              [ High-Precision Feature Extractors ]                                                      |  
-|              ( POTATR Tables / DePlot Charts / Form Fields )                                            |  
-|                            │                                                                            |  
-|                            ▼                                                                            |  
-|              [ Grounding Map Compilation ]                                                              |  
-|              ( Exact Coordinate Tracking: Page, Box, Frame )                                            |  
-|                            │                                                                            |  
-|                            ▼                                                                            |  
-|              ──>     |  
-|                                                                                                         |  
-+---------------------------------------------------------------------------------------------------------+
+
+### **Evidence-Grounded Output Rule**
+
+A multimodal answer should carry three things:
+
+| Required Output | Purpose |
+| :--- | :--- |
+| **Claim** | What the system asserts. |
+| **Evidence packet** | What region, cell, chart mark, or frame supports it. |
+| **Adequacy status** | Whether the evidence was legible, complete, and verified enough to support the claim. |
+
+When evidence is insufficient, the system should say so directly:
+
+```text
+The available crop does not include the table header, so the value cannot be
+safely attributed to a column. Retrieve the full table region or adjacent page.
 ```
 
 ## **II. Document Ingestion, OCR, and OCR-Free VLM Pipelines**
 
-Document layout analysis is the architectural boundary where raw pixels are transformed into structured semantic systems.5 Legacy systems that rely on naive, sequential Document Layout Analysis (DLA) chains introduce error propagation at every step.5 A standard legacy pipeline rasterizes a PDF page, passes it to a context-blind OCR engine to extract raw text with coordinates, and then uses a heuristic parser to group characters into blocks.5  
-Because the OCR engine operates without linguistic or structural context, it fails to differentiate between visual noise, mathematical formulas, columns, or tables.5 If any stage in this sequential chain stumbles, the layout structures collapse, yielding out-of-order text segments, orphaned table cells, and discarded captions.3  
-To address this structural fragility, modern high-dimensional architectures implement a unified Document Parsing Stack. This stack integrates classical coordinate-aware text extraction with OCR-free and layout-aware Vision-Language Models.
+Document ingestion is the boundary where raw files become structured evidence. A PDF, scan, or image must be classified before parsing because the correct processing path depends on document properties, not merely file extension.
 
-### **Artifact 3: Document Parsing Stack Model**
+A brittle routing rule such as “more than 100 extracted characters means text-native” is insufficient. A document may contain extractable text while still having broken font encodings, scrambled reading order, image-only tables, scanned appendices, rotated pages, hidden OCR layers, or layout-dependent meaning.
 
-| Layer | Input | Processing Architecture | Output Artifact | Fallback Trigger |
-| :---- | :---- | :---- | :---- | :---- |
-| **1. File Ingestion** | Heterogeneous PDFs, JPEGs, PNGs, TIFFs 4 | Rust-based pdf-inspector analysis of document internals (font encodings, operators, rasterized coverage) 29 | Standardized PDF stream + Metadata 2 | Force rendering of all pages to 300 DPI raster images 2 |
-| **2. Selective Ingestion Routing** | Standardized PDF stream | Document Classifier (>100 characters text-native threshold check) 2 | Digital Native Text Path OR Scanned Visual Path 2 | Route to VLM rasterization if font rendering or encoding errors are detected 2 |
-| **3. Page Rendering Engine** | Scanned Visual Path | PyMuPDF or pdf2image high-fidelity rasterizer 2 | 300 DPI Standardized PNG/TIFF page images 2 | Upscale to 400-600 DPI for micro-fonts or low-contrast targets 31 |
-| **4. Layout & OCR-Free VLM Ingestion** | 300 DPI page images | Compact end-to-end VLMs (e.g., olmOCR-2-7B, GraniteDocling-258M) 5 | Structured layout graph + Raw text blocks 5 | Multi-stage OCR (PaddleOCR/EasyOCR local server) 10 |
-| **5. Reading-Order Reconstruction** | Visual-spatial layout graph | Neural coordinate ordering with geometric reading path fallback 29 | Continuous serialized document stream in Markdown 29 | Heuristic column-segment splitting rules based on vertical whitespace analysis 3 |
-| **6. Structural Markup & Tagging** | Structured document stream | DocTags intermediate representation compiler 5 | Semantically tagged hierarchical document tree 5 | Rule-based tag parsing of raw Markdown markers 10 |
+### **Artifact 3: Document Ingestion Routing Classifier**
 
-The critical transition from legacy OCR to unified layout preservation is realized through models like the IBM Granite-Docling VLM series and the Allen Institute's olmOCR-2-7B.5  
-Rather than chaining discrete layout classifiers and text line extractors, models such as Granite-Docling integrate vision and language processing inside a highly compact 258-million parameter architecture.5 It consumes rasterized page images and outputs structured text wrapped in a markup format known as DocTags.5 DocTags encodes structural elements—including headers, columns, tables, formulas, footnotes, and captions—as explicit hierarchical markers, ensuring that downstream LLMs receive layout-aware, contextually complete streams.5  
-Similarly, the olmOCR-2-7B model parses mathematical equations, multi-column paper structures, and historical scans directly into clean Markdown, preserving complex mathematical expressions as LaTeX and stripping running headers and page numbers without breaking reading-order continuity.32 This visual-structural mapping is governed by a strict spatial layout tracking system.
+A robust ingestion classifier uses multiple signals:
+
+| Signal | What It Detects | Routing Implication |
+| :--- | :--- | :--- |
+| **Extractable text density** | Whether the file contains native text. | High density may route to text-native parsing, but only if quality checks pass. |
+| **Glyph map validity** | Whether extracted characters map correctly. | Invalid encodings route to visual/OCR path. |
+| **Reading-order confidence** | Whether extracted text preserves logical order. | Low confidence triggers layout-aware parsing. |
+| **Raster/image coverage** | Whether page content is mostly embedded images. | High coverage routes to visual page rendering. |
+| **Table/figure density** | Whether layout carries meaning. | High density triggers structural extraction even for text-native files. |
+| **Font size and contrast** | Whether small text can be resolved. | Microtext or low contrast triggers higher DPI rendering. |
+| **Rotation/skew** | Whether page orientation disrupts extraction. | Triggers deskewing and orientation correction. |
+| **Language/script profile** | OCR and parser suitability. | Routes to appropriate OCR/VLM or human-review fallback. |
+| **Security/provenance flags** | Macros, embedded files, strange streams, untrusted origin. | Routes to sandboxed parsing or quarantine. |
+
+### **Document Parsing Stack Model**
+
+| Layer | Input | Processing Function | Output Artifact | Fallback Trigger |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. File Ingestion** | PDF, image, scan, screenshot, office export. | Fingerprint, hash, media-type detection, page count, metadata capture. | Source artifact record. | Quarantine malformed, encrypted, or unsafe files. |
+| **2. Routing Classification** | Source artifact record. | Multi-signal routing classifier. | Parse route: text-native, visual, hybrid, table-heavy, chart-heavy, form, video. | Route to hybrid visual/text path if confidence is low. |
+| **3. Text-Native Extraction** | Digital PDF or office export. | Extract text spans, font metadata, page coordinates, links, annotations. | Text span graph with coordinates. | Broken glyphs, scrambled order, missing layout, or low confidence. |
+| **4. Page Rendering** | Pages requiring visual processing. | Render page images at task-appropriate DPI. | Page image store with render metadata. | Increase DPI for microtext, low contrast, stamps, or handwriting. |
+| **5. OCR / VLM Layout Parsing** | Page images and text spans. | OCR, OCR-free VLM parsing, layout detection, structural tagging. | Layout graph: blocks, tables, figures, captions, form fields. | Fallback to alternate OCR/VLM engine or human review. |
+| **6. Reading-Order Reconstruction** | Layout graph. | Resolve columns, marginalia, footnotes, headers, captions, and equations. | Ordered document tree. | Low reading-order confidence or conflicting layout paths. |
+| **7. Coordinate Registry** | Ordered document tree and page images. | Assign stable IDs to spans, regions, cells, figures, captions, and suppressed metadata. | Coordinate-bearing evidence registry. | Missing coordinates, invalid boxes, or page mismatch. |
+| **8. Evidence Packet Compiler** | Coordinate registry. | Produce retrieval-ready text, visual, spatial, table, and citation packets. | Multimodal evidence packets. | Fallback to page-level packet with uncertainty flag. |
 
 ### **Artifact 4: Layout Preservation Framework**
 
+```text
++--------------------------------------------------------------------------------
+| LAYOUT PRESERVATION FRAMEWORK
++--------------------------------------------------------------------------------
+|
+| Source Page:
+|   page_id: p001
+|   coordinate_system: normalized_0_1000
+|   width: 1000
+|   height: 1000
+|
+| Layout Graph:
+|
+|   header_001
+|     class: running_header
+|     text: "Journal of Systems Architecture"
+|     bbox: [60, 25, 940, 60]
+|     stream_policy: suppress_from_main_text
+|     retention_policy: retain_as_metadata
+|
+|   col_001
+|     class: column
+|     bbox: [70, 110, 470, 860]
+|     children:
+|       h1_001
+|         class: heading
+|         text: "1. Introduction"
+|         bbox: [75, 115, 460, 150]
+|       para_001
+|         class: paragraph
+|         text: "The visual structures..."
+|         bbox: [75, 165, 460, 315]
+|       eq_001
+|         class: equation
+|         latex: "S(q,d)=..."
+|         bbox: [95, 330, 430, 375]
+|       table_001
+|         class: table
+|         bbox: [75, 405, 465, 745]
+|         caption_ref: caption_001
+|
+|   col_002
+|     class: column
+|     bbox: [530, 110, 930, 860]
+|     children:
+|       para_002
+|         class: paragraph
+|         text: "The experimental results..."
+|         bbox: [535, 115, 920, 260]
+|       fig_001
+|         class: figure
+|         bbox: [540, 285, 915, 610]
+|       caption_001
+|         class: figure_caption
+|         text: "Figure 2: Grounding pipeline."
+|         bbox: [540, 620, 915, 675]
+|         parent_ref: fig_001
+|
+|   footer_001
+|     class: page_footer
+|     text: "Page 1 of 15"
+|     bbox: [420, 945, 580, 970]
+|     stream_policy: suppress_from_main_text
+|     retention_policy: retain_as_metadata
+|
++--------------------------------------------------------------------------------
+| Rule:
+|   Suppressed is not deleted. Headers, footers, watermarks, confidentiality
+|   labels, footnotes, and captions may be omitted from the main reading stream
+|   while still retained as coordinate-bearing metadata.
++--------------------------------------------------------------------------------
 ```
-+-------------------------------------------------------------------------------------------------------+  
-|                                     LAYOUT PRESERVATION FRAMEWORK                                     |  
-+-------------------------------------------------------------------------------------------------------+  
-|                                                                                                       |  
-|                                                 |  
-|                                                                                                       |  
-|  ┌─────────────────────────────────────────────────────────────────────────────────────────────────┐  |  
-|  │ Coordinates:                                                                  │  |  
-|  ├─────────────────────────────────────────────────────────────────────────────────────────────────┤  |  
-|  │                                                                                                 │  |  
-|  │  Page Header Segment: "Journal of Systems Architecture" (Omitted from Main Semantic Stream)    │  |  
-|  │                                                                                                 │  |  
-|  │  Column 1 Box:                   Column 2 Box:                                                  │  |  
-|  │  ┌──────────────────────────────────────────┐      ┌──────────────────────────────────────────┐  │  |  
-|  │  │ [Heading Node (H1)]                    │      │                         │  │  |  
-|  │  │ "1. Introduction"                       │      │ "The experimental results..."            │  │  |  
-|  │  │ Box:                │      │ Box:                │  │  |  
-|  │  ├──────────────────────────────────────────┤      ├──────────────────────────────────────────┤  │  |  
-|  │  │ [Paragraph Node]                         │      │ [Embedded Image Figure]                  │  │  |  
-|  │  │ "The visual structures..."               │      │ Class: Figure                            │  │  |  
-|  │  │ Box:                │      │ Box:                │  │  |  
-|  │  ├──────────────────────────────────────────┤      ├──────────────────────────────────────────┤  │  |  
-|  │  │ [In-line Equation Node]                  │      │ [Figure Caption Node]                    │  │  |  
-|  │  │ Plaintext: S(q, d)                       │      │ "Figure 2: Grounding..."                 │  │  |  
-|  │  │ Box:                │      │ Box:                │  │  |  
-|  │  ├──────────────────────────────────────────┤      └──────────────────────────────────────────┘  │  |  
-|  │  │                       │                                                    │  |  
-|  │  │ Table Box:            │                                                    │  |  
-|  │  │ (Linked via parent-child spatial edge)   │                                                    │  │  |  
-|  │  └──────────────────────────────────────────┘                                                    │  |  
-|  │                                                                                                 │  |  
-|  ├─────────────────────────────────────────────────────────────────────────────────────────────────┤  |  
-|  │ Coordinates:  Page Footer: "Page 1 of 15" (Omitted from Stream)            │  |  
-|  └─────────────────────────────────────────────────────────────────────────────────────────────────┘  |  
-+-------------------------------------------------------------------------------------------------------+
+
+### **Layout Node Schema**
+
+```json
+{
+  "node_id": "para_001",
+  "page_id": "p001",
+  "class": "paragraph",
+  "bbox": [75, 165, 460, 315],
+  "text": "The visual structures...",
+  "reading_order_index": 3,
+  "parent_id": "col_001",
+  "children": [],
+  "stream_policy": "include_in_main_text",
+  "confidence": 0.97,
+  "parser": {
+    "name": "layout_parser",
+    "version": "v1.4.2"
+  }
+}
 ```
+
+### **Document Parsing Invariant**
+
+The parser should never produce a plain text stream alone. At minimum, it must also produce:
+
+* page ID
+* bounding boxes
+* reading-order indices
+* structural classes
+* parser version
+* confidence scores
+* suppressed metadata records
+* source hash
+* rendering metadata when rasterization was used
+
+A document without coordinates is not yet evidence. It is just text wearing a fake mustache.
 
 ## **III. Forms and Field Understanding: Spatial-Semantic Association**
 
-The extraction of structured values from forms and administrative documents is a specialized spatial-semantic alignment problem. Forms represent a high-density visual layout where meaning is defined by label-to-value geometric vectors, checkbox selections, handwritten annotations, signatures, and stamps.  
-When a form document is processed by standard text extraction tools, its layout is destroyed. The textual fragments are serialized left-to-right, top-to-bottom, separating label tokens from their corresponding value tokens, and stripping checkbox states and handwritten signatures entirely.4  
-To preserve the spatial-logical association of form elements, architectures must employ a dedicated Form Understanding Model. This model maps localized regions to a semantic schema, tracking confidence and spatial coordinates.
+Forms are spatial contracts. Their meaning depends on label-value relationships, checkboxes, signatures, stamps, handwriting, tables, alignment, repeated sections, and intentional blank space.
+
+A form parser must not simply extract text. It must bind each value to the correct label, state, field type, coordinate region, and confidence score.
 
 ### **Artifact 5: Form Understanding Model**
 
-```
-Form Object Schema (Page Coordinate Grid: Normalized 0-1000)  
- ├── Form Metadata  
- │    ├── Coordinate Anchor Base: [x1, y1, x2, y2] =   
- │    └── Page Orientation Rotational Angle: 0.0 degrees  
- ├── Form Fields (Array of Spatial Nodes)  
- │    ├── Field 1 (Text-Native Input)  
- │    │    ├── Field Key Identifier: "vendor_name"  
- │    │    ├── Label Bounding Box:   
- │    │    ├── Value Bounding Box:   
- │    │    ├── Visual Extraction Modality: Text-Native (Digital Extract)  
- │    │    ├── Raw Extracted Text: "ACME Industrial Corp."  
- │    │    └── Field Confidence: 1.000 (Native Match)  
- │    ├── Field 2 (Handwritten Input)  
- │    │    ├── Field Key Identifier: "invoice_date"  
- │    │    ├── Label Bounding Box:   
- │    │    ├── Value Bounding Box:   
- │    │    ├── Visual Extraction Modality: Scanned Handwriting OCR  
- │    │    ├── Raw Extracted Text: "04/05/2026"  
- │    │    └── Field OCR Character Confidence: 0.895  
- │    ├── Field 3 (Checkbox / Selection Node)  
- │    │    ├── Field Key Identifier: "tax_exempt_status"  
- │    │    ├── Anchor Label Box:   
- │    │    ├── Checkbox Core Box:   
- │    │    ├── Pixel Intensity / Active Selection Ratio: 0.782  
- │    │    ├── Inferred Selection State: TRUE (Active Check Detected)  
- │    │    └── State Classifier Confidence: 0.981  
- │    └── Field 4 (Signature Validation Node)  
- │         ├── Field Key Identifier: "authorized_signature"  
- │         ├── Area Bounding Box:   
- │         ├── Signature Feature State: Verified Scribble (Dynamic Stroke/Ink Present)  
- │         ├── Stroke Pixels Count: 14203 pixels  
- │         └── Signature Verification Confidence: 0.994  
- └── Verification Logs  
-      ├── Stamp / Seal Presence: TRUE (Detected Box , Conf: 0.970)  
-      └── Empty Fields Handlers: [x1, y1, x2, y2] visual check indicates blank space on optional fields
+```json
+{
+  "form_id": "invoice_form_2026_0042",
+  "source_document_id": "doc_9ab3",
+  "page_id": "p001",
+  "coordinate_system": {
+    "type": "normalized",
+    "width": 1000,
+    "height": 1000
+  },
+  "page_orientation_degrees": 0.0,
+  "template_match": {
+    "template_id": "vendor_invoice_v3",
+    "confidence": 0.94
+  },
+  "fields": [
+    {
+      "field_id": "vendor_name",
+      "field_type": "text",
+      "state": "present",
+      "label": {
+        "text": "Vendor Name",
+        "bbox": [70, 118, 215, 145],
+        "confidence": 0.99
+      },
+      "value": {
+        "text": "ACME Industrial Corp.",
+        "bbox": [240, 116, 610, 148],
+        "extraction_modality": "native_text",
+        "confidence": 0.99
+      }
+    },
+    {
+      "field_id": "invoice_date",
+      "field_type": "handwritten_text",
+      "state": "present",
+      "label": {
+        "text": "Invoice Date",
+        "bbox": [70, 168, 220, 195],
+        "confidence": 0.98
+      },
+      "value": {
+        "text": "04/05/2026",
+        "bbox": [245, 162, 430, 205],
+        "extraction_modality": "handwriting_ocr",
+        "confidence": 0.895
+      }
+    },
+    {
+      "field_id": "tax_exempt_status",
+      "field_type": "checkbox",
+      "state": "checked",
+      "label": {
+        "text": "Tax Exempt",
+        "bbox": [70, 228, 215, 255],
+        "confidence": 0.97
+      },
+      "value": {
+        "bbox": [238, 224, 260, 246],
+        "active_mark_ratio": 0.782,
+        "local_background_adjusted": true,
+        "confidence": 0.981
+      }
+    },
+    {
+      "field_id": "authorized_signature",
+      "field_type": "signature",
+      "state": "present",
+      "label": {
+        "text": "Authorized Signature",
+        "bbox": [70, 765, 300, 792],
+        "confidence": 0.96
+      },
+      "value": {
+        "bbox": [315, 735, 720, 815],
+        "ink_pixel_count": 14203,
+        "signature_presence_class": "scribble_present",
+        "confidence": 0.994
+      }
+    },
+    {
+      "field_id": "purchase_order_number",
+      "field_type": "text",
+      "state": "intentionally_empty",
+      "label": {
+        "text": "PO Number",
+        "bbox": [70, 285, 195, 312],
+        "confidence": 0.96
+      },
+      "value": {
+        "text": null,
+        "bbox": [240, 280, 520, 318],
+        "blank_region_confidence": 0.93
+      }
+    }
+  ],
+  "verification_logs": [
+    {
+      "check": "stamp_or_seal_presence",
+      "state": "present",
+      "bbox": [745, 710, 895, 835],
+      "confidence": 0.97
+    },
+    {
+      "check": "required_fields_present",
+      "state": "passed",
+      "missing_required_fields": []
+    }
+  ]
+}
 ```
 
-When evaluating form understanding systems in production, developers must address several common architectural failure modes:
+### **Field State Taxonomy**
 
-* **Label-Value Cross-Binding:** Under multi-column form layouts, standard spatial heuristic parsers often bind a field label to the value situated directly to its right, even if the form layout intends a vertical association. The system must utilize layout-aware attention boundaries to prevent horizontal spilling.  
-* **Checkbox Inversion:** Minor rasterization noise or compression artifacts can fill a blank box or erase a light pencil mark. This causes the model to invert a critical state (e.g., classifying "Tax Exempt" as FALSE when it is checked). The pipeline must calculate the average pixel intensity of the checkbox interior relative to local page background density to establish a verifiable threshold.  
-* **Signature/Stamp Omission:** Models optimized purely for OCR text character extraction often classify signatures and corporate seals as visual noise, failing to register their presence. A downstream compliance agent will then reject a valid document for lacking authorization. The architecture must deploy parallel visual object-detection heads specifically trained to classify signature scribble matrices and validate seals.  
-* **Intentionally Empty Fields:** A standard parser often cannot distinguish between a field left blank by a user and an extraction step that failed. The form schema must explicitly capture coordinates for every field defined in the template. If no visual text, handwriting strokes, or check marks are present in the region, the field must be recorded as *Intentionally Empty* with a dedicated coordinate confidence score, rather than being omitted from the structured extraction payload.
+| Field State | Meaning | System Handling |
+| :--- | :--- | :--- |
+| **present** | Value or mark detected with sufficient confidence. | Commit extracted value with coordinates. |
+| **absent** | Expected field not visually present in the form instance. | Flag template mismatch or missing field. |
+| **checked** | Checkbox/radio/select mark is active. | Commit boolean/choice value with confidence. |
+| **unchecked** | Field exists and mark area is empty. | Commit explicit false/unchecked state. |
+| **ambiguous** | Mark, handwriting, or label-value binding is uncertain. | Route to fallback extraction or human review. |
+| **occluded** | Region is covered, cut off, blurred, or obstructed. | Mark unresolved; do not infer value. |
+| **extraction_failed** | Region exists but parser could not read it. | Preserve coordinates and failure reason. |
+| **intentionally_empty** | Field exists and region appears blank. | Commit blank state only when region was inspected. |
+
+### **Form Failure Mode Map**
+
+| Failure Mode | Symptom | Root Cause | Mitigation |
+| :--- | :--- | :--- | :--- |
+| **Label-Value Cross-Binding** | Value assigned to wrong label. | Multi-column or irregular layout misleads nearest-neighbor binding. | Use template anchors, reading-order graph, and label-value vector scoring. |
+| **Checkbox Inversion** | Checked box read as unchecked or vice versa. | Noise, compression, light pencil marks, or form artifacts. | Use local background-normalized mark ratio and ambiguity threshold. |
+| **Signature / Stamp Omission** | Valid authorization mark ignored. | OCR-only pipeline treats non-text marks as noise. | Add visual object heads for signatures, stamps, seals, and handwritten marks. |
+| **Intentional Blank Collapse** | Empty field omitted and mistaken for parser failure. | Parser only emits detected text. | Emit all template fields with explicit inspected blank states. |
+| **Template Drift** | Fields shifted or renamed across form versions. | Template changed without schema update. | Version templates and use geometry + text anchors. |
+| **Handwriting Ambiguity** | Low-confidence handwritten value becomes false fact. | OCR uncertainty below threshold. | Preserve uncertain text, route to human review, or require second model pass. |
+
+### **Form Evidence Rule**
+
+A form value is not evidence unless it carries:
+
+```text
+field_id
+field_type
+label_bbox
+value_bbox
+field_state
+extraction_modality
+confidence
+template_version
+source_page
+```
+
+The parser must record blanks, ambiguity, and extraction failure explicitly. Silence is not a field state.
 
 ## **IV. Tables as Structured Evidence: Multi-Page Recognition, Split-Merge, and Graph-Based Transformations**
 
-Tables represent highly dense, structured data where spatial layout dictates numerical meaning.3 Extracting tabular data is a demanding task; standard OCR pipelines destroy the horizontal alignment, column grouping, and header hierarchies that give numbers context.4  
-If a system flattens table cells into continuous prose, a downstream model will misbind numbers to the wrong headers, lose merged-cell relationships, and generate incorrect calculations.3 A table cell separated from its column and row header is not an informative fact—it is a hallucination risk.10  
-To address these challenges, architectures deploy table extraction models like POTATR (Page-Object Table Transformer) and TABLET.12
+Tables are structured evidence. A number inside a table is not meaningful unless the system preserves its row header, column header, units, spanning cells, footnotes, caption, page context, and continuation state.
 
-### **Artifact 6: Table Extraction and Grounding Model**
+Flattening a table into prose destroys the relationships that make the data true.
 
-| Architectural Path | Core Model | Processing Paradigm | Class Definitions / Targets | Structural Verification Metric |
-| :---- | :---- | :---- | :---- | :---- |
-| **Parallel Graph Prediction** | **POTATR-v1.0-Pub** 12 | Image-to-graph model extending TATR with parallel spatial decoding.12 Predicts parent-child structural edges between elements.12 | 16 Classes: 8 base (table, column, row, column header, projected row header, spanning cell, table caption, table footer) + 8 rotated equivalents.12 | **Grid Table Similarity Content Score (GriTS_Con)**: Pseudo F1-score for global consistency across cells, reflecting content and structure.21 |
-| **Top-Down Split-Merge Sequence Labeling** | **TABLET Split-Merge Model** 24 | Non-autoregressive encoder-only Transformer.24 Formulates splitting as sequence labeling and merging as grid cell classification.24 | 2 Stages: Split Model (modified ResNet-18 + FPN backbone + dual encoders) 24; Merge Model (ResNet-18 + FPN + 7x7 RoIAlign on grid cells).24 | **Tree Edit Distance Similarity (TEDS)** and **TEDS-Struc**: Evaluates cell-level tree alignment.24 |
-| **Traditional Multi-Stage Pipeline** | **Base TATR (Table Transformer)** 21 | DETR-based object detection on cropped table regions.21 Relies on post-processing overlaps with table class boundaries.21 | 6 Classes: Table, table column, table row, table column header, table projected row header, table spanning cell.12 | **Intersection-over-Union (IoU)** of predicted structural element bounding boxes.21 |
+### **Artifact 6: Table Evidence Lifecycle**
 
-The POTATR architecture addresses a critical limitation of previous table recognition models: processing tables in isolation after cropping them from the page.21  
-By operating directly on full-page images, POTATR preserves the table's context, including its caption and footer elements, which often contain critical units, scaling factors, or footnote mappings.12  
-Rather than relying on overlapping bounding boxes to group elements, POTATR predicts directed parent-child relationships between detected objects via an integrated relation head.12 This constructs a hierarchical spatial graph of the table directly from the page image.12  
-When table density escalates, the system uses the TABLET model.24 TABLET bypasses the instability of bounding box predictions for large, densely populated tables.23  
-The Split Model removes the max-pooling layer of ResNet-18 to maintain high-resolution feature sequences, feeding them into separate horizontal and vertical Transformer encoders to label row and column split lines.24  
-The Merge Model uses 7x7 Region of Interest Align (RoIAlign) to extract cell feature maps directly from the FPN layer, employing a cell-merging Transformer trained via Focal Loss to classify whether adjacent cells should be merged 24:  
-FL_merge = (1 / (R * C)) * sum_{k=1}^{R * C} (alpha_k * (1 - p_k)^gamma * (-log(p_k)))  
-This formula ensures the model is optimized for sparse merge-cell structures within densely populated grids.24
-
-```
-+---------------------------------------------------------------------------------------------------------+  
-|                                     MULTI-PAGE CONTINUITY RESOLUTION                                    |  
-+---------------------------------------------------------------------------------------------------------+  
-|                                                                                                         |  
-|  [ Page N Image ]                                     [ Page N+1 Image ]                                |  
-|  ┌──────────────────────────────────────────────┐      ┌──────────────────────────────────────────────┐  |  
-|  │...                                         │      │...                                          │  |  
-|  │  ┌────────────────────────────────────────┐  │      │  ┌────────────────────────────────────────┐  │  |  
-|  │  │ Column 1  │ Column 2   │ Column 3      │  │      │  │ Column 1  │ Column 2   │ Column 3      │  │  |  
-|  │  ├───────────┼────────────┼───────────────┤  │      │  ├───────────┼────────────┼───────────────┤  │  |  
-|  │  │ Item 44   │ $2410      │ Metric-A      │  │      │  │ Item 48   │ $1105     │ Metric-B      │  │  |  
-|  │  └───────────┴────────────┴───────────────┘  │      │  └───────────┴────────────┴───────────────┘  │  |  
-|  │                   │      │...                                          │  |  
-|  └──────────────────────┬───────────────────────┘      └──────────────────────┬───────────────────────┘  |  
-|                         │                                                     │                          |  
-|                         ▼                                                     ▼                          |  
-|                  [ Extraction Node N ]                 [ Extraction Node N+1 ]                    |  
-|                  └── Table Node 1 ──┐                                  └── Table Node 2 ──┐              |  
-|                                     ▼                                                     ▼              |  
-|                                    [ Multi-Page Conjoining Logic Engine ]                                |  
-|                             │   - Feature 1: Sub-header match similarity (0.941)                         |  
-|                             │   - Feature 2: Column dimension alignment (3 cols == 3 cols)               |  
-|                             │   - Feature 3: No terminal total row on Page N                             |  
-|                             ▼                                                                            |  
-|                     ( Continuation State Inferred: TRUE, Accuracy ~99% )                             |  
-|                             │                                                                            |  
-|                             ▼                                                                            |  
-|                                                                  |  
-|                     ( Merges Node 1 and Node 2, preserves header structures, offsets rows )              |  
-|                                                                                                         |  
-+---------------------------------------------------------------------------------------------------------+
+```text
++--------------------------------------------------------------------------------
+| TABLE EVIDENCE LIFECYCLE
++--------------------------------------------------------------------------------
+|
+| [ Page or Crop ]
+|      |
+|      v
+| [ Table Detection ]
+|   locate table region | caption | footer | nearby notes
+|      |
+|      v
+| [ Structure Recognition ]
+|   rows | columns | spanning cells | projected headers | merged cells
+|      |
+|      v
+| [ Cell Content Extraction ]
+|   text | numbers | units | confidence | OCR/native source
+|      |
+|      v
+| [ Header Binding ]
+|   row headers | column headers | superheaders | units | footnotes
+|      |
+|      v
+| [ Continuity Resolution ]
+|   page N/N+1 relation | repeated header | row offset | terminal totals
+|      |
+|      v
+| [ Table Object Compilation ]
+|   cells with coordinates, values, headers, provenance, confidence
+|      |
+|      v
+| [ Claim-Level Table Citation ]
+|   cite value + row header + column header + table/caption/footnote
+|
++--------------------------------------------------------------------------------
 ```
 
-To validate these extractions, the system measures structural alignment using Grid Table Similarity (GriTS) and Tree Edit Distance Similarity (TEDS).21  
-While TEDS models the table as an HTML tree structure and computes edit distances on nodes, GriTS acts as a cell-level pseudo-F1 score that enforces global consistency across rows and columns.21 GriTS-Top measures structure alone, and GriTS-Con incorporates text content validation, exposing OCR character misreads within cells.22
+### **Table Extraction Architecture**
+
+| Architectural Path | Best Fit | Processing Paradigm | Output Artifact | Verification Metric |
+| :--- | :--- | :--- | :--- | :--- |
+| **Full-Page Table Graph Recognition** | Tables embedded in reports with captions, footers, and surrounding explanatory text. | Detect table objects and structural relations in full-page context. | Table graph with parent-child relationships, caption, footer, cells. | GriTS, TEDS, cell-header binding accuracy. |
+| **Split-Merge Grid Recognition** | Dense regular grids, complex merged cells, and large financial/statistical tables. | Detect row/column separators, then classify merged cells. | Grid object with split lines, merge regions, and cell IDs. | TEDS-Struc, merge accuracy, cell adjacency F1. |
+| **Native Digital Table Extraction** | Born-digital PDFs or spreadsheets with recoverable text and coordinates. | Extract text spans and infer grid from coordinates and ruling lines. | Coordinate-bearing table cells. | Exact text match, cell order, row/column alignment. |
+| **Hybrid Table Extraction** | Mixed native text and scanned visual structures. | Combine visual structure detection with native text span assignment. | Table graph with OCR/native source flags. | Header binding and content preservation. |
+
+### **Table Object Schema**
+
+```json
+{
+  "table_id": "tbl_p012_001",
+  "source_document_id": "doc_9ab3",
+  "page_ids": ["p012", "p013"],
+  "bbox": [80, 145, 930, 850],
+  "caption": {
+    "text": "Table 4. Quarterly operating margin by segment.",
+    "bbox": [80, 105, 930, 135]
+  },
+  "continuation": {
+    "is_continued": true,
+    "continued_from": null,
+    "continued_to": "tbl_p013_001",
+    "confidence": 0.91
+  },
+  "cells": [
+    {
+      "cell_id": "r4_c3",
+      "page_id": "p012",
+      "bbox": [545, 430, 665, 462],
+      "value": "14.2%",
+      "row_headers": ["Industrial Machinery"],
+      "column_headers": ["Q2 2026", "Operating Margin"],
+      "units": "percent",
+      "footnote_refs": [],
+      "confidence": 0.982
+    }
+  ]
+}
+```
+
+### **Multi-Page Continuity Resolution**
+
+Multi-page table joining should be treated as an inference with evidence, not an automatic merge.
+
+```text
++--------------------------------------------------------------------------------
+| MULTI-PAGE TABLE CONTINUITY RESOLUTION
++--------------------------------------------------------------------------------
+|
+| [ Table Candidate on Page N ]
+|   table_id: tbl_p012_001
+|   columns: 5
+|   terminal_total_row: absent
+|   bottom_margin_cutoff: true
+|        |
+|        v
+| [ Table Candidate on Page N+1 ]
+|   table_id: tbl_p013_001
+|   columns: 5
+|   repeated_header_similarity: 0.94
+|   caption: "Table 4 continued"
+|        |
+|        v
+| [ Continuity Feature Scoring ]
+|   column_count_match: true
+|   column_x_alignment_score: 0.96
+|   repeated_header_score: 0.94
+|   row_sequence_continuity: 0.89
+|   terminal_marker_absent_on_page_N: true
+|   caption_continuation_signal: true
+|        |
+|        v
+| [ Decision ]
+|   continuation_state: likely_continued
+|   confidence: 0.91
+|   action: merge_with_row_offset_and_preserve_page_ids
+|
++--------------------------------------------------------------------------------
+```
+
+### **Continuity Decision States**
+
+| State | Meaning | Handling |
+| :--- | :--- | :--- |
+| **not_continued** | Evidence indicates separate tables. | Keep separate table IDs. |
+| **likely_continued** | Features strongly support continuation. | Merge with page-aware row offsets and confidence. |
+| **possible_continuation** | Some features match but evidence is incomplete. | Keep linked but unmerged; request inspection. |
+| **conflict** | Features disagree. | Route to review or alternate parser. |
+| **unknown** | Insufficient evidence. | Do not merge automatically. |
+
+### **Table Citation Rule**
+
+A tabular claim must cite more than the cell value. It should cite:
+
+```text
+table_id
+page_id
+cell_id
+cell_bbox
+row_headers
+column_headers
+units
+caption
+footnotes
+continuation_state
+parser_version
+```
+
+A cell without headers is not a fact. It is a number waiting to betray someone in finance.
 
 ## **V. Charts, Plots, and Visualized Data: Modality Conversion and Symbolic Reasoning**
 
-Charts, diagrams, and plots represent visual data encodings. To interpret a chart, a system must isolate its type, parse its axis scales, map its tick intervals, bind data series using legends, and extract the marks that encode numeric values.14  
-Relying on a Vision-Language Model to answer quantitative questions from visual impressions alone leads to errors.13 Models struggle with linear-to-logarithmic scale transitions, truncated baselines, and overlapping labels, often summarizing data through general impressions rather than precise values.13  
-To address these limitations, the architecture utilizes a chart interpretation pipeline to translate visual structures into structured datasets.
+Charts encode data visually. To answer questions about a chart, the system must identify chart type, parse axes, detect scale, bind legends to series, locate marks, convert pixels to values, preserve uncertainty, and execute calculations over the extracted data.
+
+A chart interpretation system should not rely on global visual impressions for quantitative answers. It should convert visual marks into structured data, then reason over the structured data.
 
 ### **Artifact 7: Chart Interpretation Pipeline**
 
-```
-+-------------------------------------------------------------------------------------------------------+  
-|                                     CHART INTERPRETATION PIPELINE                                     |  
-+-------------------------------------------------------------------------------------------------------+  
-|                                                                                                       |  
-|  [ Input Visual Chart / Plot Image ]                                                                  |  
-|       │                                                                                               |  
-|       ▼                                                                                               |  
-|  ──> ( Line, Vertical/Horizontal Bar, Scatter, Pie ) [46]             |  
-|       │                                                                                               |  
-|       ▼                                                                                               |  
-|  [ Axis & Metadata Localizer ]                                                                        |  
-|       ├── Title String Extraction & Coordinate Anchor Mapping                                     |  
-|       ├── Legend Segment Detection & Color-Series Associative Mapping                             |  
-|       └── Label & Ticks Parsing (X-axis string/date, Y-axis numerical values) [46]                    |  
-|       │                                                                                               |  
-|       ▼                                                                                               |  
-|                                                    |  
-|       ├── Pixel-to-Value Mapping Calculation (e.g., Pixel Y=450 corresponds to Value 10,000)          |  
-|       └── Scale Type Determination (Linear, Logarithmic, Exponential)                                 |  
-|       │                                                                                               |  
-|       ▼                                                                                               |  
-|  [ Visual Mark Extractor ]                                                                            |  
-|       ├── Spatial Mark Localization (Keypoints, bar boundaries, scatter coordinates)              |  
-|       ├── High-Precision Visual Reconstruction (Translates pixel offsets to tabular values)            |  
-|       └── Linearized Table Generation (Maps series labels to reconstructed coordinates)           |  
-|       │                                                                                               |  
-|       ▼                                                                                               |  
-|                                                                 |  
-|       ├── LLM Chain-of-Thought / Program-of-Thoughts Execution over Linearized Table [25]              |  
-|       └── Summary Statistics Validation (Mean, Min, Max consistency check)                        |  
-|       │                                                                                               |  
-|       ▼                                                                                               |  
-|  [ Grounded Final Fact Output ]                                                                       |  
-|                                                                                                       |  
-+-------------------------------------------------------------------------------------------------------+
+```text
++--------------------------------------------------------------------------------
+| CHART INTERPRETATION PIPELINE
++--------------------------------------------------------------------------------
+|
+| [ Input Chart Image ]
+|      |
+|      v
+| [ Chart Type Classifier ]
+|   line | bar | stacked bar | scatter | pie | area | mixed | unknown
+|      |
+|      v
+| [ Chart Region Segmentation ]
+|   plot area | title | axes | ticks | legends | labels | annotations
+|      |
+|      v
+| [ Axis and Scale Parser ]
+|   x-axis type | y-axis type | tick values | units | log/linear scale
+|      |
+|      v
+| [ Legend and Series Binder ]
+|   colors | markers | line styles | series names | confidence
+|      |
+|      v
+| [ Visual Mark Extractor ]
+|   bars | points | lines | segments | slices | error bars
+|      |
+|      v
+| [ Pixel-to-Value Conversion ]
+|   coordinate transform | scale transform | uncertainty estimate
+|      |
+|      v
+| [ Linearized Data Table ]
+|   series | x | y | units | source mark bbox | confidence
+|      |
+|      v
+| [ Programmatic / Symbolic Reasoning ]
+|   calculations over extracted table, not raw image impressions
+|      |
+|      v
+| [ Grounded Chart Claim ]
+|   claim + chart element citations + extraction uncertainty
+|
++--------------------------------------------------------------------------------
 ```
 
-The core modality conversion is executed by the DePlot engine, an end-to-end image-to-text Transformer trained specifically to translate visual charts directly into linearized tables.13  
-This decoupling of visual extraction from numeric reasoning improves performance on downstream ChartQA benchmarks.13 Rather than forcing a VLM to solve complex multi-hop mathematical queries over visual inputs, DePlot extracts the data table, allowing an LLM to execute symbolic python code (Program of Thoughts) to compute exact calculations.13  
-To improve structural accuracy, DePlot v2 models incorporate explicit structural pretraining tasks:
+### **Chart Data Object Schema**
 
-* **Visual Structure Prediction:** The model is trained to predict discrete metadata about the plot, such as the exact chart type, dominant color palettes associated with data series, and the coordinates of titles and legend items.14  
-* **Summary Statistics Prediction:** Pretraining objectives require the model to output calculated summary metrics (mean, maximum, minimum, and standard deviation) directly from the visual representation, regularizing the visual encoder's scale awareness.14  
-* **Numerical Comparison:** The model is tasked with outputting comparative relational assertions (e.g., "Series A is greater than Series B at tick interval X") directly from the chart image, aligning visual comparisons with logical operations.14
+```json
+{
+  "chart_id": "chart_p007_001",
+  "source_document_id": "doc_9ab3",
+  "page_id": "p007",
+  "chart_type": "line",
+  "bbox": [90, 130, 915, 760],
+  "title": {
+    "text": "Operating Margin by Quarter",
+    "bbox": [260, 85, 740, 122]
+  },
+  "axes": {
+    "x": {
+      "label": "Quarter",
+      "scale": "categorical",
+      "tick_values": ["Q1 2026", "Q2 2026", "Q3 2026"],
+      "bbox": [140, 700, 850, 742]
+    },
+    "y": {
+      "label": "Operating Margin (%)",
+      "scale": "linear",
+      "tick_values": [0, 5, 10, 15, 20],
+      "bbox": [92, 150, 140, 700]
+    }
+  },
+  "series": [
+    {
+      "name": "Industrial Machinery",
+      "legend_bbox": [720, 160, 895, 190],
+      "marks": [
+        {
+          "x": "Q2 2026",
+          "y": 14.2,
+          "units": "percent",
+          "mark_bbox": [430, 278, 445, 293],
+          "value_confidence": 0.94
+        }
+      ]
+    }
+  ]
+}
+```
+
+### **Chart Verification Checks**
+
+| Check | Purpose |
+| :--- | :--- |
+| **Chart-type confidence** | Prevents using line-chart logic on stacked bars or mixed charts. |
+| **Axis-label extraction** | Preserves units and variable names. |
+| **Tick interval consistency** | Detects nonlinear, logarithmic, truncated, or broken axes. |
+| **Legend binding** | Prevents series-color confusion. |
+| **Mark localization confidence** | Determines whether visual marks were actually found. |
+| **Pixel-to-value uncertainty** | Quantifies extraction precision. |
+| **Data-table validation** | Checks extracted values against visual layout and summary statistics. |
+| **Citation binding** | Links every numeric claim to chart region, axis, legend, and mark. |
+
+### **Symbolic Reasoning Rule**
+
+Use programmatic or symbolic calculation over extracted chart data:
+
+```text
+extracted_chart_table -> calculation trace -> grounded answer
+```
+
+Do not encode “chain-of-thought” as a production artifact. The durable artifact is a calculation trace over extracted data:
+
+```json
+{
+  "operation": "difference",
+  "inputs": [
+    { "series": "Industrial Machinery", "x": "Q2 2026", "y": 14.2 },
+    { "series": "Industrial Machinery", "x": "Q1 2026", "y": 12.9 }
+  ],
+  "result": 1.3,
+  "units": "percentage points"
+}
+```
+
+### **Chart Failure Modes**
+
+| Failure Mode | Symptom | Mitigation |
+| :--- | :--- | :--- |
+| **Axis Scale Misread** | Linear value inferred from log or truncated axis. | Parse scale and tick transform before extraction. |
+| **Legend Confusion** | Series values swapped. | Bind color/marker/line style to legend entries. |
+| **Overlapping Label Loss** | Tick or data labels omitted. | Use high-resolution crop and label-specific OCR. |
+| **Pie Slice Approximation Error** | Percentage inferred from visual area alone. | Prefer data labels or derender with uncertainty. |
+| **Chart Type Ambiguity** | Mixed chart treated as single type. | Decompose chart into mark layers. |
+| **Uncited Numeric Claim** | Number appears in answer with no mark/axis citation. | Block claim or route to inspection. |
 
 ## **VI. Images, Visual Grounding, and Region Evidence: Spatial Coordinate Mapping**
 
-Visual grounding is the architectural process that maps text assertions to spatial pixel coordinates.8 General image captioning models describe a scene globally but fail to isolate the precise visual coordinates that support a claim.8  
-Without spatial grounding, a system cannot verify whether its answer is based on actual image evidence or visual hallucination.8 In domains like insurance auditing, engineering diagram analysis, and contract validation, the system must show exactly what visual regions it inspected.2
+Visual grounding maps claims to spatial regions. A global image caption is not enough for high-stakes document, diagram, inspection, medical, financial, engineering, or interface tasks. The system must identify which pixels support the claim.
 
 ### **Artifact 8: Visual Grounding Model**
 
-```
-+---------------------------------------------------------------------------------------------------------+  
-|                                         VISUAL GROUNDING MODEL                                          |  
-+---------------------------------------------------------------------------------------------------------+  
-|                                                                                                         |  
-|                                                                                  |  
-|                                                                                                         |  
-|  0,0 ─────────────────────────────────────────────────────────────────────────────────────────────┐     |  
-|   │                                                                                              │     |  
-|   │                                                                    │     |  
-|   │  Bounding Box:                                                            │     |  
-|   │  Semantic Class: Text Block                                                                  │     |  
-|   │  Confidence: 0.985                                                                           │     |  
-|   │  Extracted Token Text: "The operating pressure must not exceed 150 PSI under standard load." │     |  
-|   │                                                                                              │     |  
-|   │                                                                    │     |  
-|   │  Bounding Box:                                                           │     |  
-|   │  Semantic Class: Technical Diagram                                                           │     |  
-|   │  Confidence: 0.991                                                                           │     |  
-|   │                                                                                              │     |  
-|   │       (Spatial Anchor Sub-Region: Pressure Gauge Visual Mark)                                │     │  
-|   │       Bounding Box:                                                      │     │  
-|   │       Visual Attribute: Needle pointing to red zone at 180 PSI                               │     │  
-|   │       Anchor Target ID: "mark_pressure_gauge_needle"                                         │     │  
-|   │       Grounding Confidence: 0.942                                                            │     │  
-|   │                                                                                              │     |  
-|   └──────────────────────────────────────────────────────────────────────────────────────────────┘     |  
-|                                                                                                 1000,1000|  
-|                                                                                                         |  
-|  Grounding Coordination Array:                                                                          |  
-|  {                                                                                                      |  
-|    "claim": "The equipment was operating in an over-pressure condition exceeding manual limits.",        |  
-|    "evidence_regions": [                                                                                |  
-|      { "id": "crop_1", "coordinates": , "modality": "text", "source": "page_12" },   |  
-|      { "id": "gauge_needle", "coordinates": , "modality": "visual", "source": "p12" }|  
-|    ],                                                                                                   |  
-|    "grounding_good_ratio": 0.963,                                                                       |  
-|    "spatial_semantic_alignment_score": 0.947                                                            |  
-|  }                                                                                                      |  
-+---------------------------------------------------------------------------------------------------------+
+```text
++--------------------------------------------------------------------------------
+| VISUAL GROUNDING MODEL
++--------------------------------------------------------------------------------
+|
+| Source:
+|   document_id: doc_pressure_manual
+|   page_id: p012
+|   coordinate_system: normalized_0_1000
+|
+| Evidence Regions:
+|
+|   region_text_limit
+|     class: text_block
+|     bbox: [72, 118, 612, 176]
+|     text: "The operating pressure must not exceed 150 PSI under standard load."
+|     confidence: 0.985
+|
+|   region_diagram
+|     class: technical_diagram
+|     bbox: [95, 245, 895, 720]
+|     confidence: 0.991
+|
+|   region_gauge_needle
+|     class: visual_mark
+|     parent: region_diagram
+|     bbox: [646, 438, 706, 512]
+|     attribute: needle pointing into red zone near 180 PSI
+|     confidence: 0.942
+|
+| Grounded Claim:
+|   "The equipment is shown operating above the stated 150 PSI limit."
+|
+| Required Support:
+|   text limit region + gauge needle region + gauge scale context
+|
++--------------------------------------------------------------------------------
 ```
 
-To resolve the limitation of page-level retrieval in RAG systems, architectures implement spatially grounded region retrieval via the Snappy paradigm.6  
-While ColPali provides page-level retrieval by encoding pages as 1024 patch embeddings, it does not natively output the precise sub-page bounding boxes containing the evidence.1  
-Snappy unifies this visual-patch representation with OCR coordination grids. During offline indexing, pages are rendered, patch embeddings are computed, and OCR engines extract text blocks with explicit bounding boxes.  
-At query time, Snappy repurposes ColPali's late-interaction attention weights to construct a visual relevance heatmap across the patch grid.6 For each page-patch j in a grid of W_grid x H_grid with page dimensions W x H, its spatial boundaries are mapped:  
-x_1 = (j mod W_grid) * (W / W_grid) y_1 = floor(j / W_grid) * (H / H_grid) x_2 = x_1 + (W / W_grid) y_2 = y_1 + (H / H_grid)  
-The visual score for patch j is calculated as the maximum cosine similarity to any query token vector q_i 7:  
-score_patch(j) = max_i ( (q_i. p_j) / (||q_i|| * ||p_j||) )  
-This score is then propagated to the OCR bounding boxes (B) via Intersection-over-Union (IoU) spatial weighting 7:  
-score_region(B) = sum_{j in P} ( IoU(P_j, B) * score_patch(j) )  
-where P_j is the patch coordinate box and P is the set of patches overlapping with B.7  
-This allows the retrieval engine to isolate and extract high-relevance visual crops, reducing downstream context window consumption by up to 52.3% and mitigating attention dilution in the generator.6
+### **Grounding Coordination Object**
+
+```json
+{
+  "claim_id": "claim_pressure_over_limit",
+  "claim": "The equipment is shown operating above the stated 150 PSI limit.",
+  "source": {
+    "document_id": "doc_pressure_manual",
+    "page_id": "p012",
+    "document_hash": "sha256:abc123"
+  },
+  "coordinate_system": {
+    "type": "normalized",
+    "width": 1000,
+    "height": 1000
+  },
+  "evidence_regions": [
+    {
+      "region_id": "region_text_limit",
+      "modality": "text",
+      "region_class": "text_block",
+      "bbox": [72, 118, 612, 176],
+      "extracted_text": "The operating pressure must not exceed 150 PSI under standard load.",
+      "confidence": 0.985
+    },
+    {
+      "region_id": "region_gauge_needle",
+      "modality": "visual",
+      "region_class": "visual_mark",
+      "bbox": [646, 438, 706, 512],
+      "visual_attribute": "needle points into red zone near 180 PSI",
+      "confidence": 0.942
+    },
+    {
+      "region_id": "region_gauge_scale",
+      "modality": "visual_text",
+      "region_class": "scale_labels",
+      "bbox": [575, 360, 790, 555],
+      "extracted_text": "150 180 PSI",
+      "confidence": 0.91
+    }
+  ],
+  "grounding": {
+    "grounding_good_ratio": 0.963,
+    "spatial_semantic_alignment_score": 0.947,
+    "inspection_adequacy": "sufficient"
+  }
+}
+```
+
+### **Patch-to-Region Relevance Propagation**
+
+Page-level visual retrieval can find relevant pages but often fails to identify the precise evidence region. Spatially grounded retrieval maps patch-level relevance onto OCR or layout boxes.
+
+Let:
+
+| Symbol | Meaning |
+| :--- | :--- |
+| `W`, `H` | Page image width and height. |
+| `W_grid`, `H_grid` | Patch grid width and height. |
+| `j` | Patch index. |
+| `P_j` | Patch coordinate box. |
+| `q_i` | Query token vector. |
+| `p_j` | Page patch vector. |
+| `B` | OCR/layout bounding box. |
+
+Patch coordinates:
+
+```text
+patch_width  = W / W_grid
+patch_height = H / H_grid
+
+x1_j = (j mod W_grid) * patch_width
+y1_j = floor(j / W_grid) * patch_height
+x2_j = x1_j + patch_width
+y2_j = y1_j + patch_height
+
+P_j = [x1_j, y1_j, x2_j, y2_j]
+```
+
+Patch score:
+
+```text
+score_patch(j) = max_i cosine(q_i, p_j)
+```
+
+Region score:
+
+```text
+score_region(B) =
+  sum over patches j overlapping B:
+    IoU(P_j, B) * score_patch(j)
+```
+
+### **Grounding Adequacy Rules**
+
+| Requirement | Reason |
+| :--- | :--- |
+| **Target region present** | Claim must be anchored to visible evidence. |
+| **Context region present** | Neighboring labels, scales, captions, or legends may define meaning. |
+| **Resolution sufficient** | Small text and visual marks require readable crops. |
+| **Coordinate chain intact** | Claim must map back to source page and region. |
+| **Uncertainty represented** | Ambiguous visual interpretation should not become confident text. |
+
+A grounded image claim should answer: what region supports this, what surrounding context defines it, and how confident is the localization?
 
 ## **VII. Video Evidence Sampling and Temporal Grounding: Event-Aware Structures**
 
-Video streams introduce a temporal dimension that challenges standard spatial context processing. Video data cannot be treated as an unstructured sequence of independent frames; doing so results in massive token redundancy, lost chronological context, and an inability to track motion and duration.15  
-If a system samples frames at random or at a static, low frame rate, it risks missing brief, critical visual events, reversing cause-and-effect relationships, and generating ungrounded answers.15
+Video adds time to visual evidence. A video claim may depend on event order, duration, motion, causality, speaker identity, object persistence, or a brief transient frame. Uniform sampling can miss the event that makes the claim true.
 
-```
-+-------------------------------------------------------------------------------------------------------+  
-|                                     VIDEO EVIDENCE SELECTION WORKFLOW                                 |  
-+-------------------------------------------------------------------------------------------------------+  
-|                                                                                                       |  
-|                                                                         |  
-|                                                                                                       |  
-|  ┌─────────────────────────────────────────────────────────────────────────────────────────────────┐  |  
-|  │ Stage 1: DINOv2 Visual Boundary Segmenter                                                      │  |  
-|  │                                                                                                 │  |  
-|  │  F(1)  F(30)  F(60)  F(90)  F(120)  F(150)  F(180)                                               │  |  
-|  │  [●]───[●]───[●]───[●]────[○]────[○]────[○]  <-- Temporal Cosine Similarity Curve                │  |  
-|  │                             ▲ (Local Similarity Minimum Detected at t=120s)                     │  |  
-|  │                                                                                                 │  |  
-|  │  Result: Temporal Event Boundaries Established :                                             │  |  
-|  │    Event A: 0s to 120s (Visually Homogeneous Scene A)                                           │  |  
-|  │    Event B: 121s to 180s (Visually Homogeneous Scene B)                                         │  |  
-|  └─────────────────────────────────┬───────────────────────────────────────────────────────────────┘  |  
-|                                    │                                                                  |  
-|                                    ▼                                                                  |  
-|  ┌─────────────────────────────────────────────────────────────────────────────────────────────────┐  |  
-|  │ Stage 2: BLIP2-ITM Query Relevance Localizer                                                   │  |  
-|  │                                                                                                 │  |  
-|  │  Query: "How many times does the technician press the red button before checking the gauge?"    │  |  
-|  │                                                                                                 │  |  
-|  │  - Event A Candidate Frames matched against Query via BLIP-2 ITM Semantic Scoring           │  |  
-|  │  - Event A Anchor Selected: Frame at t=45s (Relevance: 0.945)                                   │  |  
-|  │  - Event B Anchor Selected: Frame at t=155s (Relevance: 0.812)                                  │  |  
-|  └─────────────────────────────────┬───────────────────────────────────────────────────────────────┘  |  
-|                                    │                                                                  |  
-|                                    ▼                                                                  |  
-|  ┌─────────────────────────────────────────────────────────────────────────────────────────────────┐  |  
-|  │ Stage 3: Adaptive MMR Refiner                                                                  │  |  
-|  │                                                                                                 │  |  
-|  │  Optimizes keyframe set for query relevance, event coverage, and visual diversity.             │  |  
-|  │  Prevents sampling redundancy (e.g., discarding a second, visually identical frame at t=46s).    │  |  
-|  │                                                                                                 │  |  
-|  │  Final Selected Grounded Keyframe Set:                                                          │  |  
-|  │    - Frame 1: t=45s (Anchor, Technician presses button)                                     │  |  
-|  │    - Frame 2: t=90s (Refinement Frame, Technician presses button again)                     │  |  
-|  │    - Frame 3: t=155s (Anchor, Technician inspects pressure dial)                            │  |  
-|  └─────────────────────────────────────────────────────────────────────────────────────────────────┘  |  
-+-------------------------------------------------------------------------------------------------------+
+Video understanding requires temporal grounding: the system must locate the relevant time range and preserve the frames or clips that support the answer.
+
+### **Artifact 9: Temporal Evidence Pipeline**
+
+```text
++--------------------------------------------------------------------------------
+| VIDEO TEMPORAL EVIDENCE PIPELINE
++--------------------------------------------------------------------------------
+|
+| [ Source Video ]
+|   duration | fps | audio | subtitles | scene metadata | hash
+|        |
+|        v
+| [ Low-Cost Prepass ]
+|   shot boundaries | audio segments | subtitles | visual embeddings
+|        |
+|        v
+| [ Event Segmentation ]
+|   coherent temporal segments with start/end timestamps
+|        |
+|        v
+| [ Query-Aware Sampling Policy ]
+|   semantic | motion | hybrid | global summary | dialogue
+|        |
+|        v
+| [ Candidate Frame / Clip Selection ]
+|   anchor frames | refinement frames | dense motion windows
+|        |
+|        v
+| [ Temporal Inspection Adequacy Gate ]
+|   enough frames? event covered? order preserved? motion visible?
+|        |
+|        v
+| [ Event Verification ]
+|   object/action/speaker/sequence verification over selected interval
+|        |
+|        v
+| [ Grounded Temporal Claim ]
+|   claim + timestamp interval + frame IDs + uncertainty
+|
++--------------------------------------------------------------------------------
 ```
 
-Architectures implement structured frame selection and temporal grounding strategies to manage long-video inputs.
+### **Sampling Strategy Matrix**
 
-### **Artifact 9: Video Evidence Sampling and Temporal Grounding Model**
+| Query Type | Evidence Need | Sampling Strategy | Failure Risk |
+| :--- | :--- | :--- | :--- |
+| **Semantic-only** | Static objects, people, locations, scene contents. | Diverse keyframes from visually distinct segments. | Missing small objects or text if resolution is poor. |
+| **Motion-only** | Movement, direction, speed, repeated action, physical sequence. | Dense sampling inside candidate temporal windows. | Uniform sparse sampling may reverse or miss action. |
+| **Semantic + Motion** | Actor/object identity plus temporal action. | Anchor frames plus dense local windows around event. | Object identity or action sequence may be incomplete. |
+| **Dialogue / Speaker** | Spoken content, speaker turns, subtitle alignment. | Audio/subtitle alignment plus visual speaker frames. | Speaker attribution errors. |
+| **Global Summary** | Broad video overview. | Hierarchical segment sampling across beginning/middle/end plus salient events. | Over-selection and token bloat. |
+| **Rare Event Detection** | Brief safety, defect, anomaly, UI flash, or hand motion. | High-frequency pass around candidate anomaly windows. | Event may be missed entirely. |
 
-| Sampling Strategy | System Component | Core Algorithmic Mechanism | Temporal Alignment Target | Handling of Missed-Event Uncertainty |
-| :---- | :---- | :---- | :---- | :---- |
-| **Event-Anchored Frame Selection (EFS)** | **EFS Pipeline (Training-Free)** | DINOv2 self-supervised visual segment partitioning + BLIP2-ITM query-anchor selection + Adaptive MMR global refinement. | Visually homogeneous temporal segments representing semantic events. | Dynamic scaling of the Adaptive MMR diversity threshold based on video-content statistics. |
-| **Instruction-Conditioned Grounding (VideoITG)** | **VidThinker Annotation & Sampling Pipeline** | Adaptively matches frame selection categories to query profiles (Semantic, Motion, Hybrid, Non-Clues). | Segment localization via instruction-guided cross-modal reasoning. | Falls back to diverse global sampling (Beginning-Middle-End) if no visual cues are detected. |
-| **Wavelet-Boundary Selection (WFS-SB)** | **Multi-Resolution Wavelet Pipeline** | Wavelet transform decomposition of the similarity signal to clear high-frequency noise. | Semantic change signals extracted from the coarsest transform scale. | Local extrema check on coarse scales identifies robust boundaries under noise. |
+### **Temporal Evidence Object**
 
-The VideoITG VidThinker pipeline classifies incoming queries into four categories to align sampling density with reasoning needs 15:
+```json
+{
+  "video_id": "vid_2026_0042",
+  "source_hash": "sha256:abc123",
+  "claim_id": "claim_button_before_gauge",
+  "claim": "The technician presses the red button twice before checking the gauge.",
+  "evidence_intervals": [
+    {
+      "interval_id": "evt_001",
+      "start_sec": 43.7,
+      "end_sec": 46.2,
+      "event": "first button press",
+      "keyframes": [
+        { "frame_id": "f_0045_100", "timestamp_sec": 45.1, "bbox": [420, 380, 510, 460] }
+      ],
+      "confidence": 0.94
+    },
+    {
+      "interval_id": "evt_002",
+      "start_sec": 88.9,
+      "end_sec": 91.4,
+      "event": "second button press",
+      "keyframes": [
+        { "frame_id": "f_0090_300", "timestamp_sec": 90.3, "bbox": [415, 376, 512, 464] }
+      ],
+      "confidence": 0.91
+    },
+    {
+      "interval_id": "evt_003",
+      "start_sec": 153.2,
+      "end_sec": 158.8,
+      "event": "gauge inspection",
+      "keyframes": [
+        { "frame_id": "f_0155_000", "timestamp_sec": 155.0, "bbox": [610, 260, 790, 480] }
+      ],
+      "confidence": 0.88
+    }
+  ],
+  "temporal_order_verified": true
+}
+```
 
-* **Semantic-Only:** Queries focus on static objects, actors, or scenes (e.g., "What tools are on the workbench?"). The sampler extracts frame-level CLIP features and computes cosine similarities between adjacent frames.15 It retains a frame only when its similarity to the prior keyframe falls below a scene-change threshold, maximizing visual diversity.15  
-* **Motion-Only:** Queries target dynamic actions, speeds, or pathways (e.g., "Which direction did the vehicle turn?"). The pipeline bypasses scene-change filters, deploying high-frequency, fixed-rate sampling within the target segment to preserve temporal progression.15  
-* **Semantic & Motion:** Queries combine static identification and dynamic progress tracking (e.g., "Describe how the operator adjusted the valve"). The pipeline uses hybrid sampling, running fixed-rate extraction in regions with high motion indicators while retaining semantic anchor frames from stable scenes.15  
-* **Non-Clues:** Queries contain global requests lacking explicit temporal or semantic anchors (e.g., "Please describe the video in detail"). The sampler extracts a compact, diverse keyframe set distributed evenly across the video sequence.15
+### **Video Evaluation Diagnostics**
 
-To evaluate the validity of video benchmarks and prevent language-prior bias, architectures implement Frame Selection Sensitivity (FSS) and Language Independence Score (LIS) diagnostics.28  
-The FSS diagnostic isolates a VLM's true frame-level sensitivity by measuring the performance delta when the system receives the K most query-relevant frames (MaxProb) versus the K least relevant frames (MinProb).28  
-The LIS diagnostic evaluates the VLM's performance on the benchmark questions when given zero frame inputs, exposing language-prior shortcuts.28 If a benchmark demonstrates high LIS and low FSS, the questions are frame-agnostic, and high model scores reflect language reasoning rather than visual temporal understanding.28 System evaluation must prioritize frame-sensitive tasks to measure temporal grounding.
+| Diagnostic | Meaning | Use |
+| :--- | :--- | :--- |
+| **Frame Selection Sensitivity** | Accuracy delta between relevant and irrelevant frame sets. | Detects whether benchmark/model actually depends on visual evidence. |
+| **Language Independence Score** | Accuracy without frames. | Detects language-prior shortcuts. |
+| **Temporal IoU** | Overlap between predicted and ground-truth time ranges. | Measures temporal localization. |
+| **Event Recall** | Fraction of required events included in selected frames/clips. | Detects missed-event failures. |
+| **Order Accuracy** | Whether event sequence is preserved. | Detects reversal and causality errors. |
+| **Frame Budget Efficiency** | Evidence coverage per selected frame/token. | Controls cost and context size. |
+
+### **Temporal Grounding Rule**
+
+A video claim should not cite the whole video unless the whole video is the evidence. It should cite:
+
+```text
+video_id
+timestamp interval
+selected frame IDs
+event labels
+object/person boxes when relevant
+sampling policy
+confidence
+```
+
+A video answer without time is just vibes with a progress bar.
 
 ## **VIII. Multimodal Embeddings, Retrieval, and Indexing: Hybrid Storage**
 
-To serve diverse multimodal queries at scale, high-dimensional AI systems cannot rely on a single, flattened vector database.2  
-Enterprise corpora contain a mixture of text-native documents, complex visual tables, engineering diagrams, and videos, requiring a hybrid indexing strategy.2 This indexing strategy must preserve textual content, layout hierarchies, and visual patch representations in parallel, routing queries dynamically to the optimal index endpoint.2
+A production multimodal system cannot rely on one flattened vector index. Enterprise corpora contain text-native PDFs, scanned documents, forms, tables, charts, engineering diagrams, screenshots, and videos. Each modality requires different retrieval signals and different evidence packets.
+
+The retrieval architecture should preserve parallel representations:
+
+* text spans
+* layout nodes
+* page images
+* OCR boxes
+* table cells
+* chart marks
+* visual patch embeddings
+* video keyframes
+* temporal segments
+* source provenance
 
 ### **Artifact 10: Multimodal Indexing Strategy**
 
-```
-Multimodal Storage Cluster  
- ├── Vector Database (e.g., Qdrant / Milvus with Multi-Vector Collections) [18]  
- │    ├── Late-Interaction Index (Rank Vectors Field)  
- │    │    ├── Content: 1024 patch embeddings per page (ColPali SigLIP projected to 128-dim)   
- │    │    ├── Dimension: 1024 x 128 float32 vectors (~527KB per page) [18, 50]  
- │    │    └── Index Configuration: HNSW with MaxSim Distance Metric   
- │    └── Single-Vector Index (Dense Field)  
- │         ├── Content: Mean-pooled ColPali page embeddings [7, 51]  
- │         ├── Dimension: 128-dim float32 vector  
- │         └── Index Configuration: Standard Cosine Search for ANN Candidates [7, 51]  
- ├── Relational Database (e.g., PostgreSQL with pgvector)   
- │    ├── Text-Native Index  
- │    │    ├── Content: Native PDF extracted strings + Markdown layouts [31, 35]  
- │    │    └── Search Method: BM25 / Hybrid Dense-Sparse Routing   
- │    └── Spatial Coordinate Registry (OCR Metadata Field)  
- │         ├── Content: Bounding box coordinates [x1, y1, x2, y2] + DocTags markup [5, 7]  
- │         └── Search Method: SQL-based spatial overlapping query checks  
- └── Object Storage (e.g., MinIO / AWS S3)   
-      ├── Page Image Store (300 DPI high-fidelity rendered PNGs)   
-      ├── Image Region Crops (SAM and POTATR segmented boxes)   
-      └── Video Keyframe Clusters (EFS and VideoITG sampled frames) 
+```text
++--------------------------------------------------------------------------------
+| MULTIMODAL STORAGE AND INDEXING CLUSTER
++--------------------------------------------------------------------------------
+|
+| Object Store
+|   source files
+|   rendered page images
+|   region crops
+|   chart crops
+|   video keyframes
+|   parser artifacts
+|        |
+|        v
+| Relational Metadata Store
+|   document records
+|   page records
+|   layout nodes
+|   bounding boxes
+|   table cells
+|   chart marks
+|   video segments
+|   parser versions
+|        |
+|        v
+| Text Retrieval Index
+|   BM25 / sparse
+|   dense text embeddings
+|   metadata filters
+|        |
+|        v
+| Visual Retrieval Index
+|   single-vector page/image embeddings for candidate retrieval
+|   multi-vector page patch embeddings for late-interaction reranking
+|        |
+|        v
+| Specialized Evidence Indexes
+|   table index
+|   chart data index
+|   form field index
+|   object/region index
+|   temporal video index
+|
++--------------------------------------------------------------------------------
 ```
 
-At query time, the system uses a Multimodal Retrieval Decision Model to map the incoming query profile to the optimal retrieval endpoint.
+### **Late-Interaction Retrieval Posture**
+
+Late-interaction systems often store multiple vectors per page or image. Approximate nearest-neighbor search may be used to retrieve candidates through pooled or representative vectors, but **MaxSim is a scoring/reranking operation over multi-vectors**, not a normal single-vector HNSW distance metric in the ordinary dense-vector sense.
+
+A safe retrieval pattern is:
+
+```text
+1. Use metadata, lexical search, or pooled dense vectors to retrieve candidates.
+
+2. Load candidate page/image multi-vectors.
+
+3. Compute late-interaction MaxSim score over query tokens and candidate patches.
+
+4. Rerank candidates.
+
+5. Propagate patch scores to regions, boxes, or OCR/layout nodes.
+
+6. Return localized evidence packets, not just whole pages.
+```
+
+### **Hybrid Index Components**
+
+| Index | Stored Representation | Best For | Return Artifact |
+| :--- | :--- | :--- | :--- |
+| **Text-Native Index** | Extracted spans, chunks, section headers, metadata. | Exact entities, legal clauses, titles, IDs. | Text evidence packet with coordinates. |
+| **Layout Node Index** | Page objects, reading order, captions, footnotes, suppressed metadata. | Layout-dependent documents. | Layout graph packet. |
+| **Visual Page Index** | Page/image embeddings and patch vectors. | Visually rich pages, diagrams, scanned pages. | Candidate pages and patch relevance map. |
+| **Spatial Coordinate Registry** | Bounding boxes for spans, figures, tables, cells, fields, marks. | Localized evidence and citations. | Coordinate-bearing region packet. |
+| **Table Index** | Tables, cells, row/column headers, units, footnotes. | Quantitative table QA. | Cell evidence packet. |
+| **Chart Index** | Chart type, axes, series, marks, extracted data table. | Chart QA and numeric reasoning. | Chart data packet. |
+| **Form Field Index** | Form templates, label-value pairs, checkbox states, signatures. | Invoice, receipt, administrative forms. | Field evidence packet. |
+| **Video Temporal Index** | Segments, keyframes, subtitles, object tracks, embeddings. | Video QA, event search, temporal grounding. | Timestamp/frame evidence packet. |
 
 ### **Artifact 11: Multimodal Retrieval Decision Model**
 
-| Query Profile | Target Document Type | Primary Index Route | Retrieval Method | Reranking / Post-Processing |
-| :---- | :---- | :---- | :---- | :---- |
-| **Lexical / Entity-Specific** (e.g., "Retrieve Invoice #A10-9") | Text-Native Digital PDF | Text-Native Index | BM25 lexical search with exact metadata filtering | Contextual Chunk Header Injection (injects metadata like title and date) |
-| **Visual-Spatial Layout** (e.g., "Find slides with a three-box comparison diagram") | Visually Rich Presentations / Manuals | Late-Interaction Index | Page-image late-interaction MaxSim search | Late-interaction MaxSim scoring on candidate set |
-| **Spatially Grounded Factual** (e.g., "What is the Q3 operating margin in Table 4?") | Scanned PDFs with complex structural tables | Hybrid Index (Late-Interaction + OCR Coordinate Registry) | Two-stage retrieval (ANN candidates -> Full patch MaxSim scoring) | **Snappy Relevance Propagation**: IoU-weighted patch score mapping |
-| **Temporal Action Sequence** (e.g., "Show when the operator flips the emergency switch") | Video Sequence Database | Video Keyframe & Temporal Index | VideoITG Instruction-conditioned clip-level matching | **Event-Anchored Frame Selection**: DINOv2 visual segment partitioning + Adaptive MMR |
+| Query Profile | Target Artifact | Primary Route | Retrieval Method | Post-Processing |
+| :--- | :--- | :--- | :--- | :--- |
+| **Lexical / Entity-Specific** | Text-native document. | Text index. | BM25/exact metadata + dense rerank. | Section and coordinate citation. |
+| **Visual-Spatial Layout** | Presentation, manual, diagram, screenshot. | Visual page index. | Candidate retrieval + late-interaction rerank. | Region localization and crop extraction. |
+| **Table Fact** | Scanned or digital table. | Table index + coordinate registry. | Table/cell retrieval with header binding. | Cell, row, column, caption citation. |
+| **Chart Numeric Question** | Chart or plot. | Chart index / chart crop route. | Chart detection and derendering. | Extracted data table + calculation trace. |
+| **Form Extraction** | Invoice, receipt, administrative form. | Form field index. | Template matching + label-value binding. | Field object with state and confidence. |
+| **Temporal Action Sequence** | Video. | Temporal video index. | Segment retrieval + query-aware sampling. | Timestamp interval and frame citation. |
+| **Uncertain / Mixed Modality** | Unknown or hybrid artifact. | Multi-route fanout with budget cap. | Run cheap routes first, escalate selectively. | Evidence adequacy gate chooses final packet. |
 
-The physical ingestion pipelines are separated using explicit classification gates to prevent routing text-native documents through expensive VLM inference.
+### **Ingestion Routing Flow**
 
+```text
++--------------------------------------------------------------------------------
+| INGESTION ROUTING CLASSIFIER FLOW
++--------------------------------------------------------------------------------
+|
+| [ Source Artifact ]
+|      |
+|      v
+| [ Fingerprint and Inspect ]
+|   file type | hash | pages | duration | embedded text | image coverage
+|      |
+|      v
+| [ Route Decision ]
+|      |
+|      +--> text quality high, layout simple
+|      |       -> text-native parser + coordinate spans
+|      |
+|      +--> embedded text present but layout complex
+|      |       -> hybrid text + layout parser
+|      |
+|      +--> image-heavy or scanned
+|      |       -> render + OCR/VLM visual parser
+|      |
+|      +--> table-heavy
+|      |       -> table detector + structure recognizer
+|      |
+|      +--> chart-heavy
+|      |       -> chart detector + derendering path
+|      |
+|      +--> video
+|              -> temporal segmentation + keyframe index
+|
++--------------------------------------------------------------------------------
 ```
-+---------------------------------------------------------------------------------------------------------+  
-|                                  INGESTION ROUTING CLASSIFIER FLOW                                      |  
-+---------------------------------------------------------------------------------------------------------+  
-|                                                                                                         |  
-|                                                                       |  
-|       │                                                                                                 |  
-|       ▼                                                                                                 |  
-|                                                                  |  
-|       │                                                                                                 |  
-|       ├──> ( Native Text Characters Count > 100 ) ──────────────────>      |  
-|       │                                                               ( Low cost, fast extraction )     |  
-|       │                                                                                                 |  
-|       └──> ( Native Text Characters Count <= 100 ) ─────────────────>|  
-|                                                                       ( Rasterize at 300 DPI, run VLM)  |  
-|                                                                                                         |  
-|  Operational Impact :                                                                                |  
-|  - In standard enterprise corpora, this selective routing bypasses VLM ingestion for 60% to 75% of      |  
-|    pages, reducing ingestion cost and API latency proportionally without losing visual accuracy.       |  
-|                                                                                                         |  
-+---------------------------------------------------------------------------------------------------------+
-```
+
+Routing policies should be measured by cost saved, extraction accuracy, fallback frequency, and downstream answer grounding. Cheap extraction is good only when it preserves the evidence needed for the task.
 
 ## **IX. Evidence Selection and Inspection Adequacy**
 
-Before passing retrieved evidence to the visual generator, the system must assess whether the evidence is adequate to answer the query.2 An agent loop must evaluate whether the target crop contains enough resolution, whether the layout context has been preserved, and whether neighboring visual elements must be retrieved to make an audit-proof claim.2
+Retrieved evidence is not automatically adequate evidence. A page, crop, table cell, chart mark, or video frame may be relevant but still insufficient to support the final claim.
+
+The system must evaluate whether the selected evidence is legible, complete, contextualized, and appropriate for the task before generating an answer.
 
 ### **Artifact 12: Evidence Selection Quality Framework**
 
-```
-Evidence Quality Diagnostic Matrix  
- ├── 1. Ingestion Quality Assessments  
- │    ├── Page Resolution Verification  
- │    │    ├── Metric: Rendering DPI check  
- │    │    ├── Rule: If DPI < 150, trigger high-fidelity upscaling or raise Low-Resolution Warning   
- │    │    └── Operational Limit: Characters compressed below vision token grid limits cannot be resolved   
- │    ├── Document Skew & Orientation  
- │    │    ├── Metric: Rotational angle detection  
- │    │    └── Action: Run geometric deskewing if skew angle > 3 degrees   
- │    └── Ingestion Contrast & Lighting  
- │         ├── Metric: Local pixel intensity variance  
- │         └── Action: Contrast Enhancement Filter (Histogram Equalization)   
- ├── 2. Structural Integrity Inspections  
- │    ├── Spatial Context Limits Check  
- │    │    ├── Metric: Spatial Bounding Box Coverage Ratio  
- │    │    └── Diagnostic Check: Are visual markers, titles, or headers cropped out?  
- │    ├── Neighboring Page Context Verification  
- │    │    ├── Metric: Table / Paragraph Continuation Flag  
- │    │    └── Action: Retrieve adjacent page N-1 and N+1 images if multi-page continuation is detected   
- │    └── Caption-Figure Association Alignment  
- │         ├── Metric: Geometric distance to nearest label node  
- │         └── Action: Force parent-child spatial graph edge grouping in POTATR   
- └── 3. Decision Control Logic  
-      ├── If Ingestion Quality is INSUFFICIENT -> Trigger Fallback OCR Engine (PaddleOCR local server)   
-      ├── If Structural Context is INCOMPLETE -> Expand bounding box boundaries by 10% [9]  
-      └── If Confidence is low -> Elevate Uncertainty and route to Human-in-the-Loop Verification 
-```
+| Adequacy Dimension | Failure Signal | Corrective Action |
+| :--- | :--- | :--- |
+| **Resolution** | Small text unreadable, OCR confidence low, crop too compressed. | Re-render at higher DPI, upscale crop, or retrieve full page. |
+| **Crop Coverage** | Headers, axis labels, footnotes, legend, caption, or surrounding context missing. | Expand crop or retrieve neighboring layout nodes. |
+| **Coordinate Validity** | Bounding box outside page, zero-area box, wrong page ID. | Recompute coordinates or route to parser fallback. |
+| **Reading Order** | Multi-column text interleaves or skips clauses. | Use layout-aware parser and reading-order reconstruction. |
+| **Header Binding** | Table cell lacks row/column header. | Retrieve header cells, spanning cells, caption, and units. |
+| **Axis / Legend Binding** | Chart mark lacks scale or series identity. | Retrieve axis, legend, ticks, and plot area. |
+| **Temporal Coverage** | Video frames miss action start/end or sequence order. | Increase sampling density around candidate event interval. |
+| **Source Freshness** | Artifact version hash does not match active source. | Re-ingest source and invalidate stale index entries. |
+| **Permission Scope** | Evidence region belongs to unauthorized tenant or document. | Block evidence and reroute retrieval under active permission. |
+| **Uncertainty** | Confidence below threshold or conflicting parser outputs. | Use fallback parser, second-pass inspection, or human review. |
 
-To guide this automated verification process, the pipeline enforces a minimum evidence verification matrix across all task categories.
+### **Task-Specific Minimum Evidence Matrix**
 
-### **Artifact 13: Inspection Adequacy Framework**
+| Task Category | Minimum Evidence Units | Required Coordinate Targets | Adequacy Checks |
+| :--- | :--- | :--- | :--- |
+| **Contract / Legal Answer** | Target clause, adjacent definitions, footnotes, cross-references, page context. | Paragraph box, definition box, footnote box, page ID. | Reading-order confidence, version status, full clause coverage. |
+| **Invoice / Receipt / Financial Audit** | Label-value pairs, totals, tax markers, vendor/customer identifiers, signature/stamp if relevant. | Label bbox, value bbox, total bbox, signature/stamp bbox. | OCR confidence, arithmetic consistency, field-state completeness. |
+| **Tabular Quantitative Extraction** | Cell value, row header, column header, units, caption, footnotes, continuation status. | Cell bbox, header bboxes, table bbox, caption bbox. | Header binding, GriTS/TEDS, continuation confidence. |
+| **Chart / Plot Interpretation** | Chart title, axes, tick labels, legend, marks, annotations. | Plot area, axis boxes, legend boxes, mark boxes. | Scale detection, legend binding, extraction uncertainty. |
+| **Engineering Diagram Analysis** | Component crop, surrounding schematic context, labels, legends, scale/reference notes. | Component bbox, label bbox, diagram bbox. | Object localization confidence, context coverage, resolution. |
+| **Form Understanding** | Field label, field value, checkbox/signature/stamp regions, template metadata. | Label bbox, value bbox, mark bbox. | Label-value binding, field state, template confidence. |
+| **Video Sequence QA** | Event keyframes/clips, timestamp interval, subtitles/audio when needed, object/person boxes. | Time interval, frame IDs, frame-level boxes. | Temporal order, event coverage, frame selection sensitivity. |
+| **Screen / GUI Understanding** | Target UI element, label, surrounding container, active state, cursor/focus context. | Element bbox, label bbox, viewport coordinates. | Coordinate precision, click safety, stale screenshot check. |
 
-```
-Task-Specific Minimum Evidence Verification Matrix
+### **Inspection Decision Policy**
 
- ├── Task Category: Contract & Legal Answers  
- │    ├── Minimum Evidence Units: Full-page image + Adjacent definition clauses + Footnotes [33]  
- │    ├── Bounding Coordination Target: Coordinate box of target paragraph + Bounding box of cross-references  
- │    └── Verification Metrics: Strict Reading-Order F1  + Paragraph Hierarchy Preservation 
+| Adequacy State | Meaning | System Behavior |
+| :--- | :--- | :--- |
+| **sufficient** | Evidence is complete and legible enough for the claim. | Generate grounded answer with citation. |
+| **insufficient_resolution** | Evidence is relevant but unreadable. | Re-render/upscale or ask for better source. |
+| **insufficient_context** | Evidence lacks surrounding headers, labels, scale, or footnotes. | Expand crop or retrieve adjacent regions. |
+| **conflicting_evidence** | Evidence sources disagree. | Surface conflict and route to source-authority logic. |
+| **unauthorized** | Evidence violates active access scope. | Block and log. |
+| **unverifiable** | Source lacks adequate coordinate or verification path. | Report uncertainty or route to review. |
+| **human_review_required** | Automated inspection cannot safely decide. | Create review packet with crops and candidate extraction. |
 
- ├── Task Category: Invoices, Receipts & Financial Audit  
- │    ├── Minimum Evidence Units: Label-value coordinate pairs + Corporate identifier + Totals + Tax markers   
- │    ├── Bounding Coordination Target: Field labels [x1,y1,x2,y2] + Field values [x1,y1,x2,y2][9]  
- │    └── Verification Metrics: Exact match character OCR confidence > 0.95 + Grid validation (Columns match Rows)
+### **Evidence Adequacy Rule**
 
- ├── Task Category: Tabular Quantitative Extraction  
- │    ├── Minimum Evidence Units: Cell value + Target column header + Target row header + Spanning cell context   
- │    ├── Bounding Coordination Target: Cell coordinate box + Column header box + Table caption coordinate box   
- │    └── Verification Metrics: GriTS Content score > 0.92  + Continuation Merge verified 
+```text
+Relevant is not enough.
+Visible is not enough.
+Cited is not enough.
 
- ├── Task Category: Visual Diagram / Engineering Drawing Analysis  
- │    ├── Minimum Evidence Units: Focus component crop + High-resolution surrounding schematic context + Legends   
- │    ├── Bounding Coordination Target: Target visual object bounding box + Spatial annotation box [9]  
- │    └── Verification Metrics: IoU on localized components > 0.85 [9] + Resolution minimum of 300 DPI 
-
- ├── Task Category: Video Dialog & Sequence QA  
- │    ├── Minimum Evidence Units: Event keyframes + Timestamp sequences + Subtitle transcripts + Speaker identifiers   
- │    ├── Bounding Coordination Target: Timestamp range [t_start, t_end] + Frame-level bounding boxes [16, 52]  
- │    └── Verification Metrics: Frame Selection Sensitivity (FSS) > 0.40  + Temporal Order F1 
+The evidence must be adequate for the claim being made.
 ```
 
 ## **X. Evidence Provenance, Citation, and Production Observability**
 
-A production-grade multimodal system has not understood an artifact unless it can show the exact visual and temporal coordinates that support its answer.2  
-If a page image is rendered, segmented, cropped, embedded, and summarized, the system must preserve a continuous coordinate chain from the final text token back to the original source coordinates. Any loss of provenance during these transformations makes the output unauditable, preventing human-in-the-loop validation and automated regression testing.  
-To ensure verifiability, the system requires a structured citation schema.
+A production multimodal system has not understood an artifact unless it can show the exact evidence that supports its answer. The system must preserve a coordinate chain from the generated claim back to the original source artifact.
+
+This requires structured citations, failure-mode tracking, and production metrics for OCR, layout, retrieval, extraction, grounding, and citation fidelity.
 
 ### **Artifact 14: Multimodal Evidence Citation Model**
 
-```JSON  
-{  
-  "$schema": "https://ai-engineering.canon/schemas/multimodal-citation-v1.json",  
-  "citation_id": "cite_2026_06_10_08912",  
-  "source_document": {  
-    "document_uuid": "doc_8f92a10c-3b9e-4a8f-b9c2-7d8e9f0a1b2c",  
-    "document_hash": "sha256_e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",  
-    "filename": "Q2_2026_financial_report.pdf"  
-  },  
-  "grounded_claims": [  
-    {  
-      "claim_id": "claim_1",  
-      "text": "Operating margins for the Industrial Machinery segment rose to 14.2% in Q2 2026.",  
-      "evidence_class": "structured_table_cell",  
-      "confidence": 0.982,  
-      "page_evidence": {  
-        "page_number": 12,  
-        "coordinate_system": {  
-          "grid_width": 1000,  
-          "grid_height": 1000,  
-          "coordinate_standard": "normalized"  
-        },  
-        "target_regions": [  
-          {  
-            "region_id": "tbl_12_1",  
-            "region_class": "table_block",  
-            "bounding_box": ,  
-            "context_markup": "<Table class='POTATR-v1.0' id='tbl_42_1'>"  
-          },  
-          {  
-            "region_id": "cell_row_4_col_3",  
-            "region_class": "table_cell",  
-            "bounding_box": ,  
-            "cell_value": "14.2%",  
-            "cell_headers": ["Operating Margin", "Q2 2026", "Industrial Machinery"]  
-          }  
-        ]  
-      }  
-    },  
-    {  
-      "claim_id": "claim_2",  
-      "text": "The increase was driven by the installation of the ACME-400 valve configuration.",  
-      "evidence_class": "annotated_figure",  
-      "confidence": 0.941,  
-      "page_evidence": {  
-        "page_number": 43,  
-        "coordinate_system": {  
-          "grid_width": 1000,  
-          "grid_height": 1000,  
-          "coordinate_standard": "normalized"  
-        },  
-        "target_regions": [  
-          {  
-            "region_id": "fig_43_2",  
-            "region_class": "figure_image",  
-            "bounding_box": ,  
-            "context_markup": "<Figure class='olmOCR' id='fig_43_2'>"  
-          },  
-          {  
-            "region_id": "component_annotation_valve",  
-            "region_class": "figure_markup_annotation",  
-            "bounding_box": ,  
-            "annotated_value": "ACME-400 Valve Assembly"  
-          }  
-        ]  
-      }  
-    }  
-  ]  
+```json
+{
+  "$schema": "https://ai-engineering.canon/schemas/multimodal-citation-v1.json",
+  "citation_id": "cite_2026_06_10_08912",
+  "source_document": {
+    "document_uuid": "doc_8f92a10c-3b9e-4a8f-b9c2-7d8e9f0a1b2c",
+    "document_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "filename": "Q2_2026_financial_report.pdf",
+    "source_version": "v2026.06.10"
+  },
+  "rendering": {
+    "renderer": "page_renderer",
+    "renderer_version": "1.8.0",
+    "dpi": 300,
+    "coordinate_system": {
+      "type": "normalized",
+      "width": 1000,
+      "height": 1000
+    }
+  },
+  "grounded_claims": [
+    {
+      "claim_id": "claim_1",
+      "text": "Operating margins for the Industrial Machinery segment rose to 14.2% in Q2 2026.",
+      "evidence_class": "structured_table_cell",
+      "confidence": 0.982,
+      "evidence_regions": [
+        {
+          "region_id": "tbl_12_1",
+          "page_number": 12,
+          "region_class": "table_block",
+          "bounding_box": [78, 142, 930, 842],
+          "context_markup": "<Table id='tbl_12_1'>",
+          "parser": "table_extractor_v3"
+        },
+        {
+          "region_id": "cell_row_4_col_3",
+          "page_number": 12,
+          "region_class": "table_cell",
+          "bounding_box": [545, 430, 665, 462],
+          "cell_value": "14.2%",
+          "cell_headers": [
+            "Operating Margin",
+            "Q2 2026",
+            "Industrial Machinery"
+          ],
+          "units": "percent"
+        }
+      ]
+    },
+    {
+      "claim_id": "claim_2",
+      "text": "The increase was associated with the ACME-400 valve configuration.",
+      "evidence_class": "annotated_figure",
+      "confidence": 0.941,
+      "evidence_regions": [
+        {
+          "region_id": "fig_43_2",
+          "page_number": 43,
+          "region_class": "figure_image",
+          "bounding_box": [112, 185, 890, 710],
+          "context_markup": "<Figure id='fig_43_2'>"
+        },
+        {
+          "region_id": "component_annotation_valve",
+          "page_number": 43,
+          "region_class": "figure_annotation",
+          "bounding_box": [624, 390, 812, 438],
+          "annotated_value": "ACME-400 Valve Assembly"
+        }
+      ]
+    }
+  ],
+  "replay": {
+    "page_image_ids": ["p012_render_300dpi", "p043_render_300dpi"],
+    "crop_ids": ["crop_tbl_12_1", "crop_cell_row_4_col_3", "crop_fig_43_2"],
+    "index_version": "mm_index_2026_06_10",
+    "parser_manifest_id": "parser_manifest_v14"
+  }
 }
 ```
 
-This structured citation format ensures that every quantitative or factual claim is auditable.  
-If an operator hovers over a claim in the user interface, the system can draw the exact bounding boxes over the high-resolution source document page image.2  
-Architectures deploy a structured Failure Mode Map to diagnose and mitigate issues across these processing stages.
-
 ### **Artifact 15: Multimodal Failure Mode Map**
 
-| Failure Mode | Symptom | Root Cause | Detection Signal | Prevention & Architectural Mitigation |
-| :---- | :---- | :---- | :---- | :---- |
-| **OCR Drift** 10 | Downstream LLM misreads or hallucinates alphanumeric values (e.g., parsing "1" as "l" or "0" as "O").10 | Low rendering resolution (<150 DPI) or degraded scanned fonts.4 | OCR per-token confidence scores drop below 0.85.10 | Force 300 DPI rasterization + swap Tesseract default with a localized PaddleOCR/EasyOCR fallback server.2 |
-| **Layout Collapse** 5 | Multi-column text blocks or marginalia are parsed out of order, interleaving unrelated sentences.29 | Heuristic-based geometric parsing lines cross column boundaries without structural awareness.5 | Downstream QA evaluations show low Reading-Order F1 scores (<0.70).36 | Replace sequential parsing chains with end-to-end compact VLMs like GraniteDocling-258M compiling to DocTags markup.5 |
-| **Table Flattening** 4 | Cell contents are extracted as an unstructured text block; row-column headers are lost.4 | Naive text extraction tools ignore table lines and white-space alignment.4 | Standard RAG evaluations show low MRR on tabular queries.2 | Deploy POTATR parallel-decoded graph parser for full-page tables or TABLET split-merge sequence labeling for dense tables.12 |
-| **Chart Scale Misread** 13 | Visual reasoning models misinterpret line trends or fail to read numeric values on logarithmic axes.13 | Generative models read the global visual trend ("gestalt") rather than parsing axes and legends.13 | High failure rates on numerical comparison checklists.14 | Run DePlot modality conversion to translate visual charts to linearized tables prior to downstream text reasoning.13 |
-| **Form Field Misbinding** 4 | Field values are mapped to incorrect labels, or handwritten checks are missed.4 | Spatial layout heuristics fail under complex, multi-column administrative layouts.4 | Form validator detects empty required fields or confidence scores drop.10 | Implement a Form Understanding Model with explicit bounding box schema templates, mapping pixel-intensity thresholds for checkboxes.4 |
-| **Temporal Reversal** 16 | Video dialog agents confuse the chronological sequence of events (e.g., misinterpreting what happened first).28 | Flat, temporally-agnostic uniform frame sampling misses critical state-transition boundaries.15 | Downstream video QA shows near-zero accuracy on ordering and duration tasks.28 | Implement Event-Anchored Frame Selection (EFS) using DINOv2 visual segment partitioning to detect boundaries.26 |
-| **Wrong Crop Retrieval** 2 | Generator receives an image crop containing irrelevant information, leading to attention dilution.6 | Patch-to-region score propagation fails due to incorrect IoU-weighted overlap mapping.7 | Region retrieval precision matches random selection baseline (~6.7%).20 | Recalibrate Snappy visual-patch to OCR-coordinate grid bounds checking.7 |
-| **Low-Resolution Crop** 2 | Model invents characters or numbers when processing small bounding boxes.11 | Vision encoders map small crops to a fixed token count, losing high-frequency features.11 | OCR character errors escalate on tiny text chunks.36 | Implement an Inspection Quality check to dynamically upscale crops to 300 DPI prior to tokenization.2 |
-| **Visual Similarity Confusion** | System retrieves a visually similar document or image template from the wrong date or customer. | Embedding model focuses on layout structures rather than exact semantic differences in small text regions. | High false positive rates on cross-document comparative queries. | Deploy a hybrid search routing index that crosses late-interaction visual embeddings with BM25 keyword indices.2 |
-| **Figure-Caption Separation** 2 | Visual figures are extracted without their caption metadata, losing component mapping references. | Page segmenters fail to construct directed associative edges between image blocks and text blocks. | Caption text recall F1 drops below standard baselines.38 | Deploy image-to-graph models like POTATR to explicitly predict directed parent-child edges between page objects.12 |
-| **Missed Video Frame** 15 | Sampling strategy misses brief transitions or events (e.g., flash of a defect indicator). | Fixed-rate or scene-change sampling interval is too coarse to catch sub-second event boundaries.15 | Low downstream accuracy on action-duration or event-localization tasks.28 | Deploy Wavelet-based Frame Selection (WFS-SB) to resolve semantic changes at coarse and fine visual scales.48 |
-| **Stale Media Ingestion** | Downstream agents base reasoning on outdated visual versions of document attachments or UI screens. | Pipeline fails to govern state updates, allowing historical visual embeddings to persist in active memory. | Mismatched metrics showing correct text retrieval but incorrect visual grounding coordinates. | Inherit state-governance protocols from AI-ENG-B to invalidate visual vectors when source files undergo revisions. |
-| **Source Provenance Loss** 10 | Generated claims cite document titles but fail to point to the exact page, crop, or cell coordinates.7 | Coordinate mappings are discarded during structural transformations (PDF -> OCR -> Embeddings). | Audit trace completeness score drops to zero, and claims become untrustworthy. | Enforce compliance-grade structured extraction (e.g., using LlamaParse or AWS Textract) to preserve coordinate chains.10 |
-| **Evidence Over-Selection** | Generator context window is flooded with redundant visual tokens, causing performance degradation. | Multi-vector visual index returns excessive page-patches instead of localized, ranked crops.6 | Ingestion latency, API costs, and context dilution errors increase proportionally.6 | Deploy Snappy spatially-grounded region filters to return targeted crop bounding boxes instead of full-page images.7 |
-| **Evidence Under-Selection** | System synthesizes an answer based on partial visual data, missing neighboring clauses or footnote units.12 | Retrieval range is bounded too narrowly, cutting off contiguous tables or layout blocks.21 | Downstream answer correctness drops on multi-page reasoning tasks.39 | Implement an Inspection Adequacy check to retrieve neighboring page context if continuation markers are flagged.39 |
-| **Unsupported Visual Inference** | Generator confidently asserts a claim based on a visual image without verified spatial grounding. | Model synthesizes answers from general scene impressions without locating supporting coordinates.8 | High rate of "plausible but ungrounded" answers during manual expert review. | Implement a verification gate from AI-ENG-O to block user-facing status updates if grounding ratio metrics drop below 0.90. |
-
-To maintain reliability in production, architectures must establish continuous evaluation pipelines. These pipelines track metrics across each visual, spatial, and temporal processing stage.
+| Failure Mode | Symptom | Root Cause | Detection Signal | Mitigation |
+| :--- | :--- | :--- | :--- | :--- |
+| **OCR Drift** | Alphanumeric values misread. | Low resolution, poor contrast, degraded fonts. | CER/WER increase; token confidence drop. | Re-render, enhance contrast, use alternate OCR, route to review. |
+| **Layout Collapse** | Columns, captions, or footnotes serialized incorrectly. | Text-only extraction ignores visual layout. | Reading-order F1 drops; section references mismatch. | Use layout graph parser and coordinate-aware reconstruction. |
+| **Table Flattening** | Cell values lose headers and units. | Table parsed as prose. | Header-binding failure, low table QA accuracy. | Use table structure recognition and cell citation packets. |
+| **Chart Scale Misread** | Numeric chart answers wrong. | Axis/legend/scale not parsed. | High relative error on chart QA. | Derender to data table and calculate programmatically. |
+| **Form Field Misbinding** | Values assigned to wrong labels. | Spatial association failure. | Field validator mismatch. | Template anchors, label-value scoring, ambiguity states. |
+| **Temporal Reversal** | Video event order wrong. | Sparse or unordered frame sampling. | Low temporal-order accuracy. | Use event segmentation and timestamp-aware grounding. |
+| **Wrong Crop Retrieval** | Retrieved crop lacks answer. | Patch-to-region propagation mismatch. | Region hit rate near random. | Recalibrate coordinate grid and rerank localized regions. |
+| **Low-Resolution Crop** | Small text invented or guessed. | Crop too small for visual encoder/OCR. | OCR confidence drop, unresolved characters. | Upscale/re-render or retrieve larger region. |
+| **Visual Similarity Confusion** | Wrong customer/date/template retrieved. | Visual embedding overweights layout similarity. | Metadata mismatch or exact text mismatch. | Hybrid visual + lexical + metadata retrieval. |
+| **Figure-Caption Separation** | Figure interpreted without caption. | Missing parent-child layout edges. | Caption recall drops. | Preserve figure-caption graph links. |
+| **Missed Video Frame** | Brief event omitted. | Sampling interval too coarse. | Low event recall / FSS. | Dense sampling around candidate event windows. |
+| **Stale Media Ingestion** | Old visual version cited. | Index not invalidated after source update. | Source hash mismatch. | Version visual embeddings and invalidate on file change. |
+| **Source Provenance Loss** | Citation lacks page/crop/cell/frame. | Coordinate mappings discarded. | Citation fidelity failure. | Require coordinate-bearing evidence packets. |
+| **Evidence Over-Selection** | Context flooded with redundant images. | Page-level retrieval without localization. | Cost/latency spike, answer dilution. | Return targeted crops and evidence packets. |
+| **Evidence Under-Selection** | Missing headers, units, or footnotes. | Crop too narrow. | Adequacy gate failure. | Expand region or retrieve adjacent layout nodes. |
+| **Unsupported Visual Inference** | Confident claim lacks localized support. | Model answers from impression. | Grounding ratio below threshold. | Block claim or require reinspection. |
+| **Prompt Injection in Visual Text** | OCR text contains instructions to model. | Retrieved visual text treated as instruction. | Command-like content in evidence. | Wrap visual text as data and sanitize before generation. |
 
 ### **Artifact 16: Multimodal Evaluation and Observability Guidance**
 
+| Evaluation Area | Metric | Collection Method | Failure Trigger |
+| :--- | :--- | :--- | :--- |
+| **OCR Accuracy** | CER / WER / token confidence. | Compare extracted text to labeled samples or high-confidence native text. | Confidence below task threshold. |
+| **Reading Order** | Reading-order F1. | Compare layout sequence to labeled document paths. | Column or footnote ordering collapse. |
+| **Layout Detection** | Region IoU / class F1. | Compare detected blocks to annotated regions. | Missing tables, figures, captions, headers. |
+| **Table Structure** | GriTS, TEDS, header-binding accuracy. | Compare extracted table graph to ground truth. | Cell/header mismatch or continuation error. |
+| **Chart Extraction** | Relative error tolerance, axis/legend accuracy. | Compare extracted chart table to ground truth. | Numeric claim outside tolerance. |
+| **Form Extraction** | Field exact match, field-state accuracy. | Compare label-value extraction to labeled forms. | Required field missing or misbound. |
+| **Visual Grounding** | IoU@0.5, region hit rate, grounding good ratio. | Compare cited regions to labeled evidence boxes. | Unsupported claim or wrong crop. |
+| **Video Grounding** | Temporal IoU, event recall, FSS delta. | Compare selected intervals to annotated events. | Missed event or language-prior shortcut. |
+| **Citation Fidelity** | Claim-to-coordinate completeness. | Audit generated claims for source hash, page/frame, bbox/cell/time. | Claim lacks evidence packet. |
+| **Replayability** | Replay package completeness. | Check parser versions, crops, page images, index versions, source hashes. | Missing artifact prevents reproduction. |
+
+Production observability should separate multimodal stages:
+
+```text
+ingestion_latency
+render_latency
+ocr_latency
+layout_parse_latency
+visual_retrieval_latency
+crop_generation_latency
+inspection_failure_rate
+grounding_failure_rate
+citation_completeness_rate
 ```
-Multimodal Evaluation Matrix  
- ├── 1. OCR & Structural Layout Benchmarks  
- │    ├── Character Extraction Accuracy  
- │    │    ├── Metric: Character Error Rate (CER) / Word Error Rate (WER)  
- │    │    └── Evaluation Benchmark: olmOCR-Bench (ArXiv Math, Old scans Math, H&F, Multi-Col)   
- │    └── Reading-Order Tracking Correctness  
- │         ├── Metric: Reading-Order F1 Score / Layout IoU Match [43]  
- │         └── Evaluation Benchmark: OmniDocBench / LightOnOCR-bbox-bench [43, 53]  
- ├── 2. Tabular Structure & Content Metrics  
- │    ├── Cell-Structure Alignment Check  
- │    │    ├── Metric: GriTS-Top (structural adjacency similarity matrix match)   
- │    │    └── Evaluation Benchmark: PubTables-v2 Single-Page TSR [38, 39]  
- │    └── Content-Preserving Table Match  
- │         ├── Metric: GriTS-Con (content-preserving cell evaluation)  and TEDS / TEDS-Struc   
- │         └── Evaluation Benchmark: FinTabNet / PubTabNet / PubTables-v2 Full Documents [24, 39]  
- ├── 3. Chart Extraction Precision  
- │    ├── Chart Plot-to-Table Match  
- │    │    ├── Metric: Relative Error Tolerance Table Match Score   
- │    │    └── Evaluation Benchmark: ChartQA Benchmark (Human-written queries subset)   
- │    └── Visual Attribute & Metadata Extraction  
- │         ├── Metric: Category Classification Accuracy (Type, Color, Legends, Axis)   
- │         └── Evaluation Benchmark: Checklist v2 (Visual Structure & Summary Stats tasks)   
- ├── 4. Visual Grounding & Region Retrieval  
- │    ├── Spatial Localization Precision  
- │    │    ├── Metric: Mean IoU % and Good Ratio (IoU@0.5, IoU@0.25) [9, 20]  
- │    │    └── Evaluation Benchmark: BBox-DocVQA Dataset [8, 9, 20]  
- │    └── Context Volume Optimization  
- │         ├── Metric: Context Reduction Factor (CRF) / Token Savings %   
- │         └── Evaluation Benchmark: Snappy Region-Reranking validation   
- └── 5. Video Temporal Grounding  
-      ├── Frame-Selection Sensitivity  
-      │    ├── Metric: Frame Selection Sensitivity (FSS) delta   
-      │    └── Evaluation Benchmark: TempCore grounded evaluation subsets   
-      └── Temporal-Event Localization Accuracy  
-           ├── Metric: Temporal Intersection-over-Union (t-IoU) [52]  
-           └── Evaluation Benchmark: VideoITG-40K / CG-Bench / Video-MME / LongVideoBench [15, 16, 27]
-```
+
+The system should not hide visual retrieval failures inside generic generation latency. That is how greml—nope, not saying it. That is how nonsense gets a dashboard.
 
 ## **XI. Architectural Handoffs and Degraded-Mode Fallbacks**
 
-Multimodal understanding is the substrate layer that feeds downstream agent loops, interface action systems, and compliance auditing engines.2  
-If the system cannot verify what visual evidence it inspected, it cannot be trusted to perform computer-use actions, click buttons on interfaces, generate financial extractions, or sign off on legal contracts.2
+Multimodal understanding is a substrate layer for downstream agents, interface-control systems, audit systems, and user-facing evidence displays. If the system cannot verify what visual evidence it inspected, it cannot safely click interfaces, extract financial data, summarize legal documents, interpret diagrams, or report status as grounded truth.
 
 ### **Artifact 17: Cross-Canon Handoff Map**
 
-```
-Substrate Layer: AI-ENG-P (Multimodal Understanding)  
- │  
- ├── Downstream Volume 6 Handoffs (Interface Control & Action)  
- │    ├── Screen Understanding & Computer-Use Agents  
- │    │    ├── Dependency: Bounding box spatial coordinate maps + Object localization   
- │    │    └── Operational Rule: If coordinate confidence < 0.90, block click-action and trigger re-inspection  
- │    ├── Browser & GUI Automation  
- │    │    ├── Dependency: Webpage layout node serialization (DocTags/HTML)   
- │    │    └── Operational Rule: Suppress running headers/footers to prevent agent navigation loops   
- │    └── Accessibility-Mediated Interactivity  
- │         ├── Dependency: Structured reading-order reconstruction   
- │         └── Operational Rule: Force LaTeX output format for mathematical expressions to support screen-readers   
- │  
- ├── Downstream Volume 7-9 Handoffs (System Security, Fallbacks & Observability)  
- │    ├── AI-ENG-S (Production Pathologies)  
- │    │    ├── Dependency: Ingestion throughput telemetry + Memory metrics [1, 18]  
- │    │    └── Operational Rule: Log rendering latency and token consumption to balance cross-encoder costs   
- │    ├── AI-ENG-T (Prompt Injection through Documents/Images)  
- │    │    ├── Dependency: Segregated OCR / Text index parsing boundaries  
- │    │    └── Operational Rule: Sanitize visual text streams before routing to downstream generation agents  
- │    ├── AI-ENG-U (Parser and Tool Dependency Risk)  
- │    │    ├── Dependency: Local fallback libraries and sandbox execution parameters   
- │    │    └── Operational Rule: Monitor and isolate third-party OCR environments to prevent untyped memory leaks   
- │    ├── AI-ENG-W (Fallback and Degraded Modes)  
- │    │    ├── Dependency: Progressive quality evaluation degradation metrics   
- │    │    └── Operational Rule: Trigger local, CPU-bound Tesseract parse if VLM API rate limits are hit   
- │    ├── AI-ENG-X (Transparent User-Facing Evidence)  
- │    │    ├── Dependency: Fine-grained spatial citation mapping metadata  
- │    │    └── Operational Rule: Render visual bounding box highlights directly on the user interface  
- │    ├── AI-ENG-Y (Human Review)  
- │    │    ├── Dependency: Coordinate confidence threshold registry   
- │    │    └── Operational Rule: Route character OCR inputs below 0.60 directly to human adjudication   
- │    ├── AI-ENG-Z (Telemetry)  
- │    │    ├── Dependency: Query-level latency trace structures   
- │    │    └── Operational Rule: Emit visual-retrieval latency scores separately from generation latency metrics   
- │    ├── AI-ENG-AA (Multimodal Evaluations)  
- │    │    ├── Dependency: Ground-truth bounding box registries [9, 20]  
- │    │    └── Operational Rule: Evaluate system alignment against BBox-DocVQA spatial coordinates [9, 20]  
- │    ├── AI-ENG-AB (Audit and Replay)  
- │    │    ├── Dependency: Multi-vector database index traces and coordinate histories [7, 18]  
- │    │    └── Operational Rule: Store processed page images with their corresponding patch score maps   
- │    ├── AI-ENG-AC (Incident Response)  
- │    │    ├── Dependency: Fault detection indicators in layout-aware parsers   
- │    │    └── Operational Rule: Quarantine documents that trigger parsing loop crashes or coordinate inversions [33]  
- │    └── AI-ENG-AJ (Reference Architectures)  
- │         ├── Dependency: Modular, multi-index retrieval blueprints   
- │         └── Operational Rule: Provide structured templates for unifying late-interaction indices and BM25 databases   
- └──
-```
+| Target Module | Handoff Artifact | Operational Dependency |
+| :--- | :--- | :--- |
+| **AI-ENG-Q — Screen Understanding / Computer Use** | UI element boxes, viewport coordinates, OCR labels, click confidence, screenshot freshness. | Blocks unsafe clicks when coordinate confidence or screen freshness is insufficient. |
+| **AI-ENG-R — Browser / GUI Automation** | Page layout nodes, DOM/visual alignment, form fields, button states, visual confirmation. | Enables agents to act on interfaces without relying on hallucinated UI state. |
+| **AI-ENG-S — Production Pathologies** | OCR drift, parser failures, retrieval misses, grounding failures, rendering latency. | Diagnoses multimodal pipeline failures and cost spikes. |
+| **AI-ENG-T — Prompt Injection and Tenant Isolation** | Visual text streams, OCR instructions, document provenance, tenant-scoped coordinates. | Prevents visual/text prompt injection and cross-tenant evidence leakage. |
+| **AI-ENG-U — Parser and Tool Dependency Risk** | Parser versions, fallback engines, sandbox settings, third-party OCR/VLM dependency state. | Manages parser outages, model regressions, and dependency degradation. |
+| **AI-ENG-W — Fallback and Degraded Modes** | Evidence adequacy state, fallback route, parser confidence, unavailable modality flags. | Determines whether to use degraded extraction, ask for better source, or refuse. |
+| **AI-ENG-X — Transparent User-Facing Evidence** | Claim-level citations, bounding boxes, crop IDs, timestamp intervals, confidence. | Renders visual highlights and evidence cards to users. |
+| **AI-ENG-Y — Human Review** | Low-confidence crops, ambiguous fields, conflicting parser outputs, review packets. | Routes unresolved multimodal evidence to human adjudication. |
+| **AI-ENG-Z — Telemetry** | Stage-level latency, grounding metrics, citation completeness, parser failure rates. | Powers multimodal observability dashboards. |
+| **AI-ENG-AA — Multimodal Evaluations** | Ground-truth boxes, chart tables, table cells, frame intervals, replay packages. | Evaluates multimodal grounding and extraction accuracy. |
+| **AI-ENG-AB — Audit and Replay** | Source hashes, page images, crops, coordinates, parser manifests, index versions. | Reconstructs generated claims from source evidence. |
+| **AI-ENG-AC — Incident Response** | Fault indicators, poisoned artifacts, parser crashes, coordinate inversions, citation failures. | Quarantines bad documents and triggers recovery workflows. |
+| **AI-ENG-AD — Governance and Accountability** | Evidence retention policies, visual PII rules, regulated document handling, audit obligations. | Ensures multimodal evidence use complies with organizational policy. |
+| **AI-ENG-AJ — Reference Architectures** | Multi-index retrieval blueprint, coordinate registry schema, citation schema, fallback patterns. | Provides implementation templates for multimodal systems. |
 
-To support these handoffs in production, the architecture must implement robust fallbacks for degraded operating environments:
+### **Degraded-Mode Fallbacks**
 
-* **DPI Degradation Fallback:** If a client uploads a document that fails the 150 DPI minimum quality check (e.g., a low-resolution scan or mobile camera capture), the ingestion pipeline must run image preprocessing.2 It applies a deskewing rotation filter, runs contrast enhancement, and upscales the resolution to 300 DPI before passing the image to the layout models.2 If character confidence remains low (<0.60), the page is routed to a specialized OCR engine (e.g., PaddleOCR local server) or escalated to human review.10  
-* **Layout Model Fallbacks:** When deploying in resource-constrained environments (e.g., edge compute nodes, secure air-gapped clusters) where large VLMs are unavailable, the parser falls back to a dual-mode local processing pipeline.10 It uses a local CPU-bound Python library (e.g., pdfplumber or PyMuPDF with Tesseract.js default) for digital-native pages.10 If a scanned page is encountered, it routes the image to a local, compact OCR server, prioritizing throughput over peak VLM accuracy.10  
-* **Video Frame Reduction Fallback:** When a video sequence exceeds standard attention token budgets (e.g., processing multi-hour feeds through fixed context windows), the pipeline automatically steps down from dense, instruction-conditioned sampling to hierarchical segment tree retrieval.15 It uses a low-frequency, visual-diversity pass (DINOv2 temporal partitioning) to construct a global segment representation.26 It then expands frame-level resolution only within localized window segments triggered by specific user queries.15
+| Failure / Constraint | Degraded Mode | User-Facing Status |
+| :--- | :--- | :--- |
+| **Low DPI / poor scan** | Deskew, contrast enhance, re-render/upscale, alternate OCR. | “Source quality is low; extraction confidence is reduced.” |
+| **Unreadable microtext** | Retrieve larger crop, higher DPI page, or request original file. | “The visible text is too small to verify safely.” |
+| **Layout parser failure** | Fall back to text-native extraction plus coordinate uncertainty. | “Layout preservation failed; answer limited to text evidence.” |
+| **VLM/OCR API unavailable** | Use local OCR/parser route if allowed. | “Using degraded local extraction; accuracy may be lower.” |
+| **Table structure uncertain** | Preserve page crop and table region; avoid cell-specific claims. | “Table structure could not be verified.” |
+| **Chart derendering failure** | Provide qualitative description only if chart regions are visible; block numeric claims. | “Numeric chart values could not be extracted reliably.” |
+| **Video too long for dense processing** | Segment hierarchically; inspect only query-relevant intervals. | “Video processed by sampled segments; uninspected intervals remain.” |
+| **Coordinate chain broken** | Return document/page-level citation only with explicit warning. | “Precise evidence coordinates are unavailable.” |
+| **Permission conflict** | Exclude unauthorized evidence and reroute retrieval. | “Some evidence is outside the active permission scope.” |
+| **Conflicting parser outputs** | Route to human review or second-pass adjudication. | “Extraction is ambiguous and requires review.” |
+
+### **Fallback Rule**
+
+```text
+Degraded mode must degrade the claim, not just the pipeline.
+
+If the system loses resolution, layout, coordinates, or verification,
+the answer must expose that loss rather than pretending full confidence.
+```
 
 ## **XII. Durable Principles of Multimodal Understanding**
 
-To guide high-dimensional AI system deployment, architects must adhere to five core principles of multimodal evidence design:
+### **I. Evidence Before Answer Generation**
 
-1. **Evidence Prior to Answer Generation:** A multimodal system must select, parse, and verify its visual, spatial, and temporal evidence before generating any textual output.6  
-2. **Structural Preservation is Semantic Accuracy:** The spatial arrangement of document elements, table grids, chart axes, and video sequences is semantic content.1 Flattening this structure into raw text streams introduces errors and increases hallucination risks.5  
-3. **Plausible Text is Not Visual Grounding:** A system has not understood an artifact because its visual tokens entered the context window.6 Understanding is demonstrated only when the system can map its claims back to precise, coordinate-level visual or temporal boundaries.7  
-4. **Resolution and Modality Match the Task:** The architecture must enforce quality checking at ingestion, verifying rendering DPI, contrast, and layout continuity to match task-specific demands.2  
-5. **Continuous Provenance is Required:** The spatial-temporal coordinate trail must survive all processing stages.2 Visual and temporal evidence coordinates must be mapped continuously from ingestion to the generated citation payload, ensuring human-auditable verifiability.2
+A multimodal system must select, inspect, and verify visual, spatial, tabular, or temporal evidence before generating factual claims. Generation without evidence selection is visual hallucination with better lighting.
+
+### **II. Structure Is Semantic Content**
+
+Spatial layout, row/column grids, axis scales, legends, captions, footnotes, coordinates, and frame order carry meaning. Flattening structure into plain text destroys evidence.
+
+### **III. Coordinates Are Part of the Claim**
+
+A grounded multimodal claim should map to page boxes, cell coordinates, chart marks, visual regions, UI elements, or timestamp intervals. Document-level citation is not enough for high-stakes visual reasoning.
+
+### **IV. Preserve the Coordinate Chain**
+
+The system must preserve mappings through ingestion, rendering, parsing, cropping, embedding, extraction, synthesis, citation, and replay. Any break in the chain lowers citation fidelity.
+
+### **V. Route by Modality and Task**
+
+Do not force every artifact through the same parser or index. Text-native clauses, scanned forms, dense tables, chart images, diagrams, screenshots, and videos require different processing routes.
+
+### **VI. Inspect Adequacy Before Trusting Evidence**
+
+A retrieved crop may be relevant but insufficient. The system must check resolution, context, headers, axis labels, legends, footnotes, frame coverage, and uncertainty before answering.
+
+### **VII. Prefer Structured Extraction for Quantitative Claims**
+
+Tables and charts should be converted into structured data before calculations. Numeric claims should come from cells, axes, marks, or extracted data tables, not impressions.
+
+### **VIII. Treat Readable Text in Images as Data, Not Instruction**
+
+OCR text, screenshots, scanned documents, and visual prompts may contain instruction-like content. Downstream models must treat this material as evidence data, not executable commands.
+
+### **IX. Degraded Mode Must Be Honest**
+
+When OCR, layout parsing, visual grounding, video sampling, or citation mapping degrades, the answer must expose the limitation. Reduced evidence quality must reduce claim strength.
+
+### **X. Multimodal Claims Must Be Replayable**
+
+Auditors and regression tests must be able to reconstruct the claim from source hash, parser version, rendered page/frame, crop, coordinates, extraction result, and citation object.
+
+### **XI. Suppressed Metadata Is Still Evidence**
+
+Headers, footers, watermarks, confidentiality labels, page numbers, footnotes, and captions may be omitted from the main reading stream, but they should not be discarded. They often carry version, authority, or interpretive context.
+
+### **XII. Plausible Text Is Not Visual Grounding**
+
+The final invariant:
+
+```text
+No coordinate chain, no grounded multimodal claim.
+No adequate inspection, no confident answer.
+No verified evidence, no user-facing certainty.
+```
 
 #### **Works cited**
 

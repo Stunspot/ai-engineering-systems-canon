@@ -20,55 +20,61 @@ The systems-engineering parameters governing resource control and containment ar
 
 | Term | Technical Definition | Primary Operational Metric | Standard Target |
 | :---- | :---- | :---- | :---- |
-| **Denial-of-Wallet (DoW)** | An exploit vector targeting pay-per-token or pay-per-use utility pricing models to exhaust financial resources rather than causing raw hardware downtime.1 | Cost Velocity per Identity Tuple | $0.00 unbudgeted overruns 9 |
-| **Resource Envelope** | The complete set of multi-dimensional limits (tokens, turns, time, tools, dollars) enclosing an active execution path, enforced outside the model's cognitive boundary.9 | Envelope Enforce Rate | 1.00 (Absolute coverage) |
-| **Cost Bomb** | A crafted input payload or state designed to trigger disproportionate resource consumption, latency inflation, or billing spikes.1 | Amplification Cost Ratio | 1.00 (Observed vs Estimated) |
-| **Context Flooding** | Overloading a model's active context window with redundant, verbose, or adversarial data to dilute attention mechanisms or force expensive prefill computations.5 | Context Utilization Density | <50% window saturation |
-| **Retrieval Flooding** | Forcing excessive vector, semantic, or relational search operations across databases via broad, ambiguous, or recursively expanded queries.12 | Retrieval Fan-out Factor | <= 20 chunks per query 12 |
-| **Tool Exhaustion** | The rapid depletion of third-party API quotas, local process pools, or connection limits through unmonitored model-driven invocations.3 | Tool Quota Exhaustion Frequency | 0.00 rate-limit cascades 7 |
-| **Latency Inflation** | The deliberate or accidental degradation of token generation or execution speeds, holding active worker threads and starving system queues.13 | Tail Latency Delta (P99) | <1.2x baseline average 15 |
-| **Quota Exhaustion** | Depleting upstream model provider or internal hardware rate limits (RPM/TPM), resulting in cascade failures across tenant sessions.5 | Upstream 429 Rate | <0.10% of outbound calls 9 |
-| **Loop Budget** | The maximum step count, wall-clock time, token volume, and dollar spend allocated to an iterative, agentic workflow.9 | Loop Step Count | <= 10 steps per execution 18 |
-| **Progress Signal** | A verifiable change in system or environment state indicating an agent is converging toward a valid terminal state.17 | State Delta Metric | Delta State\!= 0 19 |
-| **No-Progress State** | An execution state where an agent repeats identical or semantically equivalent tool calls or plans without converging.5 | State Repetition Count (C_rep) | 0 repeated states on limit 5 |
-| **Budget-Aware Gateway** | An external proxy terminating LLM traffic to enforce cost limits, token caps, fallback routing, and circuit breakers.9 | Gateway Transit Latency | <15 microseconds overhead 3 |
-| **Tenant Resource Isolation** | Partitioning and scheduling compute resources to prevent a single tenant from starving neighbor workloads.15 | Inter-Tenant Latency Variance | <10 milliseconds variance |
-| **Cost Attribution** | The precise trace associating every unit of consumed resource back to a specific tenant, user, session, and asset.5 | Unattributed Cost Ratio | 0.00% unattributed spend |
+| **Denial-of-Wallet (DoW)** | An exploit vector targeting pay-per-token or pay-per-use utility pricing models to exhaust financial resources rather than causing raw hardware downtime. | Cost Velocity per Identity Tuple | No unapproved budget breach; unbudgeted overruns trigger immediate containment. |
+| **Resource Envelope** | The complete set of multi-dimensional limits—tokens, turns, time, tools, dollars, queue slots, retrieval work, and human review—enclosing an active execution path. | Envelope Enforcement Coverage | Coverage enforced for every production execution path. |
+| **Cost Bomb** | A crafted input payload or workflow state designed to trigger disproportionate resource consumption, latency inflation, quota burn, or billing spikes. | Amplification Cost Ratio | Amplification ratio stays within policy-defined tolerance; anomalies trigger circuit breakers. |
+| **Context Flooding** | Overloading a model’s active context window with redundant, verbose, low-value, or adversarial data to dilute attention, increase prefill cost, or force expensive compression. | Context Utilization Density | Context utilization remains inside task/profile budget; high-priority evidence and instructions are preserved. |
+| **Retrieval Flooding** | Forcing excessive vector, semantic, relational, page-rendering, or reranking operations through broad, ambiguous, or recursively expanded queries. | Retrieval Fan-Out Factor | Candidate fan-out remains inside retrieval budget for task class. |
+| **Tool Exhaustion** | Depleting third-party API quotas, local process pools, browser workers, database connections, or tool-server capacity through unbounded model-driven invocations. | Tool Quota Exhaustion Frequency | No cascading quota failures; retries and tool calls are bounded by policy. |
+| **Latency Inflation** | Deliberate or accidental degradation of request latency by forcing expensive parsing, retrieval, prefill, decoding, tool execution, rendering, or queue occupancy. | Tail Latency Delta | P95/P99 latency remains within service SLO for workload class. |
+| **Quota Exhaustion** | Depleting upstream provider, tenant, model, API, or infrastructure rate limits, causing failures for unrelated users or sessions. | Upstream / Tenant Quota Burn Rate | Provider and tenant quota burn remain below alert thresholds. |
+| **Loop Budget** | The maximum step count, wall-clock time, token volume, tool usage, retrieval work, and dollar spend allocated to an iterative or agentic workflow. | Loop Budget Utilization | Step and spend caps are defined by workflow risk profile and approval state. |
+| **Progress Signal** | A verifiable change in task, system, environment, evidence, or action state indicating that an agent is converging toward a valid terminal state. | State Delta Metric | `state_delta != 0` before additional loop budget is granted. |
+| **No-Progress State** | An execution state where an agent repeats identical or semantically equivalent plans, tool calls, retrieval queries, UI actions, or repair attempts without convergence. | State Repetition Count | Repeated states trigger bounded repair, replan, clarification, escalation, or halt. |
+| **Budget-Aware Gateway** | An external proxy or control plane that terminates model/tool traffic to enforce cost limits, token caps, fallback routing, reservations, quotas, and circuit breakers. | Gateway Enforcement Latency | Gateway overhead remains within service latency budget. |
+| **Tenant Resource Isolation** | Partitioning, scheduling, and budgeting compute resources so one tenant cannot starve neighbor workloads or consume shared provider quotas. | Tenant Impact / Noisy-Neighbor Score | No tenant can starve shared queues beyond policy threshold. |
+| **Cost Attribution** | The trace associating every unit of consumed resource back to a tenant, user, session, workflow, model route, tool, corpus, batch job, or artifact. | Unattributed Cost Ratio | Unattributed spend is investigated; high-impact spend requires full attribution. |
 
 ## **Resource Abuse Taxonomy**
 
 To establish strict boundary controls, the system must differentiate among the primary modes of resource exhaustion:
 
 ```
-                              RESOURCE EXHAUSTION MATRIX  
-                                          │  
-         ┌────────────────────────────────┴────────────────────────────────┐  
-         ▼                                                                 ▼  
- [ Availability Exhaustion ]                                      [ Financial Exhaustion ]  
- ├─ GPU memory saturation (prefill storms)                        ├─ Pay-per-token pricing spikes  
- ├─ Worker thread starvation (Slowloris LLM)                      ├─ Upstream API credit depletion  
- └─ Connection pool lockups (hung tools)                          └─ Unmonitored recursive loops  
-         │                                                                 │  
-         ├────────────────────────────────┼────────────────────────────────┤  
-         ▼                                                                 ▼  
- [ Quota Exhaustion ]                                             [ Latency Inflation ]  
- ├─ Upstream TPM/RPM rate limits hit                              ├─ Attention dilution in prefill  
- ├─ Multi-tenant rate-limit cascades                              ├─ Slow layout-aware parsing (OCR)  
- └─ Downstream third-party API lockout                            └─ Dynamic page rendering waits  
-         │                                                                 │  
-         ├────────────────────────────────┼────────────────────────────────┤  
-         ▼                                                                 ▼  
-                                              
- ├─ Head-of-line blocking (FCFS)                                  ├─ Unbounded tenant-wide reindexing  
- ├─ High-priority queue saturation                                ├─ Quadratic context amplification  
- └─ In-flight KV-cache preemption storms                          └─ Disconnected worker processes  
-         │                                                                 │  
-         └────────────────────────────────┬────────────────────────────────┘  
-                                          ▼  
-                             
-                             ├─ Cascading low-confidence escalations  
-                             ├─ Malformed OCR layout failures  
-                             └─ Repetitive formatting repair loops
+RESOURCE EXHAUSTION MATRIX
+
+                              [ Resource Abuse ]
+                                      |
+        +-----------------------------+-----------------------------+
+        |                             |                             |
+        v                             v                             v
+[ Availability Exhaustion ]   [ Financial Exhaustion ]      [ Quota Exhaustion ]
+  GPU memory saturation         pay-per-token spikes          upstream TPM/RPM limits
+  worker starvation             API credit depletion          provider key lockout
+  connection pool lockups       recursive paid calls          tenant quota cascades
+
+        +-----------------------------+-----------------------------+
+        |                             |                             |
+        v                             v                             v
+[ Latency Inflation ]          [ Queue Starvation ]          [ Batch Runaway ]
+  long prefill requests          head-of-line blocking         unbounded reindexing
+  slow OCR/rendering             priority queue saturation     embedding backfill loops
+  uncacheable prefixes           KV-cache preemption storms    disconnected workers
+
+        +-----------------------------+-----------------------------+
+                                      |
+                                      v
+                         [ Human-Review Exhaustion ]
+                           excessive escalations
+                           low-confidence floods
+                           repetitive repair reviews
+
+                                      |
+                                      v
+                         [ Agentic Amplification ]
+                           recursive planning
+                           repeated tool calls
+                           expanding trace context
+                           sub-agent delegation
 ```
 
 * **Availability Exhaustion**: Renders the system unresponsive to legitimate users. In AI serving runtimes, this occurs when long-context prefill operations saturate the GPU memory cache, triggering preemption storms, execution swaps, or out-of-memory (OOM) kernel panics that crash the active container.  
@@ -98,22 +104,18 @@ The parameters of the multi-dimensional Resource Envelope are defined in the pri
 | **Financial Limits** | dollar velocity per user, key, and tenant space.9 | token-aware pricing lookup; optimistic pre-consumption budgets.2 |
 | **Human Review Limits** | queue depth and manual review time budgets.5 | dynamic validation rules; escalation throttling caps.5 |
 
-## **Cost Bomb Classification**
-
-The characteristics, metric signatures, and containment strategies of the primary cost bomb variants are structured in the classification database:
-
-| Cost Bomb Variant | Entry Point | Amplification Path | Metric Signature | Primary Containment | Fallback Target | Regression Test |
+| Cost Bomb Variant | Entry Point | Amplification Path | Metric Signature | Primary Containment | Safer Fallback | Regression Test |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| **Token Bomb** | chat inputs, dynamic scripts.5 | loop tokens triggering continuous repetitive generation.5 | output token rate matches maximum generate limit.2 | finite state machine constrained decoding.5 | terminate stream and return partial output.2 | repetitive token simulation checks.5 |
-| **Context Bomb** | document uploads, meeting traces.6 | processing huge, uncompressed text arrays.6 | prefill latency surge; KV cache capacity drops.6 | hard physical limits on input file size.5 | compress files using a quarantined model.6 | long-context position sensitivity test.5 |
-| **Retrieval Bomb** | search fields, query expanders.12 | query expansion causing broad vector index fan-outs.12 | database query QPS spikes; reranker delay rises.7 | pre-filtering vector query limits.31 | route search to a static lexical index.6 | multi-index search stress evaluations.5 |
-| **Tool Bomb** | database updates, dynamic APIs.5 | un-buffered tool retries and loops.5 | external API connections hit limits.3 | tool consumption logs; turn limits.7 | return a simulated tool error response.5 | tool execution loop simulation runs.5 |
-| **Vision Bomb** | PDF, image, video uploads.5 | multi-page scanned document parsing.5 | parser CPU usage rises; VLM processing lags.5 | selective ingestion routing filters.8 | fall back to a local heuristic OCR engine.5 | image parsing queue stress checks.5 |
-| **Browser Bomb** | dynamic webpages, web crawling.8 | wait loops on responsive elements.5 | browser process count spikes; CPU use rises.7 | isolated browser sandboxing limits.7 | close tab and return raw HTML text.7 | dynamic page wait loop tests.5 |
-| **Voice Bomb** | real-time telephony, WebRTC. | background noise triggering continuous audio turns. | WebRTC transceiver port use rises; packet drop rises. | client-side VAD audio triggers. | mute stream and prompt user to type. | background noise loop simulations. |
-| **Batch Bomb** | reindexing triggers, log parsers.5 | background jobs expanding beyond limits.5 | queue task latency; memory limit crashes.5 | sample-first checks; spend caps.5 | split batch job and throttle execution.5 | batch job expansion limit tests.5 |
-| **Cache-Bypass** | prefix guessed token arrays.6 | prefix timing probes invalidating caches.6 | prefill token rate rises; cache hits drop.6 | selective prefix isolation keys.6 | bypass cache and run standard model.6 | cache key collision attack tests.6 |
-| **Review Bomb** | low-confidence audit queries.5 | fallback loops sending cases to reviews.5 | support queue backlog depth spikes.8 | dynamic verification bounds checks.8 | fall back to low-cost default states.5 | low-confidence escalation checks.5 |
+| **Token Bomb** | Chat inputs, prompt templates, generated continuations. | Request maximizes output length or triggers repetitive generation. | Output tokens hit configured maximum; low information density. | Output cap, stop conditions, repetition detection. | Terminate stream with partial/managed response. | Repetitive-generation and max-token tests. |
+| **Context Bomb** | Uploads, logs, meeting traces, pasted documents. | Large or redundant text causes expensive prefill and attention dilution. | Prefill latency spikes; context utilization exceeds budget. | Input size caps, context admission control, evidence prioritization. | Summarize or sample inside bounded processing route. | Long-context saturation tests. |
+| **Retrieval Bomb** | Search fields, query expansion, agentic RAG loops. | Broad query expansion causes excessive vector search, reranking, and page expansion. | Query count, candidate count, rerank latency, and index fan-out spike. | Query/candidate/rerank/page-render caps. | Return narrowed-search prompt or managed retrieval-limit status. | Retrieval fan-out stress tests. |
+| **Tool Bomb** | APIs, DB tools, SaaS connectors, browser tools. | Retries, loops, or broad tool calls exhaust quotas and connection pools. | Tool retry rate, quota burn, connection errors, repeated payload hashes. | Tool ledger, retry caps, idempotency, circuit breakers. | Return typed managed failure without invoking the tool. | Tool loop and duplicate-call simulations. |
+| **Vision Bomb** | PDFs, images, video, screenshots. | Multi-page rendering, OCR, VLM calls, or high-resolution processing expands cost. | Parser CPU, VLM calls, page renders, megapixels, frame count spike. | Page/frame/resolution limits; selective routing. | Extract sampled pages/frames or request narrower evidence scope. | Visual parsing queue stress tests. |
+| **Browser Bomb** | Web crawling, dynamic pages, UI agents. | Wait loops, redirects, scripts, and dynamic rendering hold browser workers. | Browser process count, wait time, CPU, navigation retries spike. | Browser session caps, navigation timeout, domain allowlist. | Close session and return bounded page/error summary. | Dynamic page wait-loop tests. |
+| **Voice Bomb** | Realtime audio, telephony, meetings. | Noise or background speech triggers continuous turns or transcription loops. | Turn count, STT duration, endpoint resets, audio buffer growth. | VAD/endpointing limits, audio duration caps, turn budget. | Pause audio capture and request typed/explicit input. | Background-noise loop simulations. |
+| **Batch Bomb** | Reindexing, embedding backfills, eval sweeps, log parsers. | Background jobs expand beyond estimates or repeat failed records. | Queue depth, records processed per dollar, failure retries, memory usage spike. | Dry-run, sample-first estimate, manifest caps, checkpointing. | Pause job and require operator approval to resume. | Batch expansion and retry-limit tests. |
+| **Cache-Bypass Bomb** | Adversarial prefixes, randomized prompts, semantic-cache collision attacks. | Requests defeat cache reuse or force recomputation. | Cache hit rate drops; prefill rate rises; TTFT worsens. | Scoped cache keys, prefix isolation, admission throttles. | Force recompute within budget or return capacity status. | Cache-bypass and collision tests. |
+| **Review Bomb** | Low-confidence OCR, validation failures, safety escalations. | Excessive borderline cases flood human review queues. | Review backlog, review minutes, escalation rate spike. | Escalation caps, sampling, confidence thresholds, triage classes. | Degrade to bounded review sampling or managed capacity status. | Low-confidence escalation tests. |
 
 ## **Recursive Agents and Loop Amplification**
 
@@ -122,16 +124,20 @@ The total input tokens consumed across an N-turn agentic loop is modeled by the 
 T_total = N * S + (u * N * (N + 1)) / 2 + (r * N * (N - 1)) / 2 5  
 In this model, S represents the size (in tokens) of the system prompt and tool schema definitions, u is the average size of new incoming tokens per iteration (user inputs, formatting exceptions, or tool outputs), and r is the model's generated output per step.5  
 When an agent enters an unmitigated loop, this quadratic context growth can rapidly deplete daily budgets and trigger denial-of-wallet incidents.5 Consequently, every iterative agent path must carry an explicit loop budget managed strictly outside the model by the orchestration engine.9  
-The orchestration layer must enforce a multi-dimensional constraint model on all active loops:
+The orchestration layer must enforce a multi-dimensional constraint model on active loops. The numeric ceilings should be policy-profile defaults, not universal constants. A low-risk search assistant, a high-impact financial workflow, and a batch repair job should not share the same loop envelope.
 
-* **Step Cap**: Hard limit on total execution turns (<= 10 steps per session).10  
-* **Time Cap**: Hard wall-clock limit on overall loop execution.10  
-* **Token/Spend Cap**: Maximum cumulative tokens or dollars allocated per run.9  
-* **Tool/Action Cap**: Maximum allowable external database queries or API calls.10  
-* **Progress Auditing**: Dynamic validation checks to verify execution is moving toward completion.10  
-* **Repeated-State Detection**: Pattern-matching checks to catch cyclical state transitions.10  
-* **Timeout & Fail-Closed Gates**: Graceful error handling and rollback routines if execution stalls.10  
-* **Escalation Path**: Handing off the session context to manual operators when limits are hit.5
+| Constraint | What It Controls | Enforcement Guidance |
+| :--- | :--- | :--- |
+| **Step Cap** | Total reasoning/tool/action iterations. | Set by workflow risk class; hard stop on repeated no-progress states. |
+| **Wall-Clock Cap** | Total elapsed execution time. | Cancel or degrade when the workflow exceeds profile budget. |
+| **Token / Spend Cap** | Cumulative model, embedding, rerank, and tool cost. | Enforced by gateway reservation and runtime ledger. |
+| **Tool / Action Cap** | Number and class of external calls. | Separate read-only, low-risk mutation, and high-risk mutation limits. |
+| **Retry Cap** | Repeated attempts after failure. | Small default retry budget; mutation retries require idempotency/reconciliation. |
+| **Progress Audit** | Evidence of convergence. | Additional budget is granted only when state changes materially. |
+| **Repeated-State Detection** | Cyclic plans, tool calls, payloads, UI clicks, or search queries. | Halt, replan, ask user, or escalate after bounded attempts. |
+| **Escalation Path** | Human/operator transfer. | Triggered by high-risk state, repeated failure, unknown action state, or budget exhaustion. |
+
+Quadratic context growth depends on trace-retention policy. If every prior plan, tool result, error, and repair attempt is appended to the next step, loop cost grows quickly. If traces are summarized, pruned, or externalized into state, the growth can be controlled. The resource doctrine is therefore not merely “cap loops,” but “cap loops and control what history they carry forward.”
 
 ### **Progress versus No-Progress States**
 
@@ -162,9 +168,9 @@ To defend against context inflation, the system must enforce strict boundaries a
 * **Tool-Output Truncation**: Mandatory truncation and summarization rules for API responses before appending them to the active context window.7  
 * **Retrieval-Token Budgets**: Capping the total retrieved document chunks inserted per turn to prevent context bloating.6  
 * **Memory-Inclusion Budgets**: Restricting the number of historical conversation memories loaded into active reasoning contexts.6  
-* **Conversation Compaction**: Recursively condensing older conversational turns into structured semantic summaries once the context utilization exceeds 50%.5  
+* **Conversation Compaction**: Condensing older turns into structured summaries when context utilization approaches the task profile’s budget threshold, while preserving active instructions, approvals, constraints, and unresolved state.
 * **Document-Size Limits**: Limits on raw page counts, layout nodes, or tabular elements processed in a single run.5  
-* **Modality-Specific Limits**: Restricting image inputs to 300 DPI, limiting video capture to query-relevant keyframes, and enforcing maximum audio duration caps.8  
+* **Modality-Specific Limits**: Restrict images by pixel dimensions, megapixels, page count, and file size; restrict video by duration, frame count, resolution, and query-relevant keyframes; restrict audio by duration, channel count, sample rate, and turn budget.
 * **Context Admission Control**: Prioritized scheduling that drops low-priority or un-cacheable text blocks during periods of queue congestion.15  
 * **Lossy vs Lossless Compression**: Stripping redundant formatting, comments, and empty tokens (lossless) or executing semantic summarization (lossy) based on context priorities.6  
 * **Fail-Closed Behavior**: Automatically terminating the execution path and returning a managed system exception if required evidence cannot safely fit within context limits.5
@@ -184,56 +190,67 @@ Query expansion techniques are designed to improve recall by rewriting vague use
 * **Evaluation Distortion**: Tracking candidate presence in the top-k while ignoring position, hiding the fact that the single best chunk has been pushed below the reranker's window of attention.12  
 * **Accidental Policy Agency**: The expansion model implicitly decides what the user "really meant," making the system's behavior non-deterministic and hard to audit.12
 
-### **Gated Retrieval via Hidden-State Probing**
+### **Gated Retrieval and Retrieval-Budget Control**
 
-To mitigate retrieval flooding while preserving retrieval quality, the system must deploy a failure-state-aware framework like *Skill-RAG*.38 Rather than executing query expansion unconditionally, *Skill-RAG* uses a lightweight hidden-state prober to assess whether the model's parametric knowledge or current context is sufficient.38 The prober is a feed-forward network with a single hidden layer and a binary classification head, trained on correctness labels of representations extracted from the final two-thirds of the model's layers.39 If the prober detects a failure state, the system routes the query to one of four targeted corrective skills:
+Retrieval expansion should not run unconditionally. A vague or difficult query may need rewriting, decomposition, or evidence focusing; a simple query may need no retrieval at all; an unsafe or overbroad query may need clarification instead of fan-out.
 
+Hidden-state probing methods such as Skill-RAG are one advanced option when the serving stack exposes model-internal representations. Many hosted-model deployments do not expose hidden states. In those environments, the same gating pattern can be approximated with retrieval confidence models, answerability classifiers, lightweight verifier models, query-specific uncertainty checks, or explicit evidence-sufficiency tests.
+
+```text
+GATED RETRIEVAL PIPELINE
+
+[ User Query ]
+      |
+      v
+[ Request Classifier ]
+  task type | risk class | tenant scope | evidence requirement
+      |
+      v
+[ Answerability / Retrieval Gate ]
+      |
+      +--> sufficient current context
+      |       answer from available evidence or parametric route
+      |
+      +--> evidence required
+      |       proceed to bounded retrieval
+      |
+      +--> query too broad / unsafe / under-specified
+              ask clarification or return managed limit status
+
+[ Bounded Retrieval ]
+  query cap | candidate cap | partition cap | page-render cap | rerank cap
+      |
+      v
+[ Evidence Evaluation ]
+  relevance | authority | freshness | conflict | sufficiency
+      |
+      +--> sufficient evidence
+      |       generate grounded answer
+      |
+      +--> insufficient but budget remains
+      |       choose one corrective skill
+      |
+      +--> insufficient and budget exhausted
+              stop retrieval and report limitation
+
+Corrective Skills:
+  - Query Rewriting: preserve lexical anchors and metadata constraints.
+  - Question Decomposition: split true multi-hop questions.
+  - Evidence Focusing: narrow candidate regions/pages/tables.
+  - Exit: stop retrieval before it becomes a ritual sacrifice to the vector gods.
 ```
-                            SKILL-RAG PIPELINE FLOW  
-                                      │  
-                                User Query  
-                                      │  
-                                      ▼  
-                        
-                         ├─ High confidence? ───> Return Parametric Answer  
-                         └─ Low confidence? ───> Proceed to Retrieval  
-                                      │  
-                                      ▼  
-                             
-                                      │  
-                                      ▼  
-                       [ Verification & Feedback Gate ]  
-                         ├─ Answer sufficient? ──> Return Grounded Answer  
-                         └─ Stalled/Misaligned? ──> Trigger Skill Router  
-                                      │  
-              ┌───────────────────────┼───────────────────────┐  
-              ▼                       ▼                       ▼  
-             [ Evidence Focusing ]  
-      ├─ Reformulates terms  ├─ Splits multi-hop steps  ├─ Crops precise regions  
-      └─ Rectifies synonyms  └─ Solves logical chains   └─ Reduces token waste
-```
 
-* **Query Rewriting**: Applied when the input query is poorly specified for the target evidence space, reformulating search terms using verified synonyms.38  
-* **Question Decomposition**: Applied when the query contains multi-hop dependencies, splitting it into sequential sub-questions to resolve logical chains.18  
-* **Evidence Focusing**: Applied when the candidate set is broad or semantically noisy, using page coordinates to isolate and extract precise text regions.8  
-* **Exit Skill**: Applied when the query represents an irreducible case, terminating retrieval gracefully to prevent infinite retry storms.5
+| Retrieval Control | Default Function |
+| :--- | :--- |
+| **Query Cap** | Limits rewritten/decomposed searches per user request. |
+| **Candidate Cap** | Limits chunks/documents passed forward per query. |
+| **Rerank Cap** | Limits expensive cross-encoder or LLM reranking calls. |
+| **Document Expansion Cap** | Limits neighboring pages, sections, or table continuations. |
+| **Page Rendering Cap** | Limits visual/OCR render work. |
+| **Partition Cap** | Limits index/database partitions searched per request. |
+| **Evidence Sufficiency Gate** | Stops when available evidence cannot support the requested answer. |
 
-To maintain strict cost control, retrieval budgets must be decoupled from authorization boundaries 6:
-
-* **Permission-Aware Retrieval**: Enforces security constraints, validating *who* has authorization to view specific document directories.6  
-* **Retrieval Budgets**: Enforces workload constraints, capping *how much* search, page-rendering, and citation-checking work a user or agent is permitted to trigger in a single session.6
-
-The parameters of the *Retrieval Budget Model* are defined in the primary budget matrix:
-
-| Parameter | Metric Limit Ceiling | Containment Action |
-| :---- | :---- | :---- |
-| **Query Cap** | <= 3 rewritten queries per user request.5 | discard subsequent queries if budget is exhausted.5 |
-| **Candidate Cap** | <= 20 document chunks per query.12 | truncate candidate set size before passing to the reranker.12 |
-| **Rerank Cap** | <= 5 chunks scored per model call.8 | restrict reranker workload; enforce strict timeout parameters.8 |
-| **Document Expansion** | <= 2 neighboring pages retrieved.8 | restrict page-continuation retrieval; apply layout bounds.5 |
-| **Page Rendering** | <= 1 image rendered at 300 DPI.8 | limit visual rendering budgets; use text parsers when possible.8 |
-| **Citation Checks** | 100% validation of generated quotes.5 | remove ungrounded citations; suppress unverified statements.5 |
-| **Index Fan-Out** | <= 2 vector partitions searched.6 | enforce database-level Row-Level Security and metadata filters.6 |
+Permission-aware retrieval and retrieval budgets are separate controls. Permission-aware retrieval decides **what the user is allowed to see**. Retrieval budgeting decides **how much search work this request is allowed to trigger**.
 
 ## **Tool Consumption Ledger**
 
@@ -242,49 +259,81 @@ The structure of the Tool Consumption Ledger is defined in the primary log schem
 
 | Parameter Field | Schema Data Type | System Governance Rule |
 | :---- | :---- | :---- |
-| transaction_id | UUID (v4) | unique identifier generated for every tool invocation attempt.6 |
-| tenant_uuid | UUID (v4) | maps execution directly to the active B2B tenant space.6 |
-| user_session_id | UUID (v4) | binds execution context to the authenticated user's session.6 |
-| tool_name | VARCHAR (255) | name of the tool, matching a registered, non-overlapping schema.36 |
-| action_class | VARCHAR (64) | categorizes tool as READ_ONLY, LOW_RISK_MUTATION, or HIGH_RISK.6 |
-| cost_class | VARCHAR (32) | maps tool to pricing tiers (e.g., FREE, EPHEMERAL_PAY-PER-CALL).7 |
-| idempotency_key | VARCHAR (255) | mandatory key preventing duplicate mutations on retry attempts.5 |
-| attempt_count | INT | tracks current invocation try; strict limit of <= 2 attempts.5 |
-| retry_reason | VARCHAR (512) | logs the specific exception or error code that triggered the retry.5 |
-| latency_ms | INT | execution time of the tool, bounded by hard timeout limits.8 |
-| quota_consumed | INT | amount of provider-specific quota consumed by this transaction.7 |
-| result_status | VARCHAR (32) | output status of the tool (e.g., SUCCESS, FAILED, BLOCKED).7 |
-| error_class | VARCHAR (128) | categorizes returned exception types for pattern tracking.5 |
-| cumulative_spend | DECIMAL (10, 4\) | total financial cost incurred by this tool session in USD.7 |
+| `transaction_id` | UUID | Unique identifier for every tool invocation attempt. |
+| `tenant_id` | UUID | Binds execution to active tenant. |
+| `user_id` | UUID | Binds execution to authenticated user. |
+| `session_id` | UUID | Binds execution to active session/workflow. |
+| `workflow_id` | UUID / nullable | Groups tool calls within an agentic or batch workflow. |
+| `tool_name` | String | Must match registered tool contract. |
+| `tool_version` | String | Records manifest/schema version used at execution. |
+| `action_class` | Enum | `READ_ONLY`, `LOW_RISK_MUTATION`, `HIGH_RISK_MUTATION`, `EXTERNAL_COMMUNICATION`, `ADMINISTRATIVE`. |
+| `cost_class` | Enum | `FREE`, `INTERNAL_FIXED`, `METERED_API`, `TOKEN_METERED`, `HUMAN_REVIEW`, `UNKNOWN`. |
+| `idempotency_key` | String / nullable | Required for mutations; optional request hash for reads. |
+| `payload_hash` | String | Detects duplicate or repeating calls without logging raw secrets. |
+| `attempt_count` | Integer | Bounded by retry policy for tool and action class. |
+| `retry_reason` | String / nullable | Records typed reason for retry. |
+| `timeout_ms` | Integer | Maximum allowed runtime for this call. |
+| `latency_ms` | Integer | Observed execution time. |
+| `quota_consumed` | Decimal / JSON | Provider-specific quota units consumed. |
+| `estimated_cost_usd` | Decimal | Pre-execution estimate. |
+| `actual_cost_usd` | Decimal / nullable | Reconciled cost after completion. |
+| `cumulative_workflow_spend_usd` | Decimal | Running workflow/session spend total. |
+| `result_status` | Enum | `SUCCESS`, `FAILED`, `BLOCKED`, `TIMEOUT`, `UNKNOWN`, `PARTIAL`, `PENDING`. |
+| `error_class` | String / nullable | Normalized exception/failure class. |
+| `verification_status` | Enum | `NOT_REQUIRED`, `VERIFIED`, `FAILED`, `UNKNOWN`, `PENDING`. |
+| `created_at` | Timestamp | Invocation attempt time. |
+| `completed_at` | Timestamp / nullable | Completion or timeout time. |
 
-Every tool invocation must be evaluated against the user's active session role and tenant budget before execution.6 State-changing operations require stronger gates. The system must verify the success of a transaction inside the database of record before generating any verbal or text-based confirmation to the user, ensuring the agent's statements align with system state.5
+Every tool invocation must be checked against the user’s session role, tenant scope, tool policy, and active budget before execution. Mutating calls require idempotency or an equivalent duplicate-prevention mechanism. High-risk mutations require post-action verification before the agent can claim completion. Unknown tool state must be preserved as unknown; it must not be flattened into success or failure for conversational convenience.
 
 ## **Adversarial Latency Inflation Threat Model**
 
-Adversarial latency inflation exploits serving-engine scheduling behavior to degrade system availability. Under long-context workloads, inference accuracy becomes highly variable, and when incorrect answers trigger retries or escalation, these routing mistakes inflate cumulative, user-visible delays.14 The actual performance of a long-context system is therefore modeled using the *Time-to-Correct-Answer (TTCA)* metric, which measures the total wall-clock time required to obtain the first correct, verified response, accounting for retries and escalations.14  
+Adversarial latency inflation exploits parsing, retrieval, serving-engine scheduling, tool execution, or queueing behavior to degrade availability. In some workflows, incorrect answers also trigger retries or escalation, making Time-to-Correct-Answer useful; in others, the incident is simpler worker starvation or queue saturation.14 The actual performance of a long-context system is therefore modeled using the *Time-to-Correct-Answer (TTCA)* metric, which measures the total wall-clock time required to obtain the first correct, verified response, accounting for retries and escalations.14  
 Attackers can deliberately inflate latency by submitting inputs designed to maximize processing times. High-resolution images, multi-page scanned PDFs, uncacheable prefixes, and complex math-heavy prompts force serving engines to spend excessive cycles in the compute-bound prefill phase.6 Since modern engines process requests in batches, a small number of latency-inflated requests can occupy active worker threads, saturate GPU caches, and cause queue starvation for all other concurrent users.13  
 To protect serving availability, the platform must enforce stage-wise latency budgets and isolate workloads.
 
 ```
-                         STAGE-WISE LATENCY BUDGETS  
-                                      │  
-                             [ Input Validation ] (10ms)  
-                                      │  
-                                 (120ms)  
-                                      │  
-                                    (45ms)  
-                                      │  
-                                    (80ms)  
-                                      │  
-                             [ Model Prefill ]    (150ms)  
-                                      │  
-                                 (250ms)  
-                                      │  
-                               (180ms)  
-                                      │  
-                                 (90ms)  
-                                      │  
-                                 User Speaker
+STAGE-WISE LATENCY BUDGET MODEL
+
+[ Request Intake ]
+   validate size, auth, tenant, policy, and declared modality
+        |
+        v
+[ Parsing / Modality Processing ]
+   OCR, document layout, image/video/audio preprocessing
+        |
+        v
+[ Retrieval ]
+   authorized search, candidate limits, partition limits
+        |
+        v
+[ Reranking / Evidence Selection ]
+   bounded rerank calls and evidence sufficiency checks
+        |
+        v
+[ Model Prefill ]
+   prompt/context processing; chunked prefill where supported
+        |
+        v
+[ Model Decode ]
+   output generation under token/time limits
+        |
+        v
+[ Tool Execution ]
+   bounded API/browser/database calls when required
+        |
+        v
+[ Output / Post-Processing ]
+   validation, redaction, formatting, TTS or UI delivery if applicable
+        |
+        v
+[ User-visible response ]
+
+Latency budgets should be profile-specific:
+  realtime voice/chat       -> tight first-response and streaming budgets
+  document analysis         -> larger parser/OCR budget
+  batch processing          -> throughput and total-job budget
+  high-impact tool action   -> verification budget matters more than speed
 ```
 
 * **Input Validation (10ms)**: Quickly filters out-of-bounds or malformed requests.5  
@@ -310,7 +359,7 @@ To contain these risks, all background batch jobs must be governed by the *Batch
 ## **Tenant Resource Isolation and Quota Fairness**
 
 In multi-tenant SaaS deployments, ensuring data isolation is only half the battle; resource and quota isolation are equally critical.6 Without robust resource isolation, a single tenant running bursty, long-context workloads can monopolize shared GPU memory and serve as a "noisy neighbor," causing latency spikes, preemption storms, and out-of-memory (OOM) crashes for all other tenants on the host.23  
-While physical GPU partitioning using Multi-Instance GPU (MIG) slices provides absolute latency isolation, it reduces overall fleet flexibility and underutilizes accelerators during low-traffic periods.23 To balance efficiency with reliability, platforms must deploy intelligent overload and admission control at the gateway layer.15 The system must maintain separate CoDel (Controlled Delay) queues for distinct operation types—such as point lookups (Read Queue), data writes (Write Queue), and long-running scans (Slow Queue)—to prevent background tasks from blocking real-time user traffic.15 Concurrency must be managed dynamically based on Little's Law:  
+Physical GPU partitioning using mechanisms such as Multi-Instance GPU (MIG) can provide stronger hardware-level isolation, but it does not eliminate every shared bottleneck, and it may reduce fleet flexibility or utilization during low-traffic periods.23 To balance efficiency with reliability, platforms must deploy intelligent overload and admission control at the gateway layer.15 The system should maintain separate admission lanes or queues for distinct operation classes—such as interactive reads, writes, long-running scans, batch jobs, and realtime sessions—to prevent background work from blocking latency-sensitive traffic. CoDel-style queue management is one possible technique, not a universal requirement.15 Concurrency must be managed dynamically based on Little's Law:  
 Concurrency = Throughput * Latency 15  
 To distribute remaining capacity fairly, the platform implements a rule-based admission control engine that tracks and enforces multi-level resource quotas per tenant space.15  
 These controls span several critical mechanisms:
@@ -370,6 +419,20 @@ Because the exact number of output tokens cannot be predicted prior to generatio
    Refund = Reserved Cost - Actual Cost 2  
    For streaming connections, the gateway counts tokens progressively as individual chunks arrive over the WebSocket.2 It captures the final chunk's usage.completion_tokens metadata to compute and apply the remaining refund before the HTTP socket is closed.2
 
+The reservation pattern must also define failure handling:
+
+| Failure Case | Risk | Required Handling |
+| :--- | :--- | :--- |
+| **Provider timeout before usage metadata** | Actual cost may be unknown. | Mark reservation as pending; reconcile from provider logs or expire with conservative policy. |
+| **Streaming disconnect** | User connection drops while provider may continue generating. | Cancel upstream request where possible; reconcile partial usage. |
+| **Gateway crash after reservation** | Reserved budget may leak. | Store reservation record durably with expiry and recovery worker. |
+| **Provider returns incomplete usage** | Actual cost cannot be trusted. | Use conservative estimate and flag for billing reconciliation. |
+| **Reconciliation write fails** | Refund or debit may not be recorded. | Retry idempotently; preserve transaction as unresolved. |
+| **Duplicate request retry** | Same logical request may reserve twice. | Use idempotency key or request hash for reservation records. |
+| **Budget breached mid-stream** | Generation exceeds allowed spend. | Terminate stream at budget boundary and return managed budget status. |
+
+Reservation is not merely a math trick. It is a financial transaction boundary and needs durable state, idempotency, expiry, and reconciliation.
+
 ### **Three-Layer Rate Limiting Architecture**
 
 The gateway enforces rate limiting across three complementary layers to defend against both volume and pattern-based resource abuse.9
@@ -378,8 +441,8 @@ The gateway enforces rate limiting across three complementary layers to defend a
   Every identity tuple, represented as (user, repo, model), is assigned its own token bucket in Redis to isolate rogue processes without blocking unrelated workloads.9 It operates using a continuous refill algorithm: the bucket stores a last_refill_timestamp in Redis, and on every request, the system calculates the time elapsed and adds tokens proportionally based on the configured refill rate.42  
 * **Layer 2: Pattern-Based Circuit Breakers**  
   Circuit breakers monitor traffic signatures in real time and trip (failing fast for 60 seconds) when they detect anomalous behaviors.9 Breakers trip when an agent ignores standard Retry-After headers and generates consecutive 429s, when error rates exceed 50% in a 60-second window, when cost velocity exceeds the planned budget rate, or when call shapes indicate runaway loops (e.g., identical prompts or monotonically growing context sizes).9  
-* **Layer 3: Fallback Chains**  
-  When a primary route is throttled or its circuit breaker is open, the gateway routes traffic down a declarative fallback chain.9 It transitions from the primary model to a cheaper, faster model, then to a semantic cache hit, and finally returns a managed HTTP 503 Service Unavailable status code if all other options are exhausted.9
+* **Layer 3: Policy-Preserving Fallback Chains**  
+  When a primary route is throttled or its circuit breaker is open, the gateway may route traffic down a declarative fallback chain. Fallback must preserve tenant scope, data classification, tool permissions, quality threshold, and task fitness. A cheaper model is acceptable only when it can safely perform the task. A semantic cache is acceptable only when the cache key, source freshness, tenant scope, and policy version match. If no safe fallback exists, the system returns a managed 429/503/capacity response rather than silently downgrading into wrongness.9
 
 ### **Token-Budget-Aware Pool Routing**
 
@@ -395,7 +458,7 @@ sigma_k_hat = EMA(sigma_k_hat, |c_obs - c_k_hat|) 25
 The constant gamma (positive real number) represents an asymmetric, error-aware safety parameter ensuring conservative budget estimation.25 If L_total > C_max(P_s), the gateway routes the request directly to the long pool P_l; otherwise, it dispatches the request to the high-concurrency short pool P_s, optimizing GPU memory utilization without the latency overhead of running model-specific tokenizers.25  
 This analytical split is governed by a closed-form fleet-level cost savings model:  
 Savings = alpha * (1 - 1/rho) 25  
-where alpha (between 0 and 1\) is the short-traffic fraction of the workload, and rho (greater than 1\) is the throughput gain ratio achieved by running the short pool under a tighter memory configuration.25
+where alpha (between 0 and 1) is the short-traffic fraction of the workload, and rho (greater than 1) is the throughput gain ratio achieved by running the short pool under a tighter memory configuration.25
 
 ## **Cost Attribution Architecture**
 
@@ -433,58 +496,115 @@ The platform tracks and evaluates these key telemetry metrics:
 
 When an alert triggers a resource incident, the platform executes a structured, multi-tier incident response playbook to contain the impact and restore normal operating parameters:
 
-```
-                      INCIDENT RESPONSE PROTOCOL ENGINE  
-                                      │  
-                         SIEM Alert / Anomaly Trigger  
-                                      │  
-                                      ▼  
-                           [ Containment Phase ]  
-                           ├─ Freeze actor JWT credentials  
-                           ├─ Terminate runaway batch jobs  
-                           └─ Stop loop-offending threads  
-                                      │  
-                                      ▼  
-                           [ Mitigation Phase ]  
-                           ├─ Pause compromised queues  
-                           ├─ Lower model routing tiers  
-                           └─ Rotate exposed integration keys  
-                                      │  
-                                      ▼  
-                            
-                           ├─ Invalidate cache partitions  
-                           ├─ Recalibrate tenant quotas  
-                           └─ Inject regression test to CI/CD
+```text
+RESOURCE INCIDENT RESPONSE FLOW
+
+[ Alert / Anomaly Trigger ]
+  cost velocity | quota burn | loop count | queue depth | latency | tool retries
+        |
+        v
+[ Scope the Incident ]
+  tenant | user | session | workflow | model route | tool | batch job | queue
+        |
+        v
+[ Containment ]
+  suspend affected sessions
+  revoke active tokens if abuse/compromise is suspected
+  terminate runaway jobs or loops
+  trip route/tool circuit breakers
+        |
+        v
+[ Isolation ]
+  pause affected queue or tenant partition
+  isolate noisy workload class
+  block expensive tool/model route if needed
+        |
+        v
+[ Recovery ]
+  reconcile spend and quota
+  restore safe capacity
+  credit affected customers when appropriate
+  resume traffic gradually
+        |
+        v
+[ Hardening ]
+  update budgets, limits, classifiers, tests, and runbooks
+  add regression case for the triggering pattern
 ```
 
 
-* **Containment**: The gateway identifies a budget breach or loop anomaly and automatically freezes the affected user's session tokens.5 Cost circuit breakers trip globally on the compromised model routes, blocking further API calls.9 Runaway background batch jobs and agent workflows are immediately terminated by the orchestrator.5  
-* **Isolation**: The platform pauses processing on compromised task queues to prevent cascading failures.5 Exposed tool credentials and API tokens are revoked and rotated.6 Model routing parameters are updated to force traffic to low-cost, local fallback instances while the primary environment is investigated.5  
+* **Containment**: The gateway identifies a budget breach or loop anomaly and suspends the affected sessions or revokes active tokens when abuse or compromise is suspected.5 Cost circuit breakers trip globally on the compromised model routes, blocking further API calls.9 Runaway background batch jobs and agent workflows are immediately terminated by the orchestrator.5  
+* **Isolation**: The platform pauses processing on compromised task queues to prevent cascading failures.5 Exposed tool credentials and API tokens are revoked and rotated.6 Model routing may be shifted to approved fallback routes only when those routes preserve task fitness, policy, tenant scope, and quality requirements.5  
 * **Traceback & Recovery**: SRE teams analyze execution traces and log hashes to calculate the precise financial impact and identify the exploit pathway.5 Vector database indexes are audited to locate and isolate poisoned documents.6 Platform quotas are restored, and affected customer accounts are credited.5  
 * **Hardening & Post-Mortem**: A root-cause analysis is published to catalog the failure mechanism.7 Security teams construct a regression test reproducing the exploit pattern, integrating it into the CI/CD pipeline to prevent future regressions.5
 
 ## **Cross-Canon Handoff Map**
 
-The resource-control architecture established in this report interfaces directly with adjacent disciplines across the AI Systems Engineering Canon.
+The resource-control architecture established in this report interfaces with context, retrieval, serving, orchestration, tool, action-verification, multimodal, voice, UI, security, fallback, telemetry, audit, and governance systems. Resource limits are not merely downstream operational concerns; they shape safe execution across the canon.
 
-| Downstream Target Report | Volume & Area | Core Dependency | Operational Rule | Fallback Action |
-| :---- | :---- | :---- | :---- | :---- |
-| **AI-ENG-W** | Vol 8: Fallback Modes | progressive degradation thresholds.5 | trigger local, CPU-bound Tesseract parsing when VLM rate limits are hit.8 | fail closed; return a managed system exception.5 |
-| **AI-ENG-X** | Vol 8: User Trust | real-time coordinate highlights.8 | render visual bounding box overlays directly on user interface screens.8 | display source document name and text snippet only.6 |
-| **AI-ENG-Y** | Vol 8: Human Review | validation confidence scores.5 | route character OCR results below 0.60 confidence to manual review.8 | apply low-cost default states; skip review.5 |
-| **AI-ENG-Z** | Vol 9: Telemetry | standardized syslog telemetry schema with PII masking.5 | redact credentials and API keys in log streams before writing to SIEM.6 | purge logs automatically if unmasked secrets are found.6 |
-| **AI-ENG-AA** | Vol 9: Adversarial Evals | adversarial injection test suites.6 | block software releases in CI/CD if injection protection scores drop.6 | roll back build branch to last stable release.6 |
-| **AI-ENG-AB** | Vol 9: Audit & Replay | signed transaction logs and hashes.5 | store complete variable dependency maps alongside conversation traces.5 | log unhashed transactions in local syslog volumes.6 |
-| **AI-ENG-AC** | Vol 9: Incident Response | index quarantine playbooks.6 | rebuild HNSW index partitions from backups if poisoning is flagged.6 | terminate vector search; fall back to lexical search.6 |
-| **AI-ENG-AJ** | Vol 10: Ref Architecture | multi-tenant pgvector schema maps.6 | enforce database-level Row-Level Security on every similarity query.6 | separate physical database partitions per tenant.6 |
+| Target Report ID | Target Domain | Resource-Control Handoff | Integration Rule |
+| :---- | :---- | :---- | :---- |
+| **AI-ENG-B** | Context Tenure & State Governance | Context retention budgets, memory inclusion limits, compaction thresholds. | Long sessions must preserve active state while bounding carried-forward context. |
+| **AI-ENG-C** | Cost, Latency & Margin Mechanics | Token pricing, spend attribution, latency/cost models. | Gateway budgets must align with cost and margin models. |
+| **AI-ENG-E** | Retrieval Pipeline | Query caps, candidate caps, rerank caps, page-render caps. | Retrieval must be authorized and budgeted before context assembly. |
+| **AI-ENG-J** | Throughput Mechanics | KV cache pressure, prefill/decode scheduling, queue starvation. | Serving-level resource limits must reflect memory and scheduling behavior. |
+| **AI-ENG-L** | Serving Architecture | Gateway routing, rate limits, circuit breakers, pool selection. | Serving routes must enforce budget, latency, and quota envelopes. |
+| **AI-ENG-M** | Agentic Orchestration | Loop budgets, progress detection, no-progress states. | Agents must halt, replan, or escalate when loop/resource budgets are exhausted. |
+| **AI-ENG-N** | Tool Contracts | Tool quota, retry budgets, idempotency, tool ledger. | Tool calls require budget checks and action-class-specific retry limits. |
+| **AI-ENG-O** | Action Verification | Unknown state, partial commit, post-action verification cost. | Verification work must be budgeted, but completion claims cannot bypass verification. |
+| **AI-ENG-P** | Multimodal Understanding | OCR pages, image megapixels, video frames, parser/VLM budgets. | Multimodal extraction must be bounded by modality-specific resource envelopes. |
+| **AI-ENG-Q** | Speech and Realtime Interaction | Audio duration, turn count, STT/TTS budget, realtime latency. | Voice sessions need streaming resource budgets and interruption-safe limits. |
+| **AI-ENG-R** | UI Agents | Browser sessions, waits, clicks, page renders, downloads. | UI automation must enforce browser/session/time/action budgets. |
+| **AI-ENG-S** | Production Pathologies | Runaway loops, malformed repair loops, brittle chains. | Resource incidents should be typed, observable, and replayable. |
+| **AI-ENG-T** | Boundary Defense | Tenant isolation, cache scope, authorization before retrieval. | Resource fallback must not bypass tenant, policy, or permission boundaries. |
+| **AI-ENG-U** | Supply Chain Security | Parser/tool/dependency sandbox budgets and egress limits. | Compromised dependencies must be contained by resource and network boundaries. |
+| **AI-ENG-W** | Fallback and Degraded Modes | Capacity-aware fallback and graceful degradation. | Fallback routes must preserve policy and task fitness, not just reduce cost. |
+| **AI-ENG-X** | User Trust & Transparency | Budget status, degraded-mode explanations, quota visibility. | Users should receive honest status when limits block or degrade execution. |
+| **AI-ENG-Y** | Human Review | Review queue budgets and escalation throttles. | Human review is a scarce resource and requires admission control. |
+| **AI-ENG-Z** | Telemetry & Metrics | Token burn, cost velocity, queue depth, quota burn, tool retries. | Resource telemetry must be attributed by tenant/user/session/workflow. |
+| **AI-ENG-AA** | Evaluations | Cost-bomb, loop, retrieval-flood, batch-runaway tests. | Releases must test for unbounded consumption regressions. |
+| **AI-ENG-AB** | Audit & Replay | Resource ledger, reservation records, request traces. | Replay must reconstruct cost, quota, and budget decisions. |
+| **AI-ENG-AC** | Incident Response | Cost-bomb and quota-exhaustion playbooks. | Resource incidents require containment, reconciliation, customer impact analysis, and hardening. |
+| **AI-ENG-AD** | Governance & Accountability | Budget policy, approval thresholds, exception handling. | Governance defines who may exceed budgets, when, and under what audit trail. |
+| **AI-ENG-AJ** | Reference Architecture | Budget-aware gateway, quota service, ledger, circuit breaker. | Reference systems should include resource boundaries by default. |
 
 ## **Durable Principles of Resource Boundary Governance**
 
-1. **Mechanical Enforcement Outside the Model**: Models are probabilistic generation engines that cannot reliably police their own resource consumption. System prompts, structural instructions, and self-reflection loops fail under context pressure or adversarial input. Resource envelopes must be enforced programmatically by external software frameworks.  
-2. **Every Execution Path Needs a Resource Envelope**: An unbounded system component is an active availability and financial risk. Every model call, tool execution, database retrieval, batch process, browser automation, or voice session must operate within strict ceilings for tokens, turns, time, and spend.  
-3. **The Context Window is a Metered Execution Surface**: Context is not free; it carries quadratic cost characteristics and directly affects tail latency and memory utilization. The system must actively manage context lifetimes, truncating and compressing logs before they saturate KV caches or trigger preemption storms.  
-4. **No Cost Discovery After Execution**: Batch jobs, background tasks, and agentic workflows must not discover their token and financial footprints after they run. The system must calculate preflight estimates, perform dry-run checks over sample data, and verify execution budgets before scheduling bulk operations.  
-5. **Data Isolation Demands Quota Isolation**: Multi-tenant security requires more than separating relational database rows. To prevent denial-of-wallet attacks and noisy-neighbor queue starvation, systems must enforce tenant-specific rate limits, fair-share scheduling slots, and budget ceilings at the gateway layer.
+1. **Mechanical Enforcement Outside the Model**  
+   Models cannot reliably police their own resource use. Resource envelopes must be enforced by gateways, orchestrators, schedulers, tool brokers, and batch controllers.
+
+2. **Every Execution Path Needs a Resource Envelope**  
+   Model calls, retrieval, reranking, parsing, browser sessions, tools, voice streams, human review, and batch jobs all require ceilings for tokens, time, calls, concurrency, quota, and spend.
+
+3. **Context Is a Metered Execution Surface**  
+   Context consumes memory, prefill time, money, and attention. Systems must budget context admission, compaction, retrieval insertion, memory loading, and tool-output retention.
+
+4. **Fallback Must Preserve Fitness and Policy**  
+   A cheaper model, cached answer, local parser, or degraded tool route is safe only if it preserves tenant scope, permission, data classification, task fitness, and user trust.
+
+5. **Retry Requires Idempotency or Reconciliation**  
+   Retrying model calls may waste money. Retrying tools may duplicate side effects. Mutating retries require idempotency keys, unknown-state handling, or explicit reconciliation.
+
+6. **No-Progress Loops Must Halt**  
+   Repeated plans, repeated tool payloads, repeated retrieval results, repeated UI clicks, and repeated repair errors are resource incidents. They require replan, clarification, escalation, or termination.
+
+7. **Human Review Is a Scarce Resource**  
+   Review queues can be attacked or accidentally flooded. Escalation requires budgets, triage, sampling, and clear fallback statuses.
+
+8. **Batch Work Requires Preflight Economics**  
+   Reindexing, embedding backfills, evaluations, and bulk parsing must estimate cost, dry-run on samples, checkpoint progress, and expose kill switches before full execution.
+
+9. **Quota Isolation Complements Data Isolation**  
+   Tenant data isolation prevents leaks. Tenant resource isolation prevents noisy-neighbor starvation and denial-of-wallet abuse.
+
+10. **Cost Must Be Attributable**  
+   Every token, tool call, retrieval expansion, parser run, browser action, and human-review minute should trace back to tenant, user, session, workflow, and route.
+
+11. **Unknown Resource State Must Be Reconciled**  
+   Timeouts, stream disconnects, provider failures, and gateway crashes can leave budget state uncertain. Reservations and usage records need durable reconciliation.
+
+12. **Budget Breaches Are Security Signals**  
+   Sudden cost velocity, retrieval fan-out, parser CPU spikes, or tool retry storms may indicate attack, compromise, drift, or pathological workload. Treat them as operational security events, not merely a billing annoyance.
 
 #### **Works cited**
 
@@ -530,7 +650,7 @@ The resource-control architecture established in this report interfaces directly
 40. Skill-RAG: Failure-State-Aware Retrieval Augmentation via Hidden-State Probing and Skill Routing - arXiv, accessed June 10, 2026, [https://arxiv.org/pdf/2604.15771](https://arxiv.org/pdf/2604.15771)  
 41. Enabling Performant and Flexible Model-Internal Observability for LLM Inference - arXiv, accessed June 10, 2026, [https://arxiv.org/html/2605.11093v1](https://arxiv.org/html/2605.11093v1)  
 42. Denial of Wallet: Cost-Aware Rate Limiting for Generative AI ..., accessed June 10, 2026, [https://handsonarchitects.com/blog/2026/denial-of-wallet-cost-aware-rate-limiting-part-3/](https://handsonarchitects.com/blog/2026/denial-of-wallet-cost-aware-rate-limiting-part-3/)  
-43. Denial of Wallet: Cost-Aware Rate Limiting for Generative AI Applications - Hands-On Implementation (Part 3), accessed June 10, 2026, [https://handsonarchitects.com/blog/2026/denial-of-wallet-cost-aware-rate-limiting-part-3/?utm_source=jvm-bloggers.com\&utm_medium=link\&utm_campaign=jvm-bloggers](https://handsonarchitects.com/blog/2026/denial-of-wallet-cost-aware-rate-limiting-part-3/?utm_source=jvm-bloggers.com&utm_medium=link&utm_campaign=jvm-bloggers)  
+43. Denial of Wallet: Cost-Aware Rate Limiting for Generative AI Applications - Hands-On Implementation (Part 3), accessed June 10, 2026, [https://handsonarchitects.com/blog/2026/denial-of-wallet-cost-aware-rate-limiting-part-3/?utm_source=jvm-bloggers.com&utm_medium=link&utm_campaign=jvm-bloggers](https://handsonarchitects.com/blog/2026/denial-of-wallet-cost-aware-rate-limiting-part-3/?utm_source=jvm-bloggers.com&utm_medium=link&utm_campaign=jvm-bloggers)  
 44. Dual-Pool Token-Budget Routing for Cost-Efficient and Reliable LLM Serving, accessed June 10, 2026, [https://www.researchgate.net/publication/403683060_Dual-Pool_Token-Budget_Routing_for_Cost-Efficient_and_Reliable_LLM_Serving](https://www.researchgate.net/publication/403683060_Dual-Pool_Token-Budget_Routing_for_Cost-Efficient_and_Reliable_LLM_Serving)  
 45. [2604.09613] Token-Budget-Aware Pool Routing for Cost-Efficient LLM Inference - arXiv, accessed June 10, 2026, [https://arxiv.org/abs/2604.09613](https://arxiv.org/abs/2604.09613)
 

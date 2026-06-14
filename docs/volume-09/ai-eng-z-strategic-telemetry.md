@@ -38,6 +38,7 @@ An AI interaction must not be represented as a single, flat request-response eve
 
 ### **Artifact 2: AI Trace Model**
 
+```
 Root Span (openinference.span.kind="AGENT"): "Legal Review Orchestrator"  
 │   ├── Context: trace_id=8f92a10c..., span_id=00f067aa..., parent_id=None  
 │   ├── Attributes: session.id="sess_2026_X", tenant_id="tenant_omega"  
@@ -74,6 +75,7 @@ Root Span (openinference.span.kind="AGENT"): "Legal Review Orchestrator"
 └─── Child Span (openinference.span.kind="GUARDRAIL"): "PII Leak Check"  
     ├── Context: trace_id=8f92a10c..., span_id=9c0d1e2f..., parent_id=00f067aa...  
     └── Attributes: user_disclosure_shown=true, citation_click_through_rate=0.25
+```
 
 ### **Context Propagation across Distributed Transport Channels**
 
@@ -83,7 +85,7 @@ The system utilizes the W3C Trace Context specification as its baseline.3 The tr
 
 For example, a compliant JSON-RPC payload propagating a W3C Trace Context and associated baggage is structured as follows 3:
 
-JSON  
+```JSON  
 {  
   "jsonrpc": "2.0",  
   "method": "tools/call",  
@@ -101,6 +103,7 @@ JSON
   },  
   "id": 42  
 }
+```
 
 The receiving server extracts the traceparent from the _meta block to establish parent-child relationships, ensuring that local tool execution spans are bound to the parent trace initiated by the client orchestrator.3
 
@@ -141,6 +144,7 @@ To construct a comprehensive representation of an AI application's behavior, tel
 
 ### **Artifact 4: Telemetry Plane Map**
 
+```
   +---------------------------------------------------------------------------------+  
   |                             TELEMETRY PLANES MAP                                |  
   +---------------------------------------------------------------------------------+  
@@ -165,6 +169,7 @@ To construct a comprehensive representation of an AI application's behavior, tel
 ├── Maker-Checker states         ├── Direct API spend             ├── Embedding shifts  
 ├── Overrides & comments         ├── Computed hardware cost       ├── Entailment drift  
 └── Audit signatures             └── Tenant spend ledger          └── Refusal distributions
+```
 
 The table below outlines the specific attributes, metrics, and correlation keys required to bind these planes into a unified analytical graph:
 
@@ -188,6 +193,7 @@ Tokens represent the fundamental currency and state footprint of Generative AI w
 
 The Token Telemetry Model decomposes token usage into granular components to isolate the economic characteristics of every step:
 
+```
 Total Token Footprint  
 ├── Prompt (Input) Tokens  
 │   ├── User Message Input  
@@ -202,6 +208,7 @@ Total Token Footprint
     ├── Deliberative / Internal Computational Tokens (usage.reasoning.output_tokens)  
     ├── Tool Schema / Payload Tokens  
     └── Wasted / Abandoned Tokens (Truncated generations, cancelled streams)
+```
 
 The table below maps specific token metrics to their operational diagnostic value:
 
@@ -238,6 +245,7 @@ Large Language Model inference executes across two distinct stages with fundamen
 1. **Prefill Stage (Prompt Ingestion):** The model processes the entire prompt (including system instructions, retrieved document chunks, and chat history) in parallel, building the key-value (KV) cache.7 This stage is compute-bound, heavily utilizing the GPU's Tensor Cores.7 Prefill speed defines the Time to First Token (TTFT).7  
 2. **Decode Stage (Autoregressive Generation):** The model generates subsequent completion tokens sequentially, one by one.7 Each step executes a forward pass that reads the existing KV cache from GPU High Bandwidth Memory (HBM) to generate the next token.7 This stage is memory-bandwidth-bound, leaving GPU compute cores underutilized.7 Decode speed defines the Inter-Token Latency (ITL).7
 
+```
   Prompt (Input) ───► [ Prefill Phase ] (Compute-Bound, Parallel)  
                              │  
                              ▼ Generates KV Cache  
@@ -248,6 +256,7 @@ Large Language Model inference executes across two distinct stages with fundamen
   ├─► Output Token 1 ─┐  
   ├─► Output Token 2 ─┼─► Loops Autoregressively  
   └─► Output Token N ─┘
+```
 
 ### **Artifact 6: Latency Decomposition Model**
 
@@ -303,7 +312,7 @@ This taxonomy maps semantic system failures to target diagnostic attributes and 
 
 When a fallback retry is triggered, the gateway must log the retry event to prevent thundering-herd storms and trace budget inflation.1 The retry log entry must record:
 
-JSON  
+```JSON  
 {  
   "retry_id": "ret_99102-X",  
   "trigger_error_type": "timeout",  
@@ -314,6 +323,7 @@ JSON
   "cumulative_retry_cost_usd": 0.00142,  
   "retry_outcome": "success"  
 }
+```
 
 This logging ensures that SREs can track the exact cost and latency overhead added by retries, preventing expensive "retry storms" from overloading backend services.1
 
@@ -340,7 +350,7 @@ In Retrieval-Augmented Generation (RAG) and tool-driven agent environments, stra
 
 To guarantee the structural integrity of RAG setups, the system logs the complete retrieval context. This model enforces the **Doctrine of "Provenance Before Relevance"**: no document chunk is admitted to the model-facing context unless the system can prove where it came from, what authority it carries, and what transformations it has undergone.1
 
-JSON  
+```JSON  
 {  
   "$schema": "https://ai-engineering.canon/schemas/retrieval-observability-v1.json",  
   "retrieval_id": "ret_2026_06_11_1201",  
@@ -373,6 +383,7 @@ JSON
     "stale_cache_served": false  
   }  
 }
+```
 
 This schema guarantees that if an auditor inspects an answer, they can trace the exact bounding box and page number on the original document that supported the model's output.2
 
@@ -380,7 +391,7 @@ This schema guarantees that if an auditor inspects an answer, they can trace the
 
 Tool call telemetry must enforce strict segregation of duties and verify system states. When an agent executes a tool, the system utilizes the Saga Pattern, decomposing multi-step operations into compensatable, pivot, and retriable transactions to ensure eventual consistency across distributed services.2
 
-JSON  
+```JSON  
 {  
   "$schema": "https://ai-engineering.canon/schemas/tool-trace-v1.json",  
   "tool_call_id": "tool_99201-A",  
@@ -415,6 +426,7 @@ JSON
     }  
   }  
 }
+```
 
 This structure guarantees **Eventual Consistency Gating**: the conversational interface is blocked from speaking or displaying a completion confirmation (e.g., "Your payment has been sent") until the Post-Action Auditor verifies that the database commit successfully updated the system of record.2
 
@@ -444,6 +456,7 @@ Language models are highly dynamic and non-deterministic.1 Over time, changes in
 
 To detect and isolate behavioral regressions, the system deploys a multi-layered Semantic Drift Model, using triangulation across multiple independent dimensions:
 
+```
   Semantic Drift Triangulation  
   ├── Dimensionality-Reduced Embedding Shift  
   │   ├── Cosine Distance from Reference Centroid (Threshold: > 0.15)   
@@ -454,6 +467,7 @@ To detect and isolate behavioral regressions, the system deploys a multi-layered
   │   └── Entailment vs. Contradiction Ratios on Reference Claims   
   └── Scheduled Canary Prompt Inspections  
       └── Scheduled Execution of Curated Prompts (Similarity, Perplexity, Tone) 
+```
 
 The table below outlines the implementation details and metrics for each validation layer:
 
@@ -487,7 +501,7 @@ This diagnostic maps silent behavioral failures to their corresponding detection
 
 To make behavioral health visible to operators, the system organizes telemetry across six specialized, correlated dashboard views:
 
-                 
+```                 
   ├── Queue Depth & Latency Breakdowns    ├── Groundedness & Claim-Support Ratios  
   └── GPU Cache Utilization Metrics       └── Schema Validation Exception Rates  
                  │                                       │  
@@ -500,6 +514,7 @@ To make behavioral health visible to operators, the system organizes telemetry a
                   
   ├── Maker-Checker Approval Timelines    ├── Tenant Token Spend & Cost Velocity  
   └── SARC Constraint Enforcement Flags   └── Wasted Token Runaway Cost Ratios
+```
 
 ## **Telemetry Privacy, Redaction, and Compliance**
 
@@ -513,6 +528,7 @@ To protect sensitive datasets, the platform deploys the ARGUS output-scanning ga
 
 For production deployments with strict data compliance requirements (such as GDPR or HIPAA), storing raw conversational text directly on trace attributes is prohibited.6 Instead, the system implements a reference-only tracing architecture 6:
 
+```
   User App ───► [ Ingestion Parser ]  
                                   │  
                                   ├──► Raw Payload ──►  
@@ -522,6 +538,7 @@ For production deployments with strict data compliance requirements (such as GDP
   OTel Collector ◄─────────────── Reference Link URL ──────────────┘  
   (Metadata Only,  
    No PII)
+```
 
 1. The raw prompt and completion payloads are extracted at the ingestion parser.6  
 2. These payloads are written directly to a secure, encrypted database or S3 bucket under an isolated IAM policy and short-lived retention constraints.6  
@@ -565,7 +582,7 @@ The Strategic Telemetry architecture serves as the behavioral foundation, provid
 
 ### **Artifact 17: Cross-Canon Handoff Map**
 
-   
+```   
   ├── Standardized W3C contexts, span attributes, and token metrics.  
   └── Granular latency decompositions and semantic drift centroids.  
                            │  
@@ -575,6 +592,7 @@ The Strategic Telemetry architecture serves as the behavioral foundation, provid
   Evaluations         Audit & Replay      Incident Response  
   ├── Golden traces   ├── Signed manifests├── Sandbox escapes  
   └── Drift benchmarks└── Variable maps   └── Poisoning alerts
+```
 
 The table below defines the technical parameter handoffs and operational integration rules between this report and downstream disciplines in the Canon:
 
