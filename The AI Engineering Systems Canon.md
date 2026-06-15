@@ -177,7 +177,7 @@ Covers vendor selection, open-source model strategy, local deployment, managed A
 
 ---
 
-## Volume 12: Engineering Method and System Doctrine
+## Volume 12. AI-AK - Engineering Method and System Doctrine
 *The cross-cutting principles that govern the entire canon.*
 
 ### AI-ENG-AI - Contract Thinking: Deterministic Edges Around Probabilistic Cores
