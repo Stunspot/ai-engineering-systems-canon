@@ -251,7 +251,7 @@ Created by **Sam “stunspot” Walker** / **Collaborative Dynamics**.
 
 If you use or reference this Canon, please cite it.
 
-See [CITATION.cff](../CITATION.cff) for citation metadata.
+See [CITATION.cff](./CITATION.cff) for citation metadata.
 
 Suggested plain-text citation:
 
