@@ -113,9 +113,9 @@ For best results, load only the portions relevant to the current task, then inst
 
 Example instruction:
 
-```
-Use the AI Engineering Systems Canon as governing reference material for this task. Apply its vocabulary, doctrine, design patterns, failure modes, and evaluation logic when reasoning about the system. Do not merely summarize the Canon; use it to improve the quality, precision, and operational realism of your recommendations.
-```
+
+> *Use the AI Engineering Systems Canon as governing reference material for this task. Apply its vocabulary, doctrine, design patterns, failure modes, and evaluation logic when reasoning about the system. Do not merely summarize the Canon; use it to improve the quality, precision, and operational realism of your recommendations.*
+
 
 ---
 
