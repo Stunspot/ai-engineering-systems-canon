@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/brand/stunspots-guide-pages-hero.png" alt="Stunspot’s Guide to AI Systems — The AI Engineering Systems Canon. A comprehensive field manual for practical AI systems design.">
+</p>
+
 # Stunspot’s Guide to AI Systems
 
 **The AI Engineering Systems Canon**  
