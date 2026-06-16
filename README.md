@@ -52,6 +52,20 @@ Use it as doctrine for AI agents tasked with designing, critiquing, or improving
 - [Volume 11 — Product, Business, and Organizational Architecture](./docs/volume-11/)
 - [Volume 12 — Engineering Method and System Doctrine](./docs/volume-12/)
 
+## Knowledge Packs
+
+The canonical source reports live in [`/docs/`](./docs/).
+
+For AI Projects, RAG systems, NotebookLM-style tools, and long-context workspaces, the Guide also includes bundled knowledge packs:
+
+| Pack | Location | Best Use |
+|---|---|---|
+| **By Volume** | [`/knowledge-packs/by-volume/`](./knowledge-packs/by-volume/) | Twelve files, one per canon volume. |
+| **By Part** | [`/knowledge-packs/by-part/`](./knowledge-packs/by-part/) | Recommended default. Five larger files grouped by major canon part. Useful when file count is limited. |
+| **Omnibus** | [`/knowledge-packs/omnibus/`](./knowledge-packs/omnibus/) | Full canon in one file. Best for archival, local search, or systems that handle large single-file knowledge sources well. |
+
+Most users should start with the **By Part** pack. It preserves the canon’s structure while avoiding both extremes: one giant file or 37 separate reports.
+
 ---
 
 ## What This Canon Covers

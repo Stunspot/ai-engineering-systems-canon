@@ -93,6 +93,15 @@ Use it as doctrine for AI agents tasked with designing, critiquing, or improving
 
 ---
 
+## Knowledge Packs
+
+For AI Projects, RAG systems, NotebookLM-style tools, and long-context workspaces, use the bundled knowledge packs.
+
+- [Knowledge Packs Guide](./knowledge-packs.md)
+- [Canonical Source Reports](./canon-map.md)
+
+Recommended default: **By Part**.
+
 ## Use as AI Knowledge Substrate
 
 The Canon is designed to be useful when placed inside AI systems as structured knowledge.
