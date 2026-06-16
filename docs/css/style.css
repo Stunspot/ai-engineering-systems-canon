@@ -41,7 +41,7 @@ body {
     radial-gradient(circle at 70% 8%, rgba(0, 172, 255, 0.22), transparent 34rem),
     radial-gradient(circle at 18% 20%, rgba(0, 96, 150, 0.20), transparent 26rem),
     linear-gradient(90deg, rgba(0, 0, 0, 0.72), rgba(0, 10, 18, 0.82)),
-    url("../brand/coldwire-bg.png");
+    url("../brand/coldwire-bg.jpg");
   background-size: cover;
   background-attachment: fixed;
   background-position: center;

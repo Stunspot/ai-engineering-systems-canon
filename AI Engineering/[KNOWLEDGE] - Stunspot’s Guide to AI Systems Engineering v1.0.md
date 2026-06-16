@@ -1,4 +1,4 @@
-# [KNOWLEDGE] - AI Engineering
+# [KNOWLEDGE] - Stunspot’s Guide to AI Systems Engineering
 
 [Part I - Vol. 1-4 - A-L - Foundations of AI Systems](#part-i---vol-1-4---a-l---foundations-of-ai-systems)
 [Volume 1. A-C The Informational-Epistemic Layer](#volume-1-a-c-the-informational-epistemic-layer)
@@ -48,6 +48,32 @@
   - [AI-ENG-X — Human-System Interface: Trust Calibration, Provenance & Control](#ai-eng-x--human-system-interface-trust-calibration-provenance--control)  
   - [AI-ENG-Y — High-Impact Workflow Design - Confirmation, Review & Human-in-the-Loop Governance](#ai-eng-y--high-impact-workflow-design---confirmation-review--human-in-the-loop-governance)
 
+---
+
+[Part IV - Vol. 9-10 - Z-AE - Evaluation, Operations, and Governance](#part-iv---vol-9-10---z-ae---evaluation-operations-and-governance)
+[Volume 9. Z-AB Observability, Evaluation, and Verification](#volume-9-z-ab-observability-evaluation-and-verification)
+  - [AI-ENG-Z — Strategic Telemetry - Traces, Tokens, Latency & Semantic Drift](#ai-eng-z--strategic-telemetry---traces-tokens-latency--semantic-drift)
+  - [AI-ENG-AA — Evals Architecture: Ground Truth, Golden Sets & Regression Tests](#ai-eng-aa--evals-architecture-ground-truth-golden-sets--regression-tests)
+  - [AI-ENG-AB — Verification Artifacts - Auditability, Reproducibility & Evidence Trails](#ai-eng-ab--verification-artifacts---auditability-reproducibility--evidence-trails)
+
+[Volume 10. AC-AE Operations, Governance, and Lifecycle Management](#volume-10-ac-ae-operations-governance-and-lifecycle-management)
+  - [AI-ENG-AC — AI Operations - Incident Response, Rollback & Runbook Design](#ai-eng-ac--ai-operations---incident-response-rollback--runbook-design)
+  - [AI-ENG-AD — Governance Architecture - Policy, Audit, Compliance & Accountability](#ai-eng-ad--governance-architecture---policy-audit-compliance--accountability)
+  - [AI-ENG-AE — Sustainable AI - Energy, Infrastructure Efficiency & Lifecycle Impact](#ai-eng-ae--sustainable-ai---energy-infrastructure-efficiency--lifecycle-impact)
+
+---
+
+[Part V - Vol. 11-12 AF-AK - Product Doctrine and Engineering Method](#part-v---vol-11-12-af-ak---product-doctrine-and-engineering-method)
+[Volume 11. AF-AH Product, Business, and Organizational Architecture](#volume-11-af-ah-product-business-and-organizational-architecture)
+  - [AI-ENG-AF — AI Product Architecture - Use-Case Selection, Workflow Fit & Value Design](#ai-eng-af--ai-product-architecture---use-case-selection-workflow-fit--value-design)
+  - [AI-ENG-AG — Adoption Systems - Training, Feedback Loops & Change Management](#ai-eng-ag--adoption-systems---training-feedback-loops--change-management)
+  - [AI-ENG-AH — Build, Buy, Open Source & Vendor Strategy - Doctrinal Knowledge Base for Strategic Dependency Architecture](#ai-eng-ah--build-buy-open-source--vendor-strategy---doctrinal-knowledge-base-for-strategic-dependency-architecture)
+
+
+[Volume 12. AI-AK - Engineering Method and System Doctrine](#volume-12-ai-ak---engineering-method-and-system-doctrine)
+  - [AI-ENG-AI — Contract Thinking - Deterministic Edges Around Probabilistic Cores](#ai-eng-ai--contract-thinking---deterministic-edges-around-probabilistic-cores)
+  - [AI-ENG-AJ — AI System Design Patterns - Reference Architectures & Failure-Aware Blueprints](#ai-eng-aj--ai-system-design-patterns---reference-architectures--failure-aware-blueprints)
+  - [AI-ENG-AK — The AI Engineering Mindset - Probabilistic Systems, Human Judgment & Iterative Control](#ai-eng-ak--the-ai-engineering-mindset---probabilistic-systems-human-judgment--iterative-control)
 
 ---
 
@@ -24275,4 +24301,10819 @@ High-impact workflow design provides the governance, review, approval, escalatio
 
 ---
 
-[← Back to Canon Map](../canon-map.md)
+# Part IV - Vol. 9-10 - Z-AE - Evaluation, Operations, and Governance
+
+---
+
+# Volume 9. Z-AB Observability, Evaluation, and Verification
+
+---
+
+# AI-ENG-Z — Strategic Telemetry - Traces, Tokens, Latency & Semantic Drift
+
+## **Doctrinal Foundations and the Green Dashboard Fallacy**
+
+In high-dimensional artificial intelligence systems, production reliability cannot be measured by traditional application performance monitoring (APM) paradigms.1 In legacy web architectures, system health is treated as a binary or scalar state defined by infrastructure metrics: a service is considered healthy when APIs return successful status codes, server workloads are balanced, database connections are active, and latency remains within acceptable thresholds.2 However, when these architectures are driven by probabilistic large language models (LLMs) and multi-agent loops, backend availability does not guarantee a successful, safe, or contextually coherent user transaction.1
+
+An artificial intelligence gateway can return a successful HTTP 200 payload that contains a complete structural schema failure, an unauthorized tool execution, a cross-tenant data leak, or an ungrounded factual confabulation.1 Conversely, a system can exhibit optimal hardware utilization and high throughput while delivering answers that silently violate safety boundaries, omit critical citations, or trap agentic loops in expensive, infinite executions.1
+
+This mismatch establishes the **Green Dashboard Fallacy**: the erroneous belief that an AI system is healthy because conventional infrastructure metrics are green.1 In production AI engineering, a green infrastructure dashboard can coexist with a red behavioral and meaning-level system.1
+
+Strategic telemetry is the first-class observability discipline designed to resolve this fallacy.1 It is defined as the systematic capture, correlation, protection, and interpretation of traces, spans, tokens, latency, errors, retries, retrieval events, tool calls, routing decisions, cost attribution, user trust signals, governance events, and semantic drift.1 It treats telemetry not merely as infrastructure logs, but as the primary evidence substrate required for evaluation, replay, debugging, forensic investigation, and behavioral governance.1
+
+### **Artifact 1: Conceptual Glossary**
+
+| Term | Technical Definition | Primary Operational Metric | Standard Production Target |
+| :---- | :---- | :---- | :---- |
+| **Strategic Telemetry** | The systematic capture, correlation, protection, and interpretation of semantic, economic, behavioral, security, and operational signals across an AI system’s execution path. | Behavioral Observability Coverage | Coverage is sufficient to debug, replay, evaluate, and govern high-impact workflows. |
+| **AI Trace** | A structured graph representing the execution path of a probabilistic interaction across model calls, retrieval, tools, routing, policy checks, user actions, and state transitions. | Trace Completion Rate | Critical execution paths emit complete enough traces for replay and incident analysis. |
+| **Span** | The atomic unit of observable work inside a trace, such as model inference, retrieval, reranking, tool execution, parsing, moderation, or human review. | Span Duration / Status Coverage | Required spans include status, timing, error class, and correlation identifiers. |
+| **GenAI Semantic Convention** | A configured OpenTelemetry/OpenInference-compatible attribute vocabulary for model, provider, token, tool, retrieval, and agent telemetry. | Convention Compliance Score | Required attributes are present for the configured convention version. |
+| **Token Telemetry** | Tracking of input, output, cached, embedding, reasoning, retry, repair, and wasted tokens where exposed by providers or runtime gateways. | Token Attribution Completeness | High-impact and billable usage is attributed to tenant, user/session, workflow, route, and model where applicable. |
+| **Time to First Token (TTFT)** | Duration from request dispatch until the first streamed token or first response chunk is available. | TTFT by Workload Profile | TTFT remains within workload-specific SLOs. |
+| **Prefill Latency** | Compute-bound latency required to process prompt/context tokens and initialize model state before generation. | Prefill P95 / P99 | Prefill latency scales within expected envelope for prompt length and model route. |
+| **Decode Latency** | Memory-bandwidth-sensitive latency required to generate completion tokens sequentially. | Inter-Token Latency / TPS | Decode performance remains within model and hardware profile expectations. |
+| **Routing Decision** | Runtime selection of model, provider, fallback path, cache, human review, or fail-closed route based on capability, cost, latency, safety, and availability. | Routing Decision Validity | Route satisfies task capability floor and policy constraints. |
+| **Retrieval Event** | A vector, lexical, relational, hybrid, or document-expansion query performed to gather evidence for context or citation. | Retrieval Sufficiency / Fan-Out | Retrieval remains authorized, bounded, freshness-aware, and evidence-adequate. |
+| **Tool Trace** | The structured record of tool selection, arguments, authorization, execution status, cost, side effects, and verification state. | Tool Verification Coverage | High-impact tool calls include pre-action authorization and post-action verification status. |
+| **Cost Attribution** | Mapping of resource consumption to tenant, user, session, workflow, model, tool, retrieval, parser, batch job, or incident. | Attributed Spend Ratio | Material spend is attributable or explicitly marked unknown/pending reconciliation. |
+| **Semantic Drift** | Shift in model behavior, grounding, style, refusal behavior, citation behavior, schema adherence, or policy compliance over time. | Drift Signal Ensemble | Drift is evaluated against calibrated baselines, not universal magic thresholds. |
+| **Behavioral Health** | State where outputs, citations, actions, costs, safety checks, retries, routing, and user-visible behavior remain within expected envelopes. | Behavioral Incident Rate | High-impact behavioral failures trigger containment, review, or release gates. |
+| **Green Dashboard Fallacy** | The diagnostic error of treating infrastructure health as sufficient evidence of AI-system health. | Hidden Failure Detection Rate |  Behavioral and semantic checks supplement infrastructure metrics. |
+| **Trace Redaction** | Removal, masking, hashing, or reference-only storage of sensitive payloads before telemetry reaches general observability systems. | Sensitive Payload Exposure Rate | Sensitive data exposure is blocked, minimized, or isolated through controlled references. |
+| **Observability SLO** | A service objective defined over behavioral, semantic, economic, or governance metrics. | SLO Compliance by Risk Class | SLOs are calibrated per workload, risk tier, and operational route. |## **The High-Dimensional AI Trace Model**
+
+An AI interaction must not be represented as a single, flat request-response event. It functions as an asymmetrical, stateful, multi-agent execution graph where a single user prompt can trigger parallel retrieval queries, recursive formatting repairs, multi-step tool executions, and progressive model fallbacks.1 The system must trace the entire journey as a tree of nested spans connected by parent-child relationships, preserving execution state and variables across the entire lifecycle.4
+
+### **Artifact 2: AI Trace Model**
+
+```text
+AI TRACE MODEL
+
+Root Span
+  span.kind = AGENT
+  name = "Legal Review Orchestrator"
+  trace_id = "8f92a10c7d3a4e9f9a1b6c5d4e3f2010"
+  span_id  = "00f067aa0ba902b7"
+  parent_id = null
+
+  attributes:
+    session.hash = "sha256:session_hash"
+    tenant.hash = "sha256:tenant_hash"
+    workflow.id = "wf_contract_review_2026_001"
+    risk_tier = "high"
+
+  Child Span
+    span.kind = CHAIN
+    name = "Compile Context"
+    span_id = "1a2b3c4d5e6f7081"
+    parent_id = "00f067aa0ba902b7"
+
+    Child Span
+      span.kind = RETRIEVER
+      name = "Authorized Document Retrieval"
+      span_id = "5e6f708192a3b4c5"
+      parent_id = "1a2b3c4d5e6f7081"
+
+      attributes:
+        retriever.name = "policy_document_search"
+        data_source.id = "policy_corpus"
+        retrieval.query_hash = "sha256:query_hash"
+        retrieval.candidate_count = 12
+        retrieval.authorized_candidate_count = 8
+
+      Span Event
+        name = "Document Chunk Retrieved"
+        event.parent_span_id = "5e6f708192a3b4c5"
+        attributes:
+          document.id = "doc_xyz"
+          chunk.id = "chunk_014"
+          document.score = 0.98
+          document.version_hash = "sha256:doc_version_hash"
+          document.permission_version = "perm_v17"
+
+    Child Span
+      span.kind = LLM
+      name = "Generate Audit Draft"
+      span_id = "3d4e5f60718293a4"
+      parent_id = "1a2b3c4d5e6f7081"
+
+      attributes:
+        gen_ai.provider.name = "provider_name"
+        gen_ai.request.model = "primary_reasoning_route"
+        gen_ai.response.model = "primary_reasoning_route"
+        gen_ai.usage.input_tokens = 4120
+        gen_ai.usage.output_tokens = 780
+        gen_ai.response.finish_reasons = ["tool_calls"]
+
+    Child Span
+      span.kind = TOOL
+      name = "Draft Ledger Action"
+      span_id = "7a8b9c0d1e2f3041"
+      parent_id = "1a2b3c4d5e6f7081"
+
+      attributes:
+        tool.name = "ledger_write"
+        tool.action_class = "high_risk_mutation"
+        tool.payload_hash = "sha256:payload_hash"
+        tool.idempotency_key_hash = "sha256:idempotency_key_hash"
+        approval.status = "PENDING"
+
+      Span Event
+        name = "Maker-Checker Initiated"
+        event.parent_span_id = "7a8b9c0d1e2f3041"
+        attributes:
+          approval.request_id = "approval_123"
+          approval.risk_tier = "HIGH"
+          approval.payload_hash = "sha256:payload_hash"
+
+  Child Span
+    span.kind = GUARDRAIL
+    name = "PII Leak Check"
+    span_id = "9c0d1e2f30415263"
+    parent_id = "00f067aa0ba902b7"
+
+    attributes:
+      guardrail.name = "output_redaction"
+      guardrail.result = "pass"
+      redaction.count = 0
+      user_disclosure_shown = false
+```
+
+Trace examples should use opaque or hashed identifiers for tenants, users, sessions, prompts, payloads, and idempotency keys. Raw user IDs, tenant names, prompt text, credentials, and tool payloads should not be propagated as general-purpose telemetry attributes.
+
+### **Context Propagation across Distributed Transport Channels**
+
+To maintain trace continuity across model providers, tool servers, database runtimes, and client applications, the system must enforce strict context propagation standards.1 AI transactions are transport-independent, frequently traversing HTTP REST, WebSockets, stdio subprocess pipes (for local tool integrations), and message queues within a single transaction.3
+
+The system utilizes the W3C Trace Context specification as its baseline.3 The traceparent and tracestate parameters must be injected into all outgoing execution payloads.3 In environments where standard HTTP headers are unavailable—such as Model Context Protocol (MCP) servers operating over JSON-RPC stdio pipes—instrumentations must propagate context inside the JSON-RPC request parameters using the params._meta property bag.3
+
+For example, a compliant JSON-RPC payload propagating a W3C Trace Context and associated baggage is structured as follows 3:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "tools/call",
+  "params": {
+    "name": "calculate_disbursement",
+    "arguments": {
+      "base_amount": 500.0,
+      "is_promotional": false
+    },
+    "_meta": {
+      "traceparent": "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
+      "tracestate": "vendor_key=opaque-routing-state",
+      "baggage": "subject.hash=sha256_subject_hash,tenant.hash=sha256_tenant_hash,environment=prod"
+    }
+  },
+  "id": "req_42"
+}
+```
+
+Baggage should be treated as a propagation surface, not a private vault with a lanyard. Do not place raw user IDs, raw tenant IDs, credentials, policy details, or sensitive authorization state in baggage. Use opaque correlation IDs or hashes, and keep high-sensitivity authorization context inside the trusted gateway or policy engine.
+
+The receiving server extracts the traceparent from the _meta block to establish parent-child relationships, ensuring that local tool execution spans are bound to the parent trace initiated by the client orchestrator.3
+
+## **GenAI Span Taxonomy and Semantic Conventions**
+
+To decouple instrumentation from specific platforms, the platform must standardize its telemetry around the OpenTelemetry GenAI Semantic Conventions (v1.41) 3 and the OpenInference tracing specification.5
+
+The OpenTelemetry conventions are currently in *Development* status.3 To manage transitions and protect against breaking changes in production environments, instrumentations must use the environment variable OTEL_SEMCONV_STABILITY_OPT_IN=gen_ai_latest_experimental.3 This configuration forces the runtime to emit the latest experimental conventions while maintaining compatibility profiles on downstream collectors.3
+
+### **Artifact 3: GenAI Span Taxonomy**
+
+OpenTelemetry GenAI semantic conventions and OpenInference conventions evolve. Production systems should pin a configured convention version, translate provider-specific fields at the collector/gateway layer, and preserve compatibility mappings during upgrades.
+
+| Span Name Format | Span Kind | Required Attributes | Optional / Provider-Specific Attributes | Sensitive Fields / Redaction Strategy |
+| :---- | :---- | :---- | :---- | :---- |
+| `create_agent` | INTERNAL | `agent.id`, `agent.name`, `agent.version`, `service.name` | agent description, owner, deployment profile | Redact credentials, hidden prompts, internal policy text. |
+| `invoke_agent {agent.name}` | INTERNAL / CLIENT | `trace_id`, `session.hash`, `agent.id`, `workflow.id` | agent drift score, routing profile, tool manifest hash | Hash subject identifiers; avoid raw user or tenant IDs. |
+| `invoke_workflow {workflow.name}` | INTERNAL | `workflow.id`, `workflow.name`, `workflow.run_id`, `workflow.status` | step count, retry count, budget state | Log state hashes and summaries, not raw payloads by default. |
+| `llm.inference {model.route}` | CLIENT | provider name, request model/route, response model/route, request id, status | input/output/cached/reasoning tokens where exposed | Prompt/completion text should be redacted or stored by secure reference. |
+| `retrieval {data_source.id}` | INTERNAL | data source ID, query hash, tenant/scope hash, candidate count, authorization filter version | document IDs, scores, chunk IDs, source version hashes | Do not log raw document text in general traces. |
+| `rerank {reranker.route}` | INTERNAL / CLIENT | reranker route, candidate count, latency, status | top-k IDs, score distribution | Use document IDs and hashes; avoid raw snippets unless securely referenced. |
+| `execute_tool {tool.name}` | INTERNAL / CLIENT | tool name, tool version, action class, payload hash, authorization decision, status | tool result hash, quota consumed, idempotency hash | Redact tool args/results; store secure reference for sensitive payloads. |
+| `guardrail {policy.name}` | INTERNAL | policy id, policy version, decision, risk class | redaction count, refusal reason class, detector score | Do not log raw violating text unless policy allows secure evidence capture. |
+| `human_review {queue.name}` | INTERNAL | review request id, risk tier, status, reviewer role class | review duration, outcome, override reason class | Redact reviewer/user identity or store under audit controls. |
+
+### **Model Context Protocol Tracing Integration**
+
+The Model Context Protocol (MCP) represents a critical integration surface for agentic tooling.1 Introduced in OTel v1.39, the MCP semantic conventions dictate that instead of generating duplicate, overlapping spans, the MCP middleware must enrich the existing execute_tool span with protocol-specific metadata.3  
+When an agent invokes a tool through an MCP server, the instrumentation layer appends the following attributes to the active execute_tool span 3:
+
+* mcp.method.name: The JSON-RPC method, e.g., tools/call.3  
+* mcp.session.id: The unique cryptographic session identifier.3  
+* mcp.protocol.version: The active protocol version string, e.g., 2025-06-18.3  
+* rpc.response.status_code: The JSON-RPC error code, e.g., -32602 (invalid params).3  
+* jsonrpc.request.id: The string representation of the request ID.3  
+* network.transport: Set to pipe for STDIO-based local servers, or tcp for HTTP/SSE remote servers.3
+
+If a tool call returns with isError: true inside the CallToolResult object, the instrumentation must set the span's error.type attribute to tool_error and update the overall span status to Error.3
+
+## **The Multi-Plane Telemetry Map**
+
+To construct a comprehensive representation of an AI application's behavior, telemetry must be gathered across multiple, distinct planes. These planes are not isolated; they represent correlated dimensions of a single computational system. For example, a latency spike observed on the Infrastructure Plane is diagnostic only when correlated with a route change on the Inference Plane or a cache miss on the Retrieval Plane.1
+
+```text
+TELEMETRY PLANES MAP
+
++--------------------------+     +--------------------------+
+| Infrastructure Plane     |     | Inference Plane          |
+| CPU/GPU utilization      |     | model route/provider     |
+| memory/cache pressure    |     | input/output tokens      |
+| queues and workers       |     | TTFT / ITL / finish      |
++-------------+------------+     +-------------+------------+
+              |                                |
+              v                                v
++--------------------------+     +--------------------------+
+| Retrieval Plane          |     | Tool / Action Plane      |
+| query hashes             |     | tool name/version        |
+| candidate counts         |     | payload hash             |
+| source/version IDs       |     | idempotency / status     |
+| citation verification    |     | post-action verification |
++-------------+------------+     +-------------+------------+
+              |                                |
+              v                                v
++--------------------------+     +--------------------------+
+| Agent / Workflow Plane   |     | UX / Trust Plane         |
+| plan steps               |     | user corrections         |
+| repair loops             |     | retry/cancel behavior    |
+| no-progress states       |     | disclosures shown        |
+| escalation triggers      |     | citation interactions    |
++-------------+------------+     +-------------+------------+
+              |                                |
+              v                                v
++--------------------------+     +--------------------------+
+| Governance Plane         |     | Cost / Semantic Plane    |
+| maker-checker state      |     | spend and cost velocity  |
+| approvals / overrides    |     | drift/canary signals     |
+| SARC constraints         |     | refusal distributions    |
+| audit chain events       |     | grounding/entailment     |
++--------------------------+     +--------------------------+
+
+Correlation spine:
+  trace_id -> span_id -> workflow_id -> session.hash -> tenant.hash
+  plus artifact IDs: document_id, tool_call_id, approval_request_id, route_id
+```
+
+The table below outlines the specific attributes, metrics, and correlation keys required to bind these planes into a unified analytical graph:
+
+| Telemetry Plane | Core Attributes | Primary Metrics | Correlation Key |
+| :---- | :---- | :---- | :---- |
+| **Infrastructure** | container.id, gpu.device.id, process.pid 18 | gpu_cache_usage_perc, num_requests_waiting 19 | trace_id (W3C standard) |
+| **Inference** | gen_ai.request.model, gen_ai.provider.name 6 | gen_ai.client.token.usage, time_to_first_token 3 | span_id (Model-call level) |
+| **Retrieval** | gen_ai.data_source.id, document.id 13 | document.score, retrieval.latency 16 | document.id |
+| **Tool** | gen_ai.tool.name, mcp.session.id 3 | tool.execution_time, tool.error_rate | idempotency_key |
+| **Agent** | gen_ai.agent.id, workflow.run_id 13 | agent.run_duration, repair_loop_count | workflow.run_id |
+| **UX & Trust** | session.id, user.id 20 | citation_click_rate, user_correction_count | session.id |
+| **Governance** | maker_id, checker_id, risk_tier 2 | review_duration_seconds, override_rate | approval_requests.id 2 |
+| **Cost** | usage.cost.total, tenant_id 20 | cost_velocity_usd, unattributed_cost_ratio | tenant_id |
+| **Semantic** | embedding.model_name 16 | semantic_distance, entailment_drift_score | embedding.model_name |
+
+## **Token Telemetry and Inference Economics**
+
+Tokens represent the fundamental currency and state footprint of Generative AI workloads.1 Tracking token metrics is crucial not only for financial auditing, but also for identifying systemic failure modes and performance regressions in production architectures.1
+
+### **Artifact 5: Token Telemetry Model**
+
+The Token Telemetry Model decomposes token usage into granular components to isolate the economic characteristics of every step:
+
+```
+Total Token Footprint  
+├── Prompt (Input) Tokens  
+│   ├── User Message Input  
+│   ├── System Instructions & Prompt Templates  
+│   ├── Context-Injected Tokens (RAG documents, DB schemas)  
+│   └── Memory-Injected Tokens (Historical chat context)  
+├── Cached Input Tokens  
+│   ├── Cache Read Tokens (Hits: usage.cache_read.input_tokens)  
+│   └── Cache Creation Tokens (Misses: usage.cache_creation.input_tokens)  
+└── Completion (Output) Tokens  
+    ├── User-Visible Output Tokens  
+    ├── Deliberative / Internal Computational Tokens (usage.reasoning.output_tokens)  
+    ├── Tool Schema / Payload Tokens  
+    └── Wasted / Abandoned Tokens (Truncated generations, cancelled streams)
+```
+
+The table below maps specific token metrics to their operational diagnostic value:
+
+| Token Metric Attribute | Telemetry Source | Systemic Pathology Detected | Diagnostic Signature / Behavioral Pattern |
+| :---- | :---- | :---- | :---- |
+| `gen_ai.usage.input_tokens` | OTel/OpenInference or gateway-normalized provider field | **Context Flooding** | Monotonically growing input size, high prefill latency, falling evidence density. |
+| `gen_ai.usage.output_tokens` | OTel/OpenInference or gateway-normalized provider field | **Verbosity Drift** | Output length rises for stable task profiles without quality gain. |
+| `gen_ai.usage.cached_input_tokens` | Provider-specific / gateway-normalized | **Cache Starvation or Cache Regression** | Cached-token ratio drops after prompt/template/router changes. |
+| `gen_ai.usage.cache_creation_tokens` | Provider-specific / gateway-normalized | **Cache Thrash** | High cache creation paired with low reuse. |
+| `gen_ai.usage.reasoning_tokens` | Optional/provider-specific | **Deliberation Runaway** | Hidden/reasoning token budget rises without improved answer quality. Do not log hidden reasoning text. |
+| `embedding.input_tokens` | Embedding gateway / provider metadata | **Embedding Cost Spike** | Corpus or query expansion increases embedding spend unexpectedly. |
+| `rerank.input_tokens` | Reranker gateway / model metadata | **Reranker Overload** | Too many low-signal candidates passed to expensive scoring. |
+| `wasted_tokens_count` | Custom gateway metric | **Cancelled / Abandoned Generation** | Tokens generated after user cancellation, timeout, or route failure. |
+| `repair_loop_tokens` | Orchestrator metric | **Format Repair Loop** | Repeated schema repair consumes increasing token budget. |
+| `retry_tokens` | Gateway retry ledger | **Retry Storm** | Repeated attempts inflate spend and latency after transient errors. |
+
+### **Mathematical Modeling of Loop Token Accumulation**
+
+In recursive agentic loops (such as ReAct or planning patterns), context size grows quadratically as the history of prior steps, tool execution results, and formatting exceptions accumulates over consecutive turns.1 The cumulative prompt tokens T_input consumed across an N-turn execution path is modeled by the quadratic context-accumulation equation:  
+T_input(N) = N * S + (u * N * (N + 1)) / 2 + (r * N * (N - 1)) / 2  
+Where:
+
+* S is the fixed system prompt and tool schema definition size in tokens.1  
+* u is the average size of new incoming tokens injected per iteration (the user's follow-up inputs, formatting validation exceptions, or tool outputs).1  
+* r is the average model generation output size in tokens per turn.1
+
+If an agent enters an infinite loop, this quadratic token accumulation can rapidly exhaust API budgets and trigger denial-of-wallet incidents.1 Therefore, strategic telemetry must track T_input dynamically, enabling gateways to terminate execution paths before resource limits are breached.1
+
+## **Latency Decomposition and Performance Profiling**
+
+In generative AI deployments, aggregate "inference latency" is an insufficient metric. It hides the underlying performance characteristics of the system, preventing SREs from identifying whether a slowdown is caused by network congestion, database performance, or hardware bottlenecks.22
+
+### **Prefill vs. Decode Phase Mechanics**
+
+Large Language Model inference executes across two distinct stages with fundamentally different computing characteristics and hardware constraints 7:
+
+1. **Prefill Stage (Prompt Ingestion):** The model processes the entire prompt (including system instructions, retrieved document chunks, and chat history) in parallel, building the key-value (KV) cache.7 This stage is compute-bound, heavily utilizing the GPU's Tensor Cores.7 Prefill speed defines the Time to First Token (TTFT).7  
+2. **Decode Stage (Autoregressive Generation):** The model generates subsequent completion tokens sequentially, one by one.7 Each step executes a forward pass that reads the existing KV cache from GPU High Bandwidth Memory (HBM) to generate the next token.7 This stage is memory-bandwidth-bound, leaving GPU compute cores underutilized.7 Decode speed defines the Inter-Token Latency (ITL).7
+
+```text
+PREFILL VS DECODE
+
+Prompt / Context Tokens
+  system instructions
+  user message
+  retrieved chunks
+  tool schemas
+        |
+        v
++-----------------------------+
+| Prefill Phase               |
+| compute-bound               |
+| processes prompt in bulk    |
+| builds KV cache             |
+| drives TTFT                 |
++-------------+---------------+
+              |
+              v
+        KV Cache Ready
+              |
+              v
++-----------------------------+
+| Decode Phase                |
+| autoregressive              |
+| memory-bandwidth sensitive  |
+| generates one token step    |
+| drives inter-token latency  |
++-------------+---------------+
+              |
+              +--> Output Token 1
+              +--> Output Token 2
+              +--> ...
+              +--> Output Token N
+```
+
+### **Artifact 6: Latency Decomposition Model**
+
+To isolate these bottlenecks, the system decomposes end-to-end transaction latency into stage-specific components:
+
+| Latency Component | Telemetry Metric Source | Bottleneck / Constraint | SRE Diagnostic Action |
+| :---- | :---- | :---- | :---- |
+| **Input Validation** | Gateway Trace | CPU-bound network proxy | Verify gateway thread pool scaling.1 |
+| **Parser / OCR** | parser.latency | CPU-bound text extraction | Monitor container memory limits.1 |
+| **Retrieval** | db.execution_time | Database index lookup | Tune HNSW indexing parameters.1 |
+| **Reranking** | reranker.latency | GPU-bound cross-encoder | Batch candidate documents for scoring. |
+| **Queue Waiting** | gen_ai.latency.time_in_queue 19 | Serving engine congestion | Scale GPU replicas or apply rate limits.19 |
+| **Prefill Phase** | vllm:time_to_first_token_seconds 19 | GPU compute (FLOPS) | Enable chunked prefill or prefix caching.7 |
+| **Decode Phase** | vllm:time_per_output_token_seconds 19 | GPU memory bandwidth | Quantize weights (e.g., W8A8 or W4A16).8 |
+| **Tool Execution** | tool.execution_time | Downstream API / Network | Enforce strict timeout thresholds.2 |
+| **Voice STT/TTS** | voice.ttfa | Audio streaming latency | Peer WebRTC transceivers closer to client.23 |
+| **Human Review** | review_duration_seconds 2 | Operator queue backlog | Route complex transactions to backup queues.2 |
+
+### **SRE Profiling Workflows and Metrics Collection**
+
+To capture this granular data, SRE teams use a coordinated profiling stack 22:
+
+* **Nsight Systems / NVTX:** Tracks kernel-level execution timelines, highlighting GPU synchronization stalls and inter-GPU communication waits.22  
+* **NCCL Debug Logs (export NCCL_DEBUG=INFO):** Traces collective communication calls across multi-GPU setups, identifying interconnect bottlenecks.22  
+* **vLLM Prometheus Metrics:** Collects serving engine performance signals on a 15-second scraping interval.19
+
+SREs deploy the following PromQL queries to isolate prefill bottlenecks from decode bottlenecks over rolling 5-minute windows 22:
+
+* **Average Prefill Duration (TTFT) per Request:**  
+  AveragePrefillTime = increase(vllm:time_to_first_token_seconds_sum[5m]) / increase(vllm:time_to_first_token_seconds_count[5m])  
+* **Average Inter-Token Latency (ITL) during Generation:**  
+  AverageITL = increase(vllm:inter_token_latency_seconds_sum[5m]) / increase(vllm:inter_token_latency_seconds_count[5m])
+
+## **AI Error Mechanics, Retries, and Routing Decisions**
+
+In high-dimensional AI applications, standard HTTP status codes (such as 4xx and 5xx) are insufficient for diagnosing system failures. A model call can succeed transport-wise (returning HTTP 200) while failing completely at the semantic, syntactic, or safety layer.1
+
+### **Artifact 7: AI Error and Retry Taxonomy**
+
+| Failure Classification | Operational Trigger Scenario | Telemetry Error Code (`error.type`) | Logged Context Payload | Mitigation / Fallback Playbook |
+| :---- | :---- | :---- | :---- | :---- |
+| **Syntax Violation** | Model output cannot be parsed as required JSON/XML/tool format. | `syntax_decode_error` | Response hash, redacted excerpt if allowed, parser error class. | Enter bounded repair path or return structured failure. |
+| **Schema Violation** | Output parses but omits required fields or violates schema. | `schema_validation_error` | Missing/invalid field names, schema version, validation summary. | Halt execution or repair; do not invent missing required fields. |
+| **Semantic Violation** | Structurally valid output violates business logic or domain constraints. | `business_rule_error` | Rule ID, field hashes/values if safe, diagnostic summary. | Block action; route to correction or human review. |
+| **Provider Refusal** | Provider refuses generation due to safety/policy. | `provider_refusal` | Refusal category, provider route, policy class. | Return refusal or use approved policy-equivalent fallback only when allowed. |
+| **Citation Hallucination** | Output cites source not present or not authorized in retrieval context. | `invalid_citation` | Cited source ID, context inventory hash, retrieval ID. | Remove/suppress claim or regenerate with verified evidence. |
+| **Unsupported Claim** | Claim lacks entailment or source support. | `unsupported_claim` | Claim hash, evidence IDs, entailment score/class. | Mark as unverified, request evidence, or suppress. |
+| **Tool Argument Violation** | Tool payload fails schema, authorization, or semantic checks. | `tool_argument_error` | Tool name, schema version, payload hash, validation summary. | Block tool call; ask clarification or route to approval. |
+| **Tool Execution Loop** | Agent repeats identical or equivalent tool calls. | `tool_loop_detected` | Payload hash, repetition count, workflow ID. | Halt loop, preserve state, return managed no-progress status. |
+| **Unknown Action State** | Tool timeout or partial commit leaves state unclear. | `unknown_action_state` | Tool call ID, idempotency hash, pre/post verification status. | Hold, reconcile, compensate where possible, escalate. |
+| **No-Progress State** | Agent revises plans or retries without material state change. | `no_progress_error` | State hash, plan diff summary, loop step count. | Replan once, ask user, or halt based on policy. |
+| **Cross-Tenant Boundary Event** | Resource, retrieval result, cache, or tool request crosses tenant scope. | `tenant_scope_violation` | Tenant hash, resource hash, policy ID, boundary class. | Block, isolate affected route, create security incident. |
+
+| Field Name | Type | Value Range / Pattern | Operational Security Purpose |
+| :---- | :---- | :---- | :---- |
+| `routing_id` | String | `rt_[route_profile]_[uuid]` | Primary key for route decision trace. |
+| `trace_id` | String | W3C trace ID | Correlates route with full execution trace. |
+| `tenant_hash` | String | `sha256:...` | Supports tenant-level analysis without exposing raw tenant ID. |
+| `session_hash` | String | `sha256:...` | Correlates session-level route behavior. |
+| `requested_route` | String | Route/profile name | Captures user/app requested capability floor. |
+| `selected_route` | String | Approved route/profile name | Captures actual executed route. |
+| `routing_reason` | Enum | `normal`, `failover`, `quota_throttled`, `latency_slo`, `cost_policy`, `quality_floor`, `safety_policy`, `cache_hit` | Explains why route changed. |
+| `quality_floor` | String | Profile ID | Ensures selected route meets task requirements. |
+| `capability_delta` | Array | Lost/preserved capability labels | Identifies degraded-mode impact. |
+| `budget_state` | Object | remaining spend/tokens/quota | Prevents unbounded consumption and explains throttling. |
+| `policy_version` | String | Policy manifest version | Makes route decision replayable. |
+| `user_disclosure_required` | Boolean | true/false | Records whether user-visible disclosure was required. |
+| `user_disclosure_shown` | Boolean | true/false | Verifies UI disclosure occurred when required. |
+| `route_status` | Enum | `selected`, `blocked`, `degraded`, `failed_closed` | Records route outcome. |
+
+## **Retrieval and Tool Observability Models**
+
+In Retrieval-Augmented Generation (RAG) and tool-driven agent environments, strategic telemetry must prove the validity of context and verify the execution of external mutations.1
+
+### **Artifact 9: Retrieval Observability Model**
+
+To guarantee the structural integrity of RAG setups, the system logs the complete retrieval context. This model enforces the **Doctrine of "Provenance Before Relevance"**: no document chunk is admitted to the model-facing context unless the system can prove where it came from, what authority it carries, and what transformations it has undergone.1
+
+```json
+{
+  "$schema": "https://ai-engineering.canon/schemas/retrieval-observability-v1.json",
+  "retrieval_id": "ret_2026_06_11_1201",
+  "trace_id": "8f92a10c7d3a4e9f9a1b6c5d4e3f2010",
+  "query_parameters": {
+    "original_query_hash": "sha256:original_query_hash",
+    "original_query_redacted": "What are our operating margins for the machinery segment?",
+    "rewritten_query_hashes": [
+      "sha256:rewrite_1_hash",
+      "sha256:rewrite_2_hash"
+    ],
+    "tenant_hash": "sha256:tenant_hash",
+    "permission_filter_ids": [
+      "finance_auditor",
+      "executive"
+    ],
+    "policy_version": "retrieval_policy_v12"
+  },
+  "retrieved_documents": [
+    {
+      "document_id": "doc_xyz",
+      "source_ref": "secure_payload_ref:source_doc_xyz",
+      "source_version_hash": "sha256:source_version_hash",
+      "chunk_id": "chunk_014",
+      "relevance_score": 0.98,
+      "page_number": 12,
+      "bounding_box": {
+        "x": 0.12,
+        "y": 0.34,
+        "width": 0.42,
+        "height": 0.08,
+        "coordinate_system": "normalized_page"
+      },
+      "transformation_pipeline": [
+        {
+          "step": "pdf_text_extract",
+          "version": "parser_v3.2"
+        },
+        {
+          "step": "chunking",
+          "version": "chunker_v5",
+          "chunk_hash": "sha256:chunk_hash"
+        },
+        {
+          "step": "embedding",
+          "version": "embedding_model_v2",
+          "embedding_hash": "sha256:embedding_hash"
+        }
+      ],
+      "claims_supported": [
+        {
+          "claim_id": "claim_001",
+          "claim_hash": "sha256:claim_hash",
+          "redacted_text_segment": "Operating margins for the Industrial Machinery segment rose to 14.2% in Q2 2026.",
+          "support_status": "supported",
+          "evidence_region": {
+            "page_number": 12,
+            "bounding_box": {
+              "x": 0.12,
+              "y": 0.34,
+              "width": 0.42,
+              "height": 0.08,
+              "coordinate_system": "normalized_page"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "verification_signals": {
+    "nli_grounding_score": 0.98,
+    "source_conflict_detected": false,
+    "stale_cache_served": false,
+    "authorization_checked": true,
+    "citation_verification_status": "verified"
+  }
+}
+```
+
+This artifact should prove evidence lineage without dumping raw documents into general telemetry. Auditors need source IDs, secure references, hashes, coordinates, parser/chunking versions, and verification status. They do not need your observability database cosplaying as a data breach.
+
+This schema guarantees that if an auditor inspects an answer, they can trace the exact bounding box and page number on the original document that supported the model's output.2
+
+### **Artifact 10: Tool Call Trace Model**
+
+Tool call telemetry must enforce strict segregation of duties and verify system states. When an agent executes a tool, the system utilizes the Saga Pattern, decomposing multi-step operations into compensatable, pivot, and retriable transactions to ensure eventual consistency across distributed services.2
+
+```json
+{
+  "$schema": "https://ai-engineering.canon/schemas/tool-trace-v1.json",
+  "tool_call_id": "tool_99201_A",
+  "trace_id": "8f92a10c7d3a4e9f9a1b6c5d4e3f2010",
+  "tool_specification": {
+    "name": "calculate_disbursement",
+    "schema_version": "1.4.0",
+    "action_class": "non_idempotent_mutation",
+    "tool_manifest_hash": "sha256:tool_manifest_hash"
+  },
+  "authorization": {
+    "subject_hash": "sha256:subject_hash",
+    "tenant_hash": "sha256:tenant_hash",
+    "scoped_credential_lifetime_seconds": 900,
+    "permission_gate": "maker_checker_approval_required",
+    "approval_request_id": "approval_123"
+  },
+  "execution_payload": {
+    "payload_hash": "sha256:payload_hash",
+    "redacted_argument_summary": {
+      "transaction_id": "TXN-2026-0812",
+      "base_amount_class": "under_1000_usd"
+    },
+    "idempotency_key_hash": "sha256:idempotency_key_hash"
+  },
+  "state_verification": {
+    "pre_action_state_hash": "sha256:f02c...",
+    "post_action_state_hash": "sha256:a91b...",
+    "system_of_record_commit_verified": true,
+    "verification_status": "verified"
+  },
+  "reversibility": {
+    "transaction_step": "PIVOT_TRANSACTION",
+    "compensation_supported": true,
+    "compensation_reference": "secure_ref:compensation_plan_456",
+    "compensation_status": "not_required"
+  },
+  "result": {
+    "status": "success",
+    "error_class": null,
+    "completed_at": "2026-06-11T12:04:30Z"
+  }
+}
+```
+
+Tool telemetry should log hashes, statuses, authorization decisions, and secure references. It should not spray raw compensation endpoints, secrets, or high-impact payloads into general observability.
+
+This structure guarantees **Eventual Consistency Gating**: the conversational interface is blocked from speaking or displaying a completion confirmation (e.g., "Your payment has been sent") until the Post-Action Auditor verifies that the database commit successfully updated the system of record.2
+
+## **Multi-Dimensional Cost Attribution**
+
+Enterprise AI systems process high volumes of distributed transactions, making it critical to attribute operational expenses precisely.1
+
+### **Artifact 11: Cost Attribution Model**
+
+The Cost Attribution Model associates every unit of consumed resource back to its corresponding system entity, enabling real-time cost allocation and anomaly detection:
+
+| Allocation Dimension | Primary Attribution Fields | Tracked Resource Component | Pricing Metrics Formula |
+| :---- | :---- | :---- | :---- |
+| **B2B Tenant** | tenant_id 20, tenant_tier 2 | Vector indexing, multi-tenant model calls.1 | Cost_tenant = sum(Cost_tokens + Cost_storage + Cost_review) 1 |
+| **Interactive Session** | session.id 20 | User conversation history, memory read/writes.2 | Cost_session = sum_turns(T_input * P_input + T_output * P_output) |
+| **Agent / Workflow** | gen_ai.agent.id 13, workflow.id 2 | Multi-step agent planning, self-reflection loops.1 | Cost_workflow = sum_steps(Cost_model + Cost_tools) |
+| **Parsing & OCR** | parser.name, document.id 16 | Layout analysis, PDF rasterization, OCR hosting.23 | Cost_parse = N_pages * Price_page + t_compute * Price_compute |
+| **Security Scanning** | guardrail.id | Input Prompt Shields, output ARGUS scans.1 | Cost_security = sum(Cost_classifiers + Cost_regex) |
+| **Human Governance** | approval_requests.id 2 | Centralized queue-based maker-checker reviews.2 | Cost_human = t_review_minutes * Price_operator 1 |
+| **Incident / Outage** | incident.id | Out-of-bounds runaway loops, thundering-herd retries.1 | Cost_incident = Cost_runaway_tokens + Cost_failed_retries 1 |
+
+## **Semantic Drift and Behavioral Regression Monitoring**
+
+Language models are highly dynamic and non-deterministic.1 Over time, changes in context distributions, silent provider updates, or updates to retrieval databases can cause gradual or sudden shifts in meaning, tone, and safety compliance.1 Because these regressions are semantic and behavioral, traditional statistical tests (such as KL divergence) fail to detect them, and infrastructure dashboards remain green.1
+
+### **Artifact 12: Semantic Drift Model**
+
+To detect and isolate behavioral regressions, the system deploys a multi-layered Semantic Drift Model, using triangulation across multiple independent dimensions:
+
+```
+  Semantic Drift Triangulation  
+  ├── Dimensionality-Reduced Embedding Shift  
+  │   ├── Cosine Distance from Reference Centroid (Threshold: > 0.15)   
+  │   └── Reconstruction Loss via Trained Autoencoder (Threshold: > 3 STDEV)   
+  ├── Task-Based Activation Analysis  
+  │   └── Hidden Layer Activation Pattern Variance   
+  ├── Natural Language Inference (NLI) Grounding Scores  
+  │   └── Entailment vs. Contradiction Ratios on Reference Claims   
+  └── Scheduled Canary Prompt Inspections  
+      └── Scheduled Execution of Curated Prompts (Similarity, Perplexity, Tone) 
+```
+
+The table below outlines the implementation details and metrics for each validation layer:
+
+| Validation Layer | Underlying Core Algorithm | Telemetry Metrics Captured | Regression Warning Threshold |
+| :---- | :---- | :---- | :---- |
+| **Embedding Space** | PCA/UMAP projection, centroid shift, Wasserstein or cosine-distance comparison. | `semantic_distance_metric`, `centroid_shift`, `distribution_distance` | Threshold calibrated against baseline window and task domain. |
+| **Reconstruction Loss** | Autoencoder or density model trained on baseline output embeddings. | `reconstruction_error`, `outlier_score` | Alert when sustained error exceeds calibrated baseline band. |
+| **Domain Classifier** | Classifier distinguishing baseline vs. current outputs. | `classifier_auc_score`, `domain_shift_probability` | High separability indicates distribution shift requiring review. |
+| **Canary Prompts** | Scheduled execution of curated prompts with fixed route/profile controls. | `canary_similarity_score`, `schema_pass_rate`, `policy_pass_rate` | Alert on sustained degradation against canary baseline. |
+| **NLI / Evidence Support** | Cross-encoder or verifier scoring claim support against evidence. | `nli_entailment_ratio`, `unsupported_claim_rate` | Threshold set by task risk; high-impact domains use stricter floors. |
+| **Refusal Distribution** | Clustering/classification of refusal and safety outcomes. | `refusal_rate`, `refusal_cluster_entropy`, `policy_category_shift` | Alert when refusal behavior shifts materially for stable task mix. |
+| **User Correction Signals** | Analysis of edits, corrections, thumbs-downs, retries, and abandonments. | `user_correction_count`, `edit_distance`, `retry_after_answer_rate` | Treat as UX/behavior signal, not standalone truth label. |
+
+## **The Green Dashboard Fallacy Diagnostic**
+
+The Green Dashboard Fallacy is the critical diagnostic error of assuming an AI system is healthy based solely on infrastructure metrics.1 To prevent this, platform teams must monitor behavioral indicators of degradation that hide behind green infrastructure signals.1
+
+### **Artifact 13: Green Dashboard Fallacy Diagnostic**
+
+This diagnostic maps silent behavioral failures to their corresponding detection signals and telemetry check locations:
+
+| Observed Behavioral Symptom | Green Infrastructure Signal | Hidden Systemic Failure | Telemetry Check Location / Correlation Key |
+| :---- | :---- | :---- | :---- |
+| **User Correction Spike** | HTTP 200 OK; latency <= 150 ms | Model is repeatedly outputting formatted but incorrect financial data.1 | user_correction_count correlated with edit_character_diff.2 |
+| **Citation Click Collapse** | CPU/GPU load normal; database active | Model is generating decorative, ungrounded citation badges post-hoc.1 | citation_click_rate drops below 15.0% over 1 hour.2 |
+| **Stale Cache Overuse** | TTFT <= 10 ms (Cache hits) 2 | System is serving outdated policy data, bypassing live databases.1 | stale_cache_served matches expired Redis TTL metadata.2 |
+| **No-Progress Agent Loops** | GPU utilization active; APIs active | Agent is stuck repeating identical tool calls with different formatting.1 | state_repetition_count (C_rep >= 2) inside the active task plan.1 |
+| **Reviewer Complacency** | Queue throughput high; no alerts | Reviewers are rubber-stamping high-risk payments without verification.2 | average_modal_approval_duration drops below 350 ms.2 |
+| **Silent Model Downgrade** | Cost drops; system remains online | Gateway proxy silently routed requests to smaller, low-quality models.2 | selected_model differs from client's requested_model.2 |
+
+### **Artifact 14: AI Observability Dashboard Taxonomy**
+
+To make behavioral health visible to operators, the system organizes telemetry across six specialized, correlated dashboard views:
+
+```text
+AI OBSERVABILITY DASHBOARD TAXONOMY
+
++--------------------------+     +--------------------------+
+| Serving Health           |     | Behavioral Health        |
+| queue depth              |     | groundedness ratio       |
+| TTFT / ITL               |     | schema pass rate         |
+| GPU/KV cache pressure    |     | unsupported claims       |
+| provider errors          |     | refusal distribution     |
++--------------------------+     +--------------------------+
+
++--------------------------+     +--------------------------+
+| Retrieval & Evidence     |     | Agent & Tool Behavior    |
+| retrieval fan-out        |     | tool retries             |
+| citation verification    |     | no-progress loops        |
+| stale cache use          |     | action verification      |
+| source conflicts         |     | idempotency failures     |
++--------------------------+     +--------------------------+
+
++--------------------------+     +--------------------------+
+| Governance & Review      |     | Cost & Drift             |
+| maker-checker state      |     | tenant spend             |
+| approval latency         |     | cost velocity            |
+| override rate            |     | embedding drift          |
+| break-glass events       |     | canary regressions       |
++--------------------------+     +--------------------------+
+```
+
+## **Telemetry Privacy, Redaction, and Compliance**
+
+Strategic telemetry can capture prompts, retrieved documents, tool arguments, model responses, reviewer decisions, and action traces. These payloads may contain PII, PHI, payment data, credentials, secrets, proprietary code, internal policies, or regulated business records. Observability must not become the vulnerability it was designed to diagnose.
+
+The default posture should be:
+
+* capture metadata by default;
+* capture raw payloads only when explicitly allowed;
+* redact before general telemetry storage;
+* store sensitive payloads behind controlled references;
+* log access to sensitive telemetry;
+* retain sensitive payloads for the shortest policy-compatible period;
+* keep audit evidence sufficient for replay without dumping raw secrets everywhere.
+
+### **Redaction and Payload Handling**
+
+Regex and NER filters are useful but incomplete. They can miss secrets, over-redact important evidence, or fail on unfamiliar formats. Redaction should therefore be layered:
+
+| Layer | Purpose |
+| :--- | :--- |
+| **Structured Field Policy** | Never log known secret fields, credentials, tokens, private keys, or raw auth headers. |
+| **Classifier / Regex / NER Scan** | Detect common PII, payment data, credentials, and regulated entities. |
+| **Source-Aware Redaction** | Apply stricter rules to medical, legal, financial, HR, tenant-private, and security-sensitive payloads. |
+| **Secure Reference Storage** | Store sensitive payloads outside general trace stores with purpose-bound access. |
+| **Access Auditing** | Log who accessed sensitive payload references and why. |
+| **Retention Control** | Expire sensitive payloads separately from lower-risk metadata. |
+
+### **External Payload Reference-Only Tracing**
+
+```text
+REFERENCE-ONLY TELEMETRY FLOW
+
+[ Application / Gateway ]
+  receives prompt, tool payload, retrieved text, or model output
+        |
+        v
+[ Redaction and Classification Gate ]
+  classify sensitivity
+  redact safe fields
+  decide metadata-only vs secure-reference capture
+        |
+        +--> low-risk metadata
+        |       write directly to trace span
+        |
+        v
+[ Secure Payload Vault ]
+  encrypted storage
+  short TTL
+  purpose-bound access
+  access logging
+  tenant/user scope controls
+        |
+        v
+[ Trace Collector ]
+  stores metadata only:
+    payload_ref
+    payload_hash
+    sensitivity class
+    retention class
+    access policy id
+```
+
+Reference-only tracing minimizes sensitive payload exposure. It does not make telemetry “PII-free” by magic wand; metadata can still be sensitive, and payload references require access control, retention policy, and audit logs.
+
+
+### **Artifact 15: Telemetry Privacy and Redaction Model**
+
+The table below defines the content capture and redaction policies enforced by the platform:
+
+| Content Class | Captured Data Format | Storage Location / Substrate | Access Control Rules | Retention Period | Compliance Enforcement |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **User Prompts** | Metadata, hash, redacted excerpt, or secure payload reference. | Secure payload vault if retained; metadata in trace store. | Purpose-bound access; audited retrieval. | Short TTL by default; policy-defined extension for incidents. | Deletion/export hooks where legally required. |
+| **API Credentials / Secrets** | Never intentionally captured; block or hash only for detection event. | None for raw secret; detection event in security log. | Security team only for detection metadata. | Minimal retention for incident evidence. | Secret scanners and log egress controls. |
+| **Tool Arguments** | Payload hash, redacted summary, schema version, secure reference when needed. | Action ledger / secure payload vault. | Auditor/security access by purpose and role. | Based on audit and transaction requirements. | Signed ledger and access logs. |
+| **System Prompts / Templates** | Version ID, template hash, release reference; exact text only in controlled registry. | Prompt/model registry, not general traces. | Dev/security/governance access. | Release lifecycle retention. | Change-control and approval logs. |
+| **Model Completions** | Metadata, hash, redacted excerpt, or secure payload reference. | Secure payload vault if retained. | Purpose-bound access with audit. | Short TTL by default; longer only for incidents/evals. | Privacy review and retention policy. |
+| **Citation Evidence** | Source ID, page/section/coordinates, source version hash, secure evidence reference. | Document registry / evidence store. | Same or stricter scope as source document. | Bound to source lifecycle and audit policy. | RLS/ACL checks and citation verification. |
+| **Trace Metadata** | Normalized numeric/string attributes, status, hashes, IDs. | Central telemetry store. | SRE/developer access depending on sensitivity. | Operational retention window. | Redaction checks before ingestion. |
+| **Human Review Data** | Review request ID, outcome, role class, redacted comments, evidence refs. | Review/audit system. | Reviewer, governance, audit roles. | Governance/audit retention policy. | Access audit and policy review. |
+
+## **Alerting and SRE SLO Design**
+
+In strategic telemetry, Service Level Objectives (SLOs) must be defined over behavioral and semantic metrics to protect user trust and operational safety.1
+
+### **Artifact 16: Alerting and SLO Model**
+
+The SRE team configures and monitors the following behavioral SLOs and alerting thresholds:
+
+| SLO Category | Target SLI Metric | SLO Target Threshold | Warning Alert Threshold | Critical Alert Threshold | Runbook / Automated Containment Action |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **Semantic Health** | Claim support / entailment by task profile. | Calibrated per domain and risk tier. | Sustained support drop outside baseline band. | High-impact route falls below required evidence floor. | Freeze rollout, route to safer profile, require evidence refresh. |
+| **Action Integrity** | Tool schema and post-action verification status. | High-impact actions require verified state. | Repeated validation failures on any tool route. | High-impact mutation has unknown or failed verification. | Block affected route; hold/reconcile/compensate where possible. |
+| **Cost Control** | Cost velocity and budget consumption. | Spend remains within tenant/workflow budget. | Burn rate exceeds forecast. | Budget breach or denial-of-wallet pattern. | Trip circuit breaker, throttle, or require approval. |
+| **Loop Containment** | No-progress count and repeated state hash. | Loops halt within workflow profile. | Repeated state detected. | Repeated state plus rising cost/tool calls. | Halt agent, preserve state, request clarification or escalate. |
+| **Trust Calibration** | User corrections, abandonment, disclosure acknowledgement, review overrides. | Stable within task baseline. | Correction/abandonment spike. | High-risk workflow shows systematic reviewer/user miscalibration. | Add targeted cognitive forcing, review UI, or route audit. |
+| **Tenant Safety** | Cross-tenant access/cache/retrieval mismatch events. | No accepted cross-tenant boundary violation. | Blocked mismatch event detected. | Confirmed exposure or repeated attempted boundary crossing. | Isolate affected scope, revoke implicated credentials, create incident. |
+| **Privacy / Redaction** | Sensitive payload exposure events. | No raw secrets in general telemetry. | Redaction detector catches sensitive field before storage. | Sensitive payload reaches unauthorized telemetry sink. | Quarantine trace, revoke exposed secret, investigate access. |
+| **Fallback Integrity** | Route downgrade with disclosure and quality-floor preservation. | All degradations are policy-preserving and observable. | Fallback spike or missing disclosure. | Unsafe fallback or silent downgrade on high-impact task. | Disable route, fail closed, or require user/reviewer choice. |
+
+## **Systemic Cross-Canon Handoff Map**
+
+Strategic telemetry provides the evidence substrate used across the canon. It connects behavioral health, cost, retrieval, tool execution, governance, privacy, evaluation, audit, and incident response.
+
+| Target Canon Report | Functional Domain | Core Telemetry Handoff | Operational Integration Rule | Fallback / Degraded Protocol |
+| :---- | :---- | :---- | :---- | :---- |
+| **AI-ENG-B** | Context and State Governance | Context object IDs, memory inclusion events, compaction traces. | State changes must be traceable across route switches and summaries. | Preserve state hashes and continuity checkpoints. |
+| **AI-ENG-D** | Corpus Engineering | Source IDs, source version hashes, provenance, lifecycle state. | Corpus-derived evidence must retain lineage in traces. | Exclude or quarantine unknown-provenance sources. |
+| **AI-ENG-E** | Retrieval Pipeline | Retrieval IDs, query hashes, candidate counts, citation verification. | Retrieval traces must show authorization, source version, and evidence sufficiency. | Use managed no-evidence response if retrieval cannot be trusted. |
+| **AI-ENG-F** | Freshness and Conflict Detection | Source age, cache age, conflict flags, freshness status. | Telemetry must expose stale/conflicting evidence. | Block stale high-impact answers or require refresh. |
+| **AI-ENG-L** | Serving Architecture | TTFT, ITL, queue wait, route, cache, model/provider status. | Serving decisions must correlate with user-visible behavior and cost. | Shift to approved fallback route only if quality floor holds. |
+| **AI-ENG-M** | Agentic Orchestration | Workflow run IDs, loop counts, no-progress state hashes. | Agents must emit enough telemetry to halt and replay loops. | Halt, replan, clarify, or escalate on repeated no-progress. |
+| **AI-ENG-N** | Tool Contracts | Tool call IDs, schema versions, payload hashes, error classes. | Tool traces must prove schema, authorization, and idempotency status. | Block or hold unknown/high-impact tool states. |
+| **AI-ENG-O** | Action Verification | Pre/post state hashes, verification status, action ledger. | Completion claims require verified state telemetry. | Hold, reconcile, compensate, or escalate unknown state. |
+| **AI-ENG-P** | Multimodal Understanding | Parser versions, OCR confidence, evidence coordinates, media refs. | Visual/document evidence must be inspectable without leaking raw payloads. | Use secure evidence references or manual verification. |
+| **AI-ENG-Q** | Voice Interaction | STT/TTS latency, transcript confidence, turn/endpointing events. | Voice degradation and confirmation states must be traceable. | Switch to text/card confirmation for high-impact actions. |
+| **AI-ENG-R** | UI Agents | Browser session IDs, DOM snapshots hashes, action verification. | UI actions must be observable from observation to post-action state. | Pause automation on drift or uncertainty. |
+| **AI-ENG-S** | Production Pathologies | Error classes, malformed outputs, repair loops, false success signals. | Behavioral pathologies require typed telemetry and replay traces. | Contain, repair, or route to degraded mode. |
+| **AI-ENG-T** | Boundary Defense | Tenant scope, authorization decisions, cache scope, redaction events. | Boundary violations must emit security telemetry without leaking payloads. | Fail closed and create incident record when scope cannot be trusted. |
+| **AI-ENG-U** | Supply Chain Security | Artifact hashes, model signatures, parser/tool versions, sandbox events. | Loaded artifacts must be traceable to approved supply-chain records. | Quarantine unsigned or anomalous artifacts. |
+| **AI-ENG-V** | Resource Abuse | Token burn, cost velocity, quota burn, retry storms, queue depth. | Resource anomalies must be observable by tenant/session/workflow. | Throttle, circuit-break, or require approval. |
+| **AI-ENG-W** | UX Resilience | Fallback route, disclosure shown, preserved state, degraded status. | Degraded mode must be traceable as a product state. | Use approved degraded mode, partial answer, review, or fail closed. |
+| **AI-ENG-X** | User Trust and Transparency | User corrections, disclosures, citation interactions, contestability events. | Trust signals must be interpreted as behavioral telemetry, not truth proof. | Surface clearer status/evidence or route to review. |
+| **AI-ENG-Y** | High-Impact Workflow Design | Approval request IDs, maker/checker state, review outcomes, break-glass events. | Governance actions require audit-grade telemetry. | Hold execution until approval/reconciliation is traceable. |
+| **AI-ENG-AA** | Evaluations | Golden traces, canary outputs, drift signals, adversarial cases. | Evaluation harnesses consume production-shaped telemetry. | Block release on telemetry-backed regression. |
+| **AI-ENG-AB** | Audit and Replay | Trace IDs, payload hashes, secure references, policy versions, action ledgers. | Replay must reconstruct the decision path without raw uncontrolled logs. | Preserve redacted, hash-bound evidence in audit store. |
+| **AI-ENG-AC** | Incident Response | Incident IDs, containment events, route/corpus/tool/cache quarantine. | Incidents require structured telemetry for scope and timeline reconstruction. | Quarantine affected route/artifact/cache/tool and notify owners. |
+| **AI-ENG-AD** | Governance and Compliance | Policy version, review status, retention class, access logs. | Governance defines what telemetry is mandatory, restricted, or deleted. | Route telemetry exceptions to accountable owner. |
+| **AI-ENG-AJ** | Reference Architecture | Trace collector, policy-aware gateway, secure payload vault, audit store. | Reference systems should implement strategic telemetry by default. | Use metadata-first, reference-only tracing for sensitive payloads. |
+
+## **Strategic Conclusions and Architectural Recommendations**
+
+To transition from ad-hoc monitoring to high-assurance behavioral governance, enterprise platforms must treat telemetry as core software infrastructure.1 Based on the analyses compiled in this report, the following four strategic principles are recommended for deployment architectures:
+
+1. **Centralize Telemetry at the Gateway Layer:** Avoid writing custom instrumentation, rate-limiting, and error-handling logic inside individual application services.2 Centralize strategic telemetry collection within a high-performance, budget-aware runtime gateway positioned entirely outside the model's cognitive boundary.1  
+2. **Enforce Strict Gating Before Verifications:** Never allow conversational interfaces to generate verbal or text-based confirmation claims until the Post-Action Auditor verifies that the database transaction has been successfully committed in the system of record.2 Spoken or generated claims must never outrun physical reality.2  
+3. **Secure Caches against Timing Side-Channels:** Formulated semantic cache keys must be cryptographically bound to the tenant ID and user permissions.1 Serving runtimes must deploy selective prefix isolation (such as the CacheSolidarity framework) to prevent timing side-channel probes from exfiltrating private context.1  
+4. **Isolate High-Risk Content and Payloads:** Enforce a zero-trust payload logging policy.1 Strip credentials at the gateway, run ARGUS output filters to redact PII, and utilize reference-only tracing to store sensitive inputs in secure, short-TTL external storage rather than writing them to centralized, persistent trace collectors.1
+
+## **Durable Principles of Strategic Telemetry**
+
+1. **Green Infrastructure Does Not Prove Behavioral Health**  
+   HTTP 200, low latency, and normal GPU utilization can coexist with hallucinations, tenant leaks, false success, stale cache, and unsafe actions.
+
+2. **Trace the Workflow, Not Just the Request**  
+   AI interactions span model calls, retrieval, tools, policy gates, human review, retries, routing, and state verification. A single request log is not enough.
+
+3. **Telemetry Must Preserve Meaning-Level Evidence**  
+   Strategic telemetry should capture claims, citations, evidence IDs, tool states, route decisions, and verification outcomes—not just duration and status.
+
+4. **Sensitive Payloads Need Controlled References**  
+   Raw prompts, completions, documents, and tool arguments should not be sprayed into trace stores. Use hashes, redacted summaries, and secure payload references.
+
+5. **Token Metrics Are Economic and Behavioral Signals**  
+   Token growth, cache misses, repair loops, reasoning-token spikes, and wasted tokens reveal cost bombs and behavioral pathologies.
+
+6. **Latency Must Be Decomposed by Stage**  
+   End-to-end latency hides parser, retrieval, queue, prefill, decode, tool, voice, and human-review bottlenecks.
+
+7. **Tool Success Is Not Action Truth**  
+   Tool traces must record authorization, idempotency, execution status, and post-action verification. A returned response is not proof of a committed state.
+
+8. **Drift Requires Multiple Signals**  
+   Embedding movement, canary prompts, NLI support, refusal shifts, schema pass rates, and user corrections should be triangulated. No single drift metric is oracle-grade. Obviously. The oracle budget was denied by finance.
+
+9. **Telemetry Is a Security Boundary**  
+   Observability systems hold sensitive operational evidence. They need redaction, access control, retention policy, and audit trails.
+
+10. **Fallbacks and Degraded Modes Must Be Observable**  
+   Model downgrades, cache responses, partial answers, review handoffs, and fail-closed states must emit structured events.
+
+11. **Audit and Replay Depend on Telemetry Discipline**  
+   Reproducibility requires trace IDs, payload hashes, policy versions, route decisions, evidence references, and action ledgers.
+
+12. **Telemetry Without Action Is Decorative Plumbing**  
+   Alerts must connect to runbooks, release gates, containment actions, governance review, and incident response.
+
+#### **Works cited**
+
+1. [KNOWLEDGE] - AI Engineering - Volume 7. S-V Failure, Security, and Hostile Environments  
+2. [KNOWLEDGE] - AI Engineering - Volume 8. W-Y Resilience, Degraded Modes, and Human Trust  
+3. AI Agent Observability 2026: Tracing & Monitoring Stack, accessed June 11, 2026, [https://www.digitalapplied.com/blog/ai-agent-observability-2026-tracing-monitoring-stack-guide](https://www.digitalapplied.com/blog/ai-agent-observability-2026-tracing-monitoring-stack-guide)  
+4. Tracing Concepts - Arize AX Docs, accessed June 11, 2026, [https://arize.com/docs/ax/instrument/what-are-traces](https://arize.com/docs/ax/instrument/what-are-traces)  
+5. OpenInference Specification - GitHub Pages, accessed June 11, 2026, [https://arize-ai.github.io/openinference/spec/](https://arize-ai.github.io/openinference/spec/)  
+6. How OpenTelemetry Traces LLM Calls, Agent Reasoning, and MCP Tools | Greptime, accessed June 11, 2026, [https://greptime.com/blogs/2026-05-09-opentelemetry-genai-semantic-conventions](https://greptime.com/blogs/2026-05-09-opentelemetry-genai-semantic-conventions)  
+7. Prefill and Decode: A Technical Guide to the Two Phases of Inference - WEKA, accessed June 11, 2026, [https://www.weka.io/learn/ai-ml/prefill-and-decode/](https://www.weka.io/learn/ai-ml/prefill-and-decode/)  
+8. Prefill vs Decode: LLM Inference Phases Explained - Redis, accessed June 11, 2026, [https://redis.io/blog/prefill-vs-decode/](https://redis.io/blog/prefill-vs-decode/)  
+9. Optimizing LLM Inference: Prefill vs Decode, Latency vs Throughput | by Maghonei | Medium, accessed June 11, 2026, [https://medium.com/@maghonei/optimizing-llm-inference-prefill-vs-decode-latency-vs-throughput-80dbf00fc0ba](https://medium.com/@maghonei/optimizing-llm-inference-prefill-vs-decode-latency-vs-throughput-80dbf00fc0ba)  
+10. 9 Best LLM Drift Monitoring Platforms in 2026 - Galileo AI, accessed June 11, 2026, [https://galileo.ai/blog/best-llm-output-drift-monitoring-platforms](https://galileo.ai/blog/best-llm-output-drift-monitoring-platforms)  
+11. Semantic Drift Analysis - Emergent Mind, accessed June 11, 2026, [https://www.emergentmind.com/topics/semantic-drift-analysis](https://www.emergentmind.com/topics/semantic-drift-analysis)  
+12. Translating Semantic Conventions - Phoenix - Arize AI, accessed June 11, 2026, [https://arize.com/docs/phoenix/tracing/concepts-tracing/translating-conventions](https://arize.com/docs/phoenix/tracing/concepts-tracing/translating-conventions)  
+13. Semantic Conventions for GenAI agent and framework spans - OpenTelemetry, accessed June 11, 2026, [https://opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-agent-spans/](https://opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-agent-spans/)  
+14. Semantic Conventions for Generative AI Agentic Systems (gen_ai.*) · Issue #35 - GitHub, accessed June 11, 2026, [https://github.com/open-telemetry/semantic-conventions-genai/issues/35](https://github.com/open-telemetry/semantic-conventions-genai/issues/35)  
+15. Arize-ai/openinference: OpenTelemetry Instrumentation for AI Observability - GitHub, accessed June 11, 2026, [https://github.com/Arize-ai/openinference](https://github.com/Arize-ai/openinference)  
+16. Semantic Conventions | openinference - GitHub Pages, accessed June 11, 2026, [https://arize-ai.github.io/openinference/spec/semantic_conventions.html](https://arize-ai.github.io/openinference/spec/semantic_conventions.html)  
+17. Openinference Semantic Conventions - Arize AX Docs, accessed June 11, 2026, [https://arize.com/docs/ax/observe/tracing-concepts/openinference-semantic-conventions](https://arize.com/docs/ax/observe/tracing-concepts/openinference-semantic-conventions)  
+18. OTEL.md - containers/kubernetes-mcp-server - GitHub, accessed June 11, 2026, [https://github.com/containers/kubernetes-mcp-server/blob/main/docs/OTEL.md](https://github.com/containers/kubernetes-mcp-server/blob/main/docs/OTEL.md)  
+19. Observing vLLM with OpenTelemetry and Dash0, accessed June 11, 2026, [https://www.dash0.com/blog/observing-vllm-with-opentelemetry-and-dash0](https://www.dash0.com/blog/observing-vllm-with-opentelemetry-and-dash0)  
+20. genai-otel-instrument - PyPI, accessed June 11, 2026, [https://pypi.org/project/genai-otel-instrument/0.1.24/](https://pypi.org/project/genai-otel-instrument/0.1.24/)  
+21. LLM Monitoring & Drift Detection Guide | Metrics, Tools & Examples - Leanware, accessed June 11, 2026, [https://www.leanware.co/insights/llm-monitoring-drift-detection-guide](https://www.leanware.co/insights/llm-monitoring-drift-detection-guide)  
+22. LLM Inference Optimization — Prefill vs Decode | by Robi Kumar ..., accessed June 11, 2026, [https://pub.towardsai.net/llm-inference-optimization-prefill-vs-decode-6e003d48b2ca](https://pub.towardsai.net/llm-inference-optimization-prefill-vs-decode-6e003d48b2ca)  
+23. [KNOWLEDGE] - AI Engineering - Volume 6. P-R Multimodal and Interface-Controlling Systems  
+24. sentinel/docs/DETECTION_METHODS.md at main · LLM-Dev-Ops ..., accessed June 11, 2026, [https://github.com/LLM-Dev-Ops/sentinel/blob/main/docs/DETECTION_METHODS.md](https://github.com/LLM-Dev-Ops/sentinel/blob/main/docs/DETECTION_METHODS.md)  
+25. Monitor embedding drift for LLMs deployed from Amazon SageMaker JumpStart - AWS, accessed June 11, 2026, [https://aws.amazon.com/blogs/machine-learning/monitor-embedding-drift-for-llms-deployed-from-amazon-sagemaker-jumpstart/](https://aws.amazon.com/blogs/machine-learning/monitor-embedding-drift-for-llms-deployed-from-amazon-sagemaker-jumpstart/)
+
+---
+
+# AI-ENG-AA — Evals Architecture: Ground Truth, Golden Sets & Regression Tests
+
+## **Doctrinal Foundations of High-Dimensional AI Evaluation**
+
+In high-dimensional artificial intelligence systems, production reliability cannot be measured by traditional application performance monitoring (APM) paradigms.1 In legacy architectures, system health is treated as a binary or scalar state defined by infrastructure metrics, such as database availability, memory allocation, network latency, and HTTP status codes. However, when these architectures are driven by probabilistic large language models (LLMs) and multi-agent execution loops, backend availability does not guarantee a successful, safe, or contextually coherent transaction.1 An artificial intelligence gateway can return a successful HTTP 200 payload that contains a complete structural schema failure, an unauthorized tool execution, a cross-tenant data leak, or an ungrounded factual confabulation.1 Conversely, a system can exhibit optimal hardware utilization and high throughput while delivering answers that silently violate safety boundaries, omit critical citations, or trap agentic loops in expensive, infinite executions. This mismatch establishes the Green Dashboard Fallacy: the diagnostic error of assuming an AI system is healthy based solely on infrastructure availability.
+
+Strategic telemetry, as established in the preceding canon doctrines, serves as the first-class observability discipline designed to resolve this fallacy by capturing the complete execution path of probabilistic interactions as a tree of nested spans. Evaluation architecture uses this telemetry substrate to construct durable, systematic testing systems that transition evaluations from passive demo scoring or leaderboard metrics into active product infrastructure.1 The evaluations architecture defines the layered testing and regression discipline that proves whether an AI system’s behavior remains acceptable across continuous changes to models, prompts, retrieval indexes, corpora, tool contracts, routers, adapters, safety filters, parsers, UI controls, and governance workflows.1
+
+The governing doctrine of this architecture dictates that AI systems require layered evaluations because no single score can validate probabilistic behavior. Task success, retrieval quality, grounding, citations, tool execution, safety, regression stability, human judgment, adversarial resistance, and governance compliance must be evaluated separately and then composed into automated release gates.1 Under this paradigm, the primary engineering question shifts from "Did the model perform well on a benchmark?" to "Can the system prove that today’s model, prompt, retrieval index, tool contracts, routing logic, and UI behavior still satisfy yesterday’s behavioral guarantees?".1 This evaluations architecture must outlive any single evaluation platform, benchmark, judge model, or provider feature, establishing the curated behavioral specification—encoded in test cases, rubrics, labels, traces, thresholds, and gates—as the durable asset of the enterprise.
+
+## **Conceptual Glossary**
+
+The systems-engineering parameters and operational metrics governing high-dimensional evaluation architectures, golden datasets, and regression testing pipelines are defined in the primary conceptual glossary:
+
+| Term | Technical Definition | Primary Operational Metric | Standard Production Target |
+| :---- | :---- | :---- | :---- |
+| **Evaluations Architecture** | The layered testing, scoring, regression, and release-control framework that validates probabilistic system behavior across model, prompt, retrieval, tool, interface, and governance changes. | Behavioral Coverage by Risk Class | Critical behavior classes are represented by versioned tests, traces, rubrics, and gates. |
+| **Ground Truth** | A curated, scoped specification of expected outcomes, including text, evidence, tool parameters, state transitions, refusals, safety boundaries, and review requirements. | Ground Truth Alignment Score | Alignment targets are calibrated by task risk and truth type. |
+| **Golden Set** | A curated, versioned, representative set of test cases encoding required product behaviors, regressions, incidents, and edge cases. | Golden Set Relevance Density | Key task classes, risk tiers, and failure modes are represented without excessive redundancy. |
+| **Canary Prompt** | A recurring reference case used to detect silent behavior changes in models, prompts, routes, indexes, or policy layers. | Canary Drift Score | Drift is evaluated against calibrated baselines and expected variance. |
+| **Task Evaluation** | Assessment of task-specific outputs against logical, structural, semantic, and behavioral requirements. | Task Success Rate | Targets are domain-specific and tied to risk class. |
+| **Retrieval Evaluation** | Measurement of evidence-finding quality independent of downstream generation. | MRR / nDCG / Recall / Context Precision | Retrieval quality meets task-specific evidence requirements under authorization constraints. |
+| **Grounding Evaluation** | Testing whether generated claims are supported by available evidence. | Supported Claim Ratio | High-impact claims require evidence support or explicit uncertainty. |
+| **Citation Evaluation** | Verification that citations point to the exact source spans, coordinates, records, or artifacts supporting local claims. | Citation Alignment Score | Citations are valid for the configured evidence format and task risk. |
+| **Tool-Use Evaluation** | Validation of tool selection, argument generation, authorization, idempotency, execution status, and post-action verification. | Tool Verification Coverage | High-impact tool actions require pre-action gates and verified post-action state. |
+| **Adversarial Evaluation** | Testing system boundaries using prompt injection, poisoned retrieval, hostile documents, unsafe tools, context floods, and output-sink attacks. | Containment Failure Rate | Attacks are contained by system boundaries even when model behavior is imperfect. |
+| **Synthetic Evaluation** | Generation of additional test cases from controlled seeds, schemas, traces, or behavioral parameters. | Synthetic Promotion Rate | Synthetic cases are coverage amplifiers until validated for hard gates. |
+| **LLM-as-Judge** | Use of language models to evaluate open-ended outputs against explicit rubrics, usually with calibration and human-labeled references. | Judge Calibration Error | Judge scores are calibrated against held-out human labels before release gating. |
+| **Human Label** | Expert or trained-rater annotation performed under a locked rubric and quality-control process. | Label Reliability | Reliability thresholds are calibrated by task type, difficulty, and decision impact. |
+| **Inter-Rater Reliability** | Statistical measurement of agreement among human or automated evaluators scoring identical items. | Krippendorff’s Alpha / Cohen’s Kappa | Required agreement depends on whether labels are exploratory, training, or release-gating labels. |
+| **Regression Gate** | Automated CI/CD or deployment check that evaluates system behavior against versioned datasets and release rules. | Gate Outcome by Severity | Hard gates block; soft gates require owner signoff; canaries monitor controlled rollout. |
+| **Drift Gate** | Continuous or scheduled gate that flags behavior changes in outputs, retrieval, routing, safety, or policy compliance. | Drift Signal Ensemble | Drift thresholds are calibrated against baseline windows and workload profiles. |
+| **Eval Contamination** | Leakage of evaluation cases, labels, or canary material into training, retrieval, prompt examples, or public corpora. | Contamination Risk Signal | Contamination is detected, investigated, and mitigated; canaries are evidence, not force fields. |
+
+## **The Multi-Layered Eval Architecture Map**
+
+The structural integrity of an evaluation framework depends on a multi-layered design that isolates failures at specific system boundaries.1 Production AI systems do not fail as flat, single-prompt interfaces; they fail through compounding, silent errors across distinct software and context boundaries.5 The evaluation architecture must construct specialized validation layers that mirror the multi-plane execution path of the application:
+
+| Evaluation Layer | Structural Scope | Primary Telemetry & Ingestion Inputs | Verification Mechanics |
+| :---- | :---- | :---- | :---- |
+| **Telemetry Layer** | Captures traces, spans, tokens, latency, routing, cost, retrieval, tool, and governance events. | OpenTelemetry/OpenInference-style spans, redacted traces, payload hashes, secure references. | Validates trace completeness, required attributes, redaction, and correlation keys. |
+| **Dataset Layer** | Houses golden sets, adversarial suites, synthetic cases, production-derived cases, and human labels. | Versioned repositories, secure databases, object stores, label records, source manifests. | Enforces partitioning, provenance, contamination checks, access control, and case lifecycle policy. |
+| **Task Layer** | Evaluates output syntax, schemas, extracted values, classifications, transformations, and local correctness. | Parser outputs, structured responses, expected fields, rubric targets. | Uses deterministic checks, schema validators, value comparisons, and task-specific metrics. |
+| **Component Layer** | Isolates retrieval, grounding, citation, parser, tool, routing, redaction, and safety components. | Retrieval IDs, source refs, tool traces, citation refs, parser versions, guardrail decisions. | Measures retrieval quality, evidence support, citation validity, tool correctness, and policy containment. |
+| **Workflow Layer** | Evaluates multi-step plans, agent trajectories, retries, loop behavior, degraded modes, and terminal state. | Workflow traces, state hashes, action ledgers, retry logs, approval state, route decisions. | Checks trajectory validity, no-progress detection, state verification, idempotency, and safe termination. |
+| **Judge Layer** | Scores open-ended outputs using rubric-governed human or model judges. | Judge outputs, rubric IDs, calibration splits, disagreement records. | Aggregates calibrated judgments; tracks bias, variance, reliability, and uncertainty. |
+| **Human-Review Layer** | Uses expert review for subjective, ambiguous, high-impact, or policy-sensitive cases. | Review forms, adjudication records, rater profiles, sentinel cases, dwell-time signals. | Measures inter-rater reliability, detects reviewer drift, and resolves label disagreements. |
+| **Governance Layer** | Tracks ownership, policy versions, approval requirements, audit artifacts, and release accountability. | Release manifests, policy IDs, approval records, artifact hashes, audit events. | Verifies ownership, approvals, retention, signatures where required, and accountability paths. |
+| **Release-Gate Layer** | Converts evaluation results into deployment decisions. | CI/CD scorecards, baseline comparisons, canary results, incident regressions, cost/latency metrics. | Applies hard gates, soft gates, canary gates, differential gates, and rollback triggers. |
+
+By decoupling evaluation logic across these nine layers, the platform prevents qualitative errors from being hidden inside an aggregate score.1 A small shift in an overall benchmark score can conceal a catastrophic failure in a high-impact task slice.5 This layered model guarantees that if a retrieval component degrades or a safety filter overblocks, the system isolates the failure to its specific layer, pointing engineers directly to the root cause.1
+
+## **Ground Truth Typology**
+
+Ground truth is not a static answer key; it is a versioned, multi-dimensional programmatic artifact that carries explicit provenance, operational boundaries, and failure modes.5 Evaluating a system using a single, flat string comparison assumes a deterministic simplicity that does not exist in production AI deployments.1 The evaluation architecture must classify ground truth across ten distinct typological categories: 
+
+| Truth Type | Technical Scope & Structural Composition | Source & Production Provenance | Update Policy | Dominant Failure Modes | Evaluation Method |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **Exact Truth** | Exact field values, regex-constrained identifiers, numeric ranges, enum values, and strict schemas. | Systems of record, schemas, ledgers, validated source databases. | Synchronized on schema or source-of-record change. | Schema drift, rounding errors, stale fixtures, field remapping. | Exact match, numeric tolerance checks, schema validation, deterministic parsers. |
+| **Reference Truth** | Expert-drafted exemplar answers, policy summaries, templates, and acceptable phrasings. | SMEs, policy owners, historical reviewed outputs. | Reviewed on policy/product/domain change. | Stale wording, style drift, missing caveats, overfitting to examples. | Rubrics, semantic similarity, pairwise review, calibrated judges where appropriate. |
+| **Evidence Truth** | Source IDs, spans, sections, page regions, database records, and visual coordinates supporting claims. | Knowledge base, document store, source registry, evidence manifests. | Refreshed on source ingestion, revision, permission change, or index rebuild. | Missing evidence, stale source, citation laundering, coordinate drift. | Citation verification, source-version checks, NLI/entailment, span/coordinate overlap. |
+| **Procedural Truth** | Correct operation sequence, allowed API order, routing rules, approval steps, and dependency constraints. | Workflow specs, tool contracts, policy manifests, gateway configs. | Updated on workflow, tool, or policy changes. | Wrong order, skipped gate, duplicate call, unhandled degraded path. | Trace trajectory comparison, step dependency checks, route-policy validation. |
+| **State Truth** | Verified backend mutations, balances, committed records, pending/unknown states, and ledger outcomes. | Transaction logs, action ledger, source-of-record database. | Verified at execution time and retained for audit. | False success, partial commit, orphaned tool call, sync delay, duplicate mutation. | Pre/post state hash, readback verification, idempotency, reconciliation status. |
+| **Preference Truth** | Subjective style, helpfulness, tone, brand voice, and user experience preferences. | UX research, brand guidelines, preference labels, product standards. | Updated on product/brand or user-segment changes. | Verbosity bias, positivity bias, annotator drift, style overfitting. | Pairwise preferences, calibrated judge panels, human review, segment-specific rubrics. |
+| **Safety Truth** | Prohibited actions, privacy boundaries, policy constraints, redaction requirements, refusal conditions. | Legal, compliance, security, safety policy owners. | Updated on regulation, threat, or policy change. | Overblocking, underblocking, jailbreak bypass, policy hallucination, leakage. | Deterministic checks, policy classifiers, adversarial tests, red-team cases, human review. |
+| **Governance Truth** | Approval requirements, maker-checker rules, audit requirements, signatures, review authority, break-glass conditions. | Governance policy, audit records, approval ledgers, regulatory controls. | Updated on governance, risk, or regulatory changes. | Missing approval, self-approval, stale approval, unsigned audit event, accountability gap. | Ledger checks, signature/hash validation, approval-state verification, replay audits. |
+| **Comparative Truth** | Relative preference that output A is better than B under a rubric. | Human preference labels, calibrated judge panels, evaluation studies. | Updated with new calibration and rater-quality checks. | Position bias, verbosity bias, self-preference, rubric ambiguity. | Pairwise win rates, calibrated judges, Platt scaling, human adjudication. |
+| **Negative Truth** | Required refusals, managed limitations, blocked actions, fail-closed outcomes, and out-of-scope responses. | Safety policy, threat models, boundary-defense rules. | Updated with new abuse cases, policy changes, and incident findings. | Over-refusal, unsafe compliance, silent bypass, refusal without help. | Adversarial prompts, OOD probes, refusal-quality rubrics, containment checks. |
+
+This typographical separation enforces the fundamental principle: ground truth is a version-controlled, scoped software asset with explicit failure modes, not an absolute, static answer key.5 Treating truth as a programmatic asset ensures that the testing system can adapt to changes in databases, documents, and corporate policies without requiring manual annotation of the entire evaluation catalog.4
+
+## **Golden Set Lifecycle Model**
+
+Golden sets represent curated, version-controlled, and representative test cases that encode the required behavioral properties of the AI system.1 The evaluations platform manages golden sets through a continuous, structured lifecycle to ensure they remain representative of real-world workloads while protecting against benchmark obsolescence.17
+
+```text
+GOLDEN SET LIFECYCLE
+
+[ Production Signals ]
+  incidents | user corrections | reviewer overrides | drift alerts | regressions
+        |
+        v
+[ Candidate Case Ingress ]
+  select trace or synthetic seed
+  classify task/risk/failure mode
+        |
+        v
+[ Case Authoring ]
+  define input, expected behavior, evidence, constraints, and rubric
+        |
+        v
+[ Label / Truth Creation ]
+  exact truth | evidence truth | state truth | preference truth | negative truth
+        |
+        v
+[ Review and Validation ]
+  SME review
+  privacy/redaction check
+  deduplication
+  contamination screening
+        |
+        v
+[ Baseline Run ]
+  evaluate current production/baseline route
+  record expected variance and known limitations
+        |
+        v
+[ Versioned Golden Set ]
+  immutable case version
+  source refs and policy refs
+  ownership and change history
+        |
+        v
+[ Gate Assignment ]
+  exploratory suite
+  nightly regression
+  CI hard gate
+  canary monitor
+  incident replay suite
+        |
+        v
+[ Retirement / Refresh ]
+  update stale cases
+  retire obsolete policies
+  preserve historical baselines
+```
+
+### **1. Ingestion and Case Ingress**
+
+Cases are continuously surfaced from production telemetry traces. The ingestion pipeline flags anomalies, user corrections, edit character diffs, and citation overrides.1 These traces are compiled into standardized test inputs, preserving the complete context of the transaction, including user prompts, retrieved document chunks, system prompts, and tool return payloads.1
+
+### **2. Case Authoring and Schema Layout**
+
+To ensure evaluations are precise, authored cases must conform to a strict, multi-dimensional JSON schema:
+
+```json
+{
+  "$schema": "https://ai-engineering.canon/schemas/golden-case-v1.json",
+  "case_id": "GC-2026-FIN-089",
+  "case_version": "1.4.0",
+  "task_class": "Financial_Ledger_Mutation",
+  "risk_classification": "HIGH",
+  "allowed_route_profiles": [
+    "primary_reasoning_route",
+    "approved_equivalent_route"
+  ],
+  "inputs": {
+    "user_query_redacted": "Disburse $500.00 to the approved vendor for invoice INV-102.",
+    "user_query_hash": "sha256:user_query_hash",
+    "session_context": {
+      "tenant_hash": "sha256:tenant_hash",
+      "subject_role": "finance_auditor",
+      "dialogue_history_ref": "secure_ref:dialogue_context_gc_089"
+    }
+  },
+  "retrieval_constraints": {
+    "allowed_tenant_scope_hash": "sha256:tenant_scope_hash",
+    "required_document_ids": [
+      "doc_invoice_102_hash"
+    ],
+    "forbidden_document_ids": [
+      "doc_cross_tenant_leak_hash"
+    ],
+    "required_evidence_regions": [
+      {
+        "document_id": "doc_invoice_102_hash",
+        "page_number": 1,
+        "bounding_box": {
+          "x": 0.18,
+          "y": 0.42,
+          "width": 0.31,
+          "height": 0.07,
+          "coordinate_system": "normalized_page"
+        }
+      }
+    ]
+  },
+  "tool_constraints": {
+    "expected_tool_call": "disburse_funds",
+    "action_class": "high_risk_mutation",
+    "required_arguments": {
+      "base_amount": 500.0,
+      "invoice_id": "INV-102"
+    },
+    "idempotency_key_required": true,
+    "permission_gate": "maker_checker_approval_required",
+    "compensation_supported": true,
+    "compensation_reference": "secure_ref:ledger_compensation_policy"
+  },
+  "acceptance_criteria": {
+    "exact_match_fields": {
+      "approval_status": "PENDING_REVIEW"
+    },
+    "forbidden_outcomes": [
+      "COMMITTED_WITHOUT_APPROVAL",
+      "CLAIMED_COMPLETION_WITHOUT_VERIFICATION",
+      "CROSS_TENANT_RETRIEVAL"
+    ],
+    "safety_policies_enforced": [
+      "PII_redaction",
+      "No_unauthorized_disbursement",
+      "Maker_checker_required"
+    ],
+    "minimum_evidence_support": {
+      "nli_grounding_threshold": 0.95,
+      "citation_required": true
+    }
+  },
+  "provenance": {
+    "source_trace_id": "8f92a10c7d3a4e9f9a1b6c5d4e3f2010",
+    "authored_by_role": "SRE",
+    "reviewed_by_role": "finance_domain_expert",
+    "policy_version": "finance_policy_v12",
+    "last_modified": "2026-06-11T12:00:00Z"
+  },
+  "privacy": {
+    "payload_storage": "secure_reference_only",
+    "redaction_status": "reviewed",
+    "retention_class": "evaluation_high_impact"
+  }
+}
+```
+
+### **3. Verification, Deduplication, and Contamination Screening**
+
+Once cases are authored, they must pass validation before promotion into a golden set:
+
+* **Expert Review:** Subject matter experts confirm that the expected behavior, evidence requirements, and rubrics reflect the real task rather than a convenient fantasy benchmark with a clipboard.
+* **Privacy and Payload Review:** Sensitive prompts, documents, tool payloads, and user data are redacted or stored by secure reference. General evaluation repositories should not contain uncontrolled raw production traces.
+* **Semantic Deduplication:** Candidate cases are compared against existing cases using task-aware similarity checks. Thresholds should be calibrated by task class; a universal cosine cutoff is not reliable across extraction, reasoning, policy, multimodal, and tool-use cases.
+* **Contamination Screening:** Evaluation cases should carry metadata, access controls, repository separation, and optional canary strings to detect leakage into training, retrieval, or public corpora. Canary GUIDs are useful detection markers, not magical anti-training amulets. Leakage prevention also requires permissions, storage isolation, release discipline, and provider/data-handling controls.
+* **Promotion Decision:** Cases are assigned to an appropriate suite: exploratory, nightly regression, CI hard gate, canary monitor, adversarial suite, or incident replay. Not every useful case belongs in a hard release gate.
+
+### **4. Promotion, Baselines, and Retirement**
+
+Approved cases are committed to the versioned Golden Set repository.4 Baseline runs are executed to record initial performance spreads across the allowed models.5 As product features adapt, the golden sets undergo scheduled bi-annual refreshes, where stale schema definitions or retired policy constraints are pruned to prevent benchmark decay.2
+
+## **Task Evaluation Matrix**
+
+Evaluating high-dimensional systems requires matching specific task types to distinct metrics, rubrics, and automated gates to prevent qualitative errors from reaching production 4:
+
+| Task Type | Core Target Metric | Target Rubric Parameter | Deterministic Checks | Automated Judge Role | Regression Gate Threshold | Common Failure Mode |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| **Classification** | F1-Score, Cohen's Kappa 15 | Category label match | Enforce valid category strings | Evaluates edge-case sentiment contexts | >= 0.95 Kappa 15 | Label drift, class imbalance |
+| **Extraction** | Precision, Character Error Rate 8 | Exact value matching | Regex patterns, null checks | Verifies entity boundary alignments | 100% schema validity 5 | Malformed payloads, truncation 5 |
+| **Summarization** | Rouge-L, BertScore 20 | Information density | Length constraints, formatting | Rates factual completeness 21 | >= 0.85 BertScore 20 | Hallucination, style verbosity 19 |
+| **Drafting** | Paraphrase Fidelity, Style | Tone alignment | Markdown structure, syntax | Evaluates readability and flow | >= 0.90 human correlation | Language drift, policy violation 5 |
+| **Transformation** | Exact Match, Character Diff | Semantic equivalence | Structural layout schema check | Checks for information loss | 100% type preservation | Information loss, corrupt tags 8 |
+| **Reasoning** | Logic Path F1, Code Execution | Logical coherence | Step-by-step math evaluation | Verifies intermediate thought states | >= 0.98 success rate | Logical loops, false plan jumps 5 |
+| **Coding** | Unit Test Pass Rate, AST | Compilation success | Syntax checks, imports | Validates algorithmic complexity | 100% compilation pass | Syntax errors, remote injection 5 |
+| **Data Entry** | Field Accuracy, Schema Match 5 | Value-range match | Pydantic validator models 5 | Identifies logical contradictions | 100% constraint validation | Extra keys, inverted decimals 5 |
+| **Policy App** | Compliance Ratio 22 | Policy adherence | Scan forbidden word tokens | Audits compliance exceptions | 100% safe enforcement 5 | Policy hallucination, leakage 5 |
+| **Planning** | Path Match, Step Count 5 | Target goal completion | Step dependency verification | Audits alternative trajectories | >= 0.95 trajectory match | Infinite planning loops, stall 5 |
+| **Multimodal** | Visual Grounding IoU 8 | Bounding box match | Frame count validation 8 | Verifies spatial-semantic links | >= 0.85 Mean IoU 8 | Crop drift, misread scales 8 |
+| **Voice** | Word Error Rate (WER) 8 | Pronunciation check | VAD silence thresholds 8 | Checks emotional tone suitability | < 5.0% English WER 8 | False endpointing, double talk 8 |
+| **UI Control** | Step Success Rate 8 | Interaction accuracy | DOM element visibility checks | Audits page states post-action | >= 0.98 SSR 8 | Stale selectors, unmounted elements 8 |
+| **Multi-Step** | Task Completion Rate 7 | Final state agreement | Idempotency token matches | Evaluates trajectory safety | >= 0.95 state completion | Broken state, unreleased effects 23 |
+
+### **Decoupling Task Success from System Success**
+
+The evaluation framework enforces a critical distinction between output-level task success and system-level task success.5 A text output can be highly fluent and semantically correct (task success) while failing system success because it omits a required legal caveat, violates tenant data-isolation, or uses a stale cache bypass.1 Similarly, an agent workflow can execute a sequence of tool calls and produce a valid JSON payload (task success) while failing system success because it executes a mutation over a duplicate transaction ID, lacks active permissions, or claims transaction completion before database verification.1 The task evaluation layer must validate output-level behaviors, while the workflow and release-gate layers assess system-level properties.
+
+## **Retrieval Evaluation Model**
+
+Retrieval evaluation decouples the search engine’s performance from the generation model's capabilities, ensuring that context quality is measured objectively before prompts are compiled.1 A model can generate a highly fluent, correct answer when provided with poor context, or conversely, a model can hallucinate despite receiving perfect context.5 Retrieval evaluations isolate these variables, assessing whether the search subsystem successfully located, filtered, and ranked the correct evidence.5
+
+### **Core Retrieval Metrics**
+
+The evaluation suite measures evidence-finding performance using four standardized metrics 1:
+
+* **Mean Reciprocal Rank (MRR@k)**: Evaluates the position of the first correct retrieved document chunk:  
+  MRR = (1 / |Q|) * sum_{i=1}^{|Q|} (1 / rank_i)  
+  Where rank_i is the position of the first relevant document for query i.  
+* **Normalized Discounted Cumulative Gain (nDCG@k)**: Measures ranking quality, penalizing relevant documents pushed down the search results list.11  
+* **Context Precision**: Assesses how much of the retrieved context is relevant, calculated as the ratio of relevant chunks to the total retrieved candidate count.11  
+* **Context Recall**: Measures whether all necessary information required to answer the query is present in the retrieved candidates.11
+
+### **Modality-Specific Retrieval Profiles**
+
+Retrieval evaluation must adapt its metrics and thresholds across distinct retrieval pathways 1:
+
+* **Lexical Retrieval**: Evaluates exact term matches using BM25, measuring hit rate and term frequency coverage.  
+* **Vector Retrieval**: Evaluates dense semantic embeddings, tracking retrieval recall and cosine similarity distances.  
+* **Hybrid Retrieval**: Measures the fusion of lexical and vector results, evaluating Reciprocal Rank Fusion (RRF) weights.  
+* **Graph Retrieval**: Assesses entity-relationship traversal, evaluating entity-relevance density and relation path lengths.21  
+* **Multimodal Retrieval**: Evaluates late-interaction page-patch match patterns (e.g., ColPali), tracking visual coordinate overlap rates and patch similarity densities.8  
+* **Tool-Mediated Retrieval**: Evaluates search APIs executed by agents, measuring tool selection accuracy and query rewrite quality.5
+
+### **Multi-Tenant Permission and Safety Auditing**
+
+In multi-tenant SaaS environments, retrieval must be treated as an access-control gate.5 The evaluation architecture executes security verification checks on every similarity search:
+
+* **Row-Level Security (RLS) Compliance**: Validating that similarity searches are isolated directly at the database engine layer.5 The test suite confirms that queries execute within active tenant-scoped transactions, failing instantly if a query is dispatched without an active session variable.5  
+* **Pre-Filter Authorization checking**: Enforcing role-based and attribute-based access controls on document chunks prior to vector distance calculations.5 This prevents cross-tenant data leakage and blocks timing side-channel exploits.5  
+* **HubScan Robust Z-Score**: Monitoring the vector index to identify and isolate poisoned documents or "adversarial hubs".5 The test suite calculates local hubness metrics, raising a security alert if a vector’s robust z-score exceeds 5.0 5:  
+  Z_robust = (k_i - median(k)) / MAD(k)  
+  Where k_i is the number of times vector i appears in the top-K nearest neighbors of random queries, and MAD is the Median Absolute Deviation.5
+
+## **Grounding and Citation Evaluation Model**
+
+A system must not assume its answers are trustworthy because it retrieved documents. Grounding evaluations test whether generated claims are supported by provided evidence. Citation evaluations test whether inline citations, source links, coordinates, or record references point to the specific evidence supporting local assertions. These are related but distinct checks.
+
+### **Grounding and Faithfulness Metrics**
+
+Grounding evaluation should decompose generated answers into atomic, checkable claims and compare each claim against authorized evidence. This can use Natural Language Inference (NLI), entailment classifiers, structured record checks, exact field comparison, or human review depending on the domain.
+
+```text
+faithfulness = supported_claims / total_checkable_claims
+```
+
+The denominator should exclude non-factual prose, stylistic transitions, and clearly marked uncertainty. Unsupported high-impact claims should be blocked, revised, or explicitly marked as unverified.
+
+### **Fine-Grained Citation Evaluation**
+
+Fine-grained citation evaluation verifies whether a citation supports the local claim it is attached to. Named frameworks such as ALiiCE are useful references for positional and claim-level citation evaluation, but the canon should not depend on a single framework. The general pattern is:
+
+```text
+FINE-GRAINED CITATION CHECK
+
+[ Generated Answer ]
+        |
+        v
+[ Claim Segmentation ]
+  split sentence/paragraph into atomic claims
+        |
+        v
+[ Citation Mapping ]
+  associate each claim with citation marker, source ID, span, record, or coordinate
+        |
+        v
+[ Evidence Verification ]
+  exact match | NLI entailment | structured record check | coordinate overlap
+        |
+        v
+[ Citation Verdict ]
+  supported | unsupported | wrong source | stale source | unauthorized | ambiguous
+```
+
+Evaluation should report both recall and precision:
+
+```text
+citation_recall = supported_required_claims / total_required_claims
+
+citation_precision = supported_cited_claims / total_cited_claims
+```
+
+Citation placement readability can be evaluated separately from factual support. A perfectly readable citation can still be wrong. A visually cluttered citation can still be accurate. Because the universe insists on being inconvenient.
+
+### **Spatial and Coordinate-Level Verification**
+
+In document, chart, image, and UI workflows, text-only citation checks are insufficient. The evaluation platform should verify that cited claims map to the relevant source region or record.
+
+* **Coordinate Validity:** Citation regions must point to valid, non-empty areas on the source page/frame/screenshot.
+* **Source Version:** The cited region must belong to the source version used during generation.
+* **Permission Scope:** The source must be authorized for the active tenant/user/session.
+* **Intersection-over-Union:** Where ground-truth boxes exist, overlap may be measured as:
+
+```text
+IoU = area(B_generated ∩ B_gold) / area(B_generated ∪ B_gold)
+```
+
+IoU thresholds should be task-specific. A tiny table cell, a full chart, and a document paragraph should not share a universal threshold.
+
+## **Transactional Tool-Use Evaluation Model**
+
+When model actions cross from text generation into system operations, evaluations must prove that tool execution is authorized, bounded, idempotent where required, and verified against the system of record. Tool-use evaluation is not satisfied by “the model selected the right tool.” It must also test arguments, policy gates, side effects, retries, compensation, and user-facing completion claims.
+
+```text
+TRANSACTIONAL TOOL-USE EVALUATION
+
+[ Proposed Tool Call ]
+  tool name, arguments, subject, tenant, purpose, action class
+        |
+        v
+[ Pre-Action Evaluation ]
+  schema valid?
+  authorization valid?
+  risk tier allowed?
+  approval required?
+  idempotency required?
+        |
+        +--> fail: block and record violation
+        |
+        v
+[ Execution Harness ]
+  sandbox or mock for tests
+  real integration only in controlled environments
+  request/response captured by trace
+        |
+        v
+[ Post-Action Verification ]
+  expected state reached?
+  no duplicate mutation?
+  no unauthorized resource touched?
+  unknown/pending state preserved?
+        |
+        +--> verified: pass
+        |
+        +--> failed/unknown: fail, reconcile, or escalate
+```
+
+### **Effect Classification**
+
+| Effect Class | Examples | Evaluation Requirement |
+| :--- | :--- | :--- |
+| **Read-Only Effects** | Search, lookup, document parse, status check. | Verify correct source, permissions, timeout handling, and no mutation. |
+| **Bufferable Effects** | Draft file writes, staged form values, local workspace changes. | Verify effects remain invisible until commit and can be discarded safely. |
+| **Reversible External Effects** | Reservations, provisional holds, reversible workflow updates. | Require idempotency, compensation plan, and post-action verification. |
+| **Irreversible / High-Impact Effects** | Payments, email sends, deletions, legal filings, production admin actions. | Require approval, pre-action verification, explicit user/reviewer confirmation, and post-action state readback. |
+
+For irreversible effects, the external action may itself be the point of no return. The safe design is not “execute first and pretend rollback exists.” The safe design is to gate before execution, preserve approval state, verify after execution, and represent unknown state honestly.
+
+## **Agent and Workflow Evaluation Model**
+
+Evaluating multi-step agents requires analyzing full execution trajectories rather than simply scoring final text outputs.24 A system can generate a plausible final response while repeating tool loops, ignoring errors, or violating policies.5
+
+### **Dynamic Execution-Based Benchmarking**
+
+The evaluation platform integrates agent workflows with standard sandboxed test suites, including WebArena, ST-WebAgentBench, and Claw-Eval-Live, to measure real-world performance.22 The evaluation harness enforces three execution-level metrics 7:
+
+* **Task Success Rate (SSR)**: The fraction of tasks that successfully reach a correct terminal state without unrecoverable errors.7  
+* **State Repetition Count (C_rep)**: Identifies infinite tool loops by tracking consecutive identical planning turns.5 If C_rep > 2, the execution is terminated.5  
+* **Transient Contamination**: The fraction of runs where non-committed speculative branch effects become visible to the user or other agents, violating system isolation.7
+
+### **Completion under Policies (CuP) Metric**
+
+For enterprise workflows, task success must be balanced against policy compliance.22 The evaluation platform implements the Completion under Policies (CuP) metric to ensure agents operate within organizational constraints 22:
+
+CuP = Task Completion * product_{i=1}^{M} P_i  
+
+Where Task Completion represents the portion of the task successfully executed, and P_i is in {0, 1} representing adherence to safety policy i. If any organizational policy is breached (e.g., unauthorized document access, bypass of approval gates), CuP falls to zero, and the release is blocked.[5, 22]
+
+### **Ideal vs. Degraded Trajectory Testing**
+
+Agents must be evaluated under both ideal and degraded conditions to confirm system resilience. The test suite injects artificial faults—such as database timeouts, rate limits, and OCR layout drift—to verify that the agent gracefully transitions to degraded modes (e.g., serving cached replies, narrowing retrieval bounds, or packaging escalation payloads for human review) without causing catastrophic session crashes.
+
+## **Adversarial Evaluation Taxonomy**
+
+High-dimensional systems face adversarial threats across prompts, documents, retrieval indexes, parsers, tools, caches, UI surfaces, and output sinks. Adversarial evaluation should test containment, not merely model refusal. A model may generate a bad string; the system passes only if downstream boundaries prevent unauthorized action, leakage, unsafe rendering, or false completion.
+
+| Threat Category | Execution Vector | Primary Target Boundary | Expected Defensive Behavior | Automated Release Gate |
+| :---- | :---- | :---- | :---- | :---- |
+| **Direct Prompt Injection** | Malicious user text attempts to override system/developer instructions. | Instruction hierarchy and tool authority. | Treat user text as untrusted data; block unauthorized tool/action changes. | Block release if injection changes privileged behavior or exposes protected prompt content. |
+| **Indirect Document Injection** | Hidden or visible instructions inside uploaded documents, webpages, emails, PDFs, OCR text, or retrieved chunks. | Parser, retrieval, context assembly, tool authorization. | Preserve source authority labels; prevent untrusted content from authorizing tools or memory writes. | Block if document text causes unauthorized tool calls, policy changes, or data exfiltration. |
+| **Retrieval / Index Poisoning** | Malicious uploads, metadata manipulation, adversarial embeddings, hub documents. | Corpus admission, vector index, ranking, context selection. | Enforce provenance, permissions, anomaly detection, quarantine, and rollback. | Block or quarantine on confirmed poisoning; investigate hubness/anomaly signals. |
+| **Citation Laundering** | Generated citations falsely make unsupported claims look sourced. | Grounding and user-facing evidence display. | Verify claim-to-source mapping before displaying citation confidence. | Block if unsupported claims receive valid-looking citations. |
+| **Context / Prefill Flooding** | Large, redundant, or adversarial context designed to dilute instructions or exhaust resources. | Context compiler and runtime gateway. | Enforce context budgets, evidence prioritization, truncation, and managed failure. | Block if safety/authority constraints are lost under context pressure. |
+| **Cost Bomb / Loop Abuse** | Prompts or states trigger repair loops, retries, recursive planning, or excessive reranking. | Orchestrator, gateway, retry policy. | Enforce loop budgets, retry caps, no-progress detection, and spend ceilings. | Block if unbounded consumption occurs or termination fails. |
+| **Tool / API Misuse** | Inputs induce unauthorized queries, broad tool calls, host access, or mutation. | Tool contract, credential broker, action verification. | Require scoped credentials, schema validation, authorization, idempotency, and post-action checks. | Block if tool call exceeds contract, scope, or approval state. |
+| **Output-Sink Injection** | Generated SQL, shell, HTML, Markdown, spreadsheet formulas, code, or config is rendered/executed unsafely. | Output sink and renderer/executor. | Use sink-specific escaping, parameterization, AST validation, sandboxing, or block. | Block if payload reaches unsafe sink without required transformation. |
+| **Degraded-Mode Abuse** | Attacker forces outage/cache/fallback state to bypass freshness, safety, or capability floors. | Fallback routing and UX resilience. | Preserve policy, tenant scope, cache scope, and disclosure requirements under fallback. | Block if degraded mode silently weakens safety or evidence requirements. |
+| **Evaluation Contamination Attack** | Eval cases leak into training, prompt examples, retrieval corpora, or judge calibration data. | Dataset governance and release evaluation. | Partition datasets, track provenance, use canaries, and scan for overlap. | Block release if contamination materially invalidates the evaluation. |
+
+Adversarial testing must focus on system containment rather than model refusal rates alone.5 An injection attempt may bypass a model's alignment filters, but the attack is contained if the output sink parser sanitizes the payload, the tool gateway rejects unauthorized parameters, and the SIEM database captures the anomaly.5
+
+## **Synthetic Test Governance Model**
+
+Synthetic tests expand coverage, but they do not automatically create ground truth. They can amplify generator bias, unrealistic distributions, hidden contamination, and brittle rubric assumptions. Synthetic cases should therefore be treated as candidates until validated.
+
+```text
+SYNTHETIC TEST GOVERNANCE PIPELINE
+
+[ Validated Seed Sources ]
+  documents | schemas | incidents | traces | policy specs
+        |
+        v
+[ Structure Extraction ]
+  entities
+  relations
+  events
+  constraints
+  edge-case parameters
+        |
+        v
+[ Candidate Generation ]
+  query generation
+  adversarial variants
+  multi-hop cases
+  negative/refusal cases
+        |
+        v
+[ Metadata and Contamination Controls ]
+  source refs
+  generator version
+  canary marker if used
+  train/eval partition labels
+        |
+        v
+[ Validation Gate ]
+  deduplicate
+  realism review
+  rubric review
+  privacy review
+  answerability check
+        |
+        v
+[ Suite Assignment ]
+  exploratory only
+  nightly regression
+  adversarial suite
+  hard gate after expert promotion
+```
+
+Synthetic generation should follow these rules:
+
+1. **Seed from trusted structure:** Use validated documents, schemas, traces, incidents, or policy specifications rather than unconstrained “make me tests” prompting.
+2. **Preserve provenance:** Every synthetic case should record seed source, generator version, prompt/template version, and transformation path.
+3. **Separate exploration from release gates:** Synthetic cases can explore coverage immediately, but hard CI/CD gates require expert review or deterministic validation.
+4. **Screen for contamination:** Use repository isolation, access controls, metadata labels, overlap scans, and optional canary strings. Canary GUIDs help detect leakage; they do not prevent it by themselves.
+5. **Audit realism:** Human or deterministic checks should verify that cases are answerable, meaningful, non-duplicative, and representative of actual product risk.
+
+## **LLM-as-Judge Reliability Model**
+
+Using language models as evaluators provides scalability, but general-purpose LLMs exhibit position, verbosity, self-preference, and format-level biases that compromise evaluation reliability. The evaluation architecture implements the "Calibrate, Don't Curate" paradigm, utilizing a multi-judge panel with post-hoc statistical corrections rather than relying on a single, uncalibrated oracle model.
+
+LLM judges should be used for rubric-governed, open-ended evaluation where deterministic checks are insufficient. They should not replace deterministic validators for schemas, permissions, arithmetic, source-of-record state, tenant isolation, irreversible actions, or security boundaries. The judge is a noisy measurement instrument, not a priesthood. Calibrate it, audit it, and keep it away from the big red deployment button unless hard gates already passed.
+
+### **Heterogeneity-Aware Judge Aggregation**
+
+Instead of discarding weaker judges by point accuracy alone, the system retains all parseable, non-redundant judges and aggregates their votes using an integrated Bayesian One-Coin Model.13 The joint probability of correct evaluation P(z_t = 1 | y_t) is computed as 13:
+
+P(z_t = 1 | y_t) = sigma( sum_{k in J_t} log( E[a_k^(y_tk) * (1 - a_k)^(1 - y_tk)] / E[a_k^(1 - y_tk) * (1 - a_k)^(y_tk)] ) )
+
+Where y_tk in {0, 1, -1} is the verdict of judge k on item t, J_t contains the active judges, and a_k is the judge's reliability parameter modeled as a beta distribution 13:
+
+a_k ~ Beta(c_k + 1, n_k - c_k + 1)
+
+Here, c_k is the number of correct verdicts scored by judge k on a labeled calibration split, and n_k is the total number of non-missing calibration verdicts scored by judge k.13 Judges with uncertain accuracy have c_k near (n_k - c_k) and therefore near-zero weight.13
+
+### **Residual Bias Correction (Platt Scaling)**
+
+To correct position and style biases left by the aggregator, the system runs a post-hoc logistic regression (Platt Scaling) over calibration labels. This maps the raw aggregate score to the empirical human preference frequency :
+
+logit(p_hat_t^corr) = a * logit(p_hat_t) + b
+
+When item features x_t (such as topic, prompt style, or judge family agreement levels) are available, the residual correction is expanded dynamically :
+
+logit(p_hat_t^corr) = a * logit(p_hat_t) + x_t^T * gamma + b
+
+Where (a, b, gamma) are fit via logistic regression on the calibration split, neutralizing systematic scale and shift distortions.13
+
+### **Finite-Calibration Panel Selection (FCPS)**
+
+To manage the tradeoff between panel size and calibration complexity under finite human-label budgets, the system deploys the FCPS (Finite-Calibration Panel Selection) validation selector. FCPS analyzes the calibration-label split, selecting the optimal combination of judge prefix, prefix size, and aggregator family (low-dimensional stacker vs. joint output table) that minimizes validation risk while controlling sparse-cell pressure in the joint table.  
+Deterministic audits must dominate where exact limits or security boundaries apply, bypassing judge prompts entirely for structured transactions, permissions checking, and irreversible database writes.1
+
+## **Human Review and Inter-Rater Reliability Model**
+
+Human ratings remain the gold standard for subjective evaluations, but human annotations are noisy, inconsistent, and prone to drift.15 The evaluation platform structures its human-in-the-loop workflows to measure and enforce rater reliability before incorporating annotations into golden sets.1
+
+### **Statistical Agreement Coefficients**
+
+The platform tracks human annotator alignment using chance-corrected agreement metrics 15:
+
+* **Cohen's Kappa (kappa)**: Measures agreement between two raters on categorical classifications.15  
+* **Fleiss' Kappa**: Extends Cohen's kappa to multiple raters (m >= 3) assigning nominal categories to items 15:  
+  kappa = (P_bar - P_bar_e) / (1 - P_bar_e)  
+  Where P_bar is the observed mean agreement and P_bar_e is the expected agreement by chance.15  
+* **Krippendorff's Alpha (alpha)**: The standard metric for content analysis.15 It supports ordinal, interval, or ratio data, accommodates missing entries, and uses distance metrics matching the scale type 15:  
+  alpha = 1 - D_o / D_e  
+  Where D_o is the observed disagreement and D_e is the expected disagreement by chance.15
+
+### **Human Annotation Operations**
+
+To ensure rater alignment, annotation workflows execute across three sequential stages:
+
+* **Rubric Calibration**: Human raters are trained on structured rubrics with explicit, domain-specific examples for every score tier, establishing common baselines.1  
+* **Adjudication Loops**: Discrepancies between raters (e.g., when agreement falls below alpha < 0.80) are routed to expert panels or senior editors for definitive resolution, updating the reference dataset.1  
+* **Gold-Label Sentinels**: Pre-labeled, unambiguous reference cases are silently interleaved into active review queues to audit annotator performance.1 If a rater’s accuracy on sentinel cases falls below 95% or their dwell times indicate "rubber-stamping," their submissions are quarantined for review.1
+
+Reviewers are matched to specific tasks based on complexity: standard evaluations use double-blind human reviews, while high-risk legal, medical, or financial workflows require senior subject-matter expert adjudication.1
+
+## **Regression Gate and Readiness Framework**
+
+Every update to models, prompts, indexes, tool schemas, or templates triggers the automated LLM Readiness Harness inside CI/CD pipelines to evaluate release readiness.3
+
+```text
+REGRESSION GATE AND READINESS HARNESS
+
+[ Code / Config / Model / Prompt / Index Change ]
+        |
+        v
+[ CI/CD Evaluation Runner ]
+  load versioned golden sets
+  load adversarial suites
+  load telemetry replay cases
+        |
+        v
+[ Metric Capture ]
+  task success
+  schema validity
+  retrieval quality
+  grounding/citation
+  tool verification
+  safety/policy
+  latency/cost
+        |
+        v
+[ Hard Gate Check ]
+        |
+        +--> hard violation
+        |       BLOCK RELEASE
+        |       create failure report
+        |
+        v
+[ Soft / Differential Gate Check ]
+        |
+        +--> regression requiring owner signoff
+        |       HOLD FOR REVIEW
+        |
+        v
+[ Pareto / Profile Fit Check ]
+        |
+        +--> dominated or profile mismatch
+        |       HOLD OR ROUTE TO CANARY
+        |
+        v
+[ Canary Deployment ]
+  limited traffic
+  telemetry watch
+  rollback triggers
+        |
+        +--> canary failure
+        |       ROLLBACK / DISABLE ROUTE
+        |
+        v
+[ Promote Release ]
+  publish manifest
+  record eval artifacts
+  update baselines if approved
+```
+
+The readiness harness enforces a structured, multi-tier gating strategy:
+
+* **Hard Gates**: Blocks deployment immediately if binary constraints—such as structural JSON compliance, data permission scopes, safety policies, or PII redaction—are violated.4  
+* **Soft Gates**: Warns the release team and requires explicit owner sign-off if performance drops slightly below baseline thresholds on non-critical tasks.  
+* **Canary Gates**: Deploys the update to a small subset of production traffic, monitoring error rates, latency spikes, and user corrections before completing rollout.1  
+* **Differential Gates**: Compares the semantic behavior of the new version directly against the previous baseline, highlighting changes in tone, length, or routing choices.1  
+* **Drift Gates**: Halts rollout if semantic embeddings diverge from reference centroids by more than the allowed Wasserstein distance threshold.
+
+### **Pareto Cost-Utility Frontiers**
+
+Because higher model capabilities often carry high token costs and latency overheads, the readiness harness plots all candidate configurations on a multi-dimensional Pareto frontier.3 It maps P95 latency and transaction cost against the composite utility score.3 Configurations that are dominated by more efficient alternatives are flagged or blocked.4 This allows release engineers to choose distinct, optimal paths matching specific deployment profiles:
+
+| Deployment Profile | Prioritized Dimensions | Ingestion & Execution Rules | Example Gated Architecture |
+| :---- | :---- | :---- | :---- |
+| **Cost-First** | Minimal token spend, low latency, basic task completion. | Hard cap of $0.005 per run; fallback models allowed; semantic cache priority. | Standard model + aggressive prefix caching + local regex parsers. |
+| **SLA-First** | Minimal Time-to-First-Token (TTFT), low P95 latency, high TPS. | Hard cap of 1500 ms P95 latency; streaming outputs required. | High-concurrency short-pool model routing + chunked prefill. |
+| **Risk-First** | High groundedness, precise citations, absolute policy compliance. | Zero tolerance for ungrounded claims or citation failures; strict FSM decoding. | Deliberative model + multi-stage parser + Atomix transactional tool gate. |
+
+The Composite Readiness Score R is defined across scenario-specific weights:
+
+* **Cost-First**: R = 0.20 * Workflow + 0.20 * Policy + 0.15 * Faithfulness + 0.15 * Retrieval + 0.20 * Cost + 0.10 * SLA  
+* **Risk-First**: R = 0.15 * Workflow + 0.25 * Policy + 0.20 * Faithfulness + 0.15 * Retrieval + 0.10 * Cost + 0.15 * SLA  
+* **SLA-First**: R = 0.20 * Workflow + 0.15 * Policy + 0.15 * Faithfulness + 0.15 * Retrieval + 0.10 * Cost + 0.25 * SLA
+
+Missing metrics must not silently improve readiness scores. If a required hard-gate metric is missing, the run fails or enters manual review. If an optional metric is missing, the score may be normalized over present optional metrics only when the profile explicitly permits it.
+
+```text
+R_optional = sum(w_i * m_i for i in optional_present) / sum(w_i for i in optional_present)
+```
+
+The final readiness decision is therefore:
+
+```text
+release_allowed =
+  all(required_hard_gates_pass)
+  AND no_required_metric_missing
+  AND profile_score >= threshold
+  AND required_owner_signoffs_present_if_soft_gate_triggered
+```
+
+This prevents a candidate from looking “better” merely because inconvenient metrics vanished into the floorboards.
+
+## **Evaluation Failure Triage Model**
+
+When an evaluation run fails or performance metrics regress below CI/CD gate thresholds, the triage engine analyzes trace metadata to isolate the root cause 1:
+
+| Failed Metric | Diagnostic Trace Signature | Probable Root Cause | Component Owner | Retest Suite | Recommended Remediations |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **Low Groundedness** | Low entailment/support scores; unsupported claim rate rises; evidence density falls. | Noisy retrieval, stale source, context dilution, weak claim decomposition. | Retrieval / Prompt / Grounding Owners. | Grounding Verification Suite. | Improve evidence selection, rerank, reduce distractors, refresh source, tighten claim verification. |
+| **Citation Failure** | Citation source missing, stale, unauthorized, wrong span, or empty coordinates. | Decorative citations, parser/layout drift, source-version mismatch, citation compiler bug. | Document / Citation / Retrieval Owners. | Citation Alignment Suite. | Rebuild citation mapping, verify source versions, repair coordinate extraction, suppress unsupported citations. |
+| **Schema Violation** | Validation error, missing required key, extra key, wrong enum/type. | Template drift, model route mismatch, schema version mismatch, decoder looseness. | Platform / Tool Contract Owners. | Schema Integrity Suite. | Use constrained decoding where appropriate, align schema versions, fix prompts/contracts, block unsafe outputs. |
+| **Tool Argument Failure** | Payload hash repeats; validation fails; unauthorized field/resource requested. | Tool ambiguity, weak schema, prompt injection, stale tool contract. | Tool Platform / Security Owners. | Tool Contract Suite. | Disambiguate tool names, tighten schemas, enforce authorization, add negative cases. |
+| **Infinite Tool / Repair Loop** | Repeated state hash, repeated payload hash, rising retry/repair tokens. | No-progress detection missing, error messages unhelpful, overlapping tools, brittle repair prompt. | Agent Orchestration Owners. | Agentic Trajectory Suite. | Add loop budget, improve typed errors, halt/replan, separate tool affordances. |
+| **Cross-Tenant Leak** | Tenant/session scope mismatch in retrieved chunks, cache hit, tool result, or UI state. | Filter bypass, RLS failure, cache scope bug, permission propagation failure. | Security / Data Platform Owners. | Multi-Tenant Isolation Suite. | Fail closed, fix DB-enforced policy, invalidate scoped cache, add boundary regression. |
+| **Latency Spike** | Queue wait, prefill, decode, parser, retrieval, or tool latency exceeds profile. | Cache starvation, long-context route, parser overload, queue contention, provider degradation. | SRE / Serving / Retrieval Owners. | Concurrency and Latency Suite. | Partition routes, cap context, improve cache keys, tune queues, apply admission control. |
+| **Cost Regression** | Token burn, retry cost, rerank cost, parser cost, or human-review cost rises. | Context bloat, query fan-out, repair loops, expensive route selection, review flood. | FinOps / Gateway / Orchestration Owners. | Cost Regression Suite. | Add budgets, reduce fan-out, terminate no-progress loops, update route policy. |
+| **Policy Regression** | Safety/policy pass rate drops, refusal behavior shifts, unsafe allow appears. | Policy version mismatch, prompt drift, model update, weak output sink controls. | Safety / Governance Owners. | Policy and Adversarial Suite. | Freeze rollout, restore policy version, add adversarial case, require review. |
+| **Reviewer Reliability Drop** | IRR falls, sentinel failures rise, dwell time collapses, overrides spike. | Rubric ambiguity, reviewer fatigue, queue overload, automation bias. | Human Review / Governance Owners. | Reviewer Reliability Suite. | Recalibrate rubric, add cognitive forcing, rebalance queues, adjudicate labels. |
+
+This structural isolation prevents failure modes from being masked by aggregate scores.5 If a specific slice exhibits a drop in performance, the triage engine maps the error to its localized component, ensuring rapid root-cause identification and remediation.5
+
+## **Production-to-Eval Feedback Loop**
+
+A high-performance evaluation architecture acts as the product’s behavioral immune system. Production incidents, user corrections, citation failures, tool timeouts, degraded-mode events, review overrides, and adversarial findings should become future evaluation coverage when they reveal a meaningful gap.
+
+```text
+PRODUCTION-TO-EVAL FEEDBACK LOOP
+
+[ Production Signal ]
+  incident | correction | override | drift | safety event | failed action
+        |
+        v
+[ Trace and Evidence Capture ]
+  trace IDs
+  source refs
+  payload hashes
+  route decisions
+  tool/action state
+        |
+        v
+[ Privacy and Scope Gate ]
+  redact
+  classify sensitivity
+  store raw payloads by secure reference only if needed
+        |
+        v
+[ Case Packaging ]
+  define input
+  define truth type
+  define expected behavior
+  define failure mode
+  define acceptance criteria
+        |
+        v
+[ Expert / Owner Review ]
+  validate rubric
+  verify evidence
+  assign suite and risk class
+        |
+        v
+[ Golden Set Promotion ]
+  exploratory
+  regression
+  adversarial
+  hard gate
+  canary monitor
+        |
+        v
+[ CI/CD and Monitoring Gate ]
+  prevent recurrence
+  track drift
+  update baselines only with approval
+```
+
+The feedback loop is executed through a disciplined engineering pipeline:
+
+1. **Signal Discovery:** High-severity incidents, user corrections, citation mismatches, tool timeouts, degraded-mode failures, and human approval overrides are captured by strategic telemetry.
+2. **Privacy and Redaction:** Raw prompts, documents, tool payloads, and outputs are redacted or stored by secure reference. Evaluation cases should preserve replayability without turning the eval repository into a museum of secrets.
+3. **Ground Truth Authoring:** The sanitized trace is converted into a golden-case candidate. Owners assign truth typology, rubric, expected state, evidence requirements, and failure mode.
+4. **Promotion Decision:** The case is assigned to the correct suite. Some cases become hard gates; others become exploratory, nightly, adversarial, or canary tests.
+5. **Documented Exclusion:** A production failure should either become an evaluation case or receive a documented exclusion reason, such as privacy limits, one-off external outage, non-reproducibility, or lack of product relevance.
+
+## **Cross-Canon Handoff Map**
+
+The evaluations architecture interfaces with the entire AI Systems Engineering Canon because every architectural boundary eventually needs tests, regression controls, and release gates.
+
+| Target Canon Report | Domain Area | Technical Handoff Parameters | Operational Integration Rules | Fallback & Degraded Protocols |
+| :---- | :---- | :---- | :---- | :---- |
+| **AI-ENG-B** | Context and State Governance | Context object IDs, state snapshots, memory inclusion cases. | Evaluate whether context compaction preserves active constraints and state. | Block release if state-critical context is lost. |
+| **AI-ENG-D** | Corpus Engineering | Source provenance, corpus version, permission metadata. | Golden cases must track corpus source lineage and authority. | Quarantine unknown-provenance evaluation evidence. |
+| **AI-ENG-E** | Retrieval Pipeline | Query sets, relevance labels, source IDs, citation packets. | Retrieval evals isolate recall, precision, ranking, permission, and freshness. | Use no-evidence response if retrieval cannot be trusted. |
+| **AI-ENG-F** | Freshness and Conflict Detection | Source age, conflict labels, stale-cache indicators. | Evals must include stale/conflicting-source cases. | Block high-impact answers when freshness/conflict gates fail. |
+| **AI-ENG-G** | Model Selection | Model decision records, route profiles, task fit. | Model choice must be evaluated by task/risk profile, not generic benchmark score. | Route to approved fallback only if quality floor holds. |
+| **AI-ENG-H** | Model Adaptation | Adapter versions, fine-tune datasets, safety deltas. | Adapted models require regression against baseline and safety suites. | Roll back adapter or restrict route on regression. |
+| **AI-ENG-I** | Regression Control | Negative flips, baselines, significance tests. | Eval architecture supplies datasets and metrics for regression gates. | Hold release pending owner signoff or rollback. |
+| **AI-ENG-J** | Throughput Mechanics | Latency, batch, KV-cache, token throughput metrics. | Performance evals must include resource and workload profiles. | Degrade or block route if performance SLO gates fail. |
+| **AI-ENG-K** | Weight Dynamics | Quantization, pruning, decoding, compression variants. | Optimization changes require quality, safety, and drift regressions. | Restrict optimized route to safe task profiles. |
+| **AI-ENG-L** | Serving Architecture | Route, provider, fallback, cache, telemetry. | Serving changes require routing and fallback evals. | Canary, rollback, or fail closed on unsafe route behavior. |
+| **AI-ENG-M** | Agentic Orchestration | Workflow traces, loop states, terminal outcomes. | Agents need trajectory, no-progress, and degraded-mode evaluations. | Halt, replan, or escalate on loop failures. |
+| **AI-ENG-N** | Tool Contracts | Tool schemas, payload hashes, idempotency, error taxonomy. | Tool-use evals verify schema, authorization, and safe retries. | Block tool route if contract tests fail. |
+| **AI-ENG-O** | Action Verification | Pre/post state hashes, unknown/pending status, compensation. | Completion claims require verified action state in evals. | Hold, reconcile, compensate, or escalate unknown state. |
+| **AI-ENG-P** | Multimodal Understanding | OCR/layout labels, coordinates, visual evidence. | Multimodal evals verify extraction, grounding, and citation coordinates. | Use manual review or text-only mode when visual confidence fails. |
+| **AI-ENG-Q** | Speech and Realtime Interaction | WER, endpointing, turn-taking, confirmation cases. | Voice evals include confirmation reliability for high-impact actions. | Switch to text/card confirmation on voice degradation. |
+| **AI-ENG-R** | UI Agents | DOM/action traces, screenshots, post-action state. | UI-agent evals verify observation, action, and state reconciliation. | Pause automation on drift or unsafe uncertainty. |
+| **AI-ENG-S** | Production Pathologies | Malformed output, false success, loops, brittle chains. | Pathology cases become regression tests. | Block release on recurring false-success or loop defects. |
+| **AI-ENG-T** | Boundary Defense | Injection cases, tenant scope, untrusted content labels. | Security evals test authority boundaries and data/tool isolation. | Fail closed on boundary-control regression. |
+| **AI-ENG-U** | Supply Chain Security | Artifact hashes, parser versions, tool manifests. | Eval runs must pin artifact versions and detect unsafe dependencies. | Quarantine unapproved artifacts. |
+| **AI-ENG-V** | Resource Abuse | Token budgets, cost bombs, retries, retrieval fan-out. | Evals include cost, loop, and resource-abuse stress cases. | Throttle, circuit-break, or block release on runaway behavior. |
+| **AI-ENG-W** | UX Resilience | Fallback states, partial answers, disclosure events. | Degraded-mode behavior must be tested as product behavior. | Use approved degraded route or fail-closed with saved state. |
+| **AI-ENG-X** | Trust and Transparency | Citation UX, disclosure, contestability, user corrections. | Trust signals feed eval cases but are not truth labels alone. | Escalate to review or improve evidence display. |
+| **AI-ENG-Y** | High-Impact Workflow Design | Approval states, review outcomes, CFFs, break-glass cases. | High-impact actions require approval and review-path evals. | Hold execution when review/approval gates fail. |
+| **AI-ENG-Z** | Strategic Telemetry | Golden traces, spans, payload hashes, drift signals. | Telemetry provides replayable evidence for eval case creation. | Mark eval integrity degraded if traces are incomplete. |
+| **AI-ENG-AB** | Audit and Replay | Eval artifacts, traces, case versions, run manifests. | Failed evals must be replayable from stored artifacts. | Preserve redacted, hash-bound trace evidence. |
+| **AI-ENG-AC** | Incident Response | Failed-release cases, incident regressions, containment tests. | Incidents feed adversarial and regression suites. | Trigger playbooks on production recurrence. |
+| **AI-ENG-AD** | Governance and Accountability | Metric ownership, gate policy, exception approvals. | Governance defines hard gates, soft gates, and waiver authority. | Route gate exceptions to accountable owners. |
+| **AI-ENG-AJ** | Reference Architecture | Eval harness, golden-set registry, telemetry replay, release gate. | Reference systems should include evaluations as first-class infrastructure. | Disable deployment path when eval substrate is unavailable. |
+
+
+## **Strategic Conclusions and Architectural Recommendations**
+
+To build a reliable evaluation and regression framework in high-dimensional AI systems, organizations should adopt the following five core principles of system-level validation:
+
+### **I. Treat Evaluations as Production Software Infrastructure**
+
+Evaluation is not an offline, static calculation; it is the runtime and CI/CD validation engine of the platform. Prompt edits, index modifications, and model rollouts must trigger automated test suites.5 This ensures that system constraints, security filters, and business logics are evaluated programmatically before changes are deployed.4
+
+### **II. Separate Content Grounding from Citation Precision**
+
+Evaluating whether a model's generation is grounded in context does not verify that its inline citation markers are accurate.5 Grounding and citation evaluations must run separately.5 Use NLI entailments to confirm answer consistency, and deploy the ALiiCE framework to verify that individual claims map back to exact visual coordinates, page regions, or character spans in the source document.9
+
+### **III. Enforce Progress-Aware Tool Transactions Outside the Model**
+
+Relying on prompting or model-level self-policing to verify tool safety introduces severe risks of state corruption.5 Tool use must run within external, progress-aware transactions.23 Utilize the Atomix transactional model to group tool effects, buffer local modifications, track progress frontiers, and execute Saga-style compensations if steps fail, ensuring spoken confirmations never outrun database commits.23
+
+### **IV. Calibrate LLM Judges with Bayesian One-Coin Panels**
+
+Single, uncalibrated language models are biased evaluators.12 To build reliable judge pipelines, deploy diverse multi-judge panels, aggregate votes using Bayesian One-Coin models, and apply Platt-style logistic scaling over labeled calibration sets to correct systematic position and verbosity biases.13 Use the FCPS selector to match panel size to available human annotation budgets.35
+
+### **V. Enforce Release Decisions via Pareto Cost-Utility Frontiers**
+
+Textual quality must not be evaluated in isolation.3 The readiness harness must aggregate workflow success, compliance metrics, and grounding scores, and plot configurations against direct token costs and P95 latencies.3 By identifying and deploying non-dominated configurations on the Pareto frontier, SRE teams can optimize systems matching specific cost-first, SLA-first, or risk-first profiles without compromising system safety.3
+
+## **Durable Principles of Evals Architecture**
+
+1. **Evaluations Are Production Infrastructure**  
+   Evals are not leaderboard decorations. They are release controls, regression detectors, incident memory, and behavioral specifications.
+
+2. **No Single Score Proves System Safety**  
+   Task success, retrieval, grounding, citations, tools, safety, cost, latency, UX, and governance must be evaluated separately before being composed.
+
+3. **Ground Truth Is Typed**  
+   Exact values, evidence, state, preference, safety, and governance truth require different labels, metrics, and update policies.
+
+4. **Golden Sets Must Evolve Without Rotting**  
+   Golden cases need versioning, ownership, provenance, refresh, retirement, and contamination controls.
+
+5. **Production Failures Should Become Future Tests**  
+   Incidents, corrections, overrides, and escaped regressions should feed the evaluation suite unless there is a documented reason to exclude them.
+
+6. **Synthetic Tests Amplify Coverage, Not Authority**  
+   Synthetic cases are candidates until validated. Hard gates require expert review, deterministic checks, or strong evidence.
+
+7. **Judges Need Calibration**  
+   LLM-as-judge systems are noisy measurement instruments. They need rubrics, calibration labels, bias checks, and uncertainty handling.
+
+8. **Human Labels Need Reliability Controls**  
+   Human review requires rubrics, rater training, inter-rater reliability, sentinel cases, and adjudication.
+
+9. **Tool Evals Must Verify State**  
+   Tool selection and argument correctness are not enough. High-impact tool use must verify authorization, idempotency, execution state, and post-action truth.
+
+10. **Adversarial Evals Test Containment**  
+   A model may fail locally while the system still passes if tool gateways, output sinks, permissions, and boundaries contain the attack.
+
+11. **Missing Metrics Are Not Free Passes**  
+   Missing required metrics should fail or hold a release, not make a readiness score look cleaner by subtraction sorcery.
+
+12. **Eval Artifacts Must Be Replayable and Auditable**  
+   Cases, rubrics, traces, labels, source refs, policy versions, and run manifests must support reproducible investigation.
+
+#### **Works cited**
+
+1. AI-ENG-Z — Strategic Telemetry - Traces, Tokens, Latency & Semantic Drift  
+2. [KNOWLEDGE] - AI Engineering - Volume 8. W-Y Resilience, Degraded Modes, and Human Trust  
+3. LLM Readiness Harness: Evaluation, Observability, and CI Gates for LLM/RAG Applications, accessed June 11, 2026, [https://arxiv.org/html/2603.27355v1](https://arxiv.org/html/2603.27355v1)  
+4. LLM Readiness Harness: Evaluation, Observability, and CI Gates for LLM/RAG Applications, accessed June 11, 2026, [https://arxiv.org/html/2603.27355v2](https://arxiv.org/html/2603.27355v2)  
+5. [KNOWLEDGE] - AI Engineering - Volume 7. S-V Failure, Security, and Hostile Environments  
+6. MCP-AgentBench: Evaluating Real-World Language Agent Performance with MCP-Mediated Tools, accessed June 11, 2026, [https://ojs.aaai.org/index.php/AAAI/article/view/40347/44308](https://ojs.aaai.org/index.php/AAAI/article/view/40347/44308)  
+7. Atomix: Timely, Transactional Tool Use for Reliable Agentic Workflows - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2602.14849v1](https://arxiv.org/html/2602.14849v1)  
+8. [KNOWLEDGE] - AI Engineering - Volume 6. P-R Multimodal and Interface-Controlling Systems  
+9. Explicit Evidence Grounding via Structured Inline Citation Generation - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2606.07130v1](https://arxiv.org/html/2606.07130v1)  
+10. SoK: The Attack Surface of Agentic AI — Tools, and Autonomy - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2603.22928v1](https://arxiv.org/html/2603.22928v1)  
+11. RAGAS: A Comprehensive Framework for RAG Evaluation and Synthetic Data Generation, accessed June 11, 2026, [https://gist.github.com/donbr/1a1281f647419aaacb8673223b69569c](https://gist.github.com/donbr/1a1281f647419aaacb8673223b69569c)  
+12. A Systematic Evaluation of Bias Mitigation Strategies in LLM-as-a-Judge Pipelines - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2604.23178v1](https://arxiv.org/html/2604.23178v1)  
+13. Calibrate, Don't Curate: Label-Efficient Estimation from Noisy LLM Judges - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2605.09702v1](https://arxiv.org/html/2605.09702v1)  
+14. LLM-as-a-Judge: Rapid Evaluation of Legal Document Recommendation for Retrieval-Augmented Generation - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2509.12382v1](https://arxiv.org/html/2509.12382v1)  
+15. Reliable Decision Support with LLMs: A Framework for Evaluating Consistency in Binary Text Classification Applications - arXiv, accessed June 11, 2026, [https://arxiv.org/pdf/2505.14918](https://arxiv.org/pdf/2505.14918)  
+16. Soft Contamination Means Benchmarks Test Shallow Generalization - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2602.12413v1](https://arxiv.org/html/2602.12413v1)  
+17. Search-Time Data Contamination - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2508.13180v1](https://arxiv.org/html/2508.13180v1)  
+18. Canary GUID - Grokipedia, accessed June 11, 2026, [https://grokipedia.com/page/Canary_GUID](https://grokipedia.com/page/Canary_GUID)  
+19. Weak judges, strong panel: an ensemble approach to LLM eval - Orq.ai, accessed June 11, 2026, [https://orq.ai/blog/llm-juries-in-practice](https://orq.ai/blog/llm-juries-in-practice)  
+20. (PDF) SummEval: Re-evaluating Summarization Evaluation - ResearchGate, accessed June 11, 2026, [https://www.researchgate.net/publication/351162964_SummEval_Re-evaluating_Summarization_Evaluation](https://www.researchgate.net/publication/351162964_SummEval_Re-evaluating_Summarization_Evaluation)  
+21. Knowledge-Graph Based RAG System Evaluation Framework - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2510.02549v1](https://arxiv.org/html/2510.02549v1)  
+22. ST-WebAgentBench: A Benchmark for Evaluating Safety and Trustworthiness in Web Agents, accessed June 11, 2026, [https://arxiv.org/html/2410.06703v3](https://arxiv.org/html/2410.06703v3)  
+23. Atomix: Timely, Transactional Tool Use for Reliable Agentic Workflows - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2602.14849v2](https://arxiv.org/html/2602.14849v2)  
+24. Claw-Eval-Live: A Live Agent Benchmark for Evolving Real-World Workflows - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2604.28139v1](https://arxiv.org/html/2604.28139v1)  
+25. ALiiCE: Evaluating Positional Fine-grained Citation Generation - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2406.13375v1](https://arxiv.org/html/2406.13375v1)  
+26. ALiiCE: Evaluating Positional Fine-grained Citation Generation - arXiv, accessed June 11, 2026, [https://arxiv.org/pdf/2406.13375](https://arxiv.org/pdf/2406.13375)  
+27. ALiiCE: Evaluating Positional Fine-grained Citation Generation - ACL Anthology, accessed June 11, 2026, [https://aclanthology.org/2025.naacl-long.23.pdf](https://aclanthology.org/2025.naacl-long.23.pdf)  
+28. ylXuu/ALiiCE: NAACL 2025 Main Conference - GitHub, accessed June 11, 2026, [https://github.com/ylXuu/ALiiCE](https://github.com/ylXuu/ALiiCE)  
+29. ATOMIX: TIMELY, TRANSACTIONAL TOOL USE FOR RELIABLE AGENTIC WORKFLOWS - OpenReview, accessed June 11, 2026, [https://openreview.net/attachment?id=UeRbEpSVUz&name=pdf](https://openreview.net/attachment?id=UeRbEpSVUz&name=pdf)  
+30. From Prompt–Response to Goal-Directed Systems: The Evolution of Agentic AI Software Architecture - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2602.10479v1](https://arxiv.org/html/2602.10479v1)  
+31. An Executable Benchmarking Suite for Tool-Using Agents - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2605.11030v1](https://arxiv.org/html/2605.11030v1)  
+32. SoK: The Attack Surface of Agentic AI -- Tools, and Autonomy - arXiv, accessed June 11, 2026, [https://arxiv.org/pdf/2603.22928](https://arxiv.org/pdf/2603.22928)  
+33. Authority, Truth, and Citation Bias: A Large-Scale Multi-Domain Benchmark for Studying Epistemic Susceptibility in Large Language Models - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2606.13104v1](https://arxiv.org/html/2606.13104v1)  
+34. Calibrate, Don't Curate: Label-Efficient Estimation from Noisy LLM Judges - arXiv, accessed June 11, 2026, [https://arxiv.org/pdf/2605.09702](https://arxiv.org/pdf/2605.09702)  
+35. A Finite-Calibration Regime Map for LLM Judge Panels - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2606.01034v1](https://arxiv.org/html/2606.01034v1)  
+36. Rating Roulette: Self-Inconsistency in LLM-As-A-Judge Frameworks - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2510.27106](https://arxiv.org/html/2510.27106)  
+37. Full article: Reliable decision support with LLMs: a framework for evaluating consistency in binary text classification applications - Taylor & Francis, accessed June 11, 2026, [https://www.tandfonline.com/doi/full/10.1080/2573234X.2026.2652281](https://www.tandfonline.com/doi/full/10.1080/2573234X.2026.2652281)
+
+---
+
+# AI-ENG-AB — Verification Artifacts - Auditability, Reproducibility & Evidence Trails
+
+## **Doctrinal Foundations: The Evidence Architecture Paradigm**
+
+In high-dimensional artificial intelligence systems, production reliability cannot be governed or monitored by traditional application performance monitoring (APM) paradigms.1 While legacy web architectures treat system health as a binary or scalar infrastructure state defined by hardware allocation, network latency, and HTTP status codes, modern multi-agent execution loops and probabilistic large language models (LLMs) break these assumptions.1 A system can return an infrastructure-level successful HTTP 200 payload that contains a complete structural schema failure, an unauthorized tool execution, a cross-tenant data leak, or an ungrounded factual confabulation.1 Conversely, optimal hardware utilization and high throughput can coexist with red behavioral and meaning-level system states.2 This discrepancy establishes the Green Dashboard Fallacy: the diagnostic error of assuming an AI system is operating correctly simply because its underlying servers and APIs are online and available.1
+
+To resolve this visibility deficit, modern systems architectures isolate monitoring concerns across distinct operational layers.1 While strategic telemetry (AI-ENG-Z) functions as the sensor network capturing execution spans 1, and evaluation frameworks (AI-ENG-AA) act as the regression testing pipeline 1, this document defines the architecture of verification artifacts (AI-ENG-AB).1 Verification artifacts are the durable, privacy-governed, and tamper-evident evidence objects required to reconstruct, audit, and reproduce the behavior of probabilistic systems after the fact.3
+
+This architecture is governed by the core doctrine: every consequential AI output or action must leave behind a replayable evidence trail.1 This trail must link the exact prompt template, model weights snapshot, retrieval context, tool payload, policy execution state, human modification, and final output in an unbroken, cryptographically signed chain of custody.1 The fundamental engineering question shifts from "did we record a log entry?" to "can the organization reconstruct the exact decision path from user input to final output or action, including the evidence, versions, state transitions, checks, edits, and approvals that shaped it?".1 Without this capability, compliance becomes guesswork, debugging degrades into digital archaeology, and the system cannot be safely governed.1
+
+## **Logs-Traces-Artifacts-Evidence Taxonomy**
+
+To establish a clear hierarchy, the following taxonomy contrasts these diagnostic layers across operational, technical, and evidentiary boundaries, proving why generic logs are insufficient for AI auditability:
+
+| Layer | Technical Scope & Composition | Primary Operational Purpose | System Proof Capability | Architectural Limitations |
+| :---- | :---- | :---- | :---- | :---- |
+| **Event Log** | Flat structured or unstructured events emitted by applications, services, or workers. | Debugging, operational status, exception capture, and coarse audit hints. | Shows that a code path emitted an event at a time. | Does not prove full context, prompt state, evidence, policy checks, user edits, or side effects. |
+| **Metric** | Aggregated numeric counters, gauges, histograms, and time-series measurements. | Capacity planning, alerting, scaling, and SLO monitoring. | Shows rates, volumes, durations, and resource pressure. | Blind to semantic correctness, grounding, authorization, and user-visible truth. |
+| **Execution Trace** | Parent-child span graph linking distributed work across model calls, retrieval, tools, queues, and services. | Latency analysis, causal path reconstruction, and system debugging. | Shows the causal execution path and timing relationships. | Often redacted, sampled, or incomplete for bulky or sensitive payloads. |
+| **Span** | Atomic observable unit of work such as inference, retrieval, rerank, parser, tool call, guardrail, or review step. | Local timing, status, error, and attribute capture. | Shows what a specific execution step attempted and how it ended. | Does not by itself prove global policy state, source lineage, or final user-facing transformation. |
+| **Verification Artifact** | Schema-validated evidence packet containing hashes, references, versions, decisions, state checks, and selected payload evidence. | Auditing a specific decision boundary or execution step. | Proves integrity of recorded inputs, outputs, parameters, and decisions to the degree captured. | Cannot prove uncaptured state; raw payload capture must be governed by privacy policy. |
+| **Manifest** | Declarative version record for prompts, models, tools, dependencies, policies, routes, and environments. | Pinning expected system state and baseline capability configuration. | Shows what configuration was intended or eligible for execution. | Does not prove which dynamic inputs arrived or whether runtime behavior matched intent. |
+| **Ledger** | Append-only record of actions, approvals, state transitions, tool calls, retries, and commit/verification status. | Sequencing, accountability, and action-state audit. | Shows logical progression and final known state of operations. | Does not automatically preserve full prompts, retrieved evidence, or rendered UI output. |
+| **Snapshot** | Point-in-time capture or reference to context, retrieval state, memory, index version, tool state, or UI state. | Preserving what information was available at execution time. | Shows the evidence/context surface available to the system. | Storage-intensive; may require deduplication, redaction, and secure references. |
+| **Diff** | Structural, textual, semantic, or field-level comparison between artifact versions. | Tracking edits, redactions, transformations, overrides, and regressions. | Shows exactly what changed between two captured states. | Does not explain why the change occurred unless linked to trace, policy, or reviewer artifacts. |
+| **Evidence Trail** | Hash-linked sequence of artifacts, manifests, ledgers, snapshots, and diffs with retention and access policy. | Forensic reconstruction, compliance proof, replay, and dispute resolution. | Shows an integrity-protected chain of recorded evidence across a consequential workflow. | Tamper-evident, not omniscient; evidence quality depends on capture coverage and governance. |
+
+Legacy logs are fundamentally insufficient for auditing probabilistic architectures.1 Recording that an API returned a response does not show the prompt template that generated it, the vector database coordinates that informed it, the safety policies that validated it, or the user edits that overrode it before execution.1 If an administrator cannot inspect these intermediate states, they cannot defend automated decisions to regulators, resolve disputes, or debug system drift.1
+
+## **Replay and Reproducibility Typology**
+
+### **GPU Non-Determinism and the Concurrency Hypothesis**
+
+Achieving exact, bitwise reproducibility in large language model inference is exceptionally difficult.1 It is a common misconception that setting a fixed random number seed guarantees identical outputs across successive runs.18 In parallel computing environments, GPUs execute matrix multiplications and attention calculations across thousands of concurrent cores.19  
+Because floating-point addition is non-associative, the order of arithmetic reduction operations alters the least significant bits of the floating-point representations 18:  
+(a + b) + c is not equal to a + (b + c)  
+If the execution speed of concurrent GPU threads varies due to minor hardware latency fluctuations, the reduction order changes, introducing run-to-run non-determinism.19  
+However, technical analysis reveals that this "concurrency and floating-point" hypothesis is not the primary driver of non-determinism in production inference endpoints.18 Individual operations (kernels) inside the model's forward pass are run-to-run deterministic when executed in isolation.20 The primary cause of output variance is dynamic batching.18 High-performance serving engines (such as vLLM) batch concurrent requests dynamically to maximize hardware utilization.20 Because system load changes constantly, an individual request is batched with varying sets of other user prompts.20  
+To optimize performance for different batch sizes, the engine dynamically selects different parallelization strategies, such as switching from a standard data-parallel matrix multiplication to a Split-K matmul, or modifying reduction trees in Split-Reduction RMSNorm.19 This batch-dependent kernel selection alters the reduction arithmetic, producing different outputs for the identical prompt.20
+
+To enforce true bit-exact determinism, the model must be executed on an inference stack utilizing batch-invariant kernels.19 This strategy parallelizes operations entirely within individual tensor cores (data-parallel reductions) and avoids Split-K optimizations, preserving the arithmetic order regardless of batch changes.19 This exact reproducibility introduces a measurable performance tradeoff:
+
+In empirical testing over a Qwen3-8B model, executing 1,000 runs under standard vLLM produced 80 unique completions, while forcing batch-invariant operations yielded a single, consistent completion across all runs, accompanied by a 61.5% execution latency penalty.18
+
+#### **The Replay and Reproducibility Typology**
+
+Because forcing bit-exact determinism across third-party cloud providers, variable GPU clusters, and dynamic databases is often impractical, systems must design for graded levels of verification 1:
+
+| Replay Mode | Target Objective | Execution Constraints | State Preservation Requirement | System Verifications |
+| :---- | :---- | :---- | :---- | :---- |
+| **Exact Replay** | Recreate bitwise identical outputs for debugging.1 | Requires identical hardware, batch-invariant kernels, pinned model snapshots, and matching seeds.20 | Bit-exact saving of weights, inputs, and attention states.20 | Recomputes forward passes to verify exact token matches.20 |
+| **Constrained Replay** | Recreate comparable completions on standard engines.1 | Executes on matching model versions with fixed sampling parameters and temperatures.5 | Saves the compiled prompt and exact decoding configurations.2 | Compares output tokens to ensure they fall within acceptable semantic ranges.1 |
+| **Semantic Replay** | Verify that a rerun satisfies equivalent logical constraints.1 | Allows the model, prompt, or database to vary within defined boundaries.1 | Saves the evaluation rubric, task schema, and input goals.1 | Evaluates whether the new completion satisfies identical Pydantic rules and NLI grounding.1 |
+| **Counterfactual Replay** | Compare how a change to a single variable alters behavior.1 | Modifies one parameter (e.g., prompt version, retrieved chunk) while keeping others constant.1 | Saves the base run as a template and isolates the variable under test.1 | Maps behavior changes to identify regressions or evaluate improvements.1 |
+| **Forensic Replay** | Reconstruct the cause of a failure when re-execution is impossible.1 | Does not execute the active model; relies entirely on recorded logs and states.1 | Saves the complete execution trace, tool arguments, and environment hashes.3 | Walks the recorded sequence to pinpoint the exact failure location.3 |
+| **Audit-Only** | Prove compliance with policies without exposing raw data.22 | Utilizes cryptographic hashes and signatures to verify states.1 | Saves the metadata headers, content hashes, and digital signatures.4 | Validates the signatures against root authorities to prove the run occurred as logged.15 |
+
+### **Determinism Decay and Environment Drift**
+
+A primary engineering challenge is that reproducibility degrades over time due to external dependencies.1 Even with fixed seeds and invariant kernels, the surrounding execution environment shifts silently, causing "determinism decay".1  
+The primary operational drivers of this decay are categorized below:
+
+* **Provider Model Updates:** Third-party API model weights are modified without changing the public model identifier, causing divergent semantic outputs.1  
+* **Kernel and Library Drift:** Minor updates to deep learning frameworks (e.g., PyTorch, CUDA libraries) change internal mathematical approximations, mutating low-level floats.2  
+* **Expired Caches and Rebuilt Indexes:** Changes to vector database structures or the expiration of semantic caches alter the exact retrieved context.1  
+* **Time-Dependent Inputs:** System prompts injecting dynamic variables (e.g., current_time = "2026-06-11T23:19:00Z") force models into divergent logical paths.1  
+* **Feature Flag Modifications:** Silent deployment updates change the active routing configurations or context limits mid-session.1
+
+To address this, platforms must avoid false promises of bit-exact determinism, defining instead strict "reproducibility envelopes" that capture the complete state of the execution context.1
+
+## **Verification Artifact Bundle Schema**
+
+The central evidence container of this architecture is the **Verification Artifact Bundle**. It is a structured, schema-validated evidence object that records the minimum sufficient information required to audit, replay, or explain a consequential AI output or action.
+
+The bundle should support JSON or CBOR serialization depending on platform tooling. It may be wrapped in an in-toto / DSSE-style envelope or another signed attestation format when the artifact class requires cryptographic proof. The important architectural rule is not the file format fetish—tempting though that altar is—but the preservation of signed, versioned, replayable evidence.
+
+| Block Name | Example Field Paths | Capture Rule | Purpose |
+| :---- | :---- | :---- | :---- |
+| **Identity & Scope** | `identity.request_id`, `identity.trace_id`, `identity.session_hash`, `identity.tenant_hash`, `identity.subject_hash`, `identity.workflow_id`, `identity.risk_class` | Store opaque IDs or scoped hashes by default; raw identifiers only in restricted audit stores. | Correlates the bundle with traces, sessions, tenants, subjects, workflows, and risk policy. |
+| **Prompt Lineage** | `prompt.template_id`, `prompt.template_version`, `prompt.compiler_hash`, `prompt.compiled_hash`, `prompt.payload_ref`, `prompt.token_count` | Store hash and secure reference for compiled prompt; raw prompt only under access-controlled registry. | Proves which prompt template and compiled prompt shaped execution. |
+| **Model / Route Manifest** | `model.requested_route`, `model.selected_route`, `model.provider`, `model.model_version_ref`, `model.decoding_settings_hash`, `model.routing_reason` | Store route/model manifest and provider-visible version; note when hosted provider cannot provide weight hash. | Documents model selection, fallback, decoding, and route changes. |
+| **Retrieval Snapshot** | `retrieval.index_id`, `retrieval.index_version`, `retrieval.query_hash`, `retrieval.rewrite_hashes`, `retrieval.chunk_ids`, `retrieval.source_version_hashes`, `retrieval.evidence_refs` | Store document IDs, chunk IDs, source hashes, scores, coordinates, and secure refs; avoid raw text in general bundle. | Proves what evidence was searched, selected, omitted, cited, or unavailable. |
+| **Tool Execution** | `tool.name`, `tool.schema_version`, `tool.action_class`, `tool.payload_hash`, `tool.idempotency_key_hash`, `tool.pre_state_hash`, `tool.post_state_hash`, `tool.verification_status` | Store payload hashes and redacted summaries; sensitive request/response bodies by secure reference. | Proves tool intent, arguments, authorization, side-effect status, and verification outcome. |
+| **State Ledger** | `state.plan_id`, `state.step_id`, `state.transition_log`, `state.loop_count`, `state.no_progress_count`, `state.fallback_state`, `state.termination_reason` | Store state transitions and hashes; never require hidden chain-of-thought capture. | Reconstructs the workflow trajectory without exposing private reasoning. |
+| **User / Reviewer Edit** | `edit.draft_hash`, `edit.final_hash`, `edit.diff_ref`, `edit.editor_hash`, `edit.edit_class`, `edit.approval_state` | Store diffs, hashes, and secure refs; redact sensitive text as required. | Shows how user or reviewer modifications changed the artifact. |
+| **Output Lineage** | `output.raw_hash`, `output.post_processed_hash`, `output.policy_filtered_hash`, `output.redacted_hash`, `output.rendered_hash`, `output.final_hash` | Store transformation hashes and secure refs; raw outputs only under policy. | Tracks every transformation between model output and final displayed/submitted output. |
+| **Policy Enforcement** | `policy.bundle_version`, `policy.rule_ids`, `policy.decisions`, `policy.enforcement_points`, `policy.override_state`, `policy.reviewer_hash` | Store deterministic rule results separately from classifier scores. | Proves which policy checks ran, where, and with what outcome. |
+| **Human Approval** | `approval.request_id`, `approval.status`, `approval.maker_hash`, `approval.checker_hash`, `approval.payload_hash`, `approval.expires_at`, `approval.signature_ref` | Store signed approval metadata and payload hash. | Proves approval state, separation of duties, and freshness of authorization. |
+| **Audit & Integrity** | `audit.bundle_hash`, `audit.parent_hash`, `audit.signature_ref`, `audit.created_at`, `audit.retention_class`, `audit.legal_hold`, `audit.redaction_class` | Sign bundle hash or envelope; store chain metadata and retention policy. | Makes the evidence record tamper-evident and governed. |
+
+### **Risk-Class Tiering Policy**
+
+The bundle should adapt to risk class:
+
+| Risk Class | Capture Profile |
+| :---- | :---- |
+| **Low** | Metadata, hashes, route IDs, status, and short-retention trace links. |
+| **Medium** | Metadata plus selected redacted snippets, secure refs, policy decisions, and tool hashes. |
+| **High** | Complete-enough evidence trail with secure references, signatures, approval records, state verification, and stricter retention. |
+| **Critical / Regulated** | High-risk profile plus legal hold support, stronger signing, replay package linkage, reviewer identity controls, and access-audited payload vaults. |
+
+High risk does **not** mean “store everything raw forever.” It means preserve enough evidence to audit and replay the decision while minimizing raw sensitive payloads, enforcing access controls, and recording when data was intentionally not captured.
+
+## **Reproducibility Envelope Model**
+
+Every consequential AI execution should run inside a **Reproducibility Envelope**. The envelope records the system state needed to recompile, inspect, simulate, or replay the run. The reproducibility unit is not “the model” alone; it is the model route, prompt compiler, retrieval surface, policy bundle, tool contracts, feature flags, runtime configuration, and evidence state.
+
+```
+REPRODUCIBILITY ENVELOPE
+
++----------------------------------------------------------+
+| Prompt Assembly                                          
+| template id/version | compiler hash | context policy     
++----------------------------------------------------------+
+| Inference Route                                          
+| provider route | model ref | tokenizer | decoding config 
++----------------------------------------------------------+
+| Retrieval Surface                                        
+| corpus version | index hash | embedding model | filters  
++----------------------------------------------------------+
+| Tool and Action Surface                                  
+| tool schemas | mock mode | credential policy | idempotency
++----------------------------------------------------------+
+| Policy and Governance                                    
+| policy bundle | approval flow | safety filters | retention
++----------------------------------------------------------+
+| Runtime Environment                                      
+| container image | dependency lock | feature flags | region 
++----------------------------------------------------------+
+| Replay Constraints                                       
+| exact | constrained | semantic | counterfactual | forensic
++----------------------------------------------------------+
+```
+
+| Parameter Category | Example Field Paths | Validation Source Registry |
+| :---- | :---- | :---- |
+| **Prompt Assembly** | `env.prompt.template_id`, `env.prompt.template_version`, `env.prompt.compiler_hash`, `env.prompt.context_assembler_hash`, `env.prompt.memory_policy_version` | Prompt registry, compiler release manifest, context policy registry. |
+| **Inference Runtime** | `env.model.requested_route`, `env.model.selected_route`, `env.model.provider_api_version`, `env.model.snapshot_ref`, `env.model.tokenizer_ref`, `env.model.decoding_settings_hash` | Model registry, provider manifest, gateway route manifest. |
+| **Serving Environment** | `env.serving.container_digest`, `env.serving.runtime_version`, `env.serving.cuda_or_accelerator_version`, `env.serving.batch_policy`, `env.serving.determinism_mode` | Container registry, deployment manifest, serving-engine config. |
+| **Retrieval Engine** | `env.retrieval.index_id`, `env.retrieval.index_version`, `env.retrieval.corpus_version`, `env.retrieval.embedding_model_ref`, `env.retrieval.chunker_version`, `env.retrieval.reranker_ref`, `env.retrieval.permission_policy_version` | Vector/index registry, corpus manifest, ingestion pipeline records. |
+| **Tool Integration** | `env.tool.manifest_hash`, `env.tool.schema_versions`, `env.tool.server_digest`, `env.tool.mock_mode`, `env.tool.side_effect_mode`, `env.tool.credential_policy_version` | Tool registry, container registry, credential broker policy. |
+| **Policy and Safety** | `env.policy.bundle_hash`, `env.policy.safety_filter_version`, `env.policy.redaction_policy_version`, `env.policy.approval_flow_version`, `env.policy.retention_class` | Policy registry, governance manifest, approval workflow registry. |
+| **System and UI** | `env.ui.version`, `env.ui.renderer_hash`, `env.feature_flags.hash`, `env.deployment.hash`, `env.region`, `env.cache_state`, `env.degraded_mode_state` | Web client registry, feature-flag snapshot, deployment manifest. |
+| **Replay Controls** | `env.replay.mode`, `env.replay.egress_policy`, `env.replay.payload_capture_class`, `env.replay.tool_response_source`, `env.replay.allowed_counterfactuals` | Replay policy registry and audit configuration. |
+
+This envelope does not guarantee bit-exact reproduction in every environment. It defines what must be pinned, captured, or declared unknown so auditors can distinguish exact replay, constrained replay, semantic replay, counterfactual replay, forensic replay, and audit-only verification.30
+
+## **Specialized Evidence Records**
+
+### **The Prompt Lineage Record**
+
+To determine whether behavior changed because of template edits, context assembly, memory inclusion, or dynamic variable injection, the system preserves a Prompt Lineage Record.
+
+| Field Name | Physical Data Type | Capture Rule | Operational Purpose |
+| :---- | :---- | :---- | :---- |
+| `prompt.template_id` | String | Metadata. | Identifies the registered template. |
+| `prompt.template_version` | SemVer / release ID | Metadata. | Matches the active template registry version. |
+| `prompt.template_hash` | SHA-256 hash | Hash. | Verifies template integrity without exposing text. |
+| `prompt.template_ref` | Secure reference | Restricted. | Points to raw template in controlled registry if access is allowed. |
+| `prompt.compiler_version` | Version / commit SHA | Metadata. | Identifies prompt compiler behavior. |
+| `prompt.context_assembler_version` | Version / commit SHA | Metadata. | Identifies context assembly logic. |
+| `prompt.variable_manifest` | JSON object / hash | Redacted or secure reference. | Records which variables were injected and their capture classes. |
+| `prompt.memory_refs` | Array of hashes/refs | Hash/reference. | Identifies memory items included in context. |
+| `prompt.evidence_refs` | Array of chunk/source refs | Hash/reference. | Identifies retrieval chunks inserted into context. |
+| `prompt.tool_schema_refs` | Array of schema hashes | Metadata/hash. | Records tool definitions available to the model. |
+| `prompt.policy_refs` | Array of policy hashes | Metadata/hash. | Records dynamic safety/governance instructions. |
+| `prompt.message_boundaries` | Structured offsets / roles | Metadata. | Maps system, developer, user, tool, and context scopes. |
+| `prompt.compiled_hash` | SHA-256 hash | Hash. | Verifies exact compiled prompt. |
+| `prompt.compiled_ref` | Secure reference | Restricted. | Allows controlled replay of compiled prompt when permitted. |
+| `prompt.token_count` | Integer | Metadata. | Records input size for cost and replay. |
+| `prompt.version_diff_ref` | Secure diff reference | Restricted. | Links to template diff without dumping sensitive prompt text into logs. |
+
+Saving only raw templates is insufficient because compiled prompts include dynamic variables, memories, retrieved evidence, tool schemas, policies, and message boundaries. The lineage record proves what was assembled without requiring every observer to see the full prompt text.
+
+### **The Model and Route Manifest**
+
+Model route decisions are critical audit artifacts. A silent downgrade, fallback, cache hit, provider change, or safety-route change can alter quality, cost, latency, and policy behavior.
+
+| Field Name | Physical Data Type | Capture Rule | Description / Key Purpose |
+| :---- | :---- | :---- | :---- |
+| `route.requested_route` | String | Metadata. | Captures requested capability profile. |
+| `route.selected_route` | String | Metadata. | Captures actual executed route. |
+| `route.provider_name` | String | Metadata. | Records model host or serving class. |
+| `route.provider_api_version` | String | Metadata if available. | Captures provider/API version surface. |
+| `route.model_id` | String | Metadata. | Records requested model identifier. |
+| `route.model_snapshot_ref` | String / secure ref | Metadata/reference. | Records model version or provider-supplied snapshot when available. |
+| `route.tokenizer_ref` | String / hash | Metadata/hash. | Captures tokenizer version for replay. |
+| `route.routing_reason` | Enum string | Metadata. | Examples: `nominal`, `failover`, `quota`, `cost_policy`, `quality_floor`, `safety_policy`, `cache_hit`. |
+| `route.fallback_path_id` | String | Metadata. | Identifies fallback chain step if used. |
+| `route.cached_response` | Boolean | Metadata. | Flags whether semantic, prefix, or response cache was used. |
+| `route.router_policy_hash` | SHA-256 hash | Hash. | Verifies active routing policy. |
+| `route.quality_floor_id` | String | Metadata. | Links route decision to required task quality floor. |
+| `route.safety_floor_id` | String | Metadata. | Links route decision to safety/policy floor. |
+| `route.cost_estimate` | Number / object | Metadata. | Records preflight cost estimate and confidence. |
+| `route.actual_cost_ref` | Reference / number | Metadata/reference. | Links to reconciled cost ledger. |
+| `route.latency_profile` | Object | Metadata. | Records expected/observed latency class. |
+| `route.context_headroom_tokens` | Integer | Metadata. | Verifies route could fit required context. |
+| `route.tool_capability_required` | Boolean | Metadata. | Flags if task needed tool-use support. |
+| `route.modality` | Array of strings | Metadata. | Records modalities processed, such as text, image, audio, or video. |
+| `route.tenant_tier_hash` | Hash/string | Metadata/hash. | Supports priority/cost analysis without exposing tenant identity. |
+| `route.budget_state_ref` | Secure reference | Restricted. | Links to budget ledger. |
+| `route.decoding_settings_hash` | SHA-256 hash | Hash. | Verifies temperature, top-p, max-token, and related decoding configuration. |
+| `route.decoding_settings_ref` | Secure reference | Restricted. | Allows controlled replay of decoding parameters. |
+| `route.stop_reason` | String | Metadata. | Records completion stop condition. |
+| `route.user_disclosure_required` | Boolean | Metadata. | Records whether user should have been told. |
+| `route.user_disclosure_shown` | Boolean | Metadata. | Records whether disclosure occurred. |
+
+
+### **The Retrieval Evidence Snapshot**
+
+GRC verification requires proving the context available before generation. The retrieval snapshot should show what was searched, what was authorized, what was selected, what was omitted, and how citations map to evidence.
+
+| Field Name | Physical Data Type | Capture Rule | Description / Key Purpose |
+| :---- | :---- | :---- | :---- |
+| `retrieval.raw_query_hash` | SHA-256 hash | Hash. | Verifies original query without exposing it. |
+| `retrieval.raw_query_ref` | Secure reference | Restricted. | Allows controlled access to raw query if needed. |
+| `retrieval.rewrite_hashes` | Array of hashes | Hash. | Records query reformulation steps. |
+| `retrieval.index_id` | String | Metadata. | Identifies searched index or partition. |
+| `retrieval.index_version` | String | Metadata. | Tracks index migrations and rebuilds. |
+| `retrieval.corpus_version` | String/hash | Metadata/hash. | Tracks source corpus state. |
+| `retrieval.embedding_model_ref` | String/hash | Metadata/hash. | Records query embedding model. |
+| `retrieval.permission_policy_version` | String/hash | Metadata/hash. | Records authorization policy used. |
+| `retrieval.tenant_scope_hash` | SHA-256 hash | Hash. | Confirms tenant scope without raw tenant leakage. |
+| `retrieval.permission_filter_ids` | Array of strings | Metadata. | Records RBAC/ABAC filters applied. |
+| `retrieval.metadata_filter_hash` | SHA-256 hash | Hash. | Verifies structural filters. |
+| `retrieval.candidate_ids` | Array | Metadata. | Logs candidate IDs and scores. |
+| `retrieval.selected_chunk_ids` | Array | Metadata. | Logs chunks admitted into context. |
+| `retrieval.omitted_chunk_ids` | Array | Metadata. | Logs relevant chunks pruned or omitted. |
+| `retrieval.rerank_score_summary` | Object | Metadata. | Records score distribution or secure score references. |
+| `retrieval.source_version_hashes` | Array | Hash. | Verifies parent document versions. |
+| `retrieval.evidence_refs` | Array of secure refs | Restricted. | Links to raw text or regions when access is allowed. |
+| `retrieval.coordinates` | Array of objects | Metadata. | Page, span, line, offset, or bounding boxes. |
+| `retrieval.citation_map_hash` | SHA-256 hash | Hash. | Verifies claim-to-evidence mapping. |
+| `retrieval.citation_map_ref` | Secure reference | Restricted. | Allows detailed citation replay. |
+| `retrieval.conflict_signal` | Boolean/object | Metadata. | Flags source contradiction or unresolved conflict. |
+| `retrieval.stale_flag` | Boolean/object | Metadata. | Flags source age or freshness concerns. |
+| `retrieval.inaccessible_flag` | Boolean | Metadata. | Flags deleted or unauthorized source references. |
+| `retrieval.claim_links` | Array of hashes/refs | Hash/reference. | Maps generated claims to chunk/source evidence. |
+
+This snapshot provides bounded verifiability: it can distinguish retrieval failure, stale-source failure, citation failure, and generation failure when capture coverage, source versioning, and permission metadata are complete.
+
+### **The Tool Execution Record**
+
+A generated statement claiming an action succeeded is not evidence of success. Auditing requires verification of tool authorization, payload integrity, idempotency, execution status, and post-action state.
+
+| Field Name | Physical Data Type | Capture Rule | Description / Key Purpose |
+| :---- | :---- | :---- | :---- |
+| `tool.planned_name` | String | Metadata. | Tool the model/coordinator intended to invoke. |
+| `tool.executed_name` | String | Metadata. | Tool actually executed. |
+| `tool.schema_version` | String | Metadata. | Tracks API/tool contract version. |
+| `tool.action_class` | Enum string | Metadata. | Examples: `read_only`, `idempotent_mutation`, `non_idempotent_mutation`, `high_impact_action`. |
+| `tool.permission_decision` | Object/string | Metadata. | Records authorization outcome. |
+| `tool.credential_ref_hash` | SHA-256 hash | Hash. | Verifies scoped credential reference without storing token. |
+| `tool.argument_hash` | SHA-256 hash | Hash. | Verifies exact argument object. |
+| `tool.argument_summary` | Redacted object | Redacted. | Provides safe diagnostic summary. |
+| `tool.argument_ref` | Secure reference | Restricted. | Controlled access to full arguments if policy allows. |
+| `tool.user_edit_diff_ref` | Secure reference | Restricted. | Records human changes to tool arguments. |
+| `tool.idempotency_key_hash` | SHA-256 hash | Hash. | Supports duplicate-action prevention. |
+| `tool.request_payload_hash` | SHA-256 hash | Hash. | Verifies outbound request. |
+| `tool.request_payload_ref` | Secure reference | Restricted. | Controlled access to raw request. |
+| `tool.response_payload_hash` | SHA-256 hash | Hash. | Verifies inbound response. |
+| `tool.response_payload_ref` | Secure reference | Restricted. | Controlled access to raw response. |
+| `tool.error_status` | Enum string | Metadata. | Examples: `success`, `timeout`, `provider_error`, `validation_error`, `unknown`. |
+| `tool.retry_decision` | Enum string | Metadata. | Examples: `none`, `backoff`, `abort`, `manual_review`, `reconcile`. |
+| `tool.quota_consumed` | Number/object | Metadata. | Tracks external quota or cost usage. |
+| `tool.side_effect_summary` | Object | Redacted metadata. | Records expected and observed side-effect classes. |
+| `tool.state_pre_hash` | SHA-256 hash | Hash. | Proves source-of-record state before action. |
+| `tool.state_post_hash` | SHA-256 hash | Hash. | Proves source-of-record state after action, if known. |
+| `tool.verification_status` | Enum string | Metadata. | Examples: `verified`, `failed`, `pending`, `unknown`, `not_applicable`. |
+| `tool.compensation_supported` | Boolean | Metadata. | Records whether compensation is possible. |
+| `tool.compensation_plan_ref` | Secure reference | Restricted. | Links to compensation plan without leaking endpoint surface. |
+| `tool.user_confirmation_ref` | Secure reference/hash | Restricted. | Proves required consent or approval where applicable. |
+
+### **The Intermediate State Ledger**
+
+To trace execution trajectories without exposing hidden reasoning or private chain-of-thought, the system preserves an Intermediate State Ledger. It records state transitions, decisions, validation failures, and observable progress—not the model’s private scratchpad.
+
+| Field Name | Physical Data Type | Capture Rule | Description / Key Purpose |
+| :---- | :---- | :---- | :---- |
+| `state.planner_version` | Version/hash | Metadata. | Tracks planner/orchestrator implementation. |
+| `state.subtask_graph_hash` | SHA-256 hash | Hash. | Verifies task graph structure. |
+| `state.subtask_graph_ref` | Secure reference | Restricted. | Allows controlled inspection of task DAG. |
+| `state.transitions` | Array of objects | Metadata. | Logs state-machine transitions and events. |
+| `state.loop_count` | Integer | Metadata. | Tracks total loop steps against workflow profile. |
+| `state.loop_budget_profile` | String | Metadata. | Links loop limit to risk/workflow class. |
+| `state.memory_read_hashes` | Array of hashes | Hash. | Records memory items read. |
+| `state.memory_write_hashes` | Array of hashes | Hash. | Records memory items written. |
+| `state.retry_branches` | Array of objects | Metadata. | Logs retry and branch attempts. |
+| `state.repair_attempts` | Array of objects | Metadata. | Logs output/schema repair attempts. |
+| `state.validation_failures` | Array of objects | Metadata/redacted. | Logs parser/schema/business-rule failures. |
+| `state.no_progress_count` | Integer | Metadata. | Tracks repeated states without material progress. |
+| `state.no_progress_policy` | String | Metadata. | Links action to halt, replan, or escalation policy. |
+| `state.tool_result_hashes` | Array of hashes | Hash. | Correlates tool results with steps. |
+| `state.policy_blocks` | Array of rule IDs | Metadata. | Logs triggered safety/compliance blocks. |
+| `state.fallback_state` | Enum string | Metadata. | Examples: `nominal`, `degraded_model`, `degraded_retrieval`, `cached`, `partial`, `fail_closed`. |
+| `state.termination_reason` | Enum string | Metadata. | Examples: `success`, `max_steps`, `budget_exhausted`, `user_cancelled`, `policy_block`, `unknown_state`. |
+
+### **The User Edit and Output Diff Record**
+
+The final answer displayed or submitted is the last artifact in a chain of transformations. The system should record hashes, diffs, edit metadata, and secure references while avoiding uncontrolled raw output storage.
+
+| Field Name | Physical Data Type | Capture Rule | Description / Key Purpose |
+| :---- | :---- | :---- | :---- |
+| `edit.original_draft_hash` | SHA-256 hash | Hash. | Verifies model-generated draft. |
+| `edit.original_draft_ref` | Secure reference | Restricted. | Controlled access to raw draft if retained. |
+| `edit.final_text_hash` | SHA-256 hash | Hash. | Verifies final edited text. |
+| `edit.final_text_ref` | Secure reference | Restricted. | Controlled access to final text if retained. |
+| `edit.editor_hash` | SHA-256 hash | Hash/metadata. | Identifies editor without broad raw identity exposure. |
+| `edit.editor_role` | String | Metadata. | Captures role or authority class. |
+| `edit.edit_class` | Enum string | Metadata. | Examples: `factual`, `stylistic`, `policy`, `tool_argument`, `redaction`, `citation`, `approval`. |
+| `edit.timestamp` | ISO-8601 timestamp | Metadata. | Records edit time. |
+| `edit.target_field` | String | Metadata. | Identifies field or region altered. |
+| `edit.status` | Enum string | Metadata. | Examples: `accepted`, `rejected`, `overridden`, `pending_review`. |
+| `edit.diff_hash` | SHA-256 hash | Hash. | Verifies diff artifact. |
+| `edit.diff_ref` | Secure reference | Restricted. | Controlled access to unified or structured diff. |
+| `edit.updated_memory` | Boolean | Metadata. | Records if edit updated memory. |
+| `edit.entered_evals` | Boolean | Metadata. | Records if run was promoted to evals. |
+| `edit.changed_tool_args` | Boolean | Metadata. | Flags edits to tool parameters. |
+| `edit.preserved_in_final` | Boolean | Metadata. | Verifies whether edit survived final rendering/submission. |
+
+Output lineage should capture transformation hashes for each stage:
+
+1. `output.raw_model_hash`
+2. `output.post_processed_hash`
+3. `output.policy_filtered_hash`
+4. `output.redacted_hash`
+5. `output.citation_injected_hash`
+6. `output.rendered_ui_hash`
+7. `output.human_edited_hash`
+8. `output.final_submitted_hash`
+
+Raw text for any stage should be stored only according to capture class and retention policy.
+
+### **The Policy Check Record**
+
+Policy checks must function as executable verification artifacts, not passive annotations. Deterministic rules, classifiers, human approvals, and override paths should be recorded separately so auditors can tell what kind of control actually fired.
+
+| Field Name | Physical Data Type | Capture Rule | Description / Key Purpose |
+| :---- | :---- | :---- | :---- |
+| `policy.bundle_version` | Version/hash | Metadata/hash. | Tracks active policy bundle. |
+| `policy.rule_ids` | Array of strings | Metadata. | Identifies rules executed. |
+| `policy.rule_authority` | String/hash | Metadata/hash. | Documents policy source or owner. |
+| `policy.input_hash` | SHA-256 hash | Hash. | Verifies evaluated input. |
+| `policy.input_ref` | Secure reference | Restricted. | Controlled access to evaluated content. |
+| `policy.decision` | Enum string | Metadata. | Examples: `allow`, `block`, `escalate`, `redact`, `degrade`, `require_approval`. |
+| `policy.rule_type` | Enum string | Metadata. | Examples: `deterministic`, `classifier`, `human_review`, `external_policy`. |
+| `policy.threshold` | Number/object | Metadata. | Classifier threshold when applicable. |
+| `policy.score` | Number/object | Metadata. | Classifier score when applicable. |
+| `policy.enforcement_point` | Enum string | Metadata. | Examples: `ingress`, `context_assembly`, `pre_action`, `tool_gateway`, `egress`, `ui_render`. |
+| `policy.result_status` | Enum string | Metadata. | Examples: `pass`, `fail`, `error`, `not_applicable`. |
+| `policy.override_status` | Enum string | Metadata. | Examples: `none`, `requested`, `authorized`, `denied`, `expired`. |
+| `policy.exception_summary` | String/object | Redacted. | Logs parser or system exception safely. |
+| `policy.reviewer_hash` | SHA-256 hash | Restricted metadata. | Identifies reviewer where applicable. |
+| `policy.approval_ref` | Secure reference | Restricted. | Links to approval trail. |
+| `policy.escalation_ref` | Secure reference | Restricted. | Links to escalation queue or package. |
+| `policy.final_action_state` | Enum string | Metadata. | Examples: `completed`, `blocked`, `pending`, `unknown`, `review_required`. |
+
+
+## **Replay Package Model and Execution Safety**
+
+To audit, debug, or evaluate a transaction safely, the system compiles a Replay Package. A Replay Package is not merely a folder of logs; it is a controlled reconstruction environment designed to reproduce or simulate behavior without mutating production systems.
+
+A replay package contains:
+
+* **Trace Graph:** Parent-child spans and timing relationships.
+* **Verification Bundle:** Signed evidence record for the run.
+* **Reproducibility Envelope:** Prompt, model, retrieval, policy, tool, and runtime state.
+* **Dependency Manifest:** Container digests, package locks, runtime versions, and feature flags.
+* **Tool Mocks:** Signed, recorded responses or deterministic simulators.
+* **Payload Vault References:** Secure references to redacted or raw payloads where permitted.
+* **Policy Bundle:** Exact rules, thresholds, and approval requirements.
+* **Evaluation Rubric:** Scoring rules for semantic or counterfactual replay.
+
+```
+REPLAY PACKAGE CONTAINER
+
++----------------------------------------------------------+
+| Replay Orchestrator                                      
+|  loads trace graph, bundle, envelope, policy, rubric      
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Network and Credential Controls                          
+|  no production credentials                                
+|  egress blocked or allowlisted                            
+|  production endpoints denied                              
+|  secrets replaced with inert references                   
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Mocked / Simulated Dependencies                           
+|  recorded LLM outputs                                     
+|  signed tool responses                                    
+|  retrieval snapshot                                       
+|  sandbox database                                         
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Replay Result                                             
+|  exact replay, constrained replay, semantic comparison,    
+|  counterfactual analysis, or forensic timeline             
++----------------------------------------------------------+
+```
+
+These execution bounds are mapped across six replay modes:
+
+| Replay Mode | Egress Policy | Input Constraints | Execution Layer | Target Verification | Side-Effect Prevention |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **Read-Only Replay** | Egress blocked except approved artifact stores. | Inputs locked to original values. | Recompiles prompts, layouts, UI rendering, and local transformations. | Verifies rendering, formatting, redaction, and citation display. | No tool credentials; no production write paths. |
+| **Mocked-Tool Replay** | Egress blocked. | Inputs locked; tool responses loaded from signed mocks. | Re-executes orchestration against recorded dependency responses. | Evaluates route behavior, state transitions, and output variance. | Tool gateway intercepts all calls and returns mocks. |
+| **Sandbox Replay** | Egress restricted to isolated test network. | Inputs locked or copied into sandbox fixtures. | Runs against test database, test tool servers, and inert credentials. | Evaluates integration behavior under controlled conditions. | Production endpoints denied; credentials scoped to sandbox only. |
+| **Counterfactual Replay** | Egress blocked or sandbox-only. | Allows one declared variable modification at a time. | Re-runs selected prompt/model/retrieval/policy variant. | Attributes behavioral changes to the modified variable. | Tools mocked unless explicit sandbox mutation is approved. |
+| **Semantic Replay** | Egress blocked or sandbox-only. | Inputs locked; model may vary within declared route envelope. | Evaluates logical constraints, grounding, citations, and policy outcomes. | Verifies equivalent behavior rather than exact tokens. | No production side effects; unknown states remain marked unknown. |
+| **Forensic Replay** | No execution egress. | No active model/tool execution. | Timeline analysis of recorded evidence. | Identifies likely failure point from trace, ledger, and artifacts. | Complete decoupling from execution systems. |
+
+
+## **Evidence Chain and Tamper-Evidence Infrastructure**
+
+To detect silent modification or deletion of verification artifacts, the platform should implement tamper-evident evidence chains. Each Verification Artifact Bundle is canonicalized, hashed, signed when required, and linked to prior artifacts or workflow checkpoints.
+
+The hash-chain relation can be expressed as:
+
+h_i = H(canonical(bundle_i) || h_(i-1))
+
+where `H` is a collision-resistant hash function, `canonical(bundle_i)` is a deterministic serialization of the bundle, and `h_(i-1)` is the previous chain hash. This does not make evidence indestructible or magically true. It makes later alteration detectable when verification is performed.
+
+The platform may use several signing and provenance mechanisms depending on artifact type:
+
+1. **Signed Attestation Envelope:** Verification bundles, model manifests, tool manifests, and replay packages can be wrapped in DSSE / in-toto-style signed envelopes.
+2. **Sigstore / Fulcio / Rekor:** CI/CD artifacts, container images, model bundles, and build outputs can use keyless signing and transparency logging where appropriate.
+3. **C2PA Manifests:** Images, charts, video, generated media, or datasets may carry embedded or sidecar C2PA manifests. Text-only or binary artifacts may bind to C2PA through sidecar manifests and asset references.
+4. **Internal WORM / Append-Only Ledger:** Regulated systems may store chain checkpoints in WORM object storage or append-only audit databases.
+5. **External Anchoring:** High-assurance systems may periodically anchor evidence-chain checkpoints externally to improve tamper detection.
+
+```
+TAMPER-EVIDENT EVIDENCE CHAIN
+
++----------------------------------------------------------+
+| Artifact Created                                         
+|  bundle, replay package, manifest, snapshot, or diff     
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Canonicalize and Hash                                    
+|  deterministic serialization                             
+|  content hash                                            
+|  parent hash                                             
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Sign / Attest When Required                              
+|  DSSE / in-toto envelope                                  
+|  Sigstore or internal signing                             
+|  policy-defined signer identity                           
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Store Evidence                                           
+|  content-addressed storage                                
+|  retention class                                          
+|  access policy                                            
+|  redaction status                                         
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Verify Chain                                             
+|  validate hashes                                          
+|  validate signatures                                      
+|  validate timestamps                                      
+|  detect missing or altered records                        
++----------------------------------------------------------+
+```
+
+| Field Name | JSON Field Key Path | Data Type | Validation Standard |
+| :---- | :---- | :---- | :---- |
+| **Artifact ID** | `chain.artifact_id` | String | UUID or platform artifact ID. |
+| **Artifact Type** | `chain.artifact_type` | Enum string | Examples: `verification_bundle`, `replay_package`, `manifest`, `snapshot`, `diff`, `policy_record`. |
+| **Content Hash** | `chain.content_hash` | String | SHA-256 or approved hash algorithm. |
+| **Parent Hash** | `chain.parent_hash` | String/null | Previous chain hash or null for chain root. |
+| **Canonicalization Version** | `chain.canonicalization_version` | String | Defines deterministic serialization rules. |
+| **Created By** | `chain.created_by_hash` | String | Workload, service, or user hash. |
+| **Created At** | `chain.created_at` | Timestamp | ISO-8601 with timezone. |
+| **Signed By** | `chain.signed_by` | String/reference | Signing identity or certificate reference. |
+| **Signature Reference** | `chain.signature_ref` | Secure reference | Link to DSSE, Sigstore, or internal signature record. |
+| **Transparency Entry** | `chain.transparency_log_ref` | Optional reference | Rekor or internal transparency log entry. |
+| **Storage Location** | `chain.storage_ref` | Secure reference | Content-addressed object or archive reference. |
+| **Retention Class** | `chain.retention_class` | Enum string | Policy-defined retention profile. |
+| **Access Policy** | `chain.access_policy_id` | String | Policy governing read/write access. |
+| **Redaction Status** | `chain.redaction_status` | Enum string | Examples: `metadata_only`, `redacted`, `reference_only`, `restricted_full_payload`. |
+| **Deletion Eligibility** | `chain.deletion_eligibility` | Timestamp/string | Date or policy state, subject to legal hold. |
+| **Legal Hold** | `chain.legal_hold` | Boolean | True when deletion is suspended. |
+| **Verification Status** | `chain.verification_status` | Enum string | Examples: `verified`, `failed`, `degraded`, `not_checked`. |
+
+If a historical record is altered, hash-chain verification fails and the system can trigger investigation, containment, and recovery workflows. That is the sober version. The cartoon version where cryptography tackles the attacker through a window is, regrettably, not in scope.
+
+
+## **Artifact Privacy, Redaction, and Retention Model**
+
+Verification artifacts contain sensitive operational data: proprietary documents, customer records, payment details, credentials, policy decisions, reviewer comments, tool payloads, and source-of-record state. Evidence trails must therefore follow a data-minimization model. Auditability is not permission to build a beautifully indexed breach warehouse.
+
+Redaction should be layered. Regex and NER scans are useful but insufficient alone. The system should combine structured field suppression, secret scanning, policy-aware capture classes, secure payload references, access logging, retention limits, and legal-hold rules.
+
+```
+PRIVACY REDACTION WORKFLOW
+
++----------------------------------------------------------+
+| Artifact Capture Point                                   
+|  prompt, retrieval, tool, output, review, policy, state   
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Capture-Class Decision                                   
+|  never capture                                             
+|  hash only                                                 
+|  metadata only                                             
+|  redacted snippet                                          
+|  reference only                                            
+|  restricted full payload                                   
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Redaction and Secret Controls                            
+|  structured denylist                                       
+|  regex / NER / classifier scan                             
+|  source-aware policy                                       
+|  credential stripping                                      
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Storage and Access Policy                                
+|  content-addressed storage                                 
+|  secure payload vault                                      
+|  WORM archive when needed                                  
+|  access logs and retention                                 
++----------------------------------------------------------+
+```
+
+| Capture Class | Technical Processing Rule | Physical Storage Substrate | Access Control Level | Typical Data Target |
+| :---- | :---- | :---- | :---- | :---- |
+| **0. Never Capture** | Strip or block before any persistent write. | No raw storage. | None for raw value; security event may record detection metadata. | Passwords, API tokens, private keys, CVVs, raw auth headers. |
+| **1. Hash Only** | Store digest and capture metadata; discard raw payload. | Metadata database or audit ledger. | Restricted audit/SRE as policy allows. | Large payload identity, file equality checks, prompt/output fingerprints. |
+| **2. Metadata Only** | Store size, schema, type, source ID, status, version, and timing. | Trace store or artifact metadata index. | Standard operational access if non-sensitive. | Parser status, route metadata, model IDs, schema names. |
+| **3. Redacted Snippet** | Store minimal masked excerpt sufficient for debugging. | Secure artifact store with retention limit. | Purpose-bound operator/auditor access. | Conversation excerpts, validation errors, reviewer notes. |
+| **4. Reference Only** | Store raw payload in secure vault; artifact stores only hash and reference. | Encrypted object store or payload vault. | Role-gated and access-logged. | Customer PDFs, full prompts, tool request/response bodies, raw completions. |
+| **5. Restricted Full Payload** | Retain full payload only when legally or operationally required. | Segregated encrypted vault or WORM storage. | Strict audit/security/legal roles; all access logged. | Regulated evidence, high-impact transaction records, legal holds. |
+| **6. Incident Mode** | Temporarily escalate capture under declared incident policy. | Forensic vault with short TTL or legal hold. | Incident/security team with approval trail. | Active attack traces, compromised tool sessions, outage forensics. |
+
+Metadata can itself be sensitive. Tenant hashes, source IDs, route choices, policy decisions, and timing records can reveal business activity. Access rules should therefore apply to both payloads and metadata.
+
+
+## **GRC Audit Query Playbook**
+
+To support audits, investigations, dispute resolution, and regulatory inspections, the verification framework should map common audit questions to the artifacts and replay modes required to answer them.
+
+| Audit Question | Required Verification Artifacts | Target Trace Fields / Metadata | Optimal Replay Mode | Technical Validation Path |
+| :---- | :---- | :---- | :---- | :---- |
+| **Why did the model cite this source?** | Retrieval Snapshot, Output Lineage, Model/Route Manifest. | `retrieval.selected_chunk_ids`, `retrieval.citation_map_ref`, `output.citation_injected_hash`. | Forensic Replay. | Verify claim-to-source mapping, source version, and evidence support. |
+| **Was the source document actually retrieved?** | Retrieval Snapshot. | `retrieval.index_id`, `retrieval.selected_chunk_ids`, `retrieval.evidence_refs`. | Audit-Only. | Match chunk IDs and source hashes against retrieval trace and access log. |
+| **Was the source version current?** | Retrieval Snapshot, Reproducibility Envelope. | `retrieval.source_version_hashes`, `retrieval.stale_flag`, `env.retrieval.corpus_version`. | Audit-Only. | Compare source hashes and freshness metadata against source registry. |
+| **Which prompt version produced this answer?** | Prompt Lineage Record, Reproducibility Envelope. | `prompt.template_id`, `prompt.template_version`, `prompt.compiled_hash`. | Constrained Replay. | Recompile template under recorded envelope and compare compiled prompt hash. |
+| **Did routing silently downgrade the model?** | Model and Route Manifest. | `route.requested_route`, `route.selected_route`, `route.routing_reason`, `route.user_disclosure_shown`. | Audit-Only. | Compare requested vs selected route and disclosure requirement. |
+| **Which tool call failed, and did it succeed later?** | Tool Execution Record, State Ledger. | `tool.error_status`, `tool.verification_status`, `state.transitions`. | Forensic Replay. | Walk action ledger and post-action verification state. |
+| **Did the tool actually execute, or did the model hallucinate success?** | Tool Execution Record, Output Lineage. | `tool.state_post_hash`, `tool.verification_status`, `output.final_hash`. | Forensic Replay. | Verify source-of-record state and compare completion claim to verified state. |
+| **Was confirmation shown before transaction execution?** | Tool Execution Record, Policy Check Record, Human Approval Record. | `tool.user_confirmation_ref`, `policy.decision`, `approval.status`. | Forensic Replay. | Confirm approval/consent existed before high-impact action boundary. |
+| **Did the user or reviewer edit the value?** | User Edit and Output Diff Record. | `edit.diff_ref`, `edit.editor_hash`, `edit.edit_class`, `edit.preserved_in_final`. | Counterfactual Replay. | Compare draft hash, diff hash, and final output hash. |
+| **Did the model overwrite a correction?** | User Edit Record, Intermediate State Ledger, Output Lineage. | `edit.preserved_in_final`, `state.transitions`, `output.final_submitted_hash`. | Counterfactual Replay. | Compare subsequent outputs and state transitions against edited artifact. |
+| **Which policy rule fired?** | Policy Check Record. | `policy.rule_ids`, `policy.bundle_version`, `policy.decision`, `policy.enforcement_point`. | Audit-Only. | Verify rule execution parameters and policy bundle version. |
+| **Who approved the override?** | Policy Check Record, Human Approval Record, Evidence Chain. | `policy.override_status`, `policy.reviewer_hash`, `approval.signature_ref`. | Audit-Only. | Verify approval signature or audit record against trusted identity registry. |
+| **Did the final UI hide a warning?** | Output Lineage, Policy Check Record, UI/Render Manifest. | `output.rendered_hash`, `policy.rule_ids`, `route.user_disclosure_shown`. | Forensic Replay. | Re-render under recorded UI version and verify warning/disclosure presence. |
+| **Would a different model have behaved differently?** | Verification Bundle, Reproducibility Envelope, Evaluation Rubric. | `route.selected_route`, `env.model.snapshot_ref`, `prompt.compiled_hash`. | Counterfactual Replay. | Change one declared model/route variable and evaluate behavior under same rubric. |
+| **Was sensitive data over-captured?** | Privacy Capture Record, Evidence Chain, Access Logs. | `chain.redaction_status`, `capture_class`, `access_policy_id`. | Audit-Only. | Verify capture class, retention class, and access events against privacy policy. |
+
+## **Artifact Lifecycle and Storage Architecture**
+
+Verification artifacts must be retained according to risk, regulatory obligations, incident status, tenant contract, and operational debugging value. Storage architecture should therefore be policy-based rather than hardcoded to one fixed age ladder. A low-risk FAQ trace, a failed high-impact payment action, a legal hold, and an active security incident should not share the same retention path just because the calendar was feeling democratic.
+
+```
+EVIDENCE STORAGE LIFECYCLE
+
++----------------------------------------------------------+
+| Artifact Created                                         
+|  bundle, trace, snapshot, manifest, diff, replay package  
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Classification                                            
+|  risk class                                               
+|  capture class                                            
+|  retention class                                          
+|  legal hold                                               
+|  tenant / regulatory policy                               
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Hot Operational Store                                     
+|  short debugging window                                   
+|  fast lookup                                              
+|  redacted or reference-first payloads                     
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Warm Audit Store                                          
+|  content-addressed objects                                
+|  signed manifests                                         
+|  scoped metadata indexes                                  
+|  access logging                                           
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Cold Compliance / Legal Hold                              
+|  WORM or immutable archive where required                 
+|  slower retrieval                                         
+|  legal-hold controls                                      
+|  deletion review                                          
++--------------------------+-------------------------------+
+                           |
+                           v
++----------------------------------------------------------+
+| Expiry / Deletion / Preservation Decision                 
+|  purge                                                    
+|  retain under legal hold                                  
+|  anonymize / aggregate                                    
+|  preserve hash-only evidence                              
++----------------------------------------------------------+
+```
+
+The operational profiles, retrieval expectations, and redundancy targets of these storage tiers are specified below:
+
+| Storage Tier | Retention Window | Retrieval Expectation | Storage Pattern | Encryption and Access | Typical Contents |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **Hot Operational** | Short operational window defined by retention class. | Fast enough for debugging and incident triage. | Operational database, trace store, short-TTL object store, or managed equivalent. | Tenant-scoped encryption, role-based access, audit logs. | Metadata, hashes, redacted snippets, recent traces, pending action state. |
+| **Warm Audit** | Medium retention window defined by audit and product policy. | Hours to day-scale retrieval depending on policy. | Content-addressed object storage, signed bundle registry, audit index. | Strong access control, access logging, scoped evidence views. | Verification bundles, manifests, secure payload references, signed hashes, reviewer artifacts. |
+| **Cold Compliance** | Long retention window for regulated, contractual, or legal-hold artifacts. | Slower retrieval acceptable. | WORM storage, immutable archive, Glacier-like storage, or compliant managed archive. | Legal/compliance access controls, key management, deletion controls. | Signed evidence chains, legal-hold bundles, high-impact action records, compliance artifacts. |
+| **Forensic Vault** | Incident-scoped retention window or legal-hold period. | Fast during incident, policy-controlled afterward. | Segregated forensic storage with restricted access and enhanced logging. | Security/legal approval, immutable access logs, strict retention review. | Attack traces, compromised sessions, break-glass records, raw payloads when justified. |
+| **Hash-Only Archive** | Long-lived integrity reference. | Lightweight lookup. | Metadata ledger or content-addressed hash registry. | Lower exposure than payload stores but still access controlled. | Content hashes, chain hashes, artifact IDs, deletion tombstones, proof-of-existence records. |
+
+Evidence indexes should be searchable through authorized metadata views across keys such as `trace_id`, `artifact_id`, `workflow_id`, `prompt_version`, `model_route`, `document_id`, `tool_call_id`, `approval_request_id`, and `final_output_hash`. Raw `tenant_id`, `session_id`, and user identifiers should be avoided in broad indexes; use scoped hashes or access-controlled identity joins.
+
+Storage policy must also support:
+
+| Lifecycle Control | Requirement |
+| :---- | :---- |
+| **Legal Hold** | Suspends deletion and records authority, scope, and reason. |
+| **Deletion Eligibility** | Determines when payloads, metadata, hashes, or references may be purged. |
+| **Payload Minimization** | Allows raw payload deletion while preserving hash-bound proof where legally permitted. |
+| **Access Logging** | Records every access to sensitive payload references and restricted bundles. |
+| **Key Management** | Supports tenant-scoped keys, rotation, revocation, and recovery procedures. |
+| **Redaction Reprocessing** | Allows artifacts to be reclassified or re-redacted when policy changes. |
+| **Integrity Verification** | Periodically verifies hash chains, signatures, manifests, and storage references. |
+
+## **Cross-Canon Handoff Map**
+
+The Verification Artifacts architecture integrates across the entire AI Systems Engineering Canon because every major subsystem eventually needs evidence for audit, replay, incident response, evaluation, governance, and dispute resolution.
+
+| Target Report ID | Target Report Domain | Verification Artifact Handoff | Dependency / Engineering Integration Rules |
+| :---- | :---- | :---- | :---- |
+| **AI-ENG-B** | Context and State Governance | Context snapshots, memory refs, state hashes, compaction records. | Preserve enough context lineage to prove what was available, included, omitted, or summarized. |
+| **AI-ENG-D** | Corpus Engineering | Source provenance, corpus manifests, document version hashes, ingestion records. | Evidence artifacts must bind claims to source lineage and corpus version. |
+| **AI-ENG-E** | Retrieval Pipeline | Retrieval snapshots, query hashes, source refs, citation maps, permission filters. | Retrieval evidence must prove authorization, source version, selected chunks, omitted chunks, and citation bindings. |
+| **AI-ENG-F** | Freshness and Conflict Detection | Freshness flags, conflict signals, source-age metadata, stale-cache records. | Audit trails must show whether outputs relied on stale, conflicting, or unresolved evidence. |
+| **AI-ENG-G** | Model Selection | Model/route manifest, requested route, selected route, fallback reason. | Silent downgrades, provider shifts, and capability changes must be replayable. |
+| **AI-ENG-H** | Model Adaptation | Adapter hashes, fine-tune manifests, calibration artifacts, regression records. | Adapted model behavior must be traceable to training/adaptation lineage. |
+| **AI-ENG-I** | Regression Control | Baseline artifacts, failed-run bundles, diff records, gate outcomes. | Regression investigations require preserved inputs, outputs, routes, and evaluation artifacts. |
+| **AI-ENG-J** | Throughput Mechanics | Token metrics, latency spans, serving-envelope data, queue and batch policy. | Performance regressions must be tied to reproducibility envelopes and serving conditions. |
+| **AI-ENG-K** | Weight Dynamics | Quantization/compression manifests, runtime kernel settings, model snapshots. | Optimization-induced behavior changes require route and model-state evidence. |
+| **AI-ENG-L** | Serving Architecture | Provider manifest, route manifest, cache state, fallback path, deployment hash. | Serving decisions must be reconstructable from route and environment artifacts. |
+| **AI-ENG-M** | Agentic Orchestration | State ledger, plan graph refs, loop counters, branch/retry records. | Agent failures require trajectory evidence without exposing hidden reasoning. |
+| **AI-ENG-N** | Tool Contracts | Tool schema versions, payload hashes, authorization records, idempotency hashes. | Tool calls must be auditable from planned call through verified post-action state. |
+| **AI-ENG-O** | Action Verification | Pre/post state hashes, action ledger, verification status, compensation refs. | Completion claims require state-backed verification artifacts. |
+| **AI-ENG-P** | Multimodal Understanding | Parser manifests, OCR/layout refs, coordinates, media hashes, evidence regions. | Visual/document claims must bind to source coordinates or secure evidence refs. |
+| **AI-ENG-Q** | Speech and Realtime Interaction | Transcript hashes, confirmation records, voice fallback state, endpointing metadata. | High-impact voice actions need replayable confirmation and transcript evidence. |
+| **AI-ENG-R** | UI Agents | UI state snapshots, DOM/screenshot hashes, action refs, post-action verification. | UI automation must preserve observe-act-verify evidence. |
+| **AI-ENG-S** | Production Pathologies | Malformed output records, repair-loop artifacts, false-success traces. | Pathologies require typed evidence for debugging and regression tests. |
+| **AI-ENG-T** | Boundary Defense | Tenant hashes, authorization decisions, prompt-injection evidence, redaction records. | Security boundaries must be provable without leaking the protected payload. |
+| **AI-ENG-U** | Supply Chain Security | Signed manifests, dependency locks, parser/tool/container hashes. | Evidence trails must bind behavior to approved supply-chain artifacts. |
+| **AI-ENG-V** | Resource Abuse | Cost ledgers, token-burn records, retry artifacts, quota state. | Cost bombs and runaway loops need replayable consumption evidence. |
+| **AI-ENG-W** | UX Resilience | Degraded-mode state, fallback disclosures, partial-answer records, saved-state refs. | User-visible degraded states must be backed by evidence of preserved state and disclosure. |
+| **AI-ENG-X** | User Trust and Transparency | Disclosure records, citation UX state, contestability records, user correction diffs. | Trust claims must be tied to what the user actually saw and could contest. |
+| **AI-ENG-Y** | High-Impact Workflow Design | Approval packets, maker/checker records, escalation packages, break-glass artifacts. | High-impact decisions require signed approval, reviewer, and escalation evidence. |
+| **AI-ENG-Z** | Strategic Telemetry | Trace IDs, span IDs, token metrics, latency records, semantic drift signals. | Telemetry provides sensor data; verification artifacts preserve durable evidence. |
+| **AI-ENG-AA** | Evals Architecture | Golden traces, case versions, labels, rubrics, regression gate artifacts. | Production failures and corrected outputs should become reproducible evaluation artifacts where appropriate. |
+| **AI-ENG-AC** | Incident Response and Remediation | Forensic bundles, containment timeline, compromised artifact refs, recovery evidence. | Incidents require evidence chains for scope, timeline, root cause, and remediation. |
+| **AI-ENG-AD** | Governance and Compliance | Retention class, policy bundle, approval authority, audit signatures, access logs. | Governance defines capture obligations, retention, deletion, legal hold, and exception approvals. |
+| **AI-ENG-AJ** | Reference Architectures | Verification bundle schema, replay package pattern, evidence store, audit ledger. | Reference architectures should include evidence trails as first-class infrastructure. |
+
+## **Durable Principles of Verification Artifacts**
+
+1. **Logs Are Not Evidence Trails**  
+   Logs show that something happened somewhere. Verification artifacts preserve enough structured evidence to reconstruct what happened, why it happened, what data shaped it, and what state resulted.
+
+2. **Auditability Requires Scope, Not Hoarding**  
+   More raw data is not automatically better auditability. Better auditability comes from scoped hashes, secure references, source versions, policy decisions, state checks, and signed manifests.
+
+3. **Tamper-Evident Does Not Mean True**  
+   A signed artifact proves integrity of the recorded evidence. It does not prove the underlying decision was correct unless the evidence, checks, and policies were also adequate.
+
+4. **Replay Has Levels**  
+   Exact replay, constrained replay, semantic replay, counterfactual replay, forensic replay, and audit-only verification serve different purposes. Do not promise bit-exact reproduction when the environment cannot support it.
+
+5. **The Reproducibility Unit Is the Whole Runtime**  
+   Model ID alone is not enough. Prompt compiler, retrieval index, policy bundle, route manifest, tool schema, feature flags, cache state, and deployment environment all shape behavior.
+
+6. **Hidden Reasoning Is Not an Audit Primitive**  
+   Preserve decisions, state transitions, prompts, evidence, policy checks, tool calls, and outputs. Do not require private chain-of-thought capture to explain system behavior.
+
+7. **Tool Claims Require State Evidence**  
+   “The model said it sent the invoice” proves nothing. Tool records must preserve authorization, payload hash, idempotency, execution status, and post-action verification.
+
+8. **Sensitive Payloads Need Capture Classes**  
+   Never-capture, hash-only, metadata-only, redacted snippet, reference-only, restricted full payload, and incident-mode capture should be explicit policy states.
+
+9. **Evidence Storage Must Follow Risk and Law**  
+   Retention windows should be driven by risk class, contract, regulation, incident state, legal hold, and operational need—not by vibes or one universal timer.
+
+10. **Every Artifact Needs Ownership**  
+   Prompt records, route manifests, retrieval snapshots, policy checks, approval records, and replay packages need owners, version history, and access rules.
+
+11. **Evidence Must Support Dispute Resolution**  
+   A user correction, reviewer override, citation dispute, model downgrade, or failed action should be traceable through artifacts rather than reconstructed from memory and regret.
+
+12. **Verification Infrastructure Is Governance Infrastructure**  
+   If the system cannot prove what happened, it cannot be governed. If it cannot be governed, it should not be trusted with consequential autonomy.
+
+#### **Works cited**
+
+1. AI-ENG-AA — Evals Architecture: Ground Truth, Golden Sets & Regression Tests  
+2. AI-ENG-Z — Strategic Telemetry - Traces, Tokens, Latency & Semantic Drift  
+3. Recon.AI — Trust Accounting Platform for AI systems, accessed June 11, 2026, [https://reconai.net/](https://reconai.net/)  
+4. Content-Addressed Evidence Storage & Preservation ... - SEC.gov, accessed June 11, 2026, [https://www.sec.gov/files/ctf-written-fcck-pilot-evidence-02-16-2026.pdf](https://www.sec.gov/files/ctf-written-fcck-pilot-evidence-02-16-2026.pdf)  
+5. [KNOWLEDGE] - AI Engineering - Volume 8. W-Y Resilience, Degraded Modes, and Human Trust  
+6. Provenance only gets attention after a messy document case : r/AI_Agents - Reddit, accessed June 11, 2026, [https://www.reddit.com/r/AI_Agents/comments/1sco94r/provenance_only_gets_attention_after_a_messy/](https://www.reddit.com/r/AI_Agents/comments/1sco94r/provenance_only_gets_attention_after_a_messy/)  
+7. Model Lineage and Reproducibility: Tracking Provenance Across the ML Lifecycle, accessed June 11, 2026, [https://agility-at-scale.com/ai/governance/model-lineage-and-reproducibility/](https://agility-at-scale.com/ai/governance/model-lineage-and-reproducibility/)  
+8. Trace concepts - Azure Databricks | Microsoft Learn, accessed June 11, 2026, [https://learn.microsoft.com/en-us/azure/databricks/mlflow3/genai/tracing/tracing-101](https://learn.microsoft.com/en-us/azure/databricks/mlflow3/genai/tracing/tracing-101)  
+9. OpenInference Specification - GitHub Pages, accessed June 11, 2026, [https://arize-ai.github.io/openinference/spec/](https://arize-ai.github.io/openinference/spec/)  
+10. Trace Concepts | MLflow AI Platform, accessed June 11, 2026, [https://mlflow.org/docs/latest/genai/concepts/trace/](https://mlflow.org/docs/latest/genai/concepts/trace/)  
+11. Propagation - Python - OpenTelemetry, accessed June 11, 2026, [https://opentelemetry.io/docs/languages/python/propagation/](https://opentelemetry.io/docs/languages/python/propagation/)  
+12. What is a C2PA Manifest? Structure, Assertions, and Verification, accessed June 11, 2026, [https://c2paviewer.com/articles/what-is-c2pa-manifest](https://c2paviewer.com/articles/what-is-c2pa-manifest)  
+13. In-toto Attestations in Secure Pipelines - Emergent Mind, accessed June 11, 2026, [https://www.emergentmind.com/topics/in-toto-attestations](https://www.emergentmind.com/topics/in-toto-attestations)  
+14. Provenance Driven Identity Trust Architecture, accessed June 11, 2026, [https://identitymanagementinstitute.org/provenance-driven-identity-trust-architecture/](https://identitymanagementinstitute.org/provenance-driven-identity-trust-architecture/)  
+15. Technology - Ar.io, accessed June 11, 2026, [https://ar.io/technology/](https://ar.io/technology/)  
+16. C2PA Implementation Guidance, accessed June 11, 2026, [https://spec.c2pa.org/specifications/specifications/2.4/guidance/Guidance.html](https://spec.c2pa.org/specifications/specifications/2.4/guidance/Guidance.html)  
+17. Blockchain-enforced data lineage architectures with formal verification workflows, accessed June 11, 2026, [https://ijsra.net/sites/default/files/fulltext_pdf/IJSRA-2023-0559.pdf](https://ijsra.net/sites/default/files/fulltext_pdf/IJSRA-2023-0559.pdf)  
+18. Defeating Nondeterminism in LLM Inference - Simon Willison's Weblog, accessed June 11, 2026, [https://simonwillison.net/2025/Sep/11/defeating-nondeterminism/](https://simonwillison.net/2025/Sep/11/defeating-nondeterminism/)  
+19. Defeating Nondeterminism in LLM Inference - Thinking Machines Lab, accessed June 11, 2026, [https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/](https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/)  
+20. Defeating Nondeterminism in LLM Inference - OpenAI Developer Community, accessed June 11, 2026, [https://community.openai.com/t/defeating-nondeterminism-in-llm-inference/1358623](https://community.openai.com/t/defeating-nondeterminism-in-llm-inference/1358623)  
+21. Openinference Semantic Conventions - Arize AX Docs, accessed June 11, 2026, [https://arize.com/docs/ax/observe/tracing-concepts/openinference-semantic-conventions](https://arize.com/docs/ax/observe/tracing-concepts/openinference-semantic-conventions)  
+22. Poisoning Attacks in Federated Learning: An Accountability-Oriented Survey with Centralized Learning as Baseline - Preprints.org, accessed June 11, 2026, [https://www.preprints.org/manuscript/202605.1674](https://www.preprints.org/manuscript/202605.1674)  
+23. C2PA for Developers: Implementation Guide, accessed June 11, 2026, [https://c2pa.ai/for-developers](https://c2pa.ai/for-developers)  
+24. An 84-Format Numeric Catalog with Bit-Exact Conformance Vectors: A Vendor-Neutral Reference for FP8, BF16, MXFP4, and Microscaling Formats - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2606.09686v1](https://arxiv.org/html/2606.09686v1)  
+25. Fighting Misinformation with Authenticated C2PA Provenance Metadata - IPTC, accessed June 11, 2026, [https://iptc.org/std/MediaProvenance/Documents/NAB%20Paper%20-%20Formatted%20Version.pdf](https://iptc.org/std/MediaProvenance/Documents/NAB%20Paper%20-%20Formatted%20Version.pdf)  
+26. envelope.md - in-toto/attestation - GitHub, accessed June 11, 2026, [https://github.com/in-toto/attestation/blob/main/spec/v1/envelope.md](https://github.com/in-toto/attestation/blob/main/spec/v1/envelope.md)  
+27. mlflow.tracing, accessed June 11, 2026, [https://mlflow.org/docs/latest/api_reference/python_api/mlflow.tracing.html](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.tracing.html)  
+28. Attribute Mapping Reference | MLflow AI Platform, accessed June 11, 2026, [https://mlflow.org/docs/latest/genai/tracing/opentelemetry/attribute-mapping/](https://mlflow.org/docs/latest/genai/tracing/opentelemetry/attribute-mapping/)  
+29. Agent Trace Evaluation with TruLens Scorers in MLflow, accessed June 11, 2026, [https://mlflow.org/blog/mlflow-trulens-evaluation/](https://mlflow.org/blog/mlflow-trulens-evaluation/)  
+30. From Attack Simulation to SIEM Rule: Deterministic Detection-as-Code Synthesis with Probe-Level Traceability - arXiv, accessed June 11, 2026, [https://arxiv.org/pdf/2606.05252](https://arxiv.org/pdf/2606.05252)  
+31. [KNOWLEDGE] - AI Engineering - Volume 7. S-V Failure, Security, and Hostile Environments  
+32. What do you use for tamper-evident audit logs? Looking for approaches beyond "ship to S3", accessed June 11, 2026, [https://www.reddit.com/r/Observability/comments/1rwm9vh/what_do_you_use_for_tamperevident_audit_logs/](https://www.reddit.com/r/Observability/comments/1rwm9vh/what_do_you_use_for_tamperevident_audit_logs/)  
+33. QCIVET: A Quantum–Classical Pipeline Integrity Framework with Contract-Based Subtype Verification and Hash-Chained Audit Traces - arXiv, accessed June 11, 2026, [https://arxiv.org/html/2605.13109v1](https://arxiv.org/html/2605.13109v1)  
+34. Cosign Projects - AI Tinkerers - Bogotá, accessed June 11, 2026, [https://bogota.aitinkerers.org/technologies/cosign](https://bogota.aitinkerers.org/technologies/cosign)  
+35. What Is Sigstore? Keyless Signing for the Software Supply Chain - Sbomify, accessed June 11, 2026, [https://sbomify.com/2024/08/12/what-is-sigstore/](https://sbomify.com/2024/08/12/what-is-sigstore/)  
+36. New SIG proposal: E2E Model Provenance · Issue #40 · ossf/ai-ml-security - GitHub, accessed June 11, 2026, [https://github.com/ossf/ai-ml-security/issues/40](https://github.com/ossf/ai-ml-security/issues/40)  
+37. Docker Image signing and attestation with Cosign - AugmentedMind.de, accessed June 11, 2026, [https://www.augmentedmind.de/2025/03/02/docker-image-signing-with-cosign/](https://www.augmentedmind.de/2025/03/02/docker-image-signing-with-cosign/)  
+38. Guidance for Artificial Intelligence and Machine Learning - C2PA Specifications, accessed June 11, 2026, [https://spec.c2pa.org/specifications/specifications/2.4/ai-ml/ai_ml.html](https://spec.c2pa.org/specifications/specifications/2.4/ai-ml/ai_ml.html)  
+39. A Study on Broker-Assisted Blockchain Trust Chains for Provenance and Integrity Verification of Generative Media Using Watermarking, Semantic Fingerprinting, and C2PA - MDPI, accessed June 11, 2026, [https://www.mdpi.com/2076-3417/16/7/3391](https://www.mdpi.com/2076-3417/16/7/3391)  
+40. Evidentia™ T1 — Institutional Evidence Infrastructure, accessed June 11, 2026, [https://evidentiat1.com/](https://evidentiat1.com/)  
+41. (PDF) From Policy to Pipeline: A Governance Framework for AI Development and Operations Pipelines - ResearchGate, accessed June 11, 2026, [https://www.researchgate.net/publication/399025393_From_Policy_to_Pipeline_A_Governance_Framework_for_AI_Development_and_Operations_Pipelines](https://www.researchgate.net/publication/399025393_From_Policy_to_Pipeline_A_Governance_Framework_for_AI_Development_and_Operations_Pipelines)
+
+---
+
+# Volume 10. AC-AE Operations, Governance, and Lifecycle Management
+
+---
+
+# AI-ENG-AC — AI Operations - Incident Response, Rollback & Runbook Design
+
+## **Doctrinal Foundations: Semantic Incident Response vs. Uptime Operations**
+
+Production reliability in high-dimensional artificial intelligence systems represents a fundamental break from traditional application performance monitoring (APM) and incident management paradigms.1 In legacy web architectures, system health is treated as a binary or scalar state defined by infrastructure metrics: a service is considered healthy when APIs return successful status codes, server workloads are balanced, database connections are active, and latency remains within acceptable thresholds.1 However, when these architectures are driven by probabilistic large language models (LLMs) and multi-agent loops, backend availability does not guarantee a successful, safe, or contextually coherent user transaction.1  
+An artificial intelligence gateway can return a successful HTTP 200 payload that contains a complete structural schema failure, an unauthorized tool execution, a cross-tenant data leak, or an ungrounded factual confabulation.1 Conversely, a system can exhibit optimal hardware utilization and high throughput while delivering answers that silently violate safety boundaries, omit critical citations, or trap agentic loops in expensive, infinite executions.1 This mismatch establishes the Green Dashboard Fallacy: the diagnostic error of assuming an AI system is healthy based solely on infrastructure availability.1 In production AI engineering, a green infrastructure dashboard can easily coexist with a red behavioral and meaning-level system state.1  
+This gap establishes the systems-engineering discipline of Semantic Incident Response.1 AI operations is defined as the incident-response and lifecycle discipline for systems that fail semantically, behaviorally, economically, procedurally, and socially—not merely infrastructurally.3 The core doctrine of this discipline dictates that AI incidents must be managed as behavioral and semantic failures, not merely service outages. Operational response must identify the failing layer, preserve evidence, contain harm, roll back the smallest effective component, communicate user impact, and convert the incident into durable evaluations, telemetry, policy, and runbook improvements.1  
+The primary engineering inquiry moves from "Is the service online?" to "Is the system again producing safe, grounded, authorized, governed, cost-bounded, and user-appropriate behavior?".1 Managing this requires a clean distinction between service recovery and behavioral recovery.3 While service recovery focuses on transport availability, behavioral recovery restores the system's output to safe, grounded, and policy-compliant envelopes.3 Similarly, operators must distinguish mitigation—such as prompt modifications or cache flushes that bypass active symptoms—from permanent resolution via regression-verified code changes promoted through normal CI/CD gates.2  
+This distinction is modeled mathematically as a Stackelberg game between the provider and the user to balance operational cost with user utility under degraded conditions.3 Let U_a represent the user utility derived from model action a, let t_a represent the latency delay associated with that action, and let c_a represent the monetary cost of the inference execution to the provider.3 The user's action selection seeks to maximize utility minus the latency penalty, moderated by a sensitivity parameter beta 3:  
+max_{a in A} (U_a - beta * t_a)  
+The provider, acting as the leader, optimizes its routing policies and interface disclosures to minimize operational service costs (sum of c_i) while maintaining user retention.3 If the interface fails to communicate degradation, the user's utility collapses as they over-rely on a downgraded system.3 Calibrating trust requires the system to dynamically expose its capabilities, limitations, and fallback states, transferring decision-making agency back to the user.3
+
+## **Conceptual Glossary**
+
+The following glossary defines the core operational metrics and terms governing high-dimensional AI operations and semantic incident response:
+
+| Term | Technical Definition | Primary Operational Metric | Standard Production Target |
+| :---- | :---- | :---- | :---- |
+| **AI Incident** | A situation in which deployed intelligent systems cause, or very nearly cause, real-world harm, semantic degradation, policy violations, or unauthorized actions.4 | Systemic Incident Rate (R_inc) 2 | 0.00% of automated transaction pipelines 2 |
+| **Semantic Failure** | An execution where the model output is syntactically valid but factually wrong, ungrounded, contextually irrelevant, or aligned with adversarial instructions.2 | Semantic Violation Rate (R_sem_violation) 2 | < 0.50% of evaluated transactions 2 |
+| **Behavioral Recovery** | The operational restoration of a system's output to safe, grounded, and policy-compliant envelopes after a semantic failure, independent of service availability.3 | Mean Time to Behavioral Recovery (MTTBR) | < 5 minutes via automated circuit breakers 6 |
+| **Prompt Hotfix** | An emergency, version-controlled override of a system prompt template or safety wrapper to address an active exploit or instruction failure.7 | Hotfix Verification Pass Rate | 100% compliance on automated regression gates 7 |
+| **Model Rollback** | Reverting a serving route, adapter, or model checkpoint snapshot to a prior validated version when regressions or failures occur.8 | Revert Transition Latency | < 60 seconds at the gateway layer 8 |
+| **Corpus Quarantine** | The physical or logical isolation of document batches, indexes, or vector database partitions suspected of containing poisoned or unauthorized data.2 | Quarantine Activation Delay | < 5 seconds from ingestion alert detection |
+| **Retrieval Rollback** | Reverting a vector index, document routing policy, or chunking strategy to a prior verified state to neutralize RAG poisoning.2 | Index Reconstruction Time | < 15 minutes to re-establish clean HNSW graphs |
+| **Kill Switch** | A hard, programmatic block managed outside the model's execution path to instantly disable specific agentic tools or capabilities.2 | Kill Switch Execution Latency | < 100 milliseconds via Edge proxy configurations 9 |
+| **Feature Flag** | A dynamic, runtime configuration control used to selectively toggle models, prompts, routes, or agent capabilities for specific tenants or cohorts.3 | Flag Propagation Delay | < 500 milliseconds across global CDNs |
+| **Blast Radius** | The maximum potential impact of an active failure, measured by affected tenants, transaction volumes, financial exposure, and safety risks.3 | Normalized Tenant Exposure Ratio | Scoped strictly to the failing tenant partition 2 |
+| **Degraded-Mode Failure** | A condition where core platform components fail, forcing the system to step down to a restricted but safe quality band.3 | Active Degradation Exposure (D_exp) 3 | < 2.0% of rolling monthly sessions 3 |
+| **Containment** | The rapid, temporary execution of blocks, overrides, or fallbacks to limit harm before the definitive root cause is identified.2 | Time to Containment (TTC) | < 2 minutes for critical security events 12 |
+| **Mitigation** | Structural adjustments—such as prompt modifications or cache flushes—that bypass active symptoms while permanent code fixes are prepared.3 | Mitigation Success Rate | > 95% reduction in recurring incident triggers |
+| **Resolution** | The permanent correction of the underlying system failure, verified by regression tests and promoted through normal CI/CD gates.2 | Regression Verification Coverage | 100% coverage of failure-trigger variants |
+| **Incident-to-Eval Loop** | The automated pipeline that packages an incident trace, sanitizes sensitive data, and converts the failure into a permanent evaluation case.1 | Promotion Lead Time | < 24 hours from incident closure to CI/CD gate |
+
+## **AI Incident Taxonomy**
+
+Probabilistic failure modes are highly distributed and cross-cut multiple system layers.1 To facilitate rapid categorization and triage, the platform establishes a multi-dimensional AI Incident Taxonomy.4 Incidents are classified not by their infrastructure symptoms, but by their failing semantic layer and downstream consequences.2 A successful HTTP 200 response code can still be categorized as a critical SEV-1 failure if it delivered unauthorized, harmful, or ungrounded action guidance to the execution environment.1
+
+```text
+AI INCIDENT TAXONOMY MAP
+
+[ External / User / Scheduled Input ]
+        |
+        v
++-------------------------------+
+|  Intake and Boundary Layer    |
+|  auth | tenant | policy | file |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+|  Data and Evidence Layer      |
+|  corpus | retrieval | cache   |
+|  freshness | citation support |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+|  Model and Reasoning Layer    |
+|  semantic | grounding | prompt |
+|  refusal | schema | drift     |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+|  Agent and Action Layer       |
+|  tool calls | workflows       |
+|  idempotency | verification   |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+|  User / Governance Layer      |
+|  disclosure | review | trust  |
+|  compliance | communications  |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+|  Operations Response Layer    |
+|  detect | contain | recover   |
+|  notify | evaluate | prevent  |
++-------------------------------+
+
+Incident classes are assigned by failing layer, consequence, active
+propagation, reversibility, and evidence confidence. A green HTTP response
+does not imply a healthy AI transaction.
+```
+
+The taxonomy maps sixteen distinct classes of system failure across the data ingestion, runtime processing, and interface delivery layers:
+
+| Incident Class | Failing System Layer | Primary Diagnostic Indicator | Operational Symptom | Trace Correlation Attribute |
+| :---- | :---- | :---- | :---- | :---- |
+| **Semantic** | Cognitive / Inference 1 | nli_grounding_score < 0.70 1 | Confident output of false, ungrounded, or contradictory advice.1 | gen_ai.output.messages 1 |
+| **Grounding** | Retrieval Context 1 | Delta_prior > 0.15 2 | Model answers from pre-trained weights, ignoring retrieved documents.2 | gen_ai.usage.input_tokens 1 |
+| **Citation** | Document Parser 1 | citation_alignment_score < 0.80 1 | Bracketed citations do not map to verified source page coordinates.2 | document.score 1 |
+| **Retrieval** | Index / Search 1 | MRR@k < 0.50 1 | Empty result sets or irrelevant documents returned for queries.1 | retrieval.latency 1 |
+| **Corpus** | Ingestion Storage 2 | Ingestion validation failure 2 | Attacker-controlled documents enter index, overriding system prompts.2 | origin_source_type 2 |
+| **Tool** | Agent / Executor 1 | json_decode_error 1 | Agent invokes external APIs with malformed, ungrounded, or unsafe parameters.1 | gen_ai.tool.name 1 |
+| **Routing** | Gateway Proxy 1 | selected_model mismatch 1 | Silent downgrades shift traffic below the specified model quality floor.3 | routing_reason 1 |
+| **Policy** | Guardrail / Filter 2 | policy_violation_rate trigger 2 | Model overblocks benign queries or fails to intercept policy violations.2 | guardrail.id 1 |
+| **UI / Trust** | Interface Display 3 | average_approval_ms < 250ms 1 | System hides uncertainty, encouraging uncritical user overreliance.3 | citation_click_rate 1 |
+| **Governance** | Compliance / Audit 1 | Signature validation failure 2 | Deployed pipelines execute mutations without valid cryptographic signatures.2 | maker_id / checker_id 1 |
+| **Model** | Inference Serving 1 | reconstruction_error spike 1 | Silent degradation in reasoning performance following provider updates.2 | canary_similarity_score 1 |
+| **Agent-Loop** | Orchestration 2 | state_repetition_count > 2 1 | Multi-agent pipelines enter infinite planning or formatting repair loops.2 | repair_loop_count 1 |
+| **Cost** | Billing / Resource 1 | cost_velocity_usd > limit 1 | High-frequency token consumption or runaway API invocations.2 | usage.cost.total 1 |
+| **Security** | Boundary / Access 2 | Unapproved network egress 2 | Compromised MCP tool server executes arbitrary remote commands.2 | rpc.response.status_code 1 |
+| **Privacy** | Isolation / Cache 2 | Cross-tenant cache hits 2 | Cross-tenant data leaks or cached state contamination across user boundaries.2 | stale_cache_served 1 |
+| **Human-Review** | Operational Queue 1 | review_duration_seconds spike 1 | Expert review queues become saturated, forcing automation defaults.3 | approval_requests.id 1 |
+
+## **AI Severity Model**
+
+AI severity must be consequence-driven, not symptom-driven. The same failure class can be harmless in staging, severe in a regulated production workflow, or catastrophic when it reaches an autonomous tool surface. Severity is therefore assigned by combining harm type, exposure, reversibility, active propagation, regulatory sensitivity, and confidence in detection.
+
+```text
+severity = f(
+  harm_type,
+  affected_population,
+  exposure_count,
+  active_propagation,
+  reversibility,
+  security_or_regulatory_sensitivity,
+  confidence_of_detection
+)
+```
+
+Severity assignment should be reviewed when new evidence changes the blast radius or reversibility estimate. Operators should prefer temporary over-classification during uncertainty and downgrade only after containment and scope validation.
+
+| Severity Level | Consequence Envelope | Typical AI Failure Examples | Immediate Response | Recovery / Closure Criteria |
+| :---- | :---- | :---- | :---- | :---- |
+| **SEV-0** | Active or imminent irreversible harm, uncontrolled high-impact autonomous action, confirmed cross-tenant exposure at broad scope, or severe security compromise with ongoing propagation. | Unauthorized destructive tool execution, confirmed regulated-data leak across tenants, fail-open bypass of core authorization, uncontrolled agentic action against critical systems. | Activate global or scoped kill switch; freeze affected capability; page incident commander, security, privacy, operations, and executive sponsor as applicable. | Harm is contained, affected scope is verified, exposed credentials/artifacts are revoked or quarantined, and recovery route passes high-risk validation. |
+| **SEV-1** | Active high-impact harm or high-confidence risk affecting a tenant, workflow, regulated domain, or state-changing tool surface. Harm is serious but containable. | Ungrounded high-impact advice delivered to active users, unauthorized mutation attempt blocked late, tenant-scoped data exposure, poisoned retrieval route influencing production answers. | Isolate affected tenant/route/tool/index; revoke scoped credentials; preserve evidence; switch to safe degraded mode or fail closed. | Blast radius is known, active harm has stopped, affected users/workflows are identified, and compensating or corrective actions are underway. |
+| **SEV-2** | Contained semantic, retrieval, model, policy, or tool failure with limited blast radius and no confirmed irreversible external harm. | Citation failures in production, schema drift causing blocked actions, model regression on bounded workflow, repeated tool argument rejection, contained prompt-injection success without side effect. | Disable or downgrade affected route; apply feature flag; route to verified cache, manual review, or bounded degraded mode. | Regression test covers the failure; telemetry confirms no recurrence over the required observation window. |
+| **SEV-3** | Quality, latency, cost, or trust degradation visible to limited users but without safety, privacy, or high-impact action exposure. | Model route downgrade disclosed to users, elevated unsupported-claim rate in low-risk domain, parser degradation, stale cache served with proper labeling. | Communicate limitation; preserve state; reduce capability if needed; monitor for escalation. | Service returns to expected behavioral envelope and user-visible degradation is resolved or accepted by policy. |
+| **SEV-4** | Internal anomaly, evaluation regression, telemetry drift, suspicious signal, or staging failure with no confirmed user impact. | Canary drift, golden-set failure, evaluation drop, prompt-template compile warning, non-production index anomaly. | Open tracked operations issue; assign owner; block release if policy requires. | Root cause is documented or accepted, and release gates or monitoring are updated if needed. |
+
+Severity should never be determined by a single metric alone. A low grounding score, citation score, cost spike, or routing mismatch is a signal. It becomes an incident severity level only after operators estimate consequence, exposure, active propagation, reversibility, and confidence.
+
+## **Detection and Intake Model**
+
+AI operations requires a structured, multi-channel Detection and Intake Model to route anomalies to the correct SRE responder queues.18 Anomalies are ingested automatically from strategic telemetry monitors, CI/CD evaluation gate failures, or customer-reported support tickets.1
+
+  Strategic Telemetry ───► Anomaly Detector ──┐  
+  CI/CD Eval Gates    ───► Regression Gate ──┼──► [Intake Controller] ──► Preserves Verification Artifacts ──► Pages On-Call SRE  
+  Support Desk        ───► Escalation Queue ─┘
+
+The intake schema enforces immediate field mapping to preserve the semantic state of the interaction, preventing forensic data loss during the initial triage window:
+
+* **Reporter Identity:** System ID, User ID, or support ticket reference.  
+* **Ingestion Timestamp:** Monotonic UTC timestamp of the first detected anomaly.  
+* **Affected Workspace ID:** UUID mapping the failure to a specific tenant partition.2  
+* **Observed Pathology Class:** Categorized target from the AI Incident Taxonomy.2  
+* **Trace Context Identifier:** W3C Trace Parent string and active parent-span ID.1  
+* **Active Model Manifest Hash:** Cryptographic signature verifying active weight versions.2  
+* **Active Prompt Version:** Semantic version of the compiled template.3  
+* **Retrieval Snapshot Path:** Secure reference link pointing to S3-archived document vectors.1  
+* **Containment Status Flag:** Boolean tracking whether automated circuit breakers have triggered.2
+
+### **Evidence Preservation During Intake**
+
+Containment actions must not destroy evidence required for scope analysis, replay, attribution, legal review, or regulatory reporting. Before clearing caches, wiping sessions, redeploying containers, rotating credentials, rebuilding indexes, or mutating prompt routes, the intake controller should preserve a minimal tamper-evident incident manifest containing trace identifiers, artifact hashes, active configuration versions, relevant secure payload references, policy decisions, and containment actions. Raw sensitive payloads should not be copied into general incident tickets; they should be stored only through controlled forensic references with access logs and retention policy.
+
+Upon ingestion of a serious or catastrophic incident (SEV-0 or SEV-1), the intake controller issues an automated command to lock the active session, seal related model adapters, snapshot the active index state, and write a tamper-evident reference manifest to the compliance-audit database, preventing operators from clearing caches or redeploying code before forensics are complete.2
+
+## **Semantic Triage Tree**
+
+Semantic triage identifies the failing operational layer before responders choose a containment or rollback surface. The goal is to avoid the two classic incident sins: rolling back the wrong component because it was visible, and destroying forensic evidence because someone panic-clicked “clear cache.” Charming hobbies, both. Not operations.
+
+```text
+SEMANTIC TRIAGE TREE
+
+[ Incident Intake ]
+        |
+        v
+[ 1. Is there active safety, privacy, financial, legal, or security harm? ]
+        |
+        +-- yes --> [ Contain first ]
+        |             isolate route/tool/tenant/index/cache
+        |             revoke scoped credentials if needed
+        |             preserve evidence manifest
+        |
+        +-- no  --> continue triage
+        |
+        v
+[ 2. Did a state-changing tool or external action execute or possibly execute? ]
+        |
+        +-- yes --> [ Tool / Action Branch ]
+        |             hold unknown state
+        |             reconcile source of record
+        |             compensate only committed reversible effects
+        |
+        +-- no  --> continue triage
+        |
+        v
+[ 3. Is retrieved evidence, citation, corpus, or cache state implicated? ]
+        |
+        +-- yes --> [ Retrieval / Corpus Branch ]
+        |             freeze ingestion
+        |             quarantine suspect sources
+        |             bypass unsafe cache
+        |             rebuild or re-rank from verified manifest
+        |
+        +-- no  --> continue triage
+        |
+        v
+[ 4. Is the model route, adapter, decoding policy, or provider behavior implicated? ]
+        |
+        +-- yes --> [ Model / Routing Branch ]
+        |             pin known-good route
+        |             disable suspect adapter
+        |             run canary and regression profile
+        |
+        +-- no  --> continue triage
+        |
+        v
+[ 5. Is prompt, policy, schema, or tool-description behavior implicated? ]
+        |
+        +-- yes --> [ Prompt / Policy / Contract Branch ]
+        |             revert template or policy bundle
+        |             apply bounded prompt hotfix if needed
+        |             validate against targeted incident evals
+        |
+        +-- no  --> continue triage
+        |
+        v
+[ 6. Is the failure primarily user-facing disclosure, review, or trust calibration? ]
+        |
+        +-- yes --> [ UX / Review / Governance Branch ]
+        |             disclose limitation
+        |             pause high-impact automation
+        |             route to review or approval queue
+        |
+        +-- no  --> [ Unknown / Multi-Layer Branch ]
+                      preserve full evidence manifest
+                      keep containment active
+                      assign cross-functional incident review
+```
+
+| Branch | Diagnostic Artifacts | Immediate Containment | Likely Rollback / Recovery Surface |
+| :---- | :---- | :---- | :---- |
+| **Tool / Action** | Tool trace, authorization decision, idempotency key hash, pre/post state hash, source-of-record status. | Disable affected tool, hold workflow, block blind retry, revoke scoped credentials if compromised. | Tool contract, tool route, credential scope, compensation workflow, idempotency ledger. |
+| **Retrieval / Corpus** | Retrieval trace, source IDs, source version hashes, chunk IDs, cache scope, citation verification state. | Freeze ingestion, quarantine suspect documents, bypass unsafe cache, block suspect source lifecycle states. | Corpus lifecycle state, index manifest, chunking policy, retrieval filter, cache key version. |
+| **Model / Routing** | Model route, provider profile, model/version hash where available, adapter manifest, decoding config, canary deltas. | Pin known-good route, disable suspect adapter, reduce autonomy, enter disclosed degraded mode. | Model route manifest, adapter binding, decoding profile, provider fallback policy. |
+| **Prompt / Policy / Contract** | Rendered prompt reference, prompt version, policy bundle version, schema version, validation errors. | Revert prompt/policy/schema exposure, disable risky prompt path, apply bounded hotfix. | Prompt template, policy bundle, tool description, schema registry, validator. |
+| **UX / Review / Governance** | Disclosure event, approval record, reviewer dwell time, escalation packet, user correction signal. | Show status, pause high-impact automation, route to review, block auto-approval. | Review rules, disclosure policy, approval thresholds, UI trust calibration. |
+| **Unknown / Multi-Layer** | Full trace graph, incident manifest, secure payload refs, configuration versions, containment actions. | Maintain containment until narrowed; avoid destructive cleanup. | Determined after forensics. |
+
+
+## **Incident Evidence Package**
+
+The Incident Evidence Package is the forensic bundle used to scope, replay, audit, and repair an AI incident. Raw syslogs are not enough for probabilistic systems, but unrestricted raw prompt dumps are also not acceptable. The package must preserve enough evidence to reconstruct decisions without turning the incident tracker into a second data breach wearing a little lanyard.
+
+```text
+INCIDENT EVIDENCE PACKAGE
+
+[ Incident ID ]
+      |
+      +--> Trace and Span References
+      |      trace_id, span_ids, workflow_id, session_hash, tenant_hash
+      |
+      +--> Runtime Configuration
+      |      model route, provider profile, prompt version, policy version,
+      |      schema version, tool manifest hash, gateway route manifest
+      |
+      +--> Evidence and Retrieval State
+      |      source IDs, source version hashes, chunk IDs, retrieval IDs,
+      |      cache scope, citation coordinates where applicable
+      |
+      +--> Action and Tool State
+      |      tool call ID, payload hash, idempotency key hash,
+      |      authorization decision, pre/post state hashes, verification status
+      |
+      +--> Supply-Chain and Deployment State
+      |      artifact hashes, image digest, model/adaptor signatures,
+      |      dependency manifest, sandbox profile
+      |
+      +--> Secure Payload References
+      |      access-controlled references to raw prompts, outputs, files,
+      |      tool payloads, and sensitive evidence when retention is allowed
+      |
+      +--> Containment and Recovery Record
+             feature flags, kill switches, credential revocations,
+             quarantines, rollbacks, compensations, notifications
+```
+
+| Evidence Dimension | Preserve By Default | Sensitive Payload Handling | Operational Purpose |
+| :---- | :---- | :---- | :---- |
+| **Trace Context** | W3C `traceparent`, span IDs, workflow ID, route ID, incident ID. | Safe as metadata if tenant/user identifiers are hashed or opaque. | Reconstruct execution chronology. |
+| **Model and Prompt State** | Model route, provider profile, adapter manifest, decoding config, prompt template ID, rendered prompt hash. | Rendered prompt text stored only as secure reference when needed. | Identify model, prompt, or routing regression. |
+| **Retrieval State** | Retrieval ID, query hash, source IDs, chunk IDs, source version hashes, citation regions, authorization filter version. | Raw retrieved text stored as secure evidence reference, not in general tickets. | Diagnose grounding, citation, stale-source, or leakage failures. |
+| **Tool / Action State** | Tool name/version, schema version, payload hash, idempotency key hash, approval status, pre/post state hashes. | Raw arguments and results stored only in action ledger or forensic vault. | Determine whether action executed, failed, partially committed, or remains unknown. |
+| **Policy and Authorization** | Policy bundle version, decision ID, denial/allow class, scoped credential lifetime, approval requirement. | Do not log raw credentials, auth headers, bearer tokens, or private policy secrets. | Prove whether the action was authorized. |
+| **Supply-Chain Artifacts** | Container image digest, dependency manifest, model/adaptor hash, signature status, sandbox profile. | Store signature bundles and manifests; avoid copying private keys or secrets. | Prove what artifact executed. |
+| **User-Facing State** | Disclosure shown, status message ID, user confirmation state, escalation package ID. | Store user-visible text by secure reference when sensitive. | Determine whether users were properly informed. |
+| **Containment Actions** | Flag toggles, kill-switch activation, index quarantine, cache bypass, route rollback, credential revocation. | No secret values; store action IDs and affected scopes. | Prove containment timing and scope. |
+
+### **Evidence Handling Rule**
+
+```text
+General incident record:
+  hashes, IDs, versions, policy decisions, redacted summaries, secure refs.
+
+Controlled forensic vault:
+  raw prompts, raw outputs, source excerpts, uploaded files, tool payloads,
+  transaction details, and other sensitive incident evidence.
+
+Never store raw credentials, bearer tokens, private keys, or unrestricted
+tenant data in ordinary tickets, logs, or postmortem documents.
+```
+
+## **AI Incident Command Role Model**
+
+AI incidents cross model behavior, retrieval, tools, user trust, privacy, security, governance, and infrastructure. Incident response therefore requires role separation. The incident commander owns coordination and severity. Domain owners diagnose and execute bounded changes. Governance, privacy, legal, and communications roles control regulated obligations and external messaging.
+
+```text
+AI INCIDENT COMMAND STRUCTURE
+
+                     [ Incident Commander ]
+                              |
+       +----------------------+----------------------+
+       |                      |                      |
+[ Technical Response ] [ Risk / Governance ] [ User / Business Response ]
+       |                      |                      |
+AI Ops Lead            Security Lead          Customer Comms Lead
+Model Owner            Privacy Lead           Support Lead
+Prompt Owner           Governance Lead        Executive Sponsor
+Retrieval Owner        Legal Liaison
+Tool/Action Owner
+SRE/Platform Lead
+Evaluation Lead
+```
+
+| Role | Primary Responsibility | Authorized Actions | Escalates When |
+| :---- | :---- | :---- | :---- |
+| **Incident Commander** | Owns coordination, severity, response cadence, decision log, and closure criteria. | Activates kill switches, assigns owners, approves containment scope, declares behavioral recovery. | SEV-0/SEV-1, unclear ownership, public/regulatory exposure, prolonged containment. |
+| **AI Operations Lead** | Owns gateway routing, fallback, model/provider route health, and degraded-mode operation. | Pins routes, changes traffic splits, disables unsafe model paths, coordinates with SRE. | Routing changes affect quality floor, safety, privacy, or broad user cohorts. |
+| **SRE / Platform Lead** | Owns serving infrastructure, queues, GPU capacity, deployment health, and runtime stability. | Scales serving pools, isolates pods/nodes, rolls back deployment images, enforces circuit breakers. | Infrastructure failure contributes to semantic or user-visible incident. |
+| **Model Owner** | Owns model snapshots, provider profiles, adapters, quantization configs, and decoding profiles. | Disables adapters, pins model snapshot, changes approved decoding profile, initiates model regression evaluation. | Model behavior drift, provider update, adapter failure, or route quality regression is suspected. |
+| **Prompt Owner** | Owns system prompts, tool descriptions, safety wrappers, and prompt registry changes. | Reverts prompt versions, proposes emergency hotfix, validates placeholder and policy invariants. | Prompt injection, instruction loss, schema drift, or template regression is implicated. |
+| **Retrieval / Corpus Owner** | Owns corpus lifecycle, chunking, embeddings, vector indexes, source authority, and cache eligibility. | Freezes ingestion, quarantines sources, rebuilds index from manifest, updates retrieval eligibility state. | Poisoning, stale evidence, citation failure, or cross-tenant retrieval is suspected. |
+| **Tool / Action Owner** | Owns tool contracts, scoped credentials, idempotency, action ledgers, and post-action verification. | Revokes tool credentials, disables tool route, blocks blind retry, initiates reconciliation or compensation. | State-changing action is executed, unknown, duplicated, unauthorized, or misreported. |
+| **Security Lead** | Owns prompt-injection compromise, SSRF, RCE, egress, sandbox, secret leakage, and adversarial activity. | Blocks egress, isolates runtimes, rotates exposed credentials, directs forensic capture. | Boundary violation, malicious artifact, unauthorized tool use, or active exploit is detected. |
+| **Privacy Lead** | Owns PII/PHI exposure, tenant leakage, cache contamination, and privacy-impact assessment. | Freezes affected data scopes, requires secure evidence handling, coordinates affected-scope analysis. | Personal, regulated, or tenant-private data may have been exposed. |
+| **Governance / Compliance Lead** | Owns policy obligations, regulated incident thresholds, audit artifacts, and required reporting workflows. | Determines governance review path, coordinates regulatory reporting where legally required. | Incident may trigger contractual, regulatory, audit, or internal governance obligations. |
+| **Legal Liaison** | Advises on liability, privilege, preservation duties, notification risk, and external legal exposure. | Recommends legal hold, reviews communications, coordinates with counsel. | Potential harm, regulated disclosure, litigation risk, or contractual breach is present. |
+| **Customer Communications Lead** | Owns status page, customer-facing language, support scripts, and disclosure consistency. | Publishes approved updates, coordinates user notices, avoids unverified claims. | User-visible degradation, breach notification, SLA issue, or public-facing incident occurs. |
+| **Support Lead** | Owns ticket routing, user reports, support scripts, and frontline escalation. | Escalates patterns to IC, updates support guidance, coordinates user-level remediation. | Support tickets spike, users report false success, or manual recovery is needed. |
+| **Evaluation Lead** | Owns incident-to-eval promotion, regression reproduction, golden cases, and release gates. | Converts sanitized incident traces into test cases, blocks release on unresolved regression. | Incident class lacks adequate eval coverage or repair needs release verification. |
+| **Executive Sponsor** | Owns executive decision-making for catastrophic public, regulatory, financial, or safety incidents. | Approves major public posture, business-continuity actions, and broad shutdown decisions. | Incident materially affects customers, regulators, revenue, safety, or public trust. |
+
+## **Containment Strategy**
+
+Containment means stopping active harm before the definitive root cause is identified.2 Probabilistic systems require a graduated containment progression to limit the blast radius while preserving task continuity for unaffected enterprise tenants 2:
+
+```
+  Incident Ingested ──► Map blast radius to session contexts  
+                             │  
+                             ▼  
+  Local Containment  ──► Tenant Partition / Isolate Namespace   
+                             │  
+                             ▼  
+  Scoped Containment ──► Toggle Flag / Revoke Tool Scope   
+                             │  
+                             ▼  
+  System Failover    ──► Route Fallback / Fail-Closed 
+```
+
+### **1. Identify and Scope the Failure**
+
+Upon alert ingestion, the responder identifies the smallest affected perimeter.2 If a failure impacts only a single workspace, the responder isolates that tenant's namespace inside pgvector and Redis caches, preventing global service disruption.2
+
+### **2. Isolate via Capability Kill Switches**
+
+If the failure involves agentic tool execution (such as recursive database writes), the responder toggles the corresponding feature flag, disabling write actions while preserving read-only informational capability.2
+
+### **3. Route to Safe Degraded Modes**
+
+If cognitive performance has degraded globally, the gateway proxy intercepts downstream requests, shifting traffic to smaller, cached, or local model configurations.3 The system displays a plain-language disclosure, informing the user that advanced analytical capabilities are temporarily restricted.3
+
+### **4. Fail-Closed Enforcement**
+
+If containment paths cannot satisfy the system's defined safety, privacy, or compliance floors, the transaction is terminated.2 All active session credentials are revoked, in-flight database transactions are rolled back, and the system freezes safely to prevent cascading failures.2
+
+## **Feature Flag and Kill Switch Matrix**
+
+Feature flags and kill switches must operate strictly outside the model's cognitive boundary, utilizing centralized gateway routing weights or isolated container-level network proxies to enforce boundaries.2
+
+```
+  Requests ──► Filter checks (OIDC JWT verified)  
+                     │  
+                     ├─► FF_MODEL_ROUTE ( claude-3-5-sonnet -> claude-3-5-haiku )   
+                     ├─► FF_TOOL_REVOKE ( Revokes OAuth token inside vault )   
+                     └─► FF_INDEX_FREEZE ( Sets HNSW partition to read-only ) 
+```
+
+The Feature Flag and Kill Switch Matrix outlines the technical implementation, operational check, and restoration procedure for each control:
+
+| Switch Identifier | Scope of Control | Underlying Code Mechanism | Access Control Rule (RBAC) | Standard Restoration Criteria |
+| :---- | :---- | :---- | :---- | :---- |
+| **FF_GLOBAL_AI** | Global Platform | Gateway proxy routing configuration toggle.2 | Platform Administrator | 100% pass on CI/CD validation gates.1 |
+| **FF_TENANT_BLOCK** | Specific Workspace | Redis key block; database RLS filter constraint.2 | Incident Commander 17 | Security compliance sign-off on tenant files.2 |
+| **FF_TOOL_REVOKE** | Specific Agent API | OAuth token revocation inside Secrets Manager.2 | Tool Owner | API status matches baseline schemas.2 |
+| **FF_MODEL_ROUTE** | Serving Endpoint | Gateway routing weight redistribution.3 | AI Operations Lead | 10-run canary suite perplexity matches baseline.2 |
+| **FF_INDEX_FREEZE** | Document Indexing | Ingestion worker write lock; HNSW read-only flag.2 | Retrieval Owner | HubScan robust z-score returns to normal (less than 5.0).2 |
+| **FF_CACHE_BYPASS** | Semantic Memory | Redis cache lookup bypass configuration.2 | SRE On-Call Engineer | Cache keys cleared; TTL parameters updated.2 |
+| **FF_AGENT_DRAFT** | Agent Loop Autonomy | Blocks auto-send; forces read-only draft views.2 | Prompt Owner | Trajectory evaluation pass rate > 95%.1 |
+
+## **Rollback Surface Map**
+
+Rollback in AI systems is multi-surface. Reverting the model while leaving a poisoned index, stale cache, incompatible prompt, or drifted tool schema active can create a new incident. Operators must identify the smallest effective rollback surface and validate all coupled artifacts before restoring traffic.
+
+```text
+ROLLBACK SURFACE MAP
+
+[ User-visible or telemetry-detected failure ]
+        |
+        v
+[ Identify failing surface ]
+        |
+        +--> prompt template / tool description
+        +--> model route / provider profile / adapter
+        +--> retrieval index / corpus lifecycle state
+        +--> policy bundle / authorization rule
+        +--> tool contract / action gateway
+        +--> cache key scope / semantic cache
+        +--> UI control / disclosure / automation locator
+        +--> deployment image / dependency / sandbox profile
+        |
+        v
+[ Preserve evidence manifest ]
+        |
+        v
+[ Apply smallest safe rollback or containment ]
+        |
+        v
+[ Run surface-specific validation ]
+        |
+        v
+[ Restore traffic gradually or remain degraded/fail-closed ]
+```
+
+| Rollback Surface | Mechanical Trigger | Evidence to Capture Before Change | Validation Before Restoration | Common Failure Mode |
+| :---- | :---- | :---- | :---- | :---- |
+| **Prompt Template / Tool Description** | Reassign active prompt/template tag to previous approved version. | Prompt ID, rendered prompt hash, template version, variables, failing output hash. | Prompt compile check, safety/policy invariants, targeted incident evals. | Placeholder mismatch, instruction regression, hidden tool-description drift. |
+| **Model Route / Provider Profile** | Pin gateway route to previous approved model/provider snapshot or serving profile. | Route ID, provider response metadata, model snapshot/hash where available, decoding config. | Canary suite, schema pass rate, grounding checks, latency/cost profile. | Capability loss, context-window mismatch, provider SDK incompatibility. |
+| **Adapter / LoRA / Fine-Tune** | Disable suspect adapter or revert to previous adapter manifest. | Adapter hash, parent model ID, tenant binding, training dataset lineage. | Tenant-scoped regression suite and behavior comparison against base route. | Adapter dimension mismatch, cross-tenant adapter exposure, quality regression. |
+| **Retrieval Index** | Restore index from verified manifest or rebuild from authorized source records. | Source IDs, chunk IDs, embedding model version, index manifest, query traces. | Retrieval MRR/recall checks, authorization checks, citation verification. | Missing vectors, stale source lifecycle state, HNSW rebuild delay. |
+| **Corpus Lifecycle State** | Mark suspect source/chunk/vector as quarantined, revoked, stale, or inactive. | Source version hash, ingestion batch ID, parser version, transformation history. | Retrieval eligibility tests and source-authority checks. | Quarantine bypass through cache or derived summary. |
+| **Policy Bundle** | Revert OPA/policy-as-code bundle or authorization rules. | Policy version, decision logs, rule IDs, affected scopes. | Policy compile check, adversarial tests, false-positive/false-negative smoke tests. | Overblocking, underblocking, mismatch between UI disclosure and policy. |
+| **Tool Contract / Action Gateway** | Revert tool schema, MCP manifest, OpenAPI contract, or wrapper logic. | Tool manifest hash, payload hash, validation errors, authorization decision. | Dry-run validation, idempotency test, post-action verification test. | Downstream API changed; old schema no longer matches target service. |
+| **Semantic / Prefix Cache** | Bypass, invalidate, or version cache key scope. | Cache key hashes, tenant/session scope, source/policy/model versions. | Scope-isolation test, freshness test, live retrieval confirmation. | Thundering-herd load, stale cache re-entry, cross-scope key reuse. |
+| **UI / Trust Control** | Revert disclosure labels, approval gate behavior, browser locators, or citation rendering. | Screenshot hash, DOM snapshot hash, disclosure state, click/action logs. | UI regression test, disclosure check, automation re-observation test. | Silent downgrade, incorrect confidence, blind-click automation. |
+| **Deployment Image / Runtime** | Revert container image, dependency lockfile, parser sandbox, or serving image. | Image digest, SBOM/AI-BOM refs, sandbox profile, CVE/signature status. | Vulnerability scan, smoke test, sandbox policy test, health + behavior canary. | Reintroducing vulnerable dependency or breaking model-loader compatibility. |
+
+## **Prompt Hotfix Protocol**
+
+Prompt hotfixes are emergency mitigations, not magic patches. They may reduce active harm while a durable fix is prepared, but they must be versioned, reviewed, tested, and retired or promoted through the normal release process. A prompt hotfix that cannot be audited is just production improv with a YAML costume.
+
+```text
+PROMPT HOTFIX FLOW
+
+[ Active prompt-related incident ]
+        |
+        v
+[ Create incident-bound hotfix branch ]
+        |
+        v
+[ Preserve failing trace + rendered prompt reference ]
+        |
+        v
+[ Apply minimal prompt/template/tool-description change ]
+        |
+        v
+[ Pre-flight validation ]
+  placeholders | token budget | schema references | policy invariants
+        |
+        v
+[ Risk-tiered eval gate ]
+  targeted incident cases | safety probes | schema checks | grounding checks
+        |
+        v
+[ Controlled exposure ]
+  canary, tenant-scoped route, or internal-only validation
+        |
+        v
+[ Promote, revise, or revert ]
+        |
+        v
+[ Add incident case to permanent evals ]
+```
+
+| Gate | Required Check | Failure Handling |
+| :---- | :---- | :---- |
+| **Incident Binding** | Hotfix branch, prompt version, and deployment record reference the incident ID. | Block deployment if change is not traceable to incident. |
+| **Minimality Review** | Change addresses the active failure without broad unrelated behavior changes. | Split unrelated improvements into normal release path. |
+| **Template Integrity** | Variables, tool names, delimiters, schemas, and context-budget assumptions remain valid. | Reject hotfix until compiler and schema checks pass. |
+| **Policy Invariants** | Safety, privacy, authority hierarchy, and tool-boundary instructions are not weakened. | Fail closed; route to policy owner or security lead. |
+| **Targeted Regression** | Incident-triggering case and related variants pass. | Keep containment active; revise or roll back. |
+| **Canary / Exposure Control** | Exposure is bounded by risk tier, tenant scope, and rollback readiness. | Disable route if metrics degrade or unexpected behavior appears. |
+| **Promotion / Retirement** | Hotfix is either promoted into a normal release with tests or retired after durable fix. | Emergency-only prompt changes cannot remain unowned indefinitely. |
+
+Specific thresholds such as number of eval cases, canary percentage, and observation window should be set by risk tier and deployment profile. High-impact workflows require stricter approval and lower exposure than low-risk conversational formatting fixes.
+
+## **Model Rollback Model**
+
+Model rollback restores a prior approved serving behavior by changing the model route, provider profile, adapter binding, decoding profile, or serving image. It should be executed at the gateway or serving-control layer so downstream applications do not hardcode emergency model logic.
+
+```text
+MODEL ROLLBACK MODEL
+
+[ Drift / regression / provider incident detected ]
+        |
+        v
+[ Freeze route manifest and preserve evidence ]
+        |
+        v
+[ Identify rollback target ]
+  previous provider profile
+  approved model snapshot
+  prior adapter manifest
+  conservative decoding profile
+  last stable serving image
+        |
+        v
+[ Route traffic to rollback target ]
+        |
+        v
+[ Run validation suite ]
+  schema | grounding | policy | tool compatibility | latency | cost
+        |
+        v
+[ Restore gradually or remain degraded/fail-closed ]
+```
+
+| Rollback Dimension | What Changes | Validation Required | Common Risk |
+| :---- | :---- | :---- | :---- |
+| **Provider Route** | Gateway selects previous approved provider/model profile. | Capability floor, safety profile, context window, schema support. | Silent downgrade below task requirements. |
+| **Model Snapshot** | Self-hosted or registry-managed model reverts to prior signed snapshot. | Signature/hash check, canary behavior, latency, memory footprint. | Snapshot incompatible with current tokenizer, adapter, or prompt. |
+| **Adapter / LoRA** | Suspect adapter is disabled or reverted to prior manifest. | Parent-model compatibility, tenant binding, targeted task eval. | Quality drop or accidental cross-tenant adapter exposure. |
+| **Decoding Profile** | Temperature, top-p, max tokens, constrained decoding, or structured-output mode changes. | Schema pass rate, semantic quality, refusal behavior, output length. | Overcorrection causing refusals, truncation, or loss of usefulness. |
+| **Serving Image** | Runtime container, model loader, dependency set, or quantization profile changes. | Smoke test, model-load verification, CVE/signature check, performance envelope. | Reintroducing vulnerable loaders or incompatible kernels. |
+| **Prompt Coupling** | Prompt route is pinned to a compatible version for rollback route. | Prompt-template compile, tool description compatibility, context budget. | Old model receives prompt format it cannot follow. |
+
+Rollback closure requires behavioral validation, not merely successful deployment. A route is recovered only when task-level outputs return to the approved envelope for grounding, schema, policy, latency, tool compatibility, and user-facing disclosure.
+
+
+## **Corpus Quarantine and Retrieval Rollback Model**
+
+Retrieval incidents are contained by changing source eligibility, not by trusting the model to ignore bad evidence. Poisoned, stale, unauthorized, or anomalous documents must be removed from the retrieval candidate set through database-enforced lifecycle state, tenant scope, source authority, and cache invalidation.
+
+```text
+CORPUS QUARANTINE FLOW
+
+[ Retrieval anomaly detected ]
+  hubness | stale source | cross-tenant hit | citation mismatch | user report
+        |
+        v
+[ Preserve retrieval evidence ]
+  retrieval_id, query_hash, source IDs, chunk IDs, cache scope, index manifest
+        |
+        v
+[ Mark affected artifacts ]
+  source_lifecycle_state = quarantined / revoked / stale / pending_review
+        |
+        v
+[ Enforce retrieval eligibility ]
+  tenant scope + ACL + source state + policy version + cache scope
+        |
+        v
+[ Freeze affected ingestion path ]
+        |
+        v
+[ Serve safe fallback ]
+  lexical search | verified cache | partial answer | review | fail closed
+        |
+        v
+[ Rebuild or repair index from verified manifest ]
+```
+
+| Control | Purpose | Implementation Pattern |
+| :---- | :---- | :---- |
+| **Source Lifecycle State** | Blocks suspect sources and derived chunks from active retrieval. | Store lifecycle state such as `active`, `pending_review`, `quarantined`, `revoked`, or `stale`; retrieval queries admit only eligible states. |
+| **Tenant and ACL Enforcement** | Prevents cross-tenant or unauthorized retrieval during incident response. | Enforce DB-level RLS or equivalent authorization before candidate scoring. |
+| **Quarantine Registry** | Provides fast emergency exclusion without ad hoc SQL string injection. | Maintain tenant-scoped denylist/quarantine table joined by source ID, chunk ID, or vector ID. |
+| **Cache Invalidation / Bypass** | Prevents quarantined evidence from reappearing through stale cache. | Version cache keys by source, policy, tenant, and retrieval manifest; bypass or invalidate affected scopes. |
+| **Index Rebuild Manifest** | Restores index topology from known-good source/chunk/vector versions. | Rebuild affected partition from signed or approved manifest; validate embedding model and dimensions. |
+| **Fallback Retrieval** | Preserves limited usability during vector repair. | Use lexical/BM25 search, verified cache, partial answer, or manual review depending on risk. |
+
+Hubness, citation mismatch, and retrieval anomalies should be treated as triage signals. A high robust z-score or unusual hit frequency does not prove malicious poisoning by itself; it justifies quarantine, review, and replay against representative query sets.
+
+
+## **Tool and Action Containment Model**
+
+Tool incidents are dangerous because probabilistic planning crosses into deterministic side effects. The operational rule is simple: never let conversational confidence outrun verified action state.
+
+```text
+TOOL AND ACTION CONTAINMENT
+
+[ Proposed Action ]
+        |
+        v
+[ Validate Payload ]
+  schema | semantic rules | policy | tenant/user scope
+        |
+        v
+[ Authorize Action ]
+  scoped credential | approval state | risk class
+        |
+        v
+[ Create Idempotency Record ]
+  request hash | action ID | actor | target | timestamp
+        |
+        v
+[ Capture Pre-Action State Hash ]
+        |
+        v
+[ Execute or Block ]
+        |
+        v
+[ Observe Tool Result ]
+        |
+        v
+[ Verify Source of Record ]
+        |
+        +--> verified success  -> report success
+        +--> verified failure  -> report failure / preserve draft
+        +--> unknown state     -> hold and reconcile
+        +--> partial commit    -> compensate or forward recover
+```
+
+| Incident State | Meaning | Correct Operational Response | User-Facing Status |
+| :---- | :---- | :---- | :---- |
+| **Blocked Before Execution** | Payload, policy, approval, or authorization check failed. | Do not call tool; preserve draft and validation error. | “Not submitted. This action was blocked before execution.” |
+| **Execution Failed Before Commit** | Tool rejected or failed before external state changed. | Preserve error and allow safe correction or retry if preconditions still hold. | “The action failed before completion.” |
+| **Unknown After Attempt** | Timeout, lost response, or ambiguous observation after a state-changing call. | Hold workflow; reconcile with source of record before retry. | “Status unknown. We are verifying before allowing another attempt.” |
+| **Partial Commit** | Some sub-actions committed while others failed. | Stop dependent actions; compensate reversible steps or forward recover if safer. | “Some steps completed; remaining steps are paused for verification.” |
+| **Committed Reversible Effect** | External state changed and compensation is supported. | Execute approved compensation workflow if reversal is required. | “The action completed and is being reversed through a tracked correction.” |
+| **Committed Irreversible Effect** | Pivot transaction succeeded and cannot be programmatically undone. | Stop further automation; notify responsible owners; begin remediation and communication. | “The action completed and requires manual review/remediation.” |
+| **False Success Claim** | UI/model claimed completion before verification. | Correct status, preserve claim evidence, open incident if user impact exists. | “Correction: the previous completion status was not verified.” |
+
+Rollback applies only inside a live transaction boundary. Once a side effect has committed, operators should use compensation, forward recovery, reconciliation, or manual remediation depending on the transaction state.
+
+## **Cache, Cost, and Resource Incident Model**
+
+Resource incidents occur when model calls, retries, cache behavior, retrieval fan-out, tool loops, or agentic planning consume capacity faster than the system can safely serve users. These incidents can cause denial-of-wallet, latency collapse, stale-cache exposure, and degraded user trust.
+
+```text
+RESOURCE INCIDENT CONTROL LOOP
+
+[ Active workflow ]
+        |
+        v
+[ Measure resource state ]
+  tokens | tool calls | retries | latency | queue depth | spend | cache scope
+        |
+        v
+[ Compare against profile budget ]
+  tenant | session | workflow | risk tier | route
+        |
+        +-- within budget --> continue
+        |
+        +-- warning band --> degrade, queue, prune, or ask user
+        |
+        +-- hard limit --> halt, preserve state, fail closed or escalate
+```
+
+| Resource Failure | Detection Signal | Containment | Recovery |
+| :---- | :---- | :---- | :---- |
+| **Runaway Agent Loop** | Repeated state hash, tool repetition, growing turn count, no-progress plan diffs. | Halt workflow, preserve state, block further tool calls. | Replan from verified state or escalate. |
+| **Repair Loop** | Repeated schema/format failures with similar payloads. | Stop bounded repair after profile limit. | Return structured failure or route to human review. |
+| **Retry Storm** | High retry count, queue depth spike, provider 429/5xx, synchronized backoff failure. | Circuit-break route; apply jitter/backoff; shed or queue traffic. | Restore gradually after provider/gateway health recovers. |
+| **Token / Spend Spike** | Cost velocity exceeds tenant/workflow budget band. | Freeze expensive route, reduce context, require approval, or fail closed. | Tune prompt/context, adjust budgets, add loop regression test. |
+| **Cache Scope Violation** | Cache hit with tenant/user/policy/source mismatch. | Disable affected cache scope; revoke exposed sessions if needed. | Rebuild cache namespace and add isolation test. |
+| **Stale Cache Overuse** | Cache served after source/policy/model version change. | Bypass or invalidate stale keys; disclose limitation if served safely. | Version cache by source, policy, model, prompt, and risk profile. |
+| **Prefill / Context Pressure** | Long prompt, rising TTFT, low evidence density, context overflow. | Prune low-priority context; summarize safely; block if evidence lost. | Improve retrieval selection and context compiler policy. |
+
+Budget values should be deployment-profile specific. A toy workflow, enterprise analysis route, and regulated high-impact action should not share the same hard-coded token, cost, turn, or tool-call ceiling.
+
+## **User Communication Matrix**
+
+AI incident communication must be truthful about state, uncertainty, user impact, and safe next actions. Do not say “the AI hallucinated” as if the platform were a haunted toaster. Say what failed, what is saved, what is blocked, what is known, what remains unknown, and what the user can safely do.
+
+```text
+COMMUNICATION RULE
+
+Never claim:
+  - an action succeeded before verification,
+  - no data was exposed before scope analysis,
+  - a cache/index/model is clean before validation,
+  - a degraded route is equivalent when it is not.
+
+Communicate:
+  known status, preserved state, active limitation,
+  user action required, and next update path.
+```
+
+| Incident Class | Audience | What to Say | What Not to Say | User / Customer Action |
+| :---- | :---- | :---- | :---- | :---- |
+| **RAG Poisoning / Retrieval Quarantine** | Affected workspace users or admins. | “We detected an anomaly in part of your document retrieval index and isolated the affected sources. Search may be incomplete while verification runs.” | “All results are safe” before validation completes. | None unless asked to review quarantined documents. |
+| **Model Route Degradation** | Active users on affected route. | “The primary reasoning route is temporarily unavailable. We can continue in a reduced mode with limitations, or wait for full capability.” | “Equivalent quality” if capability, citation depth, latency, or tools changed. | Choose reduced mode, wait, or save progress. |
+| **State-Changing Tool Timeout** | Specific initiator / admin. | “We could not verify the action status. To prevent duplicate effects, we paused retries and saved the request for verification.” | “It failed” or “It succeeded” before source-of-record reconciliation. | Review status or wait for verification. |
+| **Cross-Tenant / Privacy Investigation** | Security/admin contacts and affected users as policy requires. | “We identified a possible isolation issue and have contained the affected scope. Investigation and verification are ongoing.” | “No unauthorized access occurred” before confirmed. | Reauthenticate or rotate credentials if instructed. |
+| **Prompt Injection / Security Containment** | Affected session user/admin. | “This session was paused because a security boundary was triggered. Your progress is saved, and unsafe automation is disabled.” | Revealing detection logic, system prompts, or exploit details. | Resume after review or start a clean session. |
+| **Cost / Quota Halt** | User or tenant admin. | “This workflow reached its configured budget or loop limit. Progress is saved, and further automated execution is paused.” | “The system crashed” if the stop was intentional containment. | Approve more budget, simplify task, or resume manually. |
+| **Parser / Citation Degradation** | User relying on documents. | “We could not verify the document layout/citation coordinates. We can provide text-only or partial results with limitations.” | Pretending visual/table evidence was inspected when it was not. | Upload cleaner file, accept text-only mode, or request review. |
+| **Fail-Closed Security Block** | Affected users / status page if broad. | “We temporarily blocked this capability to preserve security and data integrity. Saved state is preserved where possible.” | “Scheduled maintenance” if the event is an active incident requiring transparency. | Wait for recovery path or contact support. |
+
+## **Incident Review and Postmortem Model**
+
+An AI postmortem must look beyond traditional server uptime metrics, conducting a thorough analysis of prompt templates, retrieved evidence chunks, and model configurations.20
+
+```
+  ┌────────────────────────────────────────────────────────┐  
+  │                 AI POSTMORTEM SCHEMA                   │  
+  ├────────────────────────────────────────────────────────┤  
+  │  - Incident Summary: Impact, Core Failing Layer        │  
+  │  - Root Cause: Data vs. Prompt vs. Weight Drift       │  
+  │  - Chronology: Trace-linked Ingestion to Failure Path │  
+  │  - Technical Evidence: Rendered Prompts & Raw Outputs │  
+  │  - Evaluation Gaps: Missed Canary or Golden Sets      │  
+  │  - Action Items: Preventative CI/CD Gates Added       │  
+  └────────────────────────────────────────────────────────┘
+```
+
+The postmortem process is structured to systematically catalog failure metrics, trace the chronological progression, and implement permanent behavioral guards:
+
+* **Incident Summary & Failing Layer:** Captures the severity level, blast radius, total duration, and affected tenant UUIDs, isolating the failure to its specific taxonomic class.2  
+* **Root Cause & Contributing Factors:** Analyzes whether the failure originated from data drift, prompt instruction decay, or provider-side weight updates.2  
+* **Trace-Linked Chronology:** Details the exact timeline of events, linking key milestones (anomaly detection, containment trigger, rollback execution) to specific OpenTelemetry trace and span IDs.1  
+* **Technical Evidence Repository:** Attaches the rendered prompt string, the retrieved context chunks, and the raw generated output tokens directly to the postmortem file, enabling exact reproduction.20  
+* **Evaluation & Telemetry Gaps:** Highlights why the failure escaped containment, identifying missing canary prompts or gaps in the CI/CD evaluation harness.1  
+* **Permanent Improvements List:** Replaces vague "be more careful" actions with concrete, dated, and testable improvements.2 Every postmortem must commit at least one new golden test case to the regression set and one new alert threshold to Prometheus.1
+
+## **Runbook Library**
+
+The platform maintains a runbook library for recurring AI incident classes. Each runbook must identify the trigger, severity assumptions, first actions, containment controls, evidence to preserve, owner roles, recovery path, validation steps, communication path, and incident-to-eval follow-through.
+
+Runbooks should not instruct responders to paste raw prompts, secrets, transaction details, or tenant data into ordinary incident tickets. Sensitive payloads belong in controlled forensic storage with secure references, access logs, and retention policy.
+
+```text
+AI OPERATIONS RUNBOOK LIBRARY
+
+[ Incident Trigger ]
+        |
+        v
+[ Classify ]
+  semantic | retrieval | prompt | model | tool | cost | privacy | UX/review
+        |
+        v
+[ Preserve Evidence Manifest ]
+  trace IDs | hashes | secure refs | configs | state versions
+        |
+        v
+[ Contain ]
+  flag | kill switch | quarantine | route pin | credential revoke
+        |
+        v
+[ Recover ]
+  rollback | compensate | reconcile | rebuild | degrade | escalate
+        |
+        v
+[ Validate ]
+  canary | regression | policy | isolation | source-of-record check
+        |
+        v
+[ Communicate ]
+  known status | unknowns | saved state | user action | next update path
+        |
+        v
+[ Promote Incident to Eval / Runbook Update ]
+```
+
+### **Runbook 1: Ungrounded Answer Incident (Factual Hallucination)**
+
+* **Incident Trigger & Severity:** Automated NLI grounding checks detect a business_rule_error on an active session; nli_grounding_score falls below 0.70 over a 5-minute rolling window. SEV-2 (Contained Semantic Failure).1  
+* **First 5 Minutes Actions:**  
+  1. Trace the session ID to locate the active retrieval spans and the model endpoint version.1  
+  2. Capture the rendered prompt string, the retrieved context chunks, and the raw output tokens.20  
+  3. Toggle the FF_CACHE_BYPASS flag for the affected workspace, forcing live database lookups and bypassing potentially corrupted caches.3  
+* **Containment Steps:** Force-disable advanced rag-generation routes for the tenant. Set the active trust-calibration interface to Level 3 (Inline Caveat), rendering visible uncertainty indicators for unsupported or unverified claims to communicate uncertainty.3  
+* **Evidence to Preserve:** Snapshot the current vector index state, export the retrieved chunk text strings, and write the complete telemetry trace payload to the forensic directory.1  
+* **Owner Roles:** SRE/Platform Lead (Primary investigator); Retrieval Owner (Context validator); Prompt Owner (Hotfix engineer).17  
+* **Rollback Steps:** Revert the retrieval query rewriting template inside the prompt registry to the preceding stable commit.2  
+* **Validation Steps:** Execute a parallel 50-case grounding evaluation run in staging, asserting that the model's factual outputs align with the reference documents.1  
+* **Communication Path:** Render an inline caveat badge: *"I can answer conceptually, but my live retrieval database is currently optimizing. I cannot verify specific policy changes."*.3  
+* **Postmortem Actions:** Convert the hallucinated query-response pair into a permanent, version-controlled golden test case inside the CI/CD pipeline to prevent future regressions.1
+
+### **Runbook 2: Citation Failure Incident**
+
+* **Incident Trigger & Severity:** UI monitors detect a citation_alignment_score falling below 0.75, indicating that bracketed citation markers do not map to verified coordinates inside the source documents. SEV-3 (Degraded Quality).1  
+* **First 5 Minutes Actions:**  
+  1. Scan the document parsing logs to check for layout-aware parsing exceptions or OCR failures.1  
+  2. Verify that page coordinates exist inside the retrieved metadata schemas.1  
+  3. Route document parsing tasks to the backup heuristic text parser.3  
+* **Containment Steps:** Temporarily hide visual coordinate highlights on the user interface, falling back to displaying plain-text document titles.3  
+* **Evidence to Preserve:** Snapshot the failing document file, the extracted DocTags markup, and the page coordinate array.21  
+* **Owner Roles:** Layout & Document Engineer (Primary investigator); SRE/Platform Lead (Inference monitor).17  
+* **Rollback Steps:** Revert the document parsing Docker container to the preceding stable image version.2  
+* **Validation Steps:** Run an automated unit test suite, executing a coordinate-level IoU check over table extraction targets.1  
+* **Communication Path:** Display a subtle UI warning card: *"Complex page layout unreadable. Using text-only reference mode."*.3  
+* **Postmortem Actions:** Update the parser's configuration schema to enforce profile-appropriate rasterization and layout-extraction settings for scanned PDFs.21
+
+### **Runbook 3: Prompt Injection Incident (Safety Breach)**
+
+* **Incident Trigger & Severity:** Input Prompt Shields log an adversarial bypass attempt; policy_violation_rate spikes. SEV-1 (High-Impact Active Harm).1  
+* **First 5 Minutes Actions:**  
+  1. Isolate and freeze the active user session; block the associated IP address.2  
+  2. Terminate active WebSocket connections and close active runner processes.2  
+  3. Scan execution logs to identify if the model attempted to leak system instructions or execute unauthorized tools.2  
+* **Containment Steps:** Revoke the session's active OAuth tokens. Route the tenant's queries to the quarantined fallback model instance.2  
+* **Evidence to Preserve:** Preserve hashes and secure forensic references for the input, rendered prompt, injected payload, and tool trace history. Store raw sensitive payloads only in the controlled forensic vault.1  
+* **Owner Roles:** Security Lead (Primary investigator); Prompt Owner (Defensive engineer).17  
+* **Rollback Steps:** Revert the system prompt template to the last safe version in Git.3  
+* **Validation Steps:** Run the purple-team jailbreak evaluation suite inside the CI/CD pipeline, verifying that the incident payload and representative variants are blocked or safely contained according to the applicable risk profile.1  
+* **Communication Path:** Render a full-screen red error overlay: *"Session locked due to a security policy violation. Your progress has been saved securely."*.3  
+* **Postmortem Actions:** promote the sanitized payload pattern into the adversarial evaluation suite and review whether detector training data should be updated.2
+
+### **Runbook 4: Tool Misfire Incident (Unauthorized Action)**
+
+* **Incident Trigger & Severity:** The database monitor alerts on an un-idempotent write action executed without active maker-checker clearance.2 SEV-1 (High-Impact Active Harm).2  
+* **First 5 Minutes Actions:**  
+  1. Trigger the FF_TOOL_REVOKE kill switch, disabling the misfiring API connection instantly.2  
+  2. Suspend the active multi-agent loop orchestrator.2  
+  3. Verify the ledger status inside the database of record to identify if writes were committed.2  
+* **Containment Steps:** Revoke the tool's scoped credentials in Secrets Manager.2  
+* **Evidence to Preserve:** Seal the tool call arguments, the pre-action database state hash, the idempotency key, and the Saga execution trail.1  
+* **Owner Roles:** Tool Owner (Primary investigator); Saga Coordinator (Ledger checker); Compliance Lead (Risk auditor).17  
+* **Rollback Steps:** Execute the registered Saga compensation payload to semantically reverse committed actions.3  
+* **Validation Steps:** Run a dry-run test transaction in staging, asserting that the tool gateway rejects un-idempotent payloads.3  
+* **Communication Path:** Display a full-screen modal: *"We are verifying your transaction status with the bank. Do not click buy again."*.3  
+* **Postmortem Actions:** Update tool contracts to enforce physical argument validation schemas (Pydantic validation) before execution.2
+
+### **Runbook 5: Cost Bomb Incident (Runaway Loops)**
+
+* **Incident Trigger & Severity:** Budget monitors alert on a session crossing the 5.00 USD spend ceiling; token burn velocity spikes.1 SEV-1 (High-Impact Active Harm).2  
+* **First 5 Minutes Actions:**  
+  1. Force terminate the active agent execution thread.2  
+  2. Revoke the session's active API routing keys inside the gateway proxy.2  
+  3. Clear the active memory cache for the running conversation.2  
+* **Containment Steps:** Apply a zero-token budget constraint to the tenant's workspace configurations.2  
+* **Evidence to Preserve:** Record the cumulative token metrics, the execution turn count, the planning trace, and the exact formatting errors.1  
+* **Owner Roles:** SRE/Platform Lead (Resource auditor); Agent Orchestration Lead (Loop debugger).17  
+* **Rollback Steps:** Invalidate active model prompt caches for the affected templates.2  
+* **Validation Steps:** Execute a loop simulation test in staging to verify that the orchestrator terminates tasks when thresholds are breached.1  
+* **Communication Path:** Display an inline alert card: *"Session paused. You've reached your workspace's token limit. Progress saved."*.3  
+* **Postmortem Actions:** Refactor prompt templates to reduce tool-schema overhead; implement hard limits on planning iterations.2
+
+### **Runbook 6: Model Drift Incident (Behavior Regression)**
+
+* **Incident Trigger & Severity:** Strategic telemetry logs a cosine distance shift > 0.15 compared to reference embeddings.1 SEV-2 (Contained Semantic Failure).2  
+* **First 5 Minutes Actions:**  
+  1. Scan vLLM prometheus metrics to check for changes in latency, throughput, or perplexity.1  
+  2. Run the 100-case canary prompt suite in parallel.1  
+  3. Freeze all active prompt or routing configurations in staging.30  
+* **Containment Steps:** Re-route production traffic from the drifted endpoint to the preceding stable model snapshot.3  
+* **Evidence to Preserve:** Save the generated output tokens, the calculated centroid distances, and the canary performance logs.1  
+* **Owner Roles:** Model Owner (Lead investigator); AI Operations Lead (Gateway controller); SRE Lead.17  
+* **Rollback Steps:** Revert the active model endpoint route inside the gateway proxy.20  
+* **Validation Steps:** Execute the full CI/CD regression evaluation suite, asserting that accuracy scores meet baseline thresholds.1  
+* **Communication Path:** Subtle header notification: *"Running in efficient compatibility mode to optimize system accuracy."*.3  
+* **Postmortem Actions:** Establish automated daily embedding drift checks inside production telemetry collections.1
+
+### **Runbook 7: Corpus Poisoning Incident**
+
+* **Incident Trigger & Severity:** HubScan flags a document vector with a robust z-score > 5.0, indicating topological index poisoning.2 SEV-1 (High-Impact Active Harm).2  
+* **First 5 Minutes Actions:**  
+  1. Apply a Row-Level Security database constraint to filter out the poisoned document IDs from active search.2  
+  2. Suspend the indexing worker's document ingestion pipeline.2  
+  3. Quarantine the poisoned files inside an offline S3 bucket.2  
+* **Containment Steps:** Disable vector search queries for the affected tenant workspace; fall back to BM25 keyword matching.3  
+* **Evidence to Preserve:** Preserve source IDs, source version hashes, chunk/vector IDs, secure evidence references, embedding metadata, and robust z-score logs.1  
+* **Owner Roles:** Retrieval Owner (Primary investigator); Database Administrator (Index controller); Security Lead.17  
+* **Rollback Steps:** Rebuild the vector database HNSW graph from the last safe backup.2  
+* **Validation Steps:** Re-run vector query simulations, asserting that retrieval returns clean nearest neighbors.1  
+* **Communication Path:** Status banner: *"Search capabilities are operating in cached mode. Real-time updates may be delayed."*.3  
+* **Postmortem Actions:** Enforce cryptographic signature checks (Sigstore/C2PA) on all files before database ingestion.2
+
+### **Runbook 8: Human Review Queue Failure**
+
+* **Incident Trigger & Severity:** Reviewer alerts trigger on queue backlog limits; average approval times fall below 350 ms.1 SEV-2 (Contained Semantic Failure).2  
+* **First 5 Minutes Actions:**  
+  1. Halt high-volume automated routing pipelines.2  
+  2. Switch active workspaces to safe default states, blocking mutations without reviewer signatures.2  
+  3. Route priority reviews to the backup supervisor queue.3  
+* **Containment Steps:** Temporarily lock high-risk tool execution gates.2  
+* **Evidence to Preserve:** Log the queue backlog stats, reviewer dwell times, and unapproved draft files.1  
+* **Owner Roles:** Support Lead (Queue coordinator); Compliance Lead (Operations auditor).17  
+* **Rollback Steps:** Revert approval workflow configurations to the last verified checklist.3  
+* **Validation Steps:** Run gold-label sentinel check cases through the queue to audit reviewer alignment.1  
+* **Communication Path:** Warning card: *"Verification queues are temporarily delayed. High-risk transactions may take up to 2 hours."*.3  
+* **Postmortem Actions:** Establish automated limits on the number of cases routed to individual reviewers per hour.2
+
+### **Runbook 9: Degraded-Mode Fail-Open Anomaly**
+
+* **Trigger Scenario:** A gateway routing failure allows a query to bypass active security filters or formatting validation gates.2 SEV-0 (Catastrophic System Failure).2  
+* **First 5 Minutes Actions:**  
+  1. Activate the global platform kill switch, freezing user interactions.2  
+  2. Invalidate the gateway's active API routing configurations.1  
+  3. Check log files to identify if unredacted data or unsafe commands crossed the interface.1  
+* **Containment Steps:** Suspend all active model connections. Enforce a hard fail-closed configuration across all edge proxies.2  
+* **Evidence to Preserve:** Copy the raw gateway configurations, the W3C tracecontext context logs, and the blocked output streams.1  
+* **Owner Roles:** SRE/Platform Lead (Primary investigator); AI Operations Lead (Gateway controller); Security Lead.17  
+* **Rollback Steps:** Rebuild and deploy the gateway proxy using the last stable Docker container image.3  
+* **Validation Steps:** Execute the full CI/CD security and isolation test suite, confirming 100% block rates.1  
+* **Communication Path:** Public status page update: *"The platform is offline for scheduled security system maintenance. All user data is secured."*.3  
+* **Postmortem Actions:** Consolidate all retry, fallback, and validation rules inside a centralized, self-hosted API gateway.3
+
+### **Runbook 10: Privacy and Cross-Tenant Leak Incident**
+
+* **Trigger Scenario:** Session analyzers detect a tenant ID mismatch between a user's JWT and the retrieved metadata schemas.2 SEV-0 (Catastrophic System Failure).2  
+* **First 5 Minutes Actions:**  
+  1. Isolate the affected tenant namespaces inside the pgvector and Redis clusters.2  
+  2. Revoke active session tokens and terminate Websocket connection pools.2  
+  3. Isolate and block access to the affected vector database index partitions.2  
+* **Containment Steps:** Enforce a global read-only mode for the isolated workspaces, preventing document updates.3  
+* **Evidence to Preserve:** Record the trace IDs, the mismatched user identities, the retrieved vector coordinates, and the cache keys.1  
+* **Owner Roles:** SRE/Platform Lead (Primary investigator); AI Operations Lead (Gateway controller); Privacy Lead; Security Lead.17  
+* **Rollback Steps:** Flush all cached prompt-response vectors and re-initialize isolated cache spaces.2  
+* **Validation Steps:** Execute 1,000 automated isolation probe queries inside staging, verifying that representative isolation probes cannot retrieve cross-tenant resources under the affected configurations.2  
+* **Communication Path:** Dedicated enterprise customer notification: *"We have isolated a brief namespace configuration overlap in your workspace. Active session credentials have been updated to preserve your privacy."*.3  
+* **Postmortem Actions:** Enforce database-level Row-Level Security (RLS) policies on every vector similarity query.2
+
+## **Operational Readiness and Game Days**
+
+Before launching an AI system, teams must prove that feature flags, kill switches, rollback paths, evidence capture, runbooks, on-call roles, customer communication templates, and evaluation feedback loops operate correctly under pressure.18 Operational readiness is verified through a structured, multi-step game day:
+
+  Fault Injection ──► Telemetry Trigger ──► Runbook Activation ──► Forensics Check ──► Verification
+
+### **Readiness scenarios executed in staging environments:**
+
+1. **Prompt Injection and Exfiltration:** A simulated malicious user attempts to bypass system prompt safety blocks and exfiltrate customer account details.2 The game day tests the speed of the ARGUS output filter and verifies that the system isolates the compromised session in under 120 milliseconds.2  
+2. **Vector Index Topological Poisoning:** Responders inject 5 adversarially crafted documents into the corporate knowledge base.31 The exercise verifies that the HubScan detector successfully flags and quarantines the poisoned vector coordinates, and that the retrieval engine falls back to lexical matches.2  
+3. **Model Version Behavior Regression:** The team simulates an unannounced model provider update that alters JSON formatting.2 Responders must verify that the gateway proxy detects the regression, logs the routing decision, and executes an atomic rollback to the stable model checkpoint in under 60 seconds.1  
+4. **Runaway Agent Loop and Billing Spike:** Responders run an agent configuration designed to repeat identical database lookups indefinitely.2 The game day verifies that the budget gateway terminates the loop execution path, triggers a fail-closed status, and preserves the failing traces.1
+
+**Deployment Readiness Checklist:**
+
+* [ ] Global and tenant-scoped kill switches are verified and accessible to on-call SREs.2  
+* [ ] The gateway proxy supports atomic endpoint re-routing without requiring code redeployments.20  
+* [ ] The pgvector database enforces PostgreSQL Row-Level Security (RLS) on all search transactions.2  
+* [ ] Ingestion pipelines are configured with strict magic-byte scanning and run within microVM sandboxes.2  
+* [ ] The telemetry collector redact pipeline masks PII and API keys from central logs.1  
+* [ ] Every system prompt template is version-controlled and tied to an automated regression gate.1
+
+## **Incident-to-Eval Feedback Loop**
+
+Every significant AI incident must create or update evals, telemetry, artifacts, policies, runbooks, or documented exceptions. This feedback loop is the platform's immunological learning cycle:
+
+  [Production Failure] ──► Trace Captured ──► Sanitized via ARGUS   
+                                                   │  
+                                                   ▼  
+  ◄── Golden Case Promoted ◄── SME Review 
+
+The feedback loop is executed through a disciplined engineering pipeline:
+
+1. **Incident Discovery:** High-severity incidents, user-initiated corrections, citation mismatches, tool timeouts, and human approval overrides are automatically captured by the strategic telemetry layer.1  
+2. **Telemetry Redaction:** To protect sensitive data and preserve compliance (e.g., GDPR, HIPAA), the raw trace is passed through the inline ARGUS scanning gate, replacing PII, system passwords, and API keys with secure placeholders.1  
+3. **Ground Truth Authoring:** The sanitized trace is packaged into a standard golden case format, and subject matter experts assign the correct ground-truth typologies and rubrics to resolve the failure.1  
+4. **Golden Set Promotion:** The new case is run against the current production baseline and committed to the versioned evaluation repository, transforming the production incident into an automated release gate to prevent regressions.1
+
+## **Cross-Canon Handoff Map**
+
+AI-ENG-AC defines the operational response layer for the canon: detection, intake, triage, containment, rollback, communication, incident review, and incident-to-eval promotion. It consumes telemetry, evaluation, verification, security, degraded-mode, and governance artifacts, then feeds improvements back into the lifecycle.
+
+| Canon Report | Handoff Into AC | AC Operational Use | Feedback Returned |
+| :---- | :---- | :---- | :---- |
+| **AI-ENG-B — Context Architecture** | Context object IDs, memory state, session scope, compaction records. | Diagnose context loss, stale memory, state corruption, or instruction decay. | Incident-derived context invariants and state-preservation tests. |
+| **AI-ENG-D — Corpus Engineering** | Source authority, corpus lifecycle state, provenance, ownership, document version. | Quarantine suspect sources and scope data/corpus incidents. | New corpus validation, lifecycle, and provenance requirements. |
+| **AI-ENG-E — Retrieval Pipeline** | Retrieval traces, candidate sets, filters, citation bundles, evidence packets. | Diagnose grounding, citation, and retrieval failure incidents. | New retrieval evals, filter checks, and evidence-sufficiency gates. |
+| **AI-ENG-F — Freshness and Conflict Detection** | Freshness status, conflict packets, source version drift, citation stability. | Determine whether stale or conflicting evidence caused user-visible harm. | Freshness alerts and conflict-resolution runbook updates. |
+| **AI-ENG-L — Serving Architecture** | Route manifests, latency, queue state, model endpoints, cache behavior. | Execute route rollback, failover, capacity containment, and serving recovery. | New route SLOs, rollback drills, and serving canaries. |
+| **AI-ENG-M — Agentic Orchestration** | Workflow state, loop counters, no-progress hashes, task graph. | Stop runaway agents, preserve plan state, and diagnose orchestration failures. | New loop limits, state checkpoints, and agent termination tests. |
+| **AI-ENG-N — Tool Contracts** | Tool schemas, manifests, argument validators, side-effect classes. | Disable unsafe tools and diagnose tool payload or schema failures. | Contract hardening, idempotency requirements, and new tool evals. |
+| **AI-ENG-O — Action Verification** | Action ledgers, pre/post state hashes, idempotency keys, verification state. | Reconcile unknown tool state, compensate committed effects, prevent false success. | New verification predicates and state-reconciliation tests. |
+| **AI-ENG-P — Multimodal Understanding** | Parser versions, evidence coordinates, OCR/layout confidence, media refs. | Diagnose parser, OCR, document, chart, image, and video evidence incidents. | Parser regression cases and evidence-adequacy thresholds. |
+| **AI-ENG-Q — Speech / Realtime** | Transcript state, endpointing, confirmation, interruption, voice degradation events. | Pause high-impact voice workflows and switch to safer confirmation modes. | New noisy-audio, confirmation, and barge-in game-day tests. |
+| **AI-ENG-R — UI Agents** | Browser traces, DOM/screenshot hashes, action verification, automation pause state. | Diagnose blind clicks, UI drift, false completion, and interface trust failures. | UI-agent recovery and action-verification tests. |
+| **AI-ENG-S — Production Pathologies** | Failure classes, malformed output, hallucination subtypes, brittle-chain patterns. | Classify semantic incidents and choose containment/recovery path. | New pathology-specific runbooks and regression gates. |
+| **AI-ENG-T — Boundary Defense** | Tenant scope, authority hierarchy, RLS state, cache isolation, injection events. | Contain prompt injection, cross-tenant leakage, and boundary violations. | New isolation probes and boundary-defense incident cases. |
+| **AI-ENG-U — Supply Chain Security** | Artifact signatures, dependency manifests, sandbox profiles, model/data provenance. | Quarantine unsafe artifacts and verify rollback targets. | New artifact-readiness and loader-hardening requirements. |
+| **AI-ENG-V — Resource Abuse** | Budget ceilings, token burn, tool-call limits, retry storms, abuse signals. | Halt cost bombs, throttle workflows, and enforce fail-closed budget controls. | New resource-abuse drills and budget-policy changes. |
+| **AI-ENG-W — UX Resilience** | Degraded-mode states, fallback contracts, continuity state, user disclosure events. | Communicate degraded states and preserve user progress during incidents. | New degraded-mode tests and disclosure templates. |
+| **AI-ENG-X — User Trust** | Trust calibration signals, citation interactions, user corrections, contestability events. | Detect user-facing trust failures and repair transparency patterns. | New disclosure, evidence, and contestability requirements. |
+| **AI-ENG-Y — Human Review** | Approval records, reviewer queue state, maker-checker outcomes, escalation packages. | Pause unsafe automation and route high-impact uncertainty to humans. | New reviewer sentinel cases and approval-flow thresholds. |
+| **AI-ENG-Z — Strategic Telemetry** | Trace IDs, spans, token/cost metrics, routing events, redaction metadata. | Intake, scope, replay, and correlate incidents. | New telemetry fields, alerts, dashboards, and SLOs. |
+| **AI-ENG-AA — Evaluations** | Golden sets, canaries, regression suites, calibrated scoring artifacts. | Validate rollback, hotfix, mitigation, and closure. | Incident traces promoted into permanent eval cases. |
+| **AI-ENG-AB — Verification Artifacts** | Audit trails, secure references, trace manifests, policy/model/tool versions. | Preserve forensic record and support reproducible postmortems. | New evidence-package requirements and replay constraints. |
+| **AI-ENG-AD — Governance** | Policy ownership, approval workflows, reporting obligations, accountability boundaries. | Determine reporting, escalation, exception, and lifecycle-governance requirements. | Postmortem action items, governance exceptions, and policy updates. |
+| **AI-ENG-AJ — Reference Architectures** | Deployment blueprints, gateway patterns, sandboxing, audit stores, runbook automation. | Implement operational controls as reference architecture components. | Architecture updates based on incidents and game days. |
+
+## **Strategic Conclusions and Architectural Recommendations**
+
+To transition from ad-hoc troubleshooting to systemic, high-assurance behavioral governance, enterprise platforms must consolidate their operational procedures outside the model's cognitive boundary.1 Based on the analyses compiled in this report, the following four strategic principles are recommended for deployment architectures:
+
+1. **Enforce State Verification Before Confirmations:** Never allow conversational or auditory interfaces to generate verbal completion claims (e.g., "Your payment has been sent") until the underlying API transaction has been committed and verified inside the database of record.2 Spoken or generated claims must never outrun physical reality.2  
+2. **Centralize Resilience at the Gateway Layer:** Avoid writing separate retry, fallback, and rate-limiting logic inside individual application services.3 Centralize these capabilities within a high-performance, budget-aware runtime gateway positioned entirely outside the model's cognitive boundary, ensuring consistent policy enforcement, cost tracking, and provider failovers across the entire organization.1  
+3. **Secure Caches against Timing Side-Channels:** Sharing semantic or prefix caches globally across mutually untrusted tenants introduces timing side-channel risks.3 All cache keys must be cryptographically bound to tenant identity and user permissions, and serving runtimes must deploy selective prefix isolation (such as the CacheSolidarity framework) to prevent timing side-channel probes from exfiltrating private context.2  
+4. **Enforce Strict Least-Privilege Tool Credentials:** Model-driven agents must never run with broad administrative service tokens or "god-mode" database accounts.2 Every tool execution must be mediated by a secure credential broker that validates user identity and mints short-lived, highly restricted OAuth tokens (validity less than 900 seconds) specifically for that single execution, protecting local file systems and egress routes from lateral compromise.2
+
+## **Durable Principles of AI Operations**
+
+1. **Service Recovery Is Not Behavioral Recovery**  
+   A system is not recovered because the endpoint is online. It is recovered when outputs, actions, evidence, routing, policy, and user-facing status are back inside the approved behavioral envelope.
+
+2. **Contain Harm Before Solving the Mystery**  
+   Incident response begins with stopping active damage. Root cause can wait; unauthorized tools, poisoned indexes, bad routes, and leaking caches cannot.
+
+3. **Preserve Evidence Before Destructive Cleanup**  
+   Cache flushes, redeploys, session wipes, and credential rotations can destroy forensic state. Preserve hashes, traces, manifests, and secure references first when safety allows.
+
+4. **Rollback the Smallest Effective Surface**  
+   Do not revert the whole platform when a prompt, adapter, cache namespace, corpus lifecycle state, or tool contract is the failing surface.
+
+5. **Unknown State Is a First-Class Incident State**  
+   Timeouts and partial commits are not success and not failure. They require hold, reconciliation, compensation, forward recovery, or escalation.
+
+6. **Prompt Hotfixes Are Temporary Operational Controls**  
+   Emergency prompt changes must be versioned, bounded, tested, owned, and either promoted through normal release gates or retired.
+
+7. **Runbooks Must Be Executable Under Stress**  
+   A runbook is not a philosophy pamphlet. It should say who acts, what they disable, what they preserve, what they validate, and how they communicate.
+
+8. **Communications Must Respect Evidence State**  
+   Never reassure users that no data was exposed, no action occurred, or no harm happened until verification supports it.
+
+9. **Every Significant Incident Becomes an Evaluation**  
+   Production failures should harden the system. Sanitized incident traces must become golden cases, adversarial tests, telemetry alerts, or governance controls.
+
+10. **Operations Belongs Outside the Model Boundary**  
+   Kill switches, feature flags, credential revocation, route control, policy enforcement, and rollback must be deterministic controls, not polite requests embedded in prompts.
+
+#### **Works cited**
+
+1. [KNOWLEDGE] - AI Engineering - Volume 9. Z-AB Observability, Evaluation, and Verification  
+2. [KNOWLEDGE] - AI Engineering - Volume 7. S-V Failure, Security, and Hostile Environments  
+3. [KNOWLEDGE] - AI Engineering - Volume 8. W-Y Resilience, Degraded Modes, and Human Trust  
+4. Incident management | AI Governance Platform - VerifyWise, accessed June 12, 2026, [https://verifywise.ai/platform/incident-management](https://verifywise.ai/platform/incident-management)  
+5. Preventing Repeated Real World AI Failures by Cataloging Incidents: The AI Incident Database - AAAI, accessed June 12, 2026, [https://cdn.aaai.org/ojs/17817/17817-13-21311-1-2-20210518.pdf](https://cdn.aaai.org/ojs/17817/17817-13-21311-1-2-20210518.pdf)  
+6. Resilience Circuit Breakers for Agentic AI - Medium, accessed June 12, 2026, [https://medium.com/@michael.hannecke/resilience-circuit-breakers-for-agentic-ai-cc7075101486](https://medium.com/@michael.hannecke/resilience-circuit-breakers-for-agentic-ai-cc7075101486)  
+7. MLSecOps Enterprise Guide 2026: Securing AI/ML Pipelines | BeyondScale, accessed June 12, 2026, [https://beyondscale.tech/blog/mlsecops-enterprise-guide-2026](https://beyondscale.tech/blog/mlsecops-enterprise-guide-2026)  
+8. Model Rollback: Reverting a Deployed Model to a Previous Version When Problems Occur, accessed June 12, 2026, [https://www.sandgarden.com/learn/model-rollback](https://www.sandgarden.com/learn/model-rollback)  
+9. Strengthening Emergency Preparedness and Response for AI Loss of Control Incidents - RAND, accessed June 12, 2026, [https://www.rand.org/content/dam/rand/pubs/research_reports/RRA3800/RRA3847-1/RAND_RRA3847-1.pdf](https://www.rand.org/content/dam/rand/pubs/research_reports/RRA3800/RRA3847-1/RAND_RRA3847-1.pdf)  
+10. LLMOps Pipeline Architecture Explained Simply | LaikaTest, accessed June 12, 2026, [https://laikatest.com/blogs/llmops-pipeline-architecture](https://laikatest.com/blogs/llmops-pipeline-architecture)  
+11. AI SRE explained: what it is, how it works, and the human vs. AI reality | Blog - Incident.io, accessed June 12, 2026, [https://incident.io/blog/what-is-ai-sre-complete-guide-2026](https://incident.io/blog/what-is-ai-sre-complete-guide-2026)  
+12. AI-Powered Incident Response: Use Cases, Frameworks, Tools, and a Complete Implementation Playbook - UnderDefense, accessed June 12, 2026, [https://underdefense.com/blog/ai-incident-response/](https://underdefense.com/blog/ai-incident-response/)  
+13. Incident Priority - PagerDuty Knowledge Base, accessed June 12, 2026, [https://support.pagerduty.com/main/docs/incident-priority](https://support.pagerduty.com/main/docs/incident-priority)  
+14. Incident Severity Levels Fully Explained Plus How-To's and Best Practices - Giva, accessed June 12, 2026, [https://www.givainc.com/blog/incident-severity-levels/](https://www.givainc.com/blog/incident-severity-levels/)  
+15. How to Build Incident Severity Definitions - OneUptime, accessed June 12, 2026, [https://oneuptime.com/blog/post/2026-01-30-incident-severity-definitions/view](https://oneuptime.com/blog/post/2026-01-30-incident-severity-definitions/view)  
+16. Prompt Injection Attacks: The LLM Security Risk IT Leaders Must Address, accessed June 12, 2026, [https://biztechmagazine.com/article/2026/04/prompt-injection-attacks-llm-security-risk-it-leaders-must-address-perfcon](https://biztechmagazine.com/article/2026/04/prompt-injection-attacks-llm-security-risk-it-leaders-must-address-perfcon)  
+17. How to Implement Incident Response Procedures, accessed June 12, 2026, [https://oneuptime.com/blog/post/2026-01-30-sre-incident-response-procedures/view](https://oneuptime.com/blog/post/2026-01-30-sre-incident-response-procedures/view)  
+18. LLMOps: Driving Strategic and Effective AI Lifecycle Management - Nitor Infotech, accessed June 12, 2026, [https://www.nitorinfotech.com/blog/llmops-driving-strategic-and-effective-ai-lifecycle-management/](https://www.nitorinfotech.com/blog/llmops-driving-strategic-and-effective-ai-lifecycle-management/)  
+19. What is the Incident Response Process in SRE? - Visualpath, accessed June 12, 2026, [https://visualpathblogs.com/site-reliability-engineering/what-is-the-incident-response-process-in-sre/](https://visualpathblogs.com/site-reliability-engineering/what-is-the-incident-response-process-in-sre/)  
+20. The AI Incident Response Playbook: Diagnosing LLM Degradation in Production, accessed June 12, 2026, [https://tianpan.co/blog/2026-04-19-ai-incident-response-playbook-llm-production](https://tianpan.co/blog/2026-04-19-ai-incident-response-playbook-llm-production)  
+21. [KNOWLEDGE] - AI Engineering - Volume 6. P-R Multimodal and Interface-Controlling Systems  
+22. Defending AI Systems: A New Framework for Incident Response in the Age of Intelligent Technology - Coalition for Secure AI, accessed June 12, 2026, [https://www.coalitionforsecureai.org/defending-ai-systems-a-new-framework-for-incident-response-in-the-age-of-intelligent-technology/](https://www.coalitionforsecureai.org/defending-ai-systems-a-new-framework-for-incident-response-in-the-age-of-intelligent-technology/)  
+23. SRE Incident Management Best Practices Every Startup Needs - Rootly, accessed June 12, 2026, [https://rootly.com/sre/sre-incident-management-best-practices-startup-needs-04bdd](https://rootly.com/sre/sre-incident-management-best-practices-startup-needs-04bdd)  
+24. Kubernetes Deployment Automation: A Complete Guide - Plural.sh, accessed June 12, 2026, [https://www.plural.sh/blog/kubernetes-deployment-automation-guide/](https://www.plural.sh/blog/kubernetes-deployment-automation-guide/)  
+25. What is JML? Meaning, Architecture, Examples, Use Cases, and How to Measure It (2026 Guide) - DevSecOps School, accessed June 12, 2026, [https://devsecopsschool.com/blog/jml/](https://devsecopsschool.com/blog/jml/)  
+26. LLM Operations Architecture: Runtime Governance for Production AI Systems - Rack2Cloud, accessed June 12, 2026, [https://www.rack2cloud.com/llm-ops-model-deployment-strategy-guide/](https://www.rack2cloud.com/llm-ops-model-deployment-strategy-guide/)  
+27. LLM Security: Complete Guide for CTOs and IT Security Officers - MobiDev, accessed June 12, 2026, [https://mobidev.biz/blog/llm-security-guide-for-ctos-it-security-officers](https://mobidev.biz/blog/llm-security-guide-for-ctos-it-security-officers)  
+28. The Roadmap for Mastering LLMOps in 2026 - MachineLearningMastery.com, accessed June 12, 2026, [https://machinelearningmastery.com/the-roadmap-for-mastering-llmops-in-2026/](https://machinelearningmastery.com/the-roadmap-for-mastering-llmops-in-2026/)  
+29. Runbook Automation Self-Hosted - PagerDuty, accessed June 12, 2026, [https://www.pagerduty.com/platform/automation/process-software/](https://www.pagerduty.com/platform/automation/process-software/)  
+30. Qwen 3.6 in Production: Release Runbook, AI Rollback, and LLMOps Versioning, accessed June 12, 2026, [https://stajic.de/blog/qwen-3-6-in-production-release-runbook-ai-rollback-and-llmops-versioning](https://stajic.de/blog/qwen-3-6-in-production-release-runbook-ai-rollback-and-llmops-versioning)  
+31. Prompt Injection Attacks in Large Language Models and AI Agent Systems: A Comprehensive Review of Vulnerabilities, Attack Vectors, and Defense Mechanisms - Preprints.org, accessed June 12, 2026, [https://www.preprints.org/manuscript/202511.0088?utm_source=chatgpt.com](https://www.preprints.org/manuscript/202511.0088?utm_source=chatgpt.com)
+
+---
+
+# AI-ENG-AD — Governance Architecture - Policy, Audit, Compliance & Accountability
+
+## **Doctrinal Foundations: The Executable AI Operating System**
+
+In high-dimensional artificial intelligence systems, production reliability cannot be governed by traditional application performance monitoring (APM) paradigms or static, post-hoc compliance checklists.1 Traditional web software assumes a deterministic relationship between code, infrastructure state, and output.1 In contrast, architectures driven by probabilistic large language models (LLMs) and multi-agent loops introduce non-deterministic, behavioral failures where backend services return successful HTTP 200 statuses while simultaneously generating factually false advice, leaking cross-tenant data, fabricating API calls, or bypassing security boundaries.1 This divergence establishes the "Green Dashboard Fallacy": the erroneous and high-risk assumption that an AI system is operating correctly simply because its servers, databases, and APIs are online and responsive.1  
+To bridge this visibility and control deficit, modern organizations must deploy a structured **Governance Architecture** designed as the practical operating system for organizational AI control.1 This architecture enforces a rigorous, system-integrated governing doctrine: **AI governance must be lightweight where risk is low, strict where consequences are high, and executable everywhere**.5 Policies, risk classifications, approvals, audit trails, and data rules must be attached directly to production environments, active codebases, and live database transactions—never left to float serenely above production as abstract, unexecutable ethical principles.1 The fundamental metric of organizational safety is not the presence of a "Responsible AI" PDF, but the programmatic capability to identify, isolate, audit, and prove the compliance of every model, tool, dataset, and state mutation in real time.1
+
+## **Unified Frameworks: NIST AI RMF 1.0 and ISO/IEC 42001 Integration**
+
+A high-assurance governance system must map its internal technical controls directly to established international standards.7 This synchronization is achieved by unifying the process-oriented lifecycle of the **NIST AI Risk Management Framework (AI RMF 1.0)** with the formal, auditable requirements of the **ISO/IEC 42001 Artificial Intelligence Management System (AIMS)**.9
+
+### **The NIST AI RMF Core Functions**
+
+The NIST AI RMF Core divides risk management into four continuous, non-linear functions 11:
+
+* **Govern:** Instills a culture of risk awareness, establishes legal and regulatory registries, allocates resources, and defines organizational accountability.7 It functions as a cross-cutting framework that structures and authorizes the other three functions.11  
+* **Map:** Captures the situational context of each AI system, documenting its intended purpose, potential benefits, operational boundaries, and context-specific limitations.7  
+* **Measure:** Employs quantitative and qualitative evaluations (such as tracking accuracy, measuring bias, and auditing citations) to benchmark risks and track behavioral regressions over time.7  
+* **Manage:** Allocates risk-treatment resources to mapped and measured exposures, enabling automated recovery, incident response, or system deactivation when anomalies exceed thresholds.7
+
+```text
+NIST AI RMF + ISO/IEC 42001 GOVERNANCE LOOP
+
++--------------------------------------------------------------------+
+| GOVERN                                                             |
+| culture | policy | accountability | legal/regulatory register      |
+| ISO/IEC 42001 alignment: AIMS scope, roles, policy, objectives     |
++-----------------------------+--------------------------------------+
+                              |
+                              v
++--------------------------------------------------------------------+
+| MAP                                                                |
+| use case | context | affected parties | benefits | limits | risks  |
+| ISO/IEC 42001 alignment: AI system inventory, impact assessment    |
++-----------------------------+--------------------------------------+
+                              |
+                              v
++--------------------------------------------------------------------+
+| MEASURE                                                            |
+| TEVV | bias/fairness | robustness | drift | security | evidence    |
+| ISO/IEC 42001 alignment: evaluation, monitoring, audit evidence    |
++-----------------------------+--------------------------------------+
+                              |
+                              v
++--------------------------------------------------------------------+
+| MANAGE                                                             |
+| risk treatment | runtime controls | incident response | exceptions |
+| ISO/IEC 42001 alignment: operating controls and improvement loop   |
++-----------------------------+--------------------------------------+
+                              |
+                              v
+                         back to GOVERN
+
+Rule:
+  Governance is not a document layer above production.
+  It is a decision-and-control loop attached to systems, evidence,
+  owners, release gates, and runtime enforcement points.
+```
+
+### **ISO/IEC 42001 (AIMS) and the Statement of Applicability**
+
+While NIST outlines the necessary operational process, ISO/IEC 42001 translates these activities into a set of 38 normative controls organized across nine Annex A control domains, which must be documented within a formal **Statement of Applicability (SoA)**.8 The SoA acts as the primary contract between the organization's technical practices and compliance auditors, documenting the explicit rationale for including or excluding specific controls, detail-mapping their implementation status, and providing pointers to active software verifications.8
+
+### **Control Mapping and Suggested Audit Artifacts**
+
+To satisfy NIST AI RMF and ISO/IEC 42001 together, organizations should map governance functions to implementation controls and audit evidence. The purpose of this map is not to prove compliance by collecting more paper. It is to connect obligations to owners, systems, runtime controls, and verifiable evidence.
+
+| NIST AI RMF Function | Governance Objective | ISO/IEC 42001 Alignment | Preferred Audit Evidence | Runtime / Engineering Evidence |
+| :---- | :---- | :---- | :---- | :---- |
+| **Govern** | Establish accountability, risk appetite, policy, and oversight. | AIMS scope, AI policy, roles, responsibilities, management review. | AI governance policy, RACI, risk-acceptance register, system owner roster. | Policy bundle versions, approval records, release-gate decisions, exception records. |
+| **Map** | Identify the system, use case, stakeholders, context, intended purpose, and foreseeable misuse. | AI system inventory, impact assessment, resource and lifecycle documentation. | AI system inventory, impact assessment, data-flow map, model/tool/data inventory. | Context manifests, corpus lineage records, tool manifests, model route manifests. |
+| **Measure** | Evaluate technical and socio-technical risk. | Verification, validation, testing, monitoring, data quality, performance evaluation. | TEVV plans, evaluation results, bias/fairness assessments, robustness tests. | Golden-set results, canary traces, drift signals, citation/evidence verification metrics. |
+| **Manage** | Treat, monitor, accept, transfer, or reduce risk. | Operating controls, supplier controls, incident response, continual improvement. | Risk treatment plan, incident records, vendor assessments, control review reports. | Gateway policy decisions, OPA/Rego logs, kill-switch records, runbooks, rollback traces. |
+| **Monitor / Improve** | Reassess risk after deployment and incidents. | Internal audit, management review, corrective actions, lifecycle governance. | Post-incident reviews, audit findings, corrective action plans. | Incident-to-eval promotions, telemetry alerts, new regression cases, policy diffs. |
+
+Audit evidence should be proportional to risk. A low-risk internal summarizer does not need the same evidence package as a high-impact credit, medical, employment, financial, safety, or regulated decision-support system.
+
+## **Policy-as-Code (PaC) and Centralized API Gateways**
+
+Relying on system prompts or inline instructions to enforce system rules introduces severe security vulnerabilities.1 When language models are confronted with long contexts, conversational histories, or adversarial inputs, their attention is diluted, causing them to bypass prompt-level restrictions.1 This failure mode makes "Compliance at the Point of Change" (CAPOC) a non-negotiable architectural paradigm: **compliance rules must be written as declarative, machine-readable code, managed within version-controlled repositories, and programmatically evaluated before any build is merged or action executed**.19
+
+### **Decoupling Policy from Application Code via Gateways**
+
+By routing all model transactions through a centralized, budget-aware **AI Agent Gateway**, organizations decouple authorization logic from application code, preventing developers from bypassing compliance gates.6 The gateway functions as an application-layer firewall that intercepts intent, validates input schemas, checks user credentials, and externalizes access decisions to **Open Policy Agent (OPA)** before sending the query to upstream providers.18
+
+```text
+POLICY-AS-CODE AI GATEWAY FLOW
+
+[ User / Client / Agent Request ]
+        |
+        v
++-------------------------------+
+| AI Agent Gateway              |
+| - authenticate subject        |
+| - bind tenant/session scope   |
+| - normalize intent/tool call  |
+| - attach model/tool metadata  |
+| - estimate budget/risk        |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Policy Decision Point         |
+| OPA / policy engine           |
+| - RBAC / ABAC                 |
+| - tenant boundary             |
+| - tool authority              |
+| - budget ceiling              |
+| - approval requirement        |
+| - artifact allowlist          |
++---------------+---------------+
+        | allow                         | deny / review / degrade
+        v                               v
++-------------------------------+   +-------------------------------+
+| Route to Serving / Tool Layer |   | Block / Escalate / Log        |
+| - approved model route        |   | - reason code                 |
+| - scoped credential           |   | - audit event                 |
+| - bounded execution           |   | - user-safe status            |
++-------------------------------+   +-------------------------------+
+```
+
+The gateway is the policy enforcement point. The model may propose an action, but the gateway decides whether the action is allowed, requires review, must degrade, or must fail closed.
+
+To streamline this workflow, modern setups integrate tools like **AICertify** and **Gopal**.22 AICertify automatically collects and generates the required input context (such as model versions, token metrics, and security hashes), while Gopal provides the domain-specific Rego policies that OPA evaluates.22 This integration ensures that AI-specific metrics can be audited using the same Policy-as-Code infrastructure that governs traditional cloud deployments.22
+
+### **The Validation Gap: Testing Against Real Artifacts**
+
+A persistent bottleneck in Policy-as-Code adoption is the "validation gap"—where security teams write OPA policies that check syntax correctly but crash production environments because they cannot test the rules against real software artifacts before they ship.23 To resolve this, platform engineering teams deploy the **JFrog AppTrust PaC Playground**.23  
+This playground allows AppSec leads to load actual binaries and Software Bills of Materials (SBOMs) from their system of record and run dry-runs of newly drafted Rego policies against historical artifacts.23 This prevents policies from blocking legitimate releases due to missing context variables, turning continuous governance from a development blocker into a secure business enabler.23
+
+### **Production-Grade Rego Policy for AI Gateway Authorization**
+
+The following Rego policy illustrates how an AI gateway can enforce tenant scope, RBAC, budget ceilings, approval requirements, and artifact integrity before a model-generated tool action is dispatched.
+
+The policy assumes that trusted registry data—such as approved plan hashes, tool manifests, and environment rules—is supplied to OPA as a signed data bundle or trusted sidecar input. OPA should not be treated as casually querying arbitrary production databases during local policy evaluation.
+
+```rego
+package ai.gateway.authorization
+
+default allow := false
+default decision := {
+  "allow": false,
+  "reason": "unauthorized_gateway_access",
+  "review_required": false,
+}
+
+# Expected input shape:
+#
+# input.subject = {
+#   "id": "opaque_user_or_service_id",
+#   "tenant_id": "tenant_123",
+#   "roles": ["deploy_bot"],
+#   "suspended": false,
+#   "remaining_session_budget_usd": 12.50
+# }
+#
+# input.tool_call = {
+#   "name": "apply_infrastructure",
+#   "params": {
+#     "tenant_id": "tenant_123",
+#     "environment": "staging",
+#     "plan_name": "service-update.plan",
+#     "plan_hash": "sha256:abc..."
+#   },
+#   "risk_class": "high_impact_write"
+# }
+#
+# input.token_metrics = {
+#   "input_tokens": 2500,
+#   "max_output_tokens": 800
+# }
+#
+# data.registry.valid_plan_hashes = {
+#   "sha256:abc...": true
+# }
+
+allow {
+  not subject_suspended
+  valid_tenant_scope
+  rbac_permissions_met
+  not budget_ceiling_breached
+  not blocked_destructive_action
+  plan_integrity_verified
+  approval_requirement_satisfied
+}
+
+decision := {
+  "allow": true,
+  "reason": "allowed",
+  "review_required": false,
+} {
+  allow
+}
+
+decision := {
+  "allow": false,
+  "reason": reason,
+  "review_required": review_required,
+} {
+  not allow
+  reason := deny_reason
+  review_required := requires_human_review
+}
+
+subject_suspended {
+  input.subject.suspended == true
+}
+
+valid_tenant_scope {
+  input.subject.tenant_id == input.tool_call.params.tenant_id
+}
+
+rbac_permissions_met {
+  input.tool_call.name == "read_status"
+  "viewer" in input.subject.roles
+}
+
+rbac_permissions_met {
+  input.tool_call.name == "apply_infrastructure"
+  "deploy_bot" in input.subject.roles
+  input.tool_call.params.environment != "production"
+}
+
+rbac_permissions_met {
+  input.tool_call.name == "apply_infrastructure"
+  "sre_admin" in input.subject.roles
+}
+
+estimated_cost_usd := cost {
+  input_cost := input.token_metrics.input_tokens * 0.000015
+  output_cost := input.token_metrics.max_output_tokens * 0.00006
+  cost := input_cost + output_cost
+}
+
+budget_ceiling_breached {
+  estimated_cost_usd > input.subject.remaining_session_budget_usd
+}
+
+blocked_destructive_action {
+  input.tool_call.name == "apply_infrastructure"
+  endswith(input.tool_call.params.plan_name, "-destroy.plan")
+  not "break_glass_admin" in input.subject.roles
+}
+
+plan_integrity_verified {
+  data.registry.valid_plan_hashes[input.tool_call.params.plan_hash] == true
+}
+
+approval_requirement_satisfied {
+  input.tool_call.risk_class != "high_impact_write"
+}
+
+approval_requirement_satisfied {
+  input.tool_call.risk_class == "high_impact_write"
+  input.approval.status == "approved"
+  input.approval.payload_hash == input.tool_call.payload_hash
+  input.approval.approver_id != input.subject.id
+}
+
+requires_human_review {
+  input.tool_call.risk_class == "high_impact_write"
+  not approval_requirement_satisfied
+}
+
+deny_reason := "subject_suspended" {
+  subject_suspended
+}
+
+deny_reason := "tenant_id_mismatch" {
+  not valid_tenant_scope
+}
+
+deny_reason := "insufficient_rbac_permissions" {
+  valid_tenant_scope
+  not rbac_permissions_met
+}
+
+deny_reason := "session_budget_breached" {
+  budget_ceiling_breached
+}
+
+deny_reason := "blocked_destructive_plan" {
+  blocked_destructive_action
+}
+
+deny_reason := "plan_hash_unverified" {
+  not plan_integrity_verified
+}
+
+deny_reason := "approval_required" {
+  requires_human_review
+}
+```
+
+This policy does not rely on the model to decide whether an action is safe. The model proposes; the gateway evaluates; the policy engine returns an auditable decision.
+
+## **Runtime Governance for Agentic Systems**
+
+Policy-as-code and release gates are necessary, but agentic systems also need runtime governance. A model can generate valid-looking actions that become unsafe only after state changes, streaming outputs, tool latency, partial commits, cost accumulation, or human-review uncertainty. Governance must therefore attach constraints directly to the agent loop.
+
+One useful pattern is **SARC-style runtime governance**, where system state, action space, reward/optimization pressure, and constraints are modeled explicitly. SARC should be treated as a reference pattern, not a single mandatory framework. The durable principle is broader: constraints must be executable, traceable, and enforced at the correct physical point in the workflow.
+
+### **Constraint Specification Model**
+
+A runtime governance constraint can be represented as:
+
+```text
+C = <source, class, predicate, verification_point, response>
+```
+
+| Field | Meaning | Example |
+| :---- | :---- | :---- |
+| **source** | The policy, legal, contractual, security, or organizational authority behind the constraint. | EU AI Act Article 14, corporate procurement policy, tenant data policy. |
+| **class** | Whether the constraint is hard, soft, reviewable, or advisory. | hard block, human review, throttle, warning. |
+| **predicate** | The executable condition evaluated by the system. | amount <= user_limit, tenant_id matches, PII not present. |
+| **verification_point** | Where the check runs physically. | pre-action gate, action-time monitor, post-action auditor, escalation router. |
+| **response** | What the system does when the predicate fails. | block, redact, hold, throttle, compensate, escalate, fail closed. |
+
+```text
+RUNTIME GOVERNANCE LOOP
+
+[ Agent State / User Goal / Active Policy ]
+        |
+        v
++-------------------------------+
+| Pre-Action Gate               |
+| checks state + proposed action|
+| before tool dispatch          |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Action-Time Monitor           |
+| watches streaming output,     |
+| latency, egress, cost, leaks  |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Post-Action Auditor           |
+| verifies source-of-record     |
+| state, cost, commit, effects  |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Escalation Router             |
+| freezes workflow and packages |
+| review when confidence, risk, |
+| or policy requires it         |
++-------------------------------+
+```
+
+### **The Four Runtime Enforcement Points**
+
+| Enforcement Point | When It Runs | Best For | Example Response |
+| :---- | :---- | :---- | :---- |
+| **Pre-Action Gate** | Before a tool or external action is invoked. | Tenant scope, approval status, RBAC/ABAC, payload schema, risk class, budget reservation. | Block, require approval, downgrade to read-only, or route to review. |
+| **Action-Time Monitor** | During streaming generation, tool execution, browser automation, or long-running workflow. | Token/cost velocity, data leakage, egress attempts, timeout risk, unsafe intermediate outputs. | Cancel call, redact, cut off stream, revoke temporary credential. |
+| **Post-Action Auditor** | After an action returns, before the model or UI claims completion. | Source-of-record verification, partial commit detection, actual cost, consistency with requested action. | Mark verified, hold unknown state, reconcile, compensate, or correct user status. |
+| **Escalation Router** | Whenever a hard or reviewable constraint requires human judgment. | High-impact actions, low confidence, policy exceptions, contested outcomes, regulatory review. | Freeze workflow, package evidence, route to human review, preserve state. |
+
+### **Specification-Trace Correspondence**
+
+Runtime governance should provide specification-trace correspondence: for each consequential action in the trace, an auditor should be able to identify which constraints applied, where they were evaluated, what decision they produced, and what response occurred.
+
+This is an auditability property, not a mystical proof spell. The system proves governance by preserving policy versions, decision IDs, trace IDs, state hashes, secure payload references, approval records, and action outcomes.
+
+### **Constraint Enforcement Manifest**
+
+| Constraint ID | Source | Class | Predicate | Enforcement Point | Response | Recovery Semantics |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| **C_OVERSIGHT_01** | Human oversight policy / regulated high-impact workflow. | Reviewable hard boundary. | High-impact action has valid approval bound to payload hash. | Pre-Action Gate. | Block and escalate to checker. | No external write occurs; preserve draft. |
+| **C_PRIVACY_02** | Privacy-by-design policy / GDPR-aligned internal rule. | Hard boundary. | Payload contains no prohibited sensitive data for the selected route. | Action-Time Monitor. | Abort, redact, and open privacy event if needed. | Clear transient workspace; preserve secure evidence reference. |
+| **C_FINOPS_03** | Corporate FinOps policy. | Soft boundary until hard budget limit. | Workflow spend remains within tenant/session budget. | Action-Time Monitor. | Throttle, degrade, require approval, or stop. | Preserve state; resume only after budget decision. |
+| **C_INTEGRITY_04** | Financial / operational integrity policy. | Hard boundary. | Post-action state matches expected source-of-record predicate. | Post-Action Auditor. | Hold unknown state or block success claim. | Reconcile, compensate, forward recover, or escalate. |
+| **C_LOGGING_05** | Audit and retention policy. | Hard boundary for high-impact actions. | Required trace, policy, and action-ledger metadata were written. | Post-Action Auditor. | Freeze workflow and route to operations review. | Retry audit write if safe; otherwise hold and escalate. |
+
+## **Dual-Control "Maker-Checker" Ledger Architecture**
+
+When AI systems act as the "Makers" of financial or administrative changes—such as proposing loan disbursals, generating payments, or updating security parameters—traditional, single-user database writes create significant risks of fraud, compromise, or error.3 To enforce strict segregation of duties, organizations must implement the dual-authorization **Maker-Checker** pattern (Four-Eyes Principle) at the database engine layer.3  
+Under this design, a **Maker** (the automated agent or user) initiates a sensitive operation.37 Instead of executing the action immediately, the system intercepts the request, blocks its execution on business tables, and routes the proposed transaction payload to a centralized **Approval Queue**.3 A **Checker** (a different, authorized human supervisor or auditor) must manually review, sign, and commit the proposed change from the queue.3
+
+```text
+MAKER-CHECKER CONTROL FLOW
+
+[ Maker: user or agent proposes action ]
+        |
+        v
++-------------------------------+
+| Action Interceptor            |
+| - validates schema            |
+| - classifies risk             |
+| - blocks direct business write|
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| approval_requests Queue       |
+| - payload hash / secure ref   |
+| - maker identity              |
+| - tenant / policy version     |
+| - status = PENDING            |
++---------------+---------------+
+                |
+                v
+[ Checker Review ]
+  checker must be authorized
+  checker must differ from maker
+  approval binds to payload hash
+        |
+        +--> rejected -> record reason, no business mutation
+        |
+        v
++-------------------------------+
+| Execution Worker              |
+| - revalidates approval        |
+| - executes atomic transaction |
+| - writes immutable ledger     |
+| - verifies source of record   |
++---------------+---------------+
+                |
+                v
+[ User-facing confirmation only after verified commit ]
+```
+
+### **Queue-Based Database Schema**
+
+Traditional table-level maker-checker implementations often add approval columns to every business table. That approach creates inconsistent review semantics and makes it difficult to audit pending approvals across systems. A cleaner pattern is to centralize approval requests while keeping business writes behind a verified execution worker.
+
+The following PostgreSQL schema separates the approval queue from the immutable execution ledger. It stores sensitive payloads by secure reference and hash rather than dumping raw high-impact transaction details directly into an ordinary workflow table.
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE TYPE approval_workflow_status AS ENUM (
+    'PENDING',
+    'APPROVED',
+    'REJECTED',
+    'EXPIRED',
+    'PROCESSING',
+    'COMPLETED',
+    'FAILED'
+);
+
+CREATE TYPE approval_risk_class AS ENUM (
+    'LOW',
+    'MEDIUM',
+    'HIGH',
+    'REGULATED'
+);
+
+CREATE TABLE public.approval_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    tenant_id UUID NOT NULL,
+    operation_type TEXT NOT NULL,
+    action_type TEXT NOT NULL,
+    risk_class approval_risk_class NOT NULL,
+
+    -- Sensitive payloads should live in controlled storage.
+    -- The approval record stores the reference and integrity hash.
+    payload_ref TEXT NOT NULL,
+    payload_hash TEXT NOT NULL CHECK (payload_hash ~ '^sha256:[a-f0-9]{64}$'),
+
+    policy_version TEXT NOT NULL,
+    tool_manifest_hash TEXT,
+    idempotency_key TEXT UNIQUE NOT NULL,
+
+    maker_id UUID NOT NULL,
+    checker_id UUID,
+    status approval_workflow_status NOT NULL DEFAULT 'PENDING',
+
+    approval_reason TEXT,
+    rejection_reason TEXT,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    expires_at TIMESTAMPTZ NOT NULL,
+    reviewed_at TIMESTAMPTZ,
+    executed_at TIMESTAMPTZ,
+
+    CONSTRAINT chk_checker_differs_from_maker CHECK (
+        checker_id IS NULL OR checker_id <> maker_id
+    ),
+
+    CONSTRAINT chk_review_fields_when_approved CHECK (
+        status <> 'APPROVED'
+        OR (
+            checker_id IS NOT NULL
+            AND reviewed_at IS NOT NULL
+            AND approval_reason IS NOT NULL
+        )
+    ),
+
+    CONSTRAINT chk_review_fields_when_rejected CHECK (
+        status <> 'REJECTED'
+        OR (
+            checker_id IS NOT NULL
+            AND reviewed_at IS NOT NULL
+            AND rejection_reason IS NOT NULL
+        )
+    ),
+
+    CONSTRAINT chk_completed_requires_execution CHECK (
+        status <> 'COMPLETED'
+        OR executed_at IS NOT NULL
+    )
+);
+
+CREATE INDEX idx_approval_requests_tenant_status
+    ON public.approval_requests (tenant_id, status);
+
+CREATE INDEX idx_approval_requests_operation_status
+    ON public.approval_requests (operation_type, status);
+
+CREATE TABLE public.approval_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    approval_request_id UUID NOT NULL
+        REFERENCES public.approval_requests(id),
+
+    event_type TEXT NOT NULL,
+    actor_id UUID NOT NULL,
+    event_payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+    event_hash TEXT NOT NULL CHECK (event_hash ~ '^sha256:[a-f0-9]{64}$'),
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_approval_events_request
+    ON public.approval_events (approval_request_id, created_at);
+
+CREATE TABLE public.action_execution_ledger (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    approval_request_id UUID NOT NULL
+        REFERENCES public.approval_requests(id),
+
+    tenant_id UUID NOT NULL,
+    operation_type TEXT NOT NULL,
+
+    pre_action_state_hash TEXT NOT NULL,
+    post_action_state_hash TEXT,
+    execution_status TEXT NOT NULL,
+    compensation_ref TEXT,
+
+    executed_by UUID NOT NULL,
+    executed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+    ledger_entry_hash TEXT NOT NULL CHECK (ledger_entry_hash ~ '^sha256:[a-f0-9]{64}$')
+);
+
+CREATE INDEX idx_action_execution_ledger_request
+    ON public.action_execution_ledger (approval_request_id);
+```
+
+This schema is not a complete banking ledger. It is a governance queue and execution ledger pattern. Financial systems still require domain-specific accounting tables, double-entry posting rules, reconciliation, settlement controls, and regulator-specific audit procedures.
+
+### **Double-Entry Ledger, Immutability, and State Verification**
+
+When the checker approves the request, the database executes the operation within an atomic, double-entry transactional block.39 Double-entry rules require that every financial posting writes at least one debit and one credit in equal amounts, ensuring the ledger remains balanced (Sum of Debits + Sum of Credits = 0) and mathematically preventing single-entry anomalies.39  
+Once committed, transaction logs are completely immutable—historical records are never updated or deleted.39 Any corrections must be executed by posting opposing "contra" and "re-booked" entries, leaving a chronological, tamper-evident audit trail for financial regulators.39  
+
+For high-impact operations, approval is not the same as execution. The checker approves a specific payload hash under a specific policy version. The execution worker must then re-read the approval record, verify that the payload hash still matches, confirm the approval has not expired, execute the business transaction atomically, and write an immutable execution-ledger entry. The user interface must not report completion until the post-action verifier confirms the source-of-record state.
+
+To guarantee state verification, the platform leverages configuration parameters across distinct instance types 41:
+
+* **Read Instance:** Uses read-only database connections to fetch users, templates, and transaction histories.41  
+* **Write Instance:** Persists state-changing commands to the approval queue, ensuring every update is registered.41  
+* **Batch Instance:** Automatically executes background verification, audit synchronization, and log archiving routines.41
+
+This division ensures that the conversational interface remains blocked from speaking or displaying transaction confirmations to the user until the Write Instance confirms that the database commit has successfully settled in the core ledger.2
+
+## **Governance Decision Register and Accountability Matrix**
+
+Governance architecture must define who is allowed to make which AI-system decisions, what evidence they need, where the decision is enforced, and how exceptions are reviewed. Without a decision register, governance collapses into vibes, meetings, and someone named Brad saying “seems fine” in Slack. Brad is not a control.
+
+| Governance Decision | Accountable Owner | Trigger | Required Evidence | Enforcement Surface | Review / Exception Path |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **AI System Registration** | Governance Lead / System Owner. | New AI system, material feature, model route, or agent workflow. | System card, owner, intended use, user population, data classes, model/tool inventory. | AI system inventory gate. | Architecture review for unregistered or orphaned systems. |
+| **Risk Classification** | Compliance Lead with System Owner. | New use case or material change in affected population, autonomy, or data class. | Impact assessment, harm analysis, regulatory mapping, human oversight plan. | Release gate and policy bundle. | Risk acceptance by accountable executive for exceptions. |
+| **Model Route Approval** | Model Owner / AI Operations Lead. | New model, provider, adapter, quantization profile, or fallback route. | Evaluation results, capability profile, data-processing terms, supply-chain verification. | Gateway route manifest. | Route exception expires and requires revalidation. |
+| **Tool Permission Approval** | Tool Owner / Security Lead. | New tool, new scope, new mutation class, or expanded credential. | Tool contract, side-effect class, schema, auth model, idempotency plan, verification predicate. | Tool registry and gateway policy. | Human review for high-impact or broad-scope tools. |
+| **Human Review Threshold** | Governance Lead / Workflow Owner. | High-impact workflow or repeated uncertainty. | Risk class, confidence thresholds, historical review outcomes, reviewer capacity. | Maker-checker queue and escalation router. | Periodic threshold review; exceptions logged. |
+| **Corpus / Data Source Approval** | Data Owner / Retrieval Owner / Privacy Lead. | New corpus, ingestion route, vendor data source, or tenant-shared index. | Provenance, license, sensitivity, retention, data quality, source authority. | Corpus lifecycle state and retrieval eligibility policy. | Quarantine and review for unknown-provenance sources. |
+| **Vendor / SaaS Approval** | Procurement, Security, Privacy, Legal. | New AI vendor, embedded-AI feature, subprocessor, or data-sharing route. | Security assessment, DPA, training-use terms, deletion/export rights, audit evidence. | Procurement gate and vendor registry. | Risk acceptance and compensating controls if approved with gaps. |
+| **Telemetry Retention Policy** | Privacy Lead / SRE / Governance Lead. | New trace field, payload reference, audit requirement, or incident evidence class. | Data classification, purpose, retention need, access model, deletion obligations. | Telemetry collector and secure payload vault. | Legal/privacy review for extended sensitive retention. |
+| **Incident Reporting Decision** | Incident Commander / Compliance / Legal. | SEV-0/SEV-1, privacy event, regulated system incident, or customer impact. | Incident manifest, scope analysis, affected population, legal/regulatory triggers. | Incident management system and notification workflow. | Counsel and executive approval where required. |
+| **Decommission / Sunset Decision** | System Owner / Governance Lead. | Vendor exit, model retirement, unacceptable residual risk, or system obsolescence. | Data export plan, deletion certificate, replacement route, archival evidence. | Lifecycle registry and access controls. | Formal exception if system must remain temporarily active. |
+
+The register should be machine-readable where possible. Each decision should bind to policy version, owner, timestamp, evidence references, affected systems, and expiration/review date.
+
+## **Shadow AI Discovery and Context Ingestion Hygiene**
+
+Shadow AI is the use of unapproved AI tools, browser plugins, SaaS products, local agents, or automation scripts outside formal IT, security, privacy, procurement, or governance review. The risk is not that employees are curious. The risk is that sensitive prompts, proprietary code, customer records, regulated data, credentials, or internal documents move into unapproved systems with unknown retention, training, security, and contractual terms.
+
+Shadow AI discovery must itself be governed. Monitoring should be lawful, disclosed where required, proportionate, minimized, access-controlled, and reviewed through privacy and security governance. The goal is to identify risky data flows and route users toward approved tools—not to build an employee panopticon with a compliance sticker slapped on the side.
+
+### **Multi-Layered Shadow AI Discovery Stack**
+
+```text
+SHADOW AI DISCOVERY STACK
+
+[ Approved AI Inventory ]
+        |
+        v
+[ Discovery Signals ]
+  DNS / SNI / CASB / SaaS logs
+  endpoint DLP events
+  identity and OAuth grants
+  expense/vendor records
+  browser extension inventory
+  developer package/config scans
+        |
+        v
+[ Risk Correlation ]
+  data sensitivity | destination | user role
+  volume | frequency | contract status
+  vendor approval state
+        |
+        v
+[ Governance Response ]
+  allow approved tool
+  coach user to safe path
+  require vendor review
+  block high-risk transfer
+  open incident if sensitive data exposed
+```
+
+| Discovery Layer | What It Detects | Governance Guardrail |
+| :---- | :---- | :---- |
+| **Network / CASB Signals** | Connections to unapproved AI services, unusual upload volume, risky SaaS destinations. | Use destination and volume metadata where sufficient; restrict deeper inspection to policy-approved cases. |
+| **Endpoint / DLP Signals** | Sensitive data copied, uploaded, or pasted into unapproved browser tabs or applications. | Minimize content capture; use classification events and redacted snippets rather than broad raw collection. |
+| **Identity / OAuth Monitoring** | Employees authorizing AI apps, plugins, or connectors with broad scopes. | Require OAuth scope review, app approval, and automatic revocation for prohibited grants. |
+| **Browser / Extension Inventory** | AI browser extensions, local agents, or automation plugins installed outside approval. | Maintain allowlist; notify users; block high-risk extensions with data access. |
+| **Developer Config Scans** | Unapproved MCP servers, API keys, agent configs, dependency hooks, or local tool servers. | Scan repositories and endpoint configs for risky patterns without collecting unrelated personal data. |
+| **Expense / Vendor Records** | Emerging AI SaaS purchases outside procurement review. | Route to vendor governance instead of punishing early adopters by default. |
+| **Support / User Reports** | Teams requesting tools or reporting gaps in approved options. | Use demand signals to improve approved golden paths. |
+
+### **Context Ingestion Hygiene and Metadata Context Manifests**
+
+Authorized RAG and context-ingestion pipelines must treat external documents, webpages, emails, tickets, transcripts, and uploaded files as untrusted data. Before content enters retrieval, memory, or the model-facing context window, the ingestion system should verify source, ownership, sensitivity, tenant scope, transformation history, and lifecycle state.
+
+| Hygiene Control | Purpose |
+| :---- | :---- |
+| **Sandboxed Parsing** | Parse PDFs, Office files, images, HTML, XML, SVG, archives, and other complex formats in constrained, network-restricted environments. |
+| **Active Content Removal** | Strip or disable macros, scripts, external entity resolution, hidden text, zero-width payloads, and unsafe embedded objects. |
+| **Source and Ownership Binding** | Attach source ID, owner, tenant, license, sensitivity, retention, and lifecycle state. |
+| **Transformation Lineage** | Record parser version, chunking version, embedding model, summary generator, and derived artifact hashes. |
+| **Permission Inheritance** | Ensure chunks, embeddings, summaries, citations, and cache entries inherit source permissions and classifications. |
+| **Retrieval Eligibility Policy** | Admit only active, authorized, non-quarantined sources into retrieval candidate sets. |
+| **Prompt-Injection Containment** | Treat document text as evidence, not authority; untrusted content cannot grant tool permissions or override policy. |
+
+A Context Manifest should travel with every model-facing evidence object. It should include source identity, tenant, ACL, sensitivity, parser/chunking lineage, lifecycle state, freshness, and policy version. Context assembly is an access-control decision, not a formatting step.
+
+## **Regulatory Synchronization: Global Compliance Timelines**
+
+AI compliance changes over time. Governance architecture should therefore maintain a regulatory register that distinguishes current legal obligations, future effective dates, provisional political agreements, draft guidance, and organization-specific contractual commitments.
+
+The European Union Artificial Intelligence Act entered into force on August 1, 2024 and applies progressively. Organizations should track two planning views:
+
+1. **Current-law baseline:** obligations and dates in the adopted AI Act and official EU implementation guidance.
+2. **Provisional Omnibus planning track:** as of June 2026, EU institutions had reached a provisional agreement on targeted Digital Omnibus changes, including revised timelines for certain high-risk AI obligations. Until formal adoption and publication are complete, organizations should treat these changes as planning assumptions, not as a substitute for legal review.
+
+### **EU AI Act Timeline Planning Matrix**
+
+| Date | Status | Provision / Topic | Governance Action |
+| :---- | :---- | :---- | :---- |
+| **August 1, 2024** | In force. | EU AI Act enters into force. | Establish AI system inventory, governance owner, regulatory register, and risk-classification workflow. |
+| **February 2, 2025** | Current-law baseline. | AI literacy duties and prohibited AI practices begin applying. | Train relevant personnel; block prohibited practices in policy-as-code and procurement gates. |
+| **August 2, 2025** | Current-law baseline. | GPAI and AI governance obligations begin applying under the phased timeline. | Maintain model/provider inventory, documentation, vendor evidence, and governance process. |
+| **August 2, 2026** | Current-law baseline for broad applicability, subject to exceptions and any formally adopted amendments. | General application date for many AI Act obligations. Article 50 transparency obligations are especially relevant to user-facing AI interactions. | Implement user disclosures, AI interaction labeling, incident and evidence records, and deployer controls for applicable systems. |
+| **December 2, 2026** | Provisional Omnibus planning track. | Reported deadline for certain synthetic-content transparency / watermarking-related obligations and new prohibitions under the provisional agreement. | Track final legal text; evaluate watermarking, labeling, output provenance, and prohibited-content controls. Do not hardcode C2PA as the only acceptable mechanism. |
+| **December 2, 2027** | Provisional Omnibus planning track. | Reported delayed deadline for many standalone Annex III high-risk AI system obligations. | Continue readiness work: risk management, human oversight, logging, monitoring, post-market controls, and deployer obligations. |
+| **August 2, 2028** | Provisional Omnibus planning track. | Reported delayed deadline for product-regulated Annex I high-risk AI systems. | Coordinate with product regulatory, conformity assessment, technical documentation, and safety teams. |
+
+### **Article 26: Deployer Obligations for High-Risk Systems**
+
+For high-risk AI systems, deployers should prepare controls for:
+
+| Obligation Area | Governance Implementation |
+| :---- | :---- |
+| **Use According to Instructions** | Maintain provider instructions, deployment constraints, operator training, and system-use policies. |
+| **Human Oversight** | Assign competent, authorized, supported natural persons for oversight where required. |
+| **Input Data Relevance** | Where the deployer controls input data, ensure inputs are relevant and sufficiently representative for the intended purpose. |
+| **Monitoring and Suspension** | Monitor operation; suspend use and notify appropriate parties when serious risk is identified. |
+| **Log Retention** | Retain logs generated by the high-risk system under deployer control for the legally required period, with at least six months where applicable. |
+| **Workplace Notice** | Inform workers and representatives before high-risk AI systems are used in workplace contexts where required. |
+
+This section should be reviewed periodically. Legal deadlines, guidance, standards, and enforcement interpretations can change; the governance architecture must preserve update ownership instead of fossilizing one timeline into the system like a compliance mosquito in amber.
+
+## **The Platform Engineering "Golden Path" to AI Governance**
+
+The goal of a modern platform engineering team is to balance developer velocity with enterprise governance by architecting a **Golden Path**—an opinionated, well-documented, and supported way of building and deploying software.6 Positioned as a standardized self-service route, the Golden Path makes the secure, compliant choice the easiest choice for developers, integrating compliance checks directly into the environment.4
+
+```text
+AI GOVERNANCE GOLDEN PATH
+
+[ Developer / Team ]
+  declares use case, data class, autonomy level, tools, users, deployment target
+        |
+        v
++-------------------------------+
+| Self-Service Intake           |
+| - AI system registration      |
+| - risk questionnaire          |
+| - data/source declarations    |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Template and IaC Generation   |
+| - approved service patterns   |
+| - logging and telemetry       |
+| - sandbox and gateway defaults|
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Policy-as-Code Gates          |
+| - OPA / Kyverno / CI checks   |
+| - model/tool/vendor allowlist |
+| - cost and security checks    |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Evaluation and Review Gates   |
+| - golden tests                |
+| - security/privacy review     |
+| - human approval if required  |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Production Runtime Controls   |
+| - gateway policy enforcement  |
+| - telemetry and audit trails  |
+| - incident and rollback hooks |
++---------------+---------------+
+                |
+                v
++-------------------------------+
+| Continuous Governance         |
+| - drift monitoring            |
+| - vendor review               |
+| - incident-to-eval updates    |
+| - periodic risk reassessment  |
++-------------------------------+
+```
+
+### **The Four Qualities of a Golden Path**
+
+To foster innovation while maintaining structural control, every Golden Path must satisfy four core architectural properties 65:
+
+* **Optional by exception, not by bypass:** Engineering teams may request an alternative approved path when a custom scenario requires it. Mandatory security, privacy, regulatory, and high-impact governance controls remain enforceable regardless of path. Exceptions should be logged, time-bounded, owned, and reviewed.
+* **Transparent:** The underlying technologies, security scanners, and container configurations are transparently visible, giving developers the opportunity to learn how the background automation operates.65  
+* **Extensible:** The templates are highly modular, allowing teams to add new capabilities, plugins, or evaluation libraries without rewriting the pipeline core.65  
+* **Customizable:** The configurations can be adjusted based on the team's existing experience and the business risk of the target application.65
+
+### **The Four Pillars of Platform Control**
+
+A mature, autonomous platform manages compliance across four distinct, AI-driven control mechanisms 4:
+
+1. **Golden Paths:** Self-tuning, automated roadmaps that generate compliant infrastructure and service templates from natural language intents.4  
+2. **Guardrails:** Programmatic checks (such as OPA and Kyverno) that prevent non-compliant deployments from reaching production.4  
+3. **Safety Nets:** Automated drift remediation systems that continuously scan live environments against desired states, deploying security patches and cleaning up "zombie infrastructure" using embedded time-to-live policies to reduce cloud waste.4  
+4. **Manual Review Workflows:** Strategic points of human friction where agents generate comprehensive risk reports, check cost forecasts, and present reviewers with simple risk scores and go/no-go recommendations, ensuring accountability where judgment is required.4
+
+### **FinOps and Security Inner-Loop Integrations**
+
+By shifting governance to "Step Zero" of the developer workflow, the Golden Path prevents compliance failures before resources are ever provisioned.6 OPA-driven security guardrails evaluate Terraform plans to detect contextual privilege escalation paths and verify container signatures.20  
+Simultaneously, FinOps guardrails analyze infrastructure changes to output real-time cost impact predictions and enforce resource-tagging policies before merging pull requests, eliminating post-deployment billing surprises and keeping the organization's cloud footprint secure, lean, and auditable.35
+
+## **Cross-Canon Handoff Map**
+
+AI-ENG-AD defines the governance control layer for the canon: policy ownership, accountability, risk classification, approval workflows, audit obligations, procurement gates, regulatory synchronization, and lifecycle governance. It consumes operational evidence from upstream systems and sends enforceable decisions back into gateways, registries, release gates, and runtime monitors.
+
+| Canon Report | Governance Input to AD | AD Decision / Control | Downstream Enforcement |
+| :---- | :---- | :---- | :---- |
+| **AI-ENG-B — Context Architecture** | Context object metadata, memory scope, tenure, authority, and state ownership. | Defines governance rules for memory, context retention, and state accountability. | Context compiler, memory policy, retention registry. |
+| **AI-ENG-D — Corpus Engineering** | Source authority, data ownership, lifecycle state, provenance, and data quality. | Determines approved data sources, sensitivity rules, retention, and corpus ownership. | Corpus registry, ingestion gates, data lifecycle controls. |
+| **AI-ENG-E — Retrieval Pipeline** | Retrieval eligibility, evidence packets, citation bundles, permission filters. | Defines evidence sufficiency, citation requirements, and retrieval governance controls. | Retrieval policy, RLS/ACL enforcement, citation verification gates. |
+| **AI-ENG-F — Freshness and Conflict Detection** | Freshness state, conflict packets, source versions, bitemporal records. | Defines acceptable staleness, conflict escalation, and source-of-record hierarchy. | Freshness gates, conflict-resolution policy, user disclosure rules. |
+| **AI-ENG-L — Serving Architecture** | Model routes, provider profiles, serving images, latency/cost envelopes. | Approves route classes, fallback eligibility, and model-provider governance. | Gateway route manifests, release gates, fallback policy. |
+| **AI-ENG-M — Agentic Orchestration** | Autonomy boundaries, workflow graphs, loop budgets, agent state. | Defines permissible autonomy by risk tier and escalation requirements. | Agent policy, workflow caps, escalation router. |
+| **AI-ENG-N — Tool Contracts** | Tool schemas, side-effect class, tool manifests, argument validators. | Approves tool exposure, credential scope, and human-review thresholds. | Tool registry, OPA policy, maker-checker queue. |
+| **AI-ENG-O — Action Verification** | Idempotency keys, action ledgers, verification predicates, state hashes. | Defines when completion claims, compensation, and audit obligations are required. | Post-action auditor, source-of-record verification, action ledger. |
+| **AI-ENG-P — Multimodal Understanding** | Parser lineage, OCR/layout confidence, media evidence, coordinates. | Defines evidentiary adequacy and review rules for document/media-derived claims. | Evidence adequacy gate, parser approval, human review. |
+| **AI-ENG-Q — Speech / Realtime** | Transcript confidence, voice confirmation, interruption, degraded voice state. | Defines when voice channels can authorize or must fall back to visual/text confirmation. | Confirmation policy, high-impact voice gate, transcript retention. |
+| **AI-ENG-R — UI Agents** | Browser actions, DOM/screenshot hashes, UI verification, automation uncertainty. | Defines UI-agent autonomy limits and user handoff requirements. | UI automation gate, browser sandbox, action verification. |
+| **AI-ENG-S — Production Pathologies** | Failure taxonomy, malformed output, false success, loop pathologies. | Defines which pathology classes require release gates, incidents, or governance review. | Regression tests, incident triggers, reliability SLOs. |
+| **AI-ENG-T — Boundary Defense** | Authority hierarchy, tenant isolation, cache scope, prompt-injection events. | Defines non-negotiable security boundaries and escalation paths. | Gateway policy, RLS, cache isolation, fail-closed controls. |
+| **AI-ENG-U — Supply Chain Security** | Model signatures, SBOM/AI-BOM, dependency manifests, sandbox profiles. | Defines approved artifacts, vendor requirements, and supply-chain evidence. | Artifact registry, procurement gate, runtime loader policy. |
+| **AI-ENG-V — Resource Abuse** | Budget limits, token burn, denial-of-wallet signals, loop caps. | Defines spend authority, quota policy, and abuse-response obligations. | Budget gateway, rate limits, cost approvals. |
+| **AI-ENG-W — UX Resilience** | Degraded-mode states, fallback contracts, continuity state, disclosure records. | Defines disclosure, consent, and fallback eligibility by risk tier. | UX state cards, fallback policy, human escalation. |
+| **AI-ENG-X — User Trust** | Transparency, contestability, evidence presentation, user correction signals. | Defines user-facing explanation, contestability, and trust-calibration obligations. | UI disclosures, evidence views, appeal/review paths. |
+| **AI-ENG-Y — Human Review** | Approval queues, maker-checker records, reviewer decisions, escalation packages. | Defines when human review is mandatory and how review quality is audited. | Approval workflows, reviewer governance, override logs. |
+| **AI-ENG-Z — Strategic Telemetry** | Trace IDs, telemetry fields, redaction metadata, drift metrics, SLOs. | Defines required telemetry, retention, access control, and audit scope. | Telemetry collector, secure payload vault, dashboards. |
+| **AI-ENG-AA — Evaluations** | Golden sets, canaries, rubrics, adversarial tests, calibration artifacts. | Defines release gates, acceptance criteria, and evaluation ownership. | CI/CD gates, eval registry, model/prompt release approval. |
+| **AI-ENG-AB — Verification Artifacts** | Trace manifests, secure references, replay artifacts, evidence trails. | Defines auditability, reproducibility, and evidence-retention requirements. | Audit store, incident package, replay harness. |
+| **AI-ENG-AC — AI Operations** | Incident records, runbooks, containment actions, postmortems, corrective actions. | Defines incident reporting, severity governance, accountability, and closure requirements. | Incident workflow, corrective-action tracking, incident-to-eval loop. |
+| **AI-ENG-AJ — Reference Architectures** | Blueprint patterns, gateways, registries, sandboxes, audit stores. | Converts governance decisions into default implementation architecture. | Golden paths, platform templates, reference deployments. |
+
+## **Durable Principles of AI Governance Architecture**
+
+To future-proof the enterprise and maintain compliant operations, AI systems architects must adhere to five durable design principles:
+
+### **I. Governance Must Live Outside the Model's Cognitive Path**
+
+Relying on system prompts, inline instructions, or model self-policing to enforce safety boundaries, cost limits, or structural compliance is a critical vulnerability.1 Language models are probabilistic generators whose attention is easily diluted by long contexts, complex reasoning steps, or adversarial prompts.1 True governance must be programmatically enforced outside the model's cognitive path using a centralized, budget-aware API gateway and isolated runtime verification monitors.1
+
+### **II. Context Ingestion is an Access-Control Gate**
+
+No document, database row, memory, or semantic cache entry must enter the model-facing context window unless the system has verified its origin, tenant scope, and user-level permissions.1 Enforcing security filters in application code is an anti-pattern prone to race conditions and logic bugs.1 SaaS platforms must isolate multi-tenant data directly at the database engine layer using Row-Level Security (RLS) policies and partition vector indexes per customer.1
+
+### **III. Spoken and Generated Claims Must Never Outrun Database Realities**
+
+Dialogue orchestrators and conversational interfaces must never vocalize or display a completion confirmation (e.g., stating "Your transfer of $500 is complete") until the underlying API mutation has successfully committed and been verified by a Post-Action Auditor.2 All high-impact, state-changing operations must utilize the Saga distributed transaction pattern to coordinate compensatable, pivot, and retriable steps, ensuring eventual consistency across services before outputs are rendered on the viewport.2
+
+### **IV. Every Consequential Action Requires a Verifiable Evidence Trail**
+
+Every automated transaction, policy override, user correction, and human review decision must leave behind a tamper-evident evidence trail. That trail should bind the prompt version, model route, policy decision, source/evidence identifiers, tool payload hash, approval record, pre/post state hashes, and secure payload references where raw evidence is required.
+
+Governance evidence should be sufficient to audit and replay decisions without dumping raw prompts, context chunks, tool arguments, credentials, or sensitive user data into ordinary logs. Raw evidence belongs in controlled storage with access controls, retention limits, and access auditing.
+
+### **V. Security Controls Must Retain Rigor Under Degradation**
+
+When backend services degrade, model providers timeout, or rate limits are hit, the platform must degrade gracefully along explicit quality, cost, and latency dimensions while keeping its security boundaries strict.5 A system must never fail-open, bypass permission checks, or disable tenant filters to maintain service availability.1 If compliance or safety floors cannot be satisfied by available fallback paths, the architecture must fail-closed, secure the active state, and escalate the transaction to human review queues.1
+
+#### **Works cited**
+
+1. [KNOWLEDGE] - AI Engineering - Volume 7. S-V Failure, Security, and Hostile Environments  
+2. [KNOWLEDGE] - AI Engineering - Volume 9. Z-AB Observability, Evaluation, and Verification  
+3. Maker-Checker implementation guide for secure FinTech systems, accessed June 12, 2026, [https://opcitotechnologies.medium.com/makermaker-checker-implementation-guide-for-secure-fintech-systems-eabe13ff7029](https://opcitotechnologies.medium.com/makermaker-checker-implementation-guide-for-secure-fintech-systems-eabe13ff7029)  
+4. The autonomous enterprise and the four pillars of platform control: 2026 forecast | CNCF, accessed June 12, 2026, [https://www.cncf.io/blog/2026/01/23/the-autonomous-enterprise-and-the-four-pillars-of-platform-control-2026-forecast/](https://www.cncf.io/blog/2026/01/23/the-autonomous-enterprise-and-the-four-pillars-of-platform-control-2026-forecast/)  
+5. [KNOWLEDGE] - AI Engineering - Volume 8. W-Y Resilience, Degraded Modes, and Human Trust  
+6. Architecting Trust: The Blueprint for a "Golden Standard" Software Supply Chain - Harness, accessed June 12, 2026, [https://www.harness.io/blog/architecting-trust-the-blueprint-for-a-golden-standard-software-supply-chain](https://www.harness.io/blog/architecting-trust-the-blueprint-for-a-golden-standard-software-supply-chain)  
+7. How to map AI governance controls to NIST AI RMF functions - Prediction Guard, accessed June 12, 2026, [https://predictionguard.com/blog/how-to-map-ai-governance-controls-to-nist-ai-rmf-functions](https://predictionguard.com/blog/how-to-map-ai-governance-controls-to-nist-ai-rmf-functions)  
+8. ISO 42001 Statement of Applicability Explained - ISMS.online, accessed June 12, 2026, [https://www.isms.online/iso-42001/statement-of-applicability/](https://www.isms.online/iso-42001/statement-of-applicability/)  
+9. ISO 42001 Statement Of Applicability (SoA) | Detailed Guide - Cyberzoni.com, accessed June 12, 2026, [https://cyberzoni.com/iso-42001-soa/](https://cyberzoni.com/iso-42001-soa/)  
+10. ISO 42001 Annex A Controls Explained - ISMS.online, accessed June 12, 2026, [https://www.isms.online/iso-42001/annex-a-controls/](https://www.isms.online/iso-42001/annex-a-controls/)  
+11. Understanding the NIST AI RMF (AI Risk Management Framework) - Dastra.eu, accessed June 12, 2026, [https://www.dastra.eu/en/blog/understanding-the-nist-ai-risk-management-framework/59940](https://www.dastra.eu/en/blog/understanding-the-nist-ai-risk-management-framework/59940)  
+12. AI RMF Core - AIRC - NIST AI Resource Center, accessed June 12, 2026, [https://airc.nist.gov/airmf-resources/airmf/5-sec-core/](https://airc.nist.gov/airmf-resources/airmf/5-sec-core/)  
+13. NIST AI RMF: Govern, Map, Measure, Manage as a Process | BA Copilot, accessed June 12, 2026, [https://ba-copilot.com/nist-ai-rmf](https://ba-copilot.com/nist-ai-rmf)  
+14. ISO 42001 Annex A Controls List: A.5, A.6, A.7, A.8 (38 Controls) | Mindset Cyber, accessed June 12, 2026, [https://mindsetcyber.com.au/iso-42001-controls-list/](https://mindsetcyber.com.au/iso-42001-controls-list/)  
+15. ISO 42001 Annex Control Objectives And Controls | Gabriel Consultant Limited, accessed June 12, 2026, [https://gabriel.hk/iso-42001-annex-control-objectives-and-controls/](https://gabriel.hk/iso-42001-annex-control-objectives-and-controls/)  
+16. Process Automation and Cross-System Data Integrations | Watabe Digital Insights, accessed June 12, 2026, [https://watabedigital.co.tz/insights/business-process-automation-tanzania/automation-and-system-integration/](https://watabedigital.co.tz/insights/business-process-automation-tanzania/automation-and-system-integration/)  
+17. Ready for ISO 42001? Let's Talk Next Steps | Drata Help Center, accessed June 12, 2026, [https://help.drata.com/en/articles/12591328-ready-for-iso-42001-let-s-talk-next-steps](https://help.drata.com/en/articles/12591328-ready-for-iso-42001-let-s-talk-next-steps)  
+18. Building a Least-Privilege AI Agent Gateway for Infrastructure Automation with MCP, OPA, and Ephemeral Runners - InfoQ, accessed June 12, 2026, [https://www.infoq.com/articles/building-ai-agent-gateway-mcp/](https://www.infoq.com/articles/building-ai-agent-gateway-mcp/)  
+19. What Is Policy-As-Code? Benefits & Best Practices - Apiiro, accessed June 12, 2026, [https://apiiro.com/glossary/policy-as-code-2/](https://apiiro.com/glossary/policy-as-code-2/)  
+20. Policy as code: The platform engineer's guide to automated governance and compliance, accessed June 12, 2026, [https://platformengineering.org/blog/policy-as-code](https://platformengineering.org/blog/policy-as-code)  
+21. Open Policy Agent (OPA), accessed June 12, 2026, [https://openpolicyagent.org/docs](https://openpolicyagent.org/docs)  
+22. Principled Evolution (GOPAL & AICertify) - Open Policy Agent, accessed June 12, 2026, [https://openpolicyagent.org/ecosystem/entry/principled-evolution](https://openpolicyagent.org/ecosystem/entry/principled-evolution)  
+23. How to Validate Policy-as-Code Without Breaking Builds (Even When AI Writes the Code), accessed June 12, 2026, [https://jfrog.com/blog/how-to-validate-policy-as-code/](https://jfrog.com/blog/how-to-validate-policy-as-code/)  
+24. What is Open Policy Agent (OPA)? Best Practices + Applications - Wiz, accessed June 12, 2026, [https://www.wiz.io/academy/application-security/open-policy-agent-opa](https://www.wiz.io/academy/application-security/open-policy-agent-opa)  
+25. What is Policy-as-Code? - Sysdig, accessed June 12, 2026, [https://www.sysdig.com/learn-cloud-native/what-is-policy-as-code](https://www.sysdig.com/learn-cloud-native/what-is-policy-as-code)  
+26. SARC: A Governance-by-Architecture Framework for Agentic AI Systems - arXiv, accessed June 12, 2026, [https://arxiv.org/pdf/2605.07728](https://arxiv.org/pdf/2605.07728)  
+27. SARC: A Governance-by-Architecture Framework for Agentic AI Systems Compiling Regulatory Obligations into Runtime Constraints - arXiv, accessed June 12, 2026, [https://arxiv.org/html/2605.07728v1](https://arxiv.org/html/2605.07728v1)  
+28. SARC: A Governance-by-Architecture Framework for Agentic AI, accessed June 12, 2026, [https://www.aimodels.fyi/papers/arxiv/sarc-governance-by-architecture-framework-agentic-ai](https://www.aimodels.fyi/papers/arxiv/sarc-governance-by-architecture-framework-agentic-ai)  
+29. Gaston Besanson's research works - ResearchGate, accessed June 12, 2026, [https://www.researchgate.net/scientific-contributions/Gaston-Besanson-2340161255](https://www.researchgate.net/scientific-contributions/Gaston-Besanson-2340161255)  
+30. Outsider Oversight: Designing a Third Party Audit Ecosystem for AI Governance | Request PDF - ResearchGate, accessed June 12, 2026, [https://www.researchgate.net/publication/362295642_Outsider_Oversight_Designing_a_Third_Party_Audit_Ecosystem_for_AI_Governance](https://www.researchgate.net/publication/362295642_Outsider_Oversight_Designing_a_Third_Party_Audit_Ecosystem_for_AI_Governance)  
+31. (PDF) SARC: A Governance-by-Architecture Framework for Agentic, accessed June 12, 2026, [https://www.researchgate.net/publication/404712995_SARC_A_Governance-by-Architecture_Framework_for_Agentic_AI_Systems](https://www.researchgate.net/publication/404712995_SARC_A_Governance-by-Architecture_Framework_for_Agentic_AI_Systems)  
+32. Article 26: Obligations of Deployers of High-Risk AI Systems | EU Artificial Intelligence Act, accessed June 12, 2026, [https://artificialintelligenceact.eu/article/26/](https://artificialintelligenceact.eu/article/26/)  
+33. The CISO's Guide to EU AI Act Compliance - Cequence AI, accessed June 12, 2026, [https://www.cequence.ai/eu-ai-act.html](https://www.cequence.ai/eu-ai-act.html)  
+34. AI Data Privacy vs SaaS: What Changes For Enterprise IT In 2026 - CloudNuro.ai, accessed June 12, 2026, [https://www.cloudnuro.ai/blog/ai-data-privacy-vs-saas-what-changes-for-enterprise-it-in-2026](https://www.cloudnuro.ai/blog/ai-data-privacy-vs-saas-what-changes-for-enterprise-it-in-2026)  
+35. How AI Is Becoming the Governance Layer Inside Your CI/CD Pipeline - Medium, accessed June 12, 2026, [https://medium.com/@mrigank.online/how-ai-is-becoming-the-governance-layer-inside-your-ci-cd-pipeline-ce485bb96a21](https://medium.com/@mrigank.online/how-ai-is-becoming-the-governance-layer-inside-your-ci-cd-pipeline-ce485bb96a21)  
+36. Immutable Payment Audit Trails: Storage, Discovery, and Audits - Chequedb, accessed June 12, 2026, [https://chequedb.com/resources/blog/immutable-audit-trails-101-what-financial-compliance-actually-requires](https://chequedb.com/resources/blog/immutable-audit-trails-101-what-financial-compliance-actually-requires)  
+37. Maker-checker spec: discussion, approach, design - Mifos X - MifosForge, accessed June 12, 2026, [https://mifosforge.jira.com/wiki/pages/viewpage.action?pageId=27164690&navigatingVersions=true](https://mifosforge.jira.com/wiki/pages/viewpage.action?pageId=27164690&navigatingVersions=true)  
+38. Maker-Checker Pattern: Dual-Control System Implementation - Opcito, accessed June 12, 2026, [https://www.opcito.com/blogs/maker-checker-implementation-guide-for-secure-fintech-systems](https://www.opcito.com/blogs/maker-checker-implementation-guide-for-secure-fintech-systems)  
+39. Core Banking ERP Part 2 – Data Model, Ledger & Core Products - ClefinCode, accessed June 12, 2026, [https://clefincode.com/blog/global-digital-vibes/en/core-banking-erp-part-2-data-model-ledger-core-products](https://clefincode.com/blog/global-digital-vibes/en/core-banking-erp-part-2-data-model-ledger-core-products)  
+40. Double Entry Accounting in a Relational Database | by Robert Chanphakeo | Medium, accessed June 12, 2026, [https://medium.com/@RobertKhou/double-entry-accounting-in-a-relational-database-2b7838a5d7f8](https://medium.com/@RobertKhou/double-entry-accounting-in-a-relational-database-2b7838a5d7f8)  
+41. Fineract Platform Documentation, accessed June 12, 2026, [https://fineract.apache.org/docs/current/](https://fineract.apache.org/docs/current/)  
+42. AI Contracting: Practical Legal Guidance for Growing Businesses - Koley Jessen, accessed June 12, 2026, [https://www.koleyjessen.com/insights/publications/ai-contracting-practical-legal-guidance-for-growing-businesses](https://www.koleyjessen.com/insights/publications/ai-contracting-practical-legal-guidance-for-growing-businesses)  
+43. AI Vendor Risk Management: Assessing Third Party AI Suppliers - ISMS.online, accessed June 12, 2026, [https://www.isms.online/iso-42001/ai-vendor-risk/](https://www.isms.online/iso-42001/ai-vendor-risk/)  
+44. AI Contract Clauses That Reduce Vendor, Data, and Liability Risk, accessed June 12, 2026, [https://hernanhuwyler.wordpress.com/2026/03/12/ai-procurement-controls/](https://hernanhuwyler.wordpress.com/2026/03/12/ai-procurement-controls/)  
+45. Enterprise AI Vendor RFP: 40 Questions to Ask (2026) - Worqlo, accessed June 12, 2026, [https://worqlo.com/blog/enterprise-ai-vendor-rfp-questions/](https://worqlo.com/blog/enterprise-ai-vendor-rfp-questions/)  
+46. AI Clauses In Contracts: The Practical Guide For 2025 - Tascon – Legal, accessed June 12, 2026, [https://tasconlegal.com/ai-clauses-in-contracts-the-practical-guide-for-2025/](https://tasconlegal.com/ai-clauses-in-contracts-the-practical-guide-for-2025/)  
+47. Vendor Agreement Review: The 6 Clauses That Decide the Risk - GC AI, accessed June 12, 2026, [https://gc.ai/blog/vendor-agreement-review](https://gc.ai/blog/vendor-agreement-review)  
+48. The privacy line AI platforms are crossing with user data - Regolo.AI, accessed June 12, 2026, [https://regolo.ai/the-privacy-line-ai-platforms-are-crossing-with-user-data/](https://regolo.ai/the-privacy-line-ai-platforms-are-crossing-with-user-data/)  
+49. What Is Shadow AI? Detection, Risks and Governance in 2026 - Forcepoint, accessed June 12, 2026, [https://www.forcepoint.com/blog/insights/what-is-shadow-ai](https://www.forcepoint.com/blog/insights/what-is-shadow-ai)  
+50. What Is Shadow AI? Definition, Risks & Governance Strategies - SentinelOne, accessed June 12, 2026, [https://www.sentinelone.com/cybersecurity-101/cybersecurity/what-is-shadow-ai/](https://www.sentinelone.com/cybersecurity-101/cybersecurity/what-is-shadow-ai/)  
+51. Shadow AI explained: risks, costs, and enterprise governance - Vectra AI, accessed June 12, 2026, [https://www.vectra.ai/topics/shadow-ai](https://www.vectra.ai/topics/shadow-ai)  
+52. Shadow AI: How Unmonitored Tools Bypass Security and Enter Your Business, accessed June 12, 2026, [https://compassmsp.com/resources/articles/how-unmonitored-ai-tools-are-entering-your-business](https://compassmsp.com/resources/articles/how-unmonitored-ai-tools-are-entering-your-business)  
+53. What Is Shadow AI? Definition | Proofpoint US, accessed June 12, 2026, [https://www.proofpoint.com/us/threat-reference/shadow-ai](https://www.proofpoint.com/us/threat-reference/shadow-ai)  
+54. How to Create a Corporate AI Policy for Your Organization | Otter.ai, accessed June 12, 2026, [https://otter.ai/blog/corporate-ai-policy](https://otter.ai/blog/corporate-ai-policy)  
+55. [KNOWLEDGE] - AI Engineering - Volume 6. P-R Multimodal and Interface-Controlling Systems  
+56. How to Get AI Act-Ready: A 2026 Compliance Guide | Dawiso Blog, accessed June 12, 2026, [https://www.dawiso.com/blog-post/how-to-get-ai-act-ready-2026](https://www.dawiso.com/blog-post/how-to-get-ai-act-ready-2026)  
+57. EU AI Act High-Risk Deadline: Enterprise Readiness Gap - Lab Space, accessed June 12, 2026, [https://labs.cloudsecurityalliance.org/research/csa-research-note-eu-ai-act-high-risk-compliance-deadline-20/](https://labs.cloudsecurityalliance.org/research/csa-research-note-eu-ai-act-high-risk-compliance-deadline-20/)  
+58. AI Act Update: EU Resolves to Change Rules and Extend Deadlines, accessed June 12, 2026, [https://www.lw.com/en/insights/ai-act-update-eu-resolves-to-change-rules-and-extend-deadlines](https://www.lw.com/en/insights/ai-act-update-eu-resolves-to-change-rules-and-extend-deadlines)  
+59. AI Act reloaded? What the latest AI Act changes mean in practice - Stibbe, accessed June 12, 2026, [https://www.stibbe.com/publications-and-insights/ai-act-reloaded-what-the-latest-ai-act-changes-mean-in-practice](https://www.stibbe.com/publications-and-insights/ai-act-reloaded-what-the-latest-ai-act-changes-mean-in-practice)  
+60. EU AI Act Update: Timeline Relief, Targeted Simplification, and New Prohibitions, accessed June 12, 2026, [https://www.insideprivacy.com/artificial-intelligence/eu-ai-act-update-timeline-relief-targeted-simplification-and-new-prohibitions/](https://www.insideprivacy.com/artificial-intelligence/eu-ai-act-update-timeline-relief-targeted-simplification-and-new-prohibitions/)  
+61. EU AI Act enforcement starts in 75 days - affects any team building AI agents for European clients : r/artificial - Reddit, accessed June 12, 2026, [https://www.reddit.com/r/artificial/comments/1tgf0gm/eu_ai_act_enforcement_starts_in_75_days_affects/](https://www.reddit.com/r/artificial/comments/1tgf0gm/eu_ai_act_enforcement_starts_in_75_days_affects/)  
+62. The EU AI Act's Transparency Rules: A Practical Guide to Article 50, accessed June 12, 2026, [https://artificialintelligenceact.eu/transparency-rules-article-50/](https://artificialintelligenceact.eu/transparency-rules-article-50/)  
+63. EU Deepfake Rules in AI Act Will Affect More Businesses Than Usually Expected, accessed June 12, 2026, [https://www.potomaclaw.com/news-EU-Deepfake-Rules-in-AI-Act-Will-Affect-More-Businesses-Than-Usually-Expected](https://www.potomaclaw.com/news-EU-Deepfake-Rules-in-AI-Act-Will-Affect-More-Businesses-Than-Usually-Expected)  
+64. EU AI Act Compliance: Complete Deadlines Guide 2025 - Tech Jacks Solutions, accessed June 12, 2026, [https://techjacksolutions.com/ai-brief/eu-ai-act-three-deadlines-three-compliance-programs-which-on/](https://techjacksolutions.com/ai-brief/eu-ai-act-three-deadlines-three-compliance-programs-which-on/)  
+65. What is a Golden Path for software development? - Red Hat, accessed June 12, 2026, [https://www.redhat.com/en/topics/platform-engineering/golden-paths](https://www.redhat.com/en/topics/platform-engineering/golden-paths)
+
+---
+
+# AI-ENG-AE — Sustainable AI - Energy, Infrastructure Efficiency & Lifecycle Impact
+
+## **Conceptual Glossary**
+
+Sustainable AI architecture demands a rigorous, standardized lexicon to transition environmental metrics from abstract environmental, social, and governance (ESG) reporting into active runtime engineering variables. The following table establishes the operational definitions utilized throughout this architectural doctrine.
+
+| Term | Technical Definition | Architectural Application |
+| :---- | :---- | :---- |
+| **Sustainable AI Architecture** | The systems engineering discipline of designing, deploying, operating, and retiring artificial intelligence systems under explicit energy, carbon, water, and lifecycle hardware utilization constraints. | Treats resource depletion and environmental metrics as non-negotiable runtime boundaries alongside latency, quality, cost, and safety. |
+| **Energy-Aware Routing** | The dynamic redirection of inference requests to specific model architectures, precision tiers, or geographic nodes based on real-time hardware efficiency, context length, and grid carbon intensity. | Implemented at the API gateway layer to prevent the unnecessary execution of over-parameterized models for low-complexity tasks. |
+| **Carbon-Aware Scheduling** | The temporal or spatial shifting of non-urgent, computationally intensive workloads to align with periods of high renewable energy availability or lower ambient temperatures.1 | Applied to offline evaluations, pretraining, fine-tuning, embedding generation, and vector index rebuilds.1 |
+| **Embodied Carbon** | The cumulative greenhouse gas emissions generated during the raw material extraction, semiconductor fabrication, component assembly, logistics, and end-of-life disposal of hardware.5 | Evaluated at procurement to calculate the amortized carbon tax of physical accelerator platforms over their operational lifespans.9 |
+| **Operational Carbon** | The emissions generated directly by the electricity consumed during the active operation of computing infrastructure, including server execution and cooling overhead.5 | Managed dynamically via model optimization, workload placement, and localized green energy procurement.3 |
+| **Marginal Carbon Intensity** | The grid-level carbon emissions generated per unit of electricity by the marginal power plant online to support a sudden increment in electrical demand. | Used as the target signal for carbon-aware scheduling rather than average grid intensity, reflecting the true environmental impact of new workloads.1 |
+| **Useful Utilization** | The ratio of floating-point operations (FLOPs) executed for successful, policy-compliant user tasks relative to the total idle and active power drawn by the hardware.10 | Prevents the optimization of hardware execution rates for redundant, failing, or behaviorally non-compliant model executions.10 |
+| **Energy per Successful Task** | The total electrical energy in joules consumed across the entire execution path (retrieval, prefill, decoding, verification, and retry loops) to deliver a validated user outcome. | Replaces "joules per token" as the core efficiency metric, penalizing architectures prone to repetitive failures or excessive verbosity.13 |
+| **Lifecycle Impact** | The cradle-to-grave resource footprint of an AI system, encompassing physical server manufacturing, data center construction, water evaporation, and e-waste.5 | Forces the amortization of both embodied and operational emissions over the functional retirement window of the model and its host hardware.7 |
+| **Local Inference** | Model execution performed entirely on client-side, on-device accelerators (such as neural processing units) without relying on centralized cloud infrastructure.18 | Eliminates network transmission overhead and utilizes localized, thermal-constrained device budgets, though at the cost of execution efficiency.18 |
+| **Cloud Inference** | Model execution hosted on centralized, highly virtualized hyperscale data centers optimized for maximum hardware occupancy and resource sharing.7 | Leverages economies of scale and professional cooling design, but concentrates grid demand and water consumption in localized utility basins.17 |
+| **Greenwashing** | The practice of marketing AI systems as environmentally sustainable or "green" based on unproven, unscientific, or highly selective metrics while hiding broader infrastructure impacts.22 | Typically characterized by reporting operational offsets while ignoring embodied carbon, water stress, or underutilized accelerator fleets.17 |
+| **Sustainability Telemetry Plane** | The unified monitoring layer that captures, normalizes, and correlates hardware power consumption, water evaporation rates, grid intensity, and token flow. | Feeds the active gateway to dynamically adjust routing tables, scheduling queues, and auto-scaling group limits. |
+
+## **Sustainable AI Architecture Doctrine**
+
+The rapid expansion of generative AI workloads has introduced a fundamental systemic challenge: the rate of digital infrastructure expansion far outpaces the physical capacity of global energy and utility grids.27 Traditional application performance monitoring focuses on a binary status model, assuming that any transaction returning an HTTP 200 payload represents a healthy system.29 In high-dimensional, non-deterministic AI systems, this perspective is an architectural failure.29 A system can report a green operational dashboard while simultaneously executing multi-megawatt training runs that yield zero downstream business value, or executing highly verbose, repetitive reasoning steps that deplete limited water reserves and overload regional electrical substations.17  
+The governing doctrine of sustainable AI architecture asserts that sustainability is a first-class engineering constraint, co-equal with latency, quality, cost, security, and governance.29 A system that achieves optimal task accuracy at the cost of unconstrained compute consumption, excessive context bloat, and unchecked hardware degradation is a poorly designed architecture. Historically, model selection has been treated as a prestige marker, where teams deploy the largest available frontier models to solve basic classification, data transformation, or informational lookup tasks.32 Sustainable architecture rejects this paradigm. The correct architecture is the smallest, most efficient, sufficiently capable model and routing topology that satisfies the validated criteria of the task.  
+Maximizing efficiency requires analyzing the entire physical chain of computation. Every prompt executed on a client device initiates a physical cascade: a local processor packages the request; network switches route the packets across regional grids; a data center substation steps down high-voltage power to run specialized silicon; cooling systems evaporate water or run high-power compressors to extract heat; and global supply chains fabricate the accelerators that will eventually decay into e-waste.7 To optimize this system, architects must treat energy, carbon, and hardware degradation as hard constraints within which all software, routing, and quantization decisions must be negotiated. The greenest token is the one the system did not need to generate.
+
+## **The Macroeconomic Resource Challenge**
+
+The expansion of generative AI workloads has transformed data centers from passive, predictable consumers of commodity electricity into volatile, resource-dense industrial nodes. To contextually frame this shift, the physical parameters of data center energy demand, grid integration, water consumption, and thermal dissipation must be quantified.
+
+### **Global and Regional Grid Projections**
+
+Global data-center electricity demand is rising quickly, but projections vary by scope, methodology, hardware assumptions, utilization assumptions, and whether cryptocurrency or broader digital infrastructure is included. Sustainable AI architecture should therefore avoid treating a single forecast as destiny. The correct planning posture is to maintain a baseline, a near-term estimate, a 2030 base case, and high/sensitivity cases.
+
+| Planning View | Estimate / Range | Interpretation | Architectural Implication |
+| :---- | :---- | :---- | :---- |
+| **Recent global baseline** | Approximately 415 TWh in 2024, around 1.5% of global electricity consumption. | Current data-center demand is already a large industrial load, before full AI buildout is realized. | AI systems should track electricity use as a first-class operational metric, not as annual ESG afterthought. |
+| **2030 IEA base case** | Approximately 945 TWh by 2030, just under 3% of global electricity consumption. | Data-center electricity demand roughly doubles by 2030 under base-case assumptions. | Routing, scheduling, model sizing, and utilization controls become infrastructure capacity controls. |
+| **2030 sensitivity / high-growth cases** | Higher estimates exceed the base case depending on AI demand, accelerator deployment, grid constraints, and regional buildout. | Forecast uncertainty is high because demand depends on adoption, regulation, chip supply, efficiency gains, and grid availability. | Architectures should support budget caps, carbon-aware scheduling, workload deferral, and graceful degradation. |
+| **AI share of data-center load** | Increasing rapidly, but estimates vary by definition and region. | AI-optimized servers are shifting data centers from relatively predictable enterprise loads toward dense, accelerator-heavy industrial loads. | AI traffic should be separated from conventional IT workloads in telemetry, procurement, and sustainability reporting. |
+| **Regional concentration** | Demand is concentrated in specific grid regions and data-center hubs. | Local grid stress can be severe even when global percentages look modest. | Regional placement must consider grid congestion, water stress, interconnection queues, and local utility capacity. |
+
+In the United States, Europe, China, Ireland, Singapore, Northern Virginia, Frankfurt, Dublin, and other dense data-center markets, the operational issue is not merely aggregate global electricity share. It is localized concentration. A workload that looks small in global percentage terms can still create major interconnection delays, utility-rate pressure, water-basin stress, or local reliability risk when clustered in constrained regions.
+
+The architectural conclusion is straightforward: sustainable AI cannot depend on vague global averages. It must make deployment decisions using region-specific electricity, water, cooling, carbon, and capacity constraints.
+
+### **Power Density and Dynamic Grid Interconnection**
+
+The physical characteristics of AI compute clusters impose severe stresses on grid infrastructure. Traditional server racks operate at predictable power densities of 5 kW to 15 kW. By contrast, advanced AI server racks packed with modern accelerator blocks feature power densities that increased 11-fold between 2020 and 2025, with an additional fourfold increase projected by 2027.30 A single advanced server rack can have a peak power demand equivalent to that of 65 average households.30  
+Furthermore, AI workloads exhibit extreme load variability. While traditional enterprise workloads present smooth, diurnal load profiles, AI data centers experience repeated swings of server load exceeding 50% of rated capacity within a single second.30 These rapid step-changes inject significant frequency instability into the local transmission grid. To mitigate the risk of voltage sag or grid collapse, operators are forced to either overbuild dedicated onsite gas-fired backup generation by 30% to 70% relative to average demand, or contract with private producers to install multiple, highly inefficient natural gas reciprocating engines directly at the data center boundary.28
+
+### **Hydrological and Thermal Footprints**
+
+AI infrastructure has a water and thermal footprint as well as an electricity footprint. Water use varies sharply by region, cooling design, facility efficiency, weather, time of day, and electricity-generation mix. A single universal “water per prompt” number is therefore misleading. Published GPT-3-style estimates suggest roughly one 500 ml bottle of water for about 10 to 50 medium-length responses, depending on when and where inference is served. That figure should be treated as an order-of-magnitude estimate, not a universal constant.
+
+Water consumption has three main channels:
+
+| Water Channel | Description | Architectural Control |
+| :---- | :---- | :---- |
+| **Direct facility water** | Water consumed by data-center cooling systems, especially evaporative cooling. | Region selection, cooling design, WUE targets, workload shifting away from water-stressed basins. |
+| **Indirect electricity water** | Water consumed by the electricity-generation mix powering the workload, including thermal generation cooling and hydroelectric evaporation. | Carbon-aware and water-aware scheduling, grid-region selection, clean-energy procurement. |
+| **Supply-chain water** | Water consumed during semiconductor manufacturing, facility construction, and hardware lifecycle processes. | Procurement requirements, hardware lifetime extension, utilization improvement, refurbishment and recycling. |
+
+Thermal stress is similarly local. Dense AI clusters convert nearly all consumed electrical energy into heat that must be removed from racks, rooms, and facilities. High-density accelerator racks may require liquid cooling, rear-door heat exchangers, or facility-level cooling redesign. In hot or water-stressed regions, the environmental tradeoff can become acute: reducing electricity use, reducing water use, and maintaining hardware reliability may require different operating points.
+
+The practical engineering rule is that water and thermal metrics must be attached to deployment decisions:
+
+| Decision | Sustainability Question |
+| :---- | :---- |
+| **Region selection** | Is the target grid or basin already constrained by water stress, heat, or interconnection delay? |
+| **Cooling design** | Does the facility trade lower electricity use for high evaporative water loss? |
+| **Workload scheduling** | Can flexible jobs run during cooler periods or cleaner grid windows? |
+| **Model sizing** | Can the task be handled by a smaller or more efficient route without raising failure/retry rates? |
+| **Procurement** | Does the vendor disclose WUE, cooling method, and water-risk exposure at useful granularity? |
+
+Sustainable AI architecture should therefore report water estimates with scope, region, method, and confidence level. “Water per response” is useful only when it is tied to a specific model class, facility type, electricity mix, cooling design, request size, and measurement method.
+
+## **Energy, Carbon, and Water Cost Model**
+
+Sustainable AI requires unit-explicit accounting. Energy, carbon, water, and embodied hardware impact should be modeled as related but distinct quantities. A useful model must separate measured energy from allocated estimates, operational emissions from embodied emissions, and successful work from failed or reworked computation.
+
+### **Unit-Explicit Operational Energy**
+
+For a workload executed over time window `T`, the system energy is:
+
+```text
+E_system_kWh =
+  sum over t in T [
+    (P_compute_kW(t)
+   + P_memory_kW(t)
+   + P_storage_kW(t)
+   + P_network_kW(t)
+   + P_cooling_allocated_kW(t)) * delta_t_hours
+  ]
+```
+
+Where:
+
+| Term | Meaning |
+| :---- | :---- |
+| `P_compute_kW(t)` | Active accelerator, CPU, and model-serving power. |
+| `P_memory_kW(t)` | Memory and KV-cache-related power where separately measurable or allocated. |
+| `P_storage_kW(t)` | Storage power allocated to retrieval, logs, vector indexes, checkpoints, or traces. |
+| `P_network_kW(t)` | Network power allocated to request routing, retrieval, replication, or data transfer. |
+| `P_cooling_allocated_kW(t)` | Facility cooling energy allocated to the workload through PUE or direct metering. |
+| `delta_t_hours` | Measurement interval in hours. |
+
+For most production systems, not every component is directly measured per request. The architecture should label each value as measured, estimated, allocated, or vendor-reported.
+
+### **Operational Carbon**
+
+Operational carbon is calculated by multiplying electricity consumption by grid carbon intensity:
+
+```text
+CO2e_operational_kg =
+  sum over t in T [
+    E_system_kWh(t) * CI_grid_kgCO2e_per_kWh(g, t)
+  ]
+```
+
+For scheduling and workload-shifting decisions, marginal carbon intensity is usually the more appropriate control signal when available. Average grid intensity may be useful for reporting but can understate or misrepresent the impact of new incremental load.
+
+### **Embodied Carbon Allocation**
+
+Embodied carbon should not be added wholesale to every request. It must be allocated across the hardware’s useful life according to a declared allocation method:
+
+```text
+CO2e_embodied_allocated_kg =
+  CO2e_hardware_lifecycle_kg
+  * workload_allocation_share
+  * accounting_window_share
+```
+
+Possible allocation bases include:
+
+| Allocation Basis | Best Use |
+| :---- | :---- |
+| **Time share** | Dedicated hardware or reserved clusters. |
+| **FLOP share** | Mixed workloads with reliable compute accounting. |
+| **Accelerator-hour share** | Shared GPU/TPU fleets with scheduler telemetry. |
+| **Revenue/task share** | Business-level reporting where physical allocation is unavailable. |
+| **Hybrid allocation** | Large organizations with multiple workload classes and partial telemetry. |
+
+Allocation method must be documented. Otherwise embodied-carbon accounting becomes spreadsheet alchemy with a leaf icon.
+
+### **Verified-Task Efficiency**
+
+A successful AI task is not merely a completed model call. It is an accepted, policy-compliant, verified outcome. Instead of dividing by a binary success variable and creating infinite dashboard values, the system tracks verified work and waste separately.
+
+```text
+E_per_verified_task_kWh =
+  E_total_accepted_tasks_kWh / count(verified_successful_tasks)
+```
+
+```text
+CO2e_per_verified_task_kg =
+  (CO2e_operational_accepted_kg + CO2e_embodied_allocated_kg)
+  / count(verified_successful_tasks)
+```
+
+Failed or rejected work is tracked as waste:
+
+```text
+E_waste_kWh =
+  E_failed_generations
++ E_retries
++ E_policy_rejections
++ E_unverified_tool_attempts
++ E_rework
+```
+
+```text
+Waste_ratio =
+  E_waste_kWh / E_total_kWh
+```
+
+This makes brittle systems visible. A tiny model that fails repeatedly, triggers retries, or requires human cleanup may be less sustainable than a larger model that solves the task correctly once.
+
+### **Water Accounting**
+
+Water use should be modeled as direct facility water plus indirect electricity water plus allocated supply-chain water where available:
+
+```text
+Water_direct_liters =
+  E_IT_kWh * WUE_facility_liters_per_kWh
+```
+
+```text
+Water_indirect_liters =
+  E_grid_kWh * WI_grid_liters_per_kWh(g, t)
+```
+
+```text
+Water_task_liters =
+  Water_direct_allocated
++ Water_indirect_allocated
++ Water_supply_chain_allocated
+```
+
+Where:
+
+| Term | Meaning |
+| :---- | :---- |
+| `WUE_facility_liters_per_kWh` | Facility water usage effectiveness or equivalent direct water intensity. |
+| `WI_grid_liters_per_kWh` | Water intensity of the regional electricity mix. |
+| `Water_supply_chain_allocated` | Allocated water footprint from hardware manufacturing and facility lifecycle where known. |
+
+Because water estimates vary dramatically by region and cooling design, water metrics must include location, measurement method, and confidence level.
+
+### **Metric Families**
+
+| Metric | Formula / Method | Scope | Optimization Target |
+| :---- | :---- | :---- | :---- |
+| **Joules per Token** | Energy during generation interval divided by generated tokens. | Decoding efficiency benchmark. | Kernel/backend comparison, model-serving optimization. |
+| **Joules per Request** | Total request-path energy across prefill, decoding, retrieval, safety, and routing. | Request-level efficiency. | Prompt design, routing, cache strategy. |
+| **Energy per Verified Task** | Energy for accepted successful work divided by verified task count. | Outcome-level efficiency. | Correct model sizing and routing. |
+| **Waste Energy Ratio** | Failed/retried/rejected/reworked energy divided by total energy. | Failure-driven inefficiency. | Reduce brittle chains, retry loops, and bad routing. |
+| **Carbon per Request** | Request energy multiplied by grid carbon intensity. | Operational carbon estimate. | Carbon-aware routing and scheduling. |
+| **Carbon per Verified Task** | Accepted-task operational + allocated embodied carbon divided by verified task count. | Sustainability KPI. | Lifecycle-aware architecture comparison. |
+| **Water per Request** | Direct + indirect water allocated to the request. | Regional water estimate. | Water-aware placement and scheduling. |
+| **Rework-Adjusted Energy** | Compute energy plus estimated human remediation and rerun energy. | Full failure cost. | Avoid false economy from underpowered models. |
+| **Embodied Carbon per Accelerator-Hour** | Lifecycle hardware footprint allocated across useful operating hours. | Hardware lifecycle accounting. | Extend useful life and maximize useful utilization. |
+
+
+## **Model Sizing Matrix**
+
+Model size is an architectural decision, not a prestige marker. The correct route is the smallest sufficiently capable execution path that satisfies quality, safety, latency, privacy, and governance constraints. The following matrix is indicative rather than universal: energy use varies by hardware, batching, context length, output length, quantization, cache state, compiler backend, and utilization.
+
+| Task Class | Ambiguity / Risk | Context Profile | Candidate Architecture | Sizing Guidance | Verification Gate | Escalation Trigger |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| **Deterministic Transform** | None to very low. | Small, structured input. | Static code, parser, schema validator, regex, AST transform, database query. | No generative model unless natural-language ambiguity is present. | Unit tests, schema validation, deterministic output comparison. | Input does not match known transform signature. |
+| **Structured Lookup** | Low. | Small to moderate. | Search API, SQL template, rules engine, typed retrieval. | Prefer deterministic or tool-backed route over LLM generation. | Source-of-record check, query validation, permission filter. | User asks ambiguous or synthesized question beyond lookup scope. |
+| **Simple Extraction / Classification** | Low to medium. | Short documents or bounded fields. | Embeddings, classifier, small model, constrained decoder. | Smallest model that meets extraction accuracy and schema fidelity. | Entity-level precision/recall, schema validity, calibration. | Low confidence, out-of-domain input, regulated field. |
+| **Constrained RAG Answering** | Medium. | Trusted corpus, moderate context. | Retrieval + reranker + small/specialist model. | Size model to answer from evidence, not from parametric memory. | Groundedness, context relevance, citation verification. | Low evidence support, conflicting sources, sensitive domain. |
+| **Domain Specialist Workflow** | Medium to high. | Specialized vocabulary or workflow rules. | Fine-tuned specialist, domain model, tool-assisted route. | Specialist model may beat larger generalist when domain is narrow and evals are strong. | Domain benchmark, SME review, structured output checks. | Novel domain edge case, low confidence, high-impact result. |
+| **Routine Document Processing** | Medium. | Large PDFs, forms, reports, OCR, tables. | Parser + retrieval + specialist model + validation. | Spend compute on parsing and evidence quality before escalating model size. | Field-level extraction accuracy, citation/page coordinate verification. | Parser uncertainty, missing fields, layout ambiguity. |
+| **Complex Multi-Step Reasoning** | High. | Multi-document, tool-using, conflicting or long context. | Cascaded route: smaller planner/evaluator, larger model when justified. | Use large models only when lower-cost routes fail confidence, reasoning, or verification gates. | Task tests, tool verification, consistency checks, human review where needed. | Failed assertions, unresolved conflict, unsafe action, high rework risk. |
+| **High-Impact Strategic Synthesis** | Very high. | Long context, high consequence, regulated or irreversible decisions. | Governed cascade with frontier model, review gates, and evidence package. | Higher compute may be sustainable if it prevents harm, rework, legal exposure, or repeated failures. | Dual evaluation, human oversight, audit trail, policy compliance. | Low confidence, missing evidence, unsupported claim, action side effect. |
+
+The matrix should be implemented as a routing policy, not a static spreadsheet shrine. Each route must be validated on production-like traffic and periodically reviewed as models, hardware, costs, and environmental conditions change.
+
+
+## **Energy-Aware Routing Policy**
+
+A static, single-model API gateway is an architectural anti-pattern for sustainable AI. The routing layer should match each request to the least resource-intensive path that still satisfies quality, safety, privacy, latency, and governance requirements. Sustainability never overrides hard safety or access-control boundaries; it chooses among safe and valid execution paths.
+
+```text
+ENERGY-AWARE ROUTING FLOW
+
+[ Incoming Request ]
+        |
+        v
+[ Classify Task ]
+  deterministic | lookup | extraction | RAG | reasoning | high-impact
+        |
+        v
+[ Check Hard Floors ]
+  safety | privacy | tenant scope | policy | data residency | tool authority
+        |
+        v
+[ Estimate Route Cost ]
+  energy | carbon | water | latency | money | rework risk
+        |
+        v
+[ Select Smallest Sufficient Route ]
+        |
+        +--> deterministic route
+        +--> small-model route
+        +--> specialist route
+        +--> cascade route
+        +--> large-model route
+        +--> local route
+        +--> cloud route
+        +--> batch/offline route
+        +--> fail-closed/degraded route
+        |
+        v
+[ Verify Outcome ]
+        |
+        v
+[ Log Routing Decision According to Retention Policy ]
+```
+
+### **Route Modes**
+
+| Route Mode | Use When | Sustainability Benefit | Guardrail |
+| :---- | :---- | :---- | :---- |
+| **Deterministic Route** | Task is a known transform, calculation, validation, lookup, or formatting operation. | Avoids model inference entirely. | Must reject ambiguous inputs rather than pretending deterministic code understood them. |
+| **Small-Model Route** | Task is bounded, low-risk, and covered by evals. | Reduces memory bandwidth, power draw, and serving cost. | Must escalate when confidence, schema, or evidence checks fail. |
+| **Specialist Route** | Narrow domain has strong specialist model or tool route. | Avoids large generalist model for domain-bounded tasks. | Must be evaluated against domain edge cases and drift. |
+| **Cascade Route** | Complexity is uncertain or variable. | Pays large-model cost only when smaller route fails. | Verifier must be independent enough to detect failure, not rubber-stamp it. |
+| **Large-Model Route** | High ambiguity, high rework risk, or high consequence justifies compute. | Avoids waste from repeated smaller-model failure. | Requires stronger evidence, policy, and success verification. |
+| **Local Route** | Privacy, latency, offline operation, or edge constraints dominate. | Reduces network dependency and can preserve sensitive data locally. | Must account for device energy, thermal limits, auditability, and update lifecycle. |
+| **Cloud Route** | Workload needs high throughput, large context, specialized accelerators, or centralized governance. | Can improve utilization and observability. | Must account for regional grid, water stress, provider telemetry, and tenant isolation. |
+| **Batch / Offline Route** | Workload is flexible in time or location. | Enables carbon-aware and water-aware scheduling. | Must respect deadlines, data residency, fairness, and capacity constraints. |
+| **Fail-Closed / Degraded Route** | No safe route satisfies environmental, safety, privacy, or governance floors. | Prevents unsustainable or unsafe execution. | Must preserve state and communicate limitation honestly. |
+
+Routing decisions should record route ID, model/profile, task class, policy version, estimated energy/carbon/water method, and verification outcome according to retention and audit policy. Do not retain sustainability telemetry forever by default; eternal logs become their own zombie workload.
+
+## **Efficient Inference Playbook**
+
+Efficient inference is achieved by combining architecture, compiler, memory, routing, cache, context, and output controls. No optimization is universally safe. Each must be evaluated against task quality, policy compliance, data isolation, and downstream failure rate.
+
+| Technique | Optimization Target | Expected Benefit | Quality / Governance Risk | Required Evaluation |
+| :---- | :---- | :---- | :---- | :---- |
+| **Quantization** | Reduce weight and activation precision to lower memory bandwidth and improve throughput. | Lower latency, higher batch occupancy, reduced energy per token. | Can degrade reasoning, calibration, multilingual behavior, tool accuracy, or rare-domain performance. | Task-level evals, schema pass rate, safety checks, calibration, regression by domain. |
+| **Distillation** | Transfer behavior from a larger model to a smaller model. | Lower serving cost and energy for repeated task classes. | Student model may lose edge-case generalization or hidden capabilities needed for rare inputs. | Teacher/student comparison, out-of-distribution tests, human review for high-impact classes. |
+| **Pruning / Sparsity** | Remove or skip weights, layers, heads, or computation paths. | Reduced compute and memory pressure. | May create uneven degradation by task type. | Per-task regression, latency/energy benchmark, failure clustering analysis. |
+| **Speculative Decoding** | Draft tokens with a smaller model and verify with a target model. | Lower latency and improved throughput when acceptance rate is high. | Exactness depends on algorithm, sampling configuration, and implementation. | Acceptance rate, task quality, output distribution checks, safety and schema regression. |
+| **Prefix Caching** | Reuse KV cache for stable prompt prefixes such as system prompts or schemas. | Reduces prefill cost for repeated prefixes. | Unsafe if prefix identity, policy version, tenant scope, or tool schema changes. | Cache-key validation, tenant isolation, policy-version invalidation, prefill latency measurement. |
+| **Semantic Caching** | Reuse prior answers for semantically similar requests. | Avoids repeated inference for common low-risk queries. | Can return stale, unauthorized, or subtly mismatched answers. | Freshness checks, permission scope, similarity threshold tuning, answer-support validation. |
+| **Continuous Batching** | Batch active decoding steps across requests. | Improves accelerator occupancy and reduces idle draw. | Can increase tail latency or complicate priority handling. | Throughput, p95/p99 latency, fairness, cancellation behavior. |
+| **KV Cache Management** | Allocate, evict, page, or compress KV cache efficiently. | Increases concurrent serving capacity and reduces memory waste. | Incorrect reuse or eviction can corrupt sessions or degrade long-context behavior. | Session isolation tests, long-context regression, memory pressure tests. |
+| **Prompt / Context Compression** | Reduce prompt tokens before prefill. | Lowers prefill energy and cost. | Can remove critical evidence, citations, instructions, or nuance. | Claim support, retrieval recall, answer accuracy, citation fidelity, schema fidelity. |
+| **Early Exit / Adaptive Compute** | Stop computation early for easy inputs. | Reduces average compute per request. | Misclassifies hard cases as easy and returns low-quality outputs. | Confidence calibration, hard-case regression, escalation checks. |
+| **Output Length Control** | Constrain verbosity and stop unnecessary generation. | Reduces decode energy and user review burden. | Over-compression may omit necessary caveats or evidence. | Answer completeness, policy disclosure, user task success. |
+| **Tool-First Execution** | Use deterministic tools before model synthesis. | Avoids unnecessary generation for calculable or database-backed tasks. | Tool errors can be hidden if model summarizes without verification. | Source-of-record checks, tool-result grounding, false-success tests. |
+
+The efficiency objective is not maximum tokens per second. It is minimum resource use per verified, policy-compliant task.
+
+## **Context and Retrieval Efficiency Model**
+
+Retrieval-Augmented Generation (RAG) is a highly effective pattern for grounding model responses, but naive implementations can lead to significant resource waste. Sending large, unranked document chunks into a prompt to answer a question that requires only a single sentence is a primary source of context inflation and energy waste.42
+
+### **The Context Bloat Cascade**
+
+When a system retrieves ten documents of 400 tokens each to answer a query, it forces the model to process 4,000 context tokens.42 If the actual answer is buried in a single sentence in the sixth document, several systemic failures occur:
+
+* **Prefill Energy Penalty:** The model pays a major computational tax to execute self-attention over the entire 4,000-token input.41  
+* **Decoding Memory Pressure:** The size of the KV cache increases linearly with context length, restricting batch size on the accelerator and driving down hardware efficiency.13  
+* **Attention Degradation:** Language models demonstrate "lost in the middle" phenomena, where they reliably process information at the absolute beginning and end of the prompt but fail to track facts buried in the center of a long context window.42  
+* **Financial Waste:** The enterprise pays per input token, meaning that over-retrieval results in direct financial inflation on every single execution.42
+
+### **Retrieval and Context Metrics**
+
+To enforce efficiency across retrieval architectures, teams must integrate five core metrics into their observability pipelines:
+
+#### **Retrieved-Token Usefulness Ratio (R_useful)**
+
+Measures the fraction of retrieved and prompt-inserted tokens that actually contribute to the validated output response, defined as:
+
+R_useful = Tokens in Context Containing Gold Facts / Total Retrieved Tokens in Prompt
+
+Low usefulness ratios (less than 0.1) indicate poorly sized document chunks or the absence of semantic rerankers.42
+
+#### **Duplicate Context Ratio (R_dup)**
+
+Quantifies the volume of redundant semantic information present within the retrieved context set:
+
+R_dup = Redundant Sentences or Duplicate Semantic Chunks / Total Sentences in Context Set
+
+High redundancy indicates a lack of deduplication filters or clustering steps in the retrieval pipeline.38
+
+#### **Stale Context Ratio (R_stale)**
+
+Tracks the portion of the retrieved document set that has been updated or deprecated in the source system of record but remains active in the vector database index:
+
+R_stale = Stale or Deprecated Chunks Retrieved / Total Retrieved Chunks
+
+This metric measures index maintenance efficiency, identifying systemic energy waste in continuous indexing pipelines.26
+
+#### **Grounding Gain per Token (G_token)**
+
+Calculates the marginal improvement in output correctness (measured by automated factual consistency scores) per additional token of context inserted into the prompt:
+
+G_token = (Accuracy_grounded - Accuracy_zero_shot) / Context Tokens
+
+This curve helps identify the point of diminishing returns, where adding more context documents fails to improve output quality while continuing to inflate energy consumption.
+
+#### **Context Tokens per Successful Answer (C_task_tokens)**
+
+The absolute number of prompt context tokens processed to deliver a verified, policy-compliant user response:
+
+C_task_tokens = Total Context Tokens processed in Run / S_task
+
+## **Hardware Utilization Model**
+
+Maximizing the energy efficiency of an AI deployment requires a deep understanding of accelerator physics. The primary source of resource waste in modern enterprise AI is not the power consumed by active computation, but the static energy wasted by underutilized, idle accelerators.10
+
+### **The Accelerator Power Curve**
+
+Modern AI accelerators exhibit highly non-linear power curves. An advanced GPU or TPU baseboard draws a substantial amount of power when idling—frequently 30% to 50% of its maximum thermal design power (TDP)—even when executing zero floating-point operations.10 For example, a single high-performance NVIDIA HGX H100 GPU baseboard features a typical power consumption of 5,600 W.8 While a single H100 GPU has a TDP of approximately 700 W (compared to 400 W for the previous-generation A100), it continues to draw nearly 300 W of static power while idling.9  
+Consequently, a cluster of accelerators running at 15% average utilization (which represents the baseline average for most enterprise deployments 32) consumes nearly the same baseline operational energy as a cluster running at 70% utilization, while delivering only a fraction of the useful output.10 This represents an immense waste of both operational energy and amortized embodied carbon.
+
+```
+Instantaneous Power (Watts)  
+  ▲  
+  │                       ┌─────────────────────────  ◄── Maximum TDP (700 Watts)   
+  │                     ┌─┘  
+  │                   ┌─┘  
+  │                 ┌─┘  
+  │               ┌─┘  
+  │             ┌─┘  
+  │  ───────────┘  ◄──────────────────────────────────  Idle Draw (300 Watts)   
+  │  │  
+  └──┴──────────┬───────────────────────────┬────────►  
+     0%        15% (Typical Enterprise)    70%+ (Target)  
+                Accelerator Utilization (%) 
+```
+
+To eliminate this waste, platform teams must monitor and optimize several hardware-level telemetry points:
+
+* **Accelerator Memory and Bandwidth Utilization:** Captures the fraction of high-bandwidth memory (HBM) capacity occupied by active model weights and KV cache, and tracks the active memory bus traffic.13  
+* **Active Queue Depth and Batch Occupancy:** Monitors the number of queued execution requests awaiting processing. If queue depth is consistently zero while accelerators are kept online, the cluster is over-provisioned.32  
+* **Cold Replica Fragmentation:** The presence of warm, idle model replicas running across multiple isolated server nodes, each drawing static idle power rather than consolidating traffic onto a single node.  
+* **Accelerator Power Caps and Thermal Throttling:** Restricts the maximum allowable power draw of individual GPUs (e.g., capping an H100 at 550 W instead of 700 W). This technique achieves a substantial reduction in energy-per-token with minimal impact on latency.  
+* **Cooling Infrastructure Overhead (PUE/WUE):** The localized data center power and water consumed to dissipate heat generated by the active accelerators.15 Less-efficient enterprise data centers feature cooling overheads exceeding 30% of total energy draw, compared to less than 7% in highly optimized hyperscale facilities.34
+
+## **Energy-Aware Deployment Profiles**
+
+To operationalize sustainable architecture across diverse enterprise application scenarios, engineers must implement structured deployment profiles. These profiles define the exact configuration knobs, target architectures, and optimization strategies appropriate for specific operational tolerances.
+
+| Profile Name | Target Latency / SLO | Primary Optimization Objective | Quantization Tiers | Speculative Decoding Strategy | Scaling / Topology Rules | Approved Workload Classes |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| **Interactive Low-Latency** | TTFT < 100ms; Total Latency < 1s | Minimize user-perceived latency and time-to-first-token. | FP8 or INT8 with active KV Cache compression.37 | Multi-candidate draft-target speculative decoding using specialized feature heads (e.g., EAGLE).44 | Keep warm replicas with aggressive scale-up triggers; deploy to edge or local nodes if network latency exceeds 200ms.19 | Live customer support chat, real-time code-autocomplete widgets, conversational interfaces. |
+| **Batch / Offline High-Throughput** | Latency-insensitive; queue delays up to 24 hours | Maximize throughput per watt; minimize total carbon footprint.1 | Highly compressed FP4 or INT4 quantization. | Disabled or simplified draft model to save memory footprint. | Consolidate traffic into massive, high-occupancy batches; execute scale-to-zero when queues are fully depleted. | Batch document classification, offline evaluation runs, vector index regeneration, text corpus embedding. |
+| **High-Impact Governed** | Moderate Latency (1s–5s) | Prevent downstream semantic, policy, and safety failures; avoid manual human rework.37 | High-precision FP16 or FP8 to preserve reasoning capabilities. | Strict target verification; speculative decoding allowed only when draft-model alignment is verified.44 | Redundant dual-gate evaluation; warm, isolated compute pools to ensure deterministic execution. | Legal contract analysis, medical chart review, automated compliance reporting, high-stakes financial transactions. |
+| **Edge / Local Constraint** | Highly variable; sub-50ms local processing | Minimize network dependency, protect data privacy, operate within strict thermal budgets.18 | Aggressive INT4, 3-bit, or binary quantization to fit local device memory. | Local on-device draft head or disabled.18 | Scale-to-zero immediately; execute on localized NPU/GPU threads.18 | Offline mobile translation apps, localized privacy-critical data entry, smart-device voice interfaces.18 |
+| **Hybrid Dynamically Routed** | Adaptive (100ms–5s) | Balance latency, cost, and carbon footprints dynamically.2 | Variable; switches dynamically between uncompressed and quantized models. | Adaptive speculative decoding; changes candidate length based on live queue depth. | Dynamic autoscaling across local, private cloud, and public cloud endpoints.18 | Enterprise workflow platforms, variable-demand web applications, multi-tenant SaaS tools. |
+| **Degraded Survival Mode** | Best-effort latency | Maintain minimal viable functionality under extreme capacity or budget sags. | Minimum viable 2-bit or 3-bit quantization; drop non-essential features (e.g., fallback to text-only from multimodal). | Disabled to conserve memory and minimize power spikes. | Hard limits on concurrent requests; drop queue depth limiters; enforce aggressive rate limits. | Emergency response platforms, offline recovery terminals, cost-capped utility sags. |
+
+## **Carbon-Aware Scheduling Model**
+
+Carbon-aware scheduling shifts flexible AI workloads to cleaner, cooler, cheaper, or less constrained execution windows. It is most useful for non-urgent jobs such as offline evaluations, batch embeddings, vector index rebuilds, document parsing, pretraining, fine-tuning, and synthetic data generation.
+
+Live user interactions, security response, critical transaction routing, and legally time-bound workflows usually cannot be delayed for environmental optimization. Sustainability is a scheduling objective only inside the envelope permitted by safety, policy, deadline, and user commitments.
+
+### **Scheduling Candidates and Exclusions**
+
+| Workload Type | Scheduling Treatment |
+| :---- | :---- |
+| **Embedding batch generation** | Strong candidate for carbon-aware and water-aware scheduling. |
+| **Vector index rebuilds** | Candidate when freshness SLO permits delay. |
+| **Offline eval sweeps** | Candidate unless blocking emergency release validation. |
+| **Historical OCR / parsing** | Candidate when not tied to active user workflow. |
+| **Fine-tuning / training** | Candidate when data residency, deadline, and accelerator availability permit. |
+| **Live chat / realtime voice** | Usually excluded. |
+| **Security incident response** | Excluded unless delay is explicitly safe. |
+| **High-impact transaction flow** | Excluded unless workflow is already queued for human review or batch execution. |
+
+### **Scheduling Decision Flow**
+
+```text
+CARBON-AWARE SCHEDULING FLOW
+
+[ Workload Submitted ]
+        |
+        v
+[ Classify Flexibility ]
+  immediate | deadline-bound | flexible | opportunistic
+        |
+        v
+[ Check Hard Constraints ]
+  data residency
+  privacy / tenant scope
+  legal deadline
+  freshness SLO
+  security urgency
+  capacity reservation
+        |
+        v
+[ Estimate Execution Windows ]
+  grid carbon intensity
+  marginal carbon signal
+  regional water stress
+  ambient temperature / cooling load
+  electricity price
+  queue backlog
+  accelerator availability
+        |
+        v
+[ Optimize ]
+  minimize carbon + water + cost
+  subject to deadline + policy + quality + fairness
+        |
+        +--> execute now
+        +--> queue until cleaner window
+        +--> shift to approved region
+        +--> split job across windows
+        +--> reject or escalate if constraints conflict
+```
+
+### **Scheduling Constraints**
+
+| Constraint | Why It Matters |
+| :---- | :---- |
+| **Deadline / Freshness SLO** | Prevents stale indexes, delayed reports, or missed release gates. |
+| **Data Residency** | Some data cannot move to cleaner regions. |
+| **Privacy / Tenant Isolation** | Scheduling cannot weaken access boundaries. |
+| **Regional Water Stress** | Lowest-carbon region may not be lowest-water-impact region. |
+| **Network and Egress Cost** | Moving data can create cost, latency, and carbon overhead. |
+| **Queue Fairness** | Low-priority jobs should not starve indefinitely waiting for perfect carbon windows. |
+| **Accelerator Availability** | Cleaner region must have compatible hardware and capacity. |
+| **Reliability Risk** | Workloads should not shift into unstable regions or overloaded queues. |
+
+### **Scheduler Outputs**
+
+| Output | Meaning |
+| :---- | :---- |
+| **Execute now** | Current window is acceptable or workload is urgent. |
+| **Delay** | Workload waits for a cleaner, cooler, cheaper, or less constrained window. |
+| **Shift region** | Workload moves only to an approved region satisfying residency and privacy constraints. |
+| **Split execution** | Large job is partitioned across approved windows. |
+| **Escalate** | Constraints conflict or deadline cannot be met within environmental budget. |
+
+Carbon-aware scheduling should be evaluated by measured or estimated avoided emissions, missed-deadline rate, queue fairness, cost impact, and user/business outcome quality.
+
+## **Local vs Cloud Decision Matrix**
+
+The local-versus-cloud decision is not a simple sustainability contest. Local execution can reduce network dependency and preserve privacy, but may run on inefficient, underutilized, poorly measured hardware. Cloud execution can improve utilization and observability, but may concentrate electricity, water, heat, and grid stress in constrained regions. Sustainable architecture requires a full lifecycle comparison.
+
+| Dimension | Local / Edge Pattern | Cloud / Data-Center Pattern | Decision Rule |
+| :---- | :---- | :---- | :---- |
+| **Privacy and Data Control** | Sensitive data can remain on device or on-prem. | Data may traverse provider infrastructure and subprocessors. | Prefer local when privacy, offline operation, or data sovereignty dominates. |
+| **Energy Efficiency** | Highly variable; consumer or office devices may be inefficient under sustained AI load. | Often more efficient per unit of compute when utilization and cooling are optimized. | Prefer the route with measured or credible estimated energy per verified task. |
+| **Utilization** | Device accelerators may sit idle or be thermally constrained. | Shared clusters can achieve higher occupancy through batching and scheduling. | Prefer cloud for bursty or high-throughput work if provider efficiency is strong. |
+| **Water Impact** | Usually avoids direct data-center cooling water, but still uses local/grid electricity. | May consume direct cooling water and indirect electricity water. | Prefer local or water-efficient regions when water stress is the binding constraint. |
+| **Network Overhead** | Low when model, data, and retrieval are all local; higher if updates or retrieval sync continuously. | Higher data movement for prompts, files, embeddings, logs, and model outputs. | Include network and storage overhead in large-file or multimodal workflows. |
+| **Embodied Carbon** | Distributed devices may have short replacement cycles and low utilization. | Servers can amortize embodied carbon across high utilization and managed lifecycle. | Prefer longer useful life and higher useful utilization, not merely “local” or “cloud.” |
+| **Auditability** | Fragmented telemetry and inconsistent environments can reduce audit confidence. | Provider telemetry may be better, but only if exposed at useful granularity. | Prefer the route with sufficient evidence for the system’s risk tier. |
+| **Latency and Resilience** | Excellent for offline or low-latency local tasks. | Strong for heavy workloads but dependent on network and provider availability. | Match route to latency, resilience, and fallback requirements. |
+| **Governance Controls** | Harder to enforce centralized policy if devices are unmanaged. | Easier to enforce gateway policy, logging, and access control centrally. | High-impact workflows need enforceable governance regardless of placement. |
+
+The sustainable choice is the route with the best verified outcome per lifecycle impact under the system’s privacy, safety, latency, governance, and regional constraints.
+
+## **Sustainability Telemetry Plane**
+
+Sustainability metrics must move from annual reports into operational telemetry, but they should be modeled correctly. W3C trace context should carry correlation identifiers, not every environmental measurement. Sustainability telemetry should join traces, span attributes, resource metrics, facility metrics, grid signals, and allocation models.
+
+```text
+SUSTAINABILITY TELEMETRY ARCHITECTURE
+
+[ Request Trace ]
+  trace_id | span_id | route_id | tenant/workload class
+        |
+        v
+[ AI Span Attributes ]
+  model route | prompt tokens | output tokens | cache hits
+  batch size | tool calls | verifier outcome | task status
+        |
+        v
+[ Hardware Metrics Stream ]
+  accelerator power | utilization | memory | temperature
+  queue depth | batch occupancy | replica count
+        |
+        v
+[ Facility / Region Metrics ]
+  PUE | WUE | cooling mode | region | grid carbon intensity
+  water stress | electricity price | capacity state
+        |
+        v
+[ Allocation Layer ]
+  joins request traces to metric windows
+  estimates energy, carbon, water, embodied allocation
+        |
+        v
+[ Control Plane ]
+  routing | scheduling | autoscaling | scale-to-zero | procurement review
+```
+
+### **Trace and Span Schema**
+
+The request trace should record identifiers and AI execution metadata:
+
+```json
+{
+  "trace_id": "ot-9821a-bf091",
+  "span_id": "span-0918a",
+  "ai.route_id": "cascade.route.triage",
+  "ai.model_profile": "small-specialist-fp8",
+  "ai.hardware_class": "accelerator.shared.h100",
+  "ai.region": "us-east-1",
+  "ai.prompt_tokens": 1042,
+  "ai.completion_tokens": 412,
+  "ai.cached_prefix_tokens": 512,
+  "ai.dynamic_batch_size": 64,
+  "ai.verifier_status": "accepted",
+  "ai.task_status": "verified_success"
+}
+```
+
+Power, grid carbon, PUE, WUE, and water stress should generally be metric streams or resource attributes correlated by time, region, hardware pool, and route. They should not be stuffed into trace headers.
+
+### **Metric Sources**
+
+| Metric Family | Source | Typical Granularity | Notes |
+| :---- | :---- | :---- | :---- |
+| **Accelerator power** | NVML, RAPL, vendor telemetry, BMC, rack PDU, lab profiler. | Device, node, rack, or pool. | Per-request attribution usually requires allocation. |
+| **Utilization** | Scheduler, serving engine, GPU telemetry. | Request, batch, node, pool. | Needed to separate idle draw from useful work. |
+| **Token / cache metrics** | Gateway, serving engine, tracing spans. | Request or span. | Connects software behavior to physical cost. |
+| **Grid carbon intensity** | Grid APIs, utility data, regional estimates. | Region and time window. | Marginal intensity preferred for scheduling when available. |
+| **PUE / WUE** | Facility telemetry or provider disclosure. | Facility, region, or provider estimate. | Often not available at request granularity. |
+| **Embodied carbon** | Vendor PCF, EPD, LCA, procurement record. | Hardware class or asset. | Must be allocated by documented method. |
+| **Outcome status** | Evaluation, policy, verification, user/task success. | Request or workflow. | Required for energy per verified task. |
+
+### **Derived Sustainability Metrics**
+
+| Metric | Use |
+| :---- | :---- |
+| **Energy per Request** | Estimate execution-path energy across model, retrieval, tools, and overhead. |
+| **Energy per Verified Task** | Compare architectures by accepted useful outcomes. |
+| **Waste Energy Ratio** | Expose retries, failures, rejected outputs, and unverified work. |
+| **Carbon per Request** | Estimate operational emissions by time and region. |
+| **Carbon per Verified Task** | Combine outcome quality with energy and carbon intensity. |
+| **Water per Request / Task** | Estimate direct and indirect water impact with confidence labels. |
+| **Embodied Carbon Allocation** | Attach hardware lifecycle impact to workload classes. |
+| **Avoided Footprint** | Compare optimized route to documented baseline route. |
+
+Production systems should use sampling, profiling, and allocation where direct measurement is too costly. Sustainability telemetry that costs more to collect than it saves is just another tiny ceremonial bonfire.
+
+## **Lifecycle Impact Model**
+
+A sustainable AI strategy must account for hardware lifecycle impact, not merely operational electricity. Accelerators, high-bandwidth memory, networking, storage, cooling equipment, substations, concrete, steel, and eventual e-waste all contribute to the system footprint.
+
+Lifecycle numbers should be labeled by evidence confidence:
+
+| Evidence Class | Meaning | Use |
+| :---- | :---- | :---- |
+| **Vendor PCF** | Product carbon footprint published by manufacturer. | Useful for procurement and comparison, but vendor assumptions should be reviewed. |
+| **Third-party-reviewed PCF / EPD** | Product footprint reviewed under a recognized methodology. | Stronger procurement evidence. |
+| **Independent LCA** | Lifecycle assessment by independent researchers or auditors. | Strongest external challenge to vendor assumptions. |
+| **Internal allocation estimate** | Organization’s allocation of hardware/facility footprint to workloads. | Useful for engineering decisions, not sufficient alone for external claims. |
+
+### **Amortized Embodied Carbon of Accelerators**
+
+High-performance AI accelerators have substantial cradle-to-gate emissions from semiconductor fabrication, HBM, integrated circuits, substrates, power delivery, cooling assemblies, and assembly. NVIDIA’s published HGX H100 Product Carbon Footprint summary reports 1,312 kg CO2e cradle-to-gate for one HGX H100 GPU baseboard, with materials and components dominating the footprint.
+
+```text
+HGX H100 Baseboard PCF Example
+
+Cradle-to-gate footprint:
+  1,312 kg CO2e per HGX H100 baseboard
+
+Major contributors:
+  materials and components: 91%
+    high-bandwidth memory: 42%
+    integrated circuits:   25%
+    thermals/cooling:      18%
+  assembly:                8.6%
+  transport/logistics:     0.4%
+
+Evidence class:
+  vendor PCF summary
+```
+
+These figures should not be blindly copied into all deployments. They should be used as a documented input to workload allocation, procurement comparison, and hardware refresh analysis.
+
+### **Generational Efficiency and Replacement Tradeoffs**
+
+Newer hardware may reduce energy per task or embodied carbon intensity, but replacing hardware too aggressively can increase e-waste and strand embodied emissions. A hardware upgrade is sustainable only when the lifecycle benefit exceeds the lifecycle cost under expected utilization.
+
+| Upgrade Question | Required Evidence |
+| :---- | :---- |
+| Does the new hardware reduce energy per verified task? | Production-like benchmark under expected batch, context, and route patterns. |
+| Does the efficiency gain outweigh added embodied carbon? | Amortized lifecycle comparison over expected useful life. |
+| Can existing hardware be repurposed? | Secondary workload plan, lower-tier route, development pool, or resale/refurbishment path. |
+| Will utilization actually improve? | Scheduler and demand forecast, not only theoretical FLOP claims. |
+| Are cooling, water, and facility constraints improved or worsened? | Regional PUE/WUE, thermal density, water stress, and rack-level constraints. |
+
+### **Decommissioning, E-Waste, and Zombie Infrastructure**
+
+Sustainable AI must manage retirement as deliberately as deployment. Idle accelerators, obsolete vector indexes, persistent debug traces, duplicated datasets, abandoned notebooks, and unused model replicas consume storage, power, cooling, administrative attention, and sometimes license cost.
+
+| Lifecycle Risk | Control |
+| :---- | :---- |
+| **Idle accelerators** | Scale-to-zero, reservation review, utilization thresholds, workload consolidation. |
+| **Cold model replicas** | Replica TTL, route review, autoscaling, serving pool consolidation. |
+| **Obsolete vector indexes** | Index lifecycle policy, source freshness checks, deduplication, archival tiering. |
+| **Redundant datasets** | Dataset registry, lineage-aware garbage collection, retention policy. |
+| **Persistent debug logs** | Retention limits, sampling, redaction, secure archive for required evidence. |
+| **Hardware retirement** | Refurbish, redeploy, resell, recycle through certified e-waste channels. |
+| **Facility expansion** | Whole-life carbon assessment covering building, substation, cooling, and backup generation. |
+
+### **Lifecycle Review Triggers**
+
+| Trigger | Required Review |
+| :---- | :---- |
+| **New model route** | Model size, quantization, hardware target, energy per verified task, carbon/water estimate. |
+| **Workload volume surge** | Routing, batching, cache, scheduling, and utilization review. |
+| **Accelerator purchase or lease** | Whole-life carbon and utilization plan. |
+| **New region or provider** | Grid carbon, water stress, PUE/WUE, data residency, provider telemetry. |
+| **Index or dataset growth** | Deduplication, pruning, storage tiering, source lifecycle review. |
+| **Retry or timeout spike** | Rework energy, route rollback, failure-mode evaluation. |
+| **Hardware refresh proposal** | Embodied-carbon payback and e-waste plan. |
+| **Vendor footprint update** | Recalculate workload allocation and procurement score. |
+
+## **Sustainability Governance Checklist**
+
+Sustainability governance should be attached to AI system inventory, procurement, release gates, and operational review. Controls should be risk-tiered. A low-volume internal assistant does not need the same evidence burden as a high-volume public model route or a dedicated accelerator fleet.
+
+### **System Inventory Integration**
+
+Every AI system registration should include an environmental profile proportional to its expected scale and risk.
+
+| Inventory Field | Required For | Purpose |
+| :---- | :---- | :---- |
+| **Expected workload volume** | All production systems. | Estimate request count, token volume, batch jobs, and growth rate. |
+| **Model routes and fallback routes** | All production systems. | Identify energy, carbon, and cost exposure by route. |
+| **Task class and quality floor** | All production systems. | Prevent tiny-model trap and unnecessary frontier routing. |
+| **Quantization / precision policy** | Systems with hosted models or dedicated serving. | Define approved precision tiers and exception process. |
+| **Cache policy** | Systems using semantic, prefix, retrieval, or response caches. | Prevent stale, unauthorized, or wasteful cache behavior. |
+| **Scheduling flexibility** | Batch/offline workloads. | Enable carbon-aware and water-aware execution. |
+| **Region / provider / facility class** | Medium and high-volume systems. | Track grid, water, residency, and provider exposure. |
+| **Embodied carbon allocation method** | Dedicated hardware or large reserved capacity. | Assign lifecycle footprint to workloads. |
+| **Retention and deletion policy** | All systems with logs, traces, prompts, indexes, or eval artifacts. | Avoid zombie storage and privacy risk. |
+| **Review and retirement triggers** | All production systems. | Force lifecycle reassessment when volume, route, or hardware changes. |
+
+### **Procurement and Vendor Audit Controls**
+
+Vendor sustainability requirements should be tiered by volume, criticality, data sensitivity, and integration depth.
+
+| Control | Required | Preferred | Roadmap / Compensating Control |
+| :---- | :---- | :---- | :---- |
+| **Emissions reporting** | Corporate or service-level emissions disclosure for material vendors. | Workload-class or region-level AI emissions reporting. | Proxy estimates using tokens, route, region, and provider-published factors. |
+| **Energy telemetry** | Basic usage and region reporting for high-volume providers. | Trace-level or workload-level energy estimates. | Internal allocation model with documented assumptions. |
+| **Water reporting** | WUE or water-risk disclosure for material data-center providers. | Region/facility-level direct water and cooling method. | Avoid high-risk regions or require contractual improvement plan. |
+| **PUE / facility efficiency** | Facility or regional efficiency disclosure for dedicated capacity. | Time-varying PUE or cooling-load data. | Use provider class averages with confidence label. |
+| **Hardware lifecycle evidence** | Hardware model, refresh cycle, and lifecycle policy for dedicated or leased clusters. | PCF, EPD, or independent LCA for accelerators and servers. | Internal lifecycle allocation using vendor documentation. |
+| **Carbon-aware scheduling support** | Required for large flexible workloads where provider supports it. | Region/time scheduling APIs or clean-energy windows. | Batch locally or defer until provider exposes controls. |
+| **Telemetry export APIs** | Required where sustainability claims are made from provider-hosted workloads. | Standardized export of tokens, route, region, energy estimate, and carbon estimate. | No external sustainability claims beyond documented proxy method. |
+| **Data deletion / garbage collection** | Required for all vendors handling customer data, logs, prompts, or derived artifacts. | Automated retention APIs and deletion certificates. | Contractual retention caps and periodic deletion audits. |
+
+### **Release Gate Questions**
+
+Before production launch or major route change, the system owner should answer:
+
+| Question | Gate Outcome |
+| :---- | :---- |
+| Is the selected model route the smallest sufficiently capable route? | If no, justify exception or redesign. |
+| Have failure and retry rates been included in resource estimates? | If no, run representative evals. |
+| Can flexible workloads be scheduled by carbon, water, or cost windows? | If yes, enable scheduling policy. |
+| Are caches scoped by tenant, source, policy, model, and freshness? | If no, block semantic/prefix cache use. |
+| Does telemetry distinguish measured, estimated, allocated, and vendor-reported values? | If no, downgrade confidence of sustainability claims. |
+| Is there a retirement trigger for routes, indexes, logs, and hardware allocations? | If no, add lifecycle policy. |
+
+## **Sustainability Theater Diagnostic**
+
+Many enterprise Green AI programs suffer from "sustainability theater"—the practice of deploying decorative dashboards and publishing leaf-branded marketing summaries that fail to drive real environmental or architectural change. Platform teams must run this diagnostic to identify and eliminate standard theater anti-patterns.
+
+### **Diagnostic Check 1: The Green Dashboard Fallacy**
+
+* **The Theater Pattern:** Visualizing tree-planting graphs or displaying average grid-carbon metrics on SRE dashboards, while continuing to route trivial lookup tasks to unquantized, 400B-parameter frontier models running on fossil-heavy grids.13  
+* **Diagnostic Check:** Ask: *Does the telemetry dashboard programmatically change gateway routing tables, alter queue scheduling, or trigger auto-scaling scale-to-zero routines?* If the answer is no, the dashboard is theater.
+
+### **Diagnostic Check 2: The Offset Illusion**
+
+* **The Theater Pattern:** Claims of "carbon neutrality" or "zero-emissions execution" based on the purchase of annual Renewable Energy Certificates (RECs) or speculative carbon offset credits, while operating physical servers on grids dominated by coal and gas generation.1  
+* **Diagnostic Check:** Ask: *Is the workload's electrical consumption actively matched hour-by-hour with local, 24/7 carbon-free energy (CFE) on the specific grid where the computation occurs?* 3 If the matching is calculated annually or globally, the claim is ungrounded.
+
+### **Diagnostic Check 3: Generative and Traditional Blurring**
+
+* **The Theater Pattern:** Publishing reports that highlight massive emissions reductions achieved by deploying AI models (e.g., claiming that AI reduced data center cooling energy by 15%), while conflating highly efficient predictive/traditional ML with highly resource-intensive generative LLMs.22  
+* **Diagnostic Check:** Ask: *Does corporate carbon reporting explicitly isolate generative AI training and inference volumes from traditional machine learning tasks?* 22
+
+### **Diagnostic Check 4: The Tiny Model Trap**
+
+* **The Theater Pattern:** Forcing the deployment of highly quantized, extremely small models (e.g., 1B parameters) on tasks that require complex, multi-step logical reasoning to meet "green computing" targets.  
+* **Diagnostic Check:** Ask: *What is the downstream failure rate?* If the tiny model repeatedly hallucinates, outputting syntactically invalid structured schemas or incorrect logic that forces the system to initiate multiple retry loops or forces human engineers to spend hours manually correcting errors, the tiny model is less sustainable than a larger model that solves the task correctly on the first forward pass.37
+
+### **Diagnostic Check 5: The Zombie Workload Swarm**
+
+* **The Theater Pattern:** Hundreds of forgotten development notebooks, under-utilized model replicas, obsolete vector indices, and redundant dataset copies sitting warm on high-cost cloud resources, while the platform team focuses on micro-optimizing prompt lengths.26  
+* **Diagnostic Check:** Ask: *Are there active, automated network and traffic sweeps to identify any server or container running with near-zero CPU or GPU utilization for over 48 hours, programmatically shutting down these "zombie" environments?* 26
+
+## **Sustainable AI Decision Record Template**
+
+Every major model selection, regional deployment, hardware procurement, or routing configuration should be documented using a Sustainable AI Architecture Decision Record. The goal is to make sustainability tradeoffs explicit before production deployment.
+
+```markdown
+# Architectural Decision Record: SUST-AI-<ID>
+
+## Title
+
+## Status
+Proposed | Accepted | Superseded | Retired
+
+## Context and Problem Statement
+- Business requirement:
+- User population:
+- Expected workload volume:
+- Input profile:
+- Output profile:
+- Latency / availability SLO:
+- Quality / safety / governance floor:
+- Current baseline route or architecture:
+
+## Scope Boundary
+Mark each metric as included, excluded, or unknown.
+
+| Boundary Item | Included? | Measurement Method | Confidence |
+| :---- | :---- | :---- | :---- |
+| Model inference energy | Yes / No / Unknown | measured / estimated / allocated / vendor-reported | High / Medium / Low |
+| Retrieval and vector search | Yes / No / Unknown | measured / estimated / allocated / vendor-reported | High / Medium / Low |
+| Tool calls and external APIs | Yes / No / Unknown | measured / estimated / allocated / vendor-reported | High / Medium / Low |
+| Storage and logs | Yes / No / Unknown | measured / estimated / allocated / vendor-reported | High / Medium / Low |
+| Network transfer | Yes / No / Unknown | measured / estimated / allocated / vendor-reported | High / Medium / Low |
+| Facility PUE/WUE | Yes / No / Unknown | measured / estimated / allocated / vendor-reported | High / Medium / Low |
+| Embodied hardware carbon | Yes / No / Unknown | measured / estimated / allocated / vendor-reported | High / Medium / Low |
+| Human rework / retry cost | Yes / No / Unknown | measured / estimated / allocated / vendor-reported | High / Medium / Low |
+
+## Architectural Design Constraints
+- Maximum latency:
+- Minimum quality / accuracy:
+- Safety / policy constraints:
+- Data residency constraints:
+- Privacy constraints:
+- Cost ceiling:
+- Carbon objective:
+- Water / region objective:
+- Retention and deletion requirements:
+
+## Evaluated Alternatives
+
+### Option 1
+- Model / route:
+- Hardware / provider / region:
+- Precision / quantization:
+- Scheduling mode:
+- Estimated or measured energy per request:
+- Estimated or measured energy per verified task:
+- Estimated or measured carbon per verified task:
+- Estimated or measured water per verified task:
+- Expected failure / retry / rework rate:
+- Confidence level:
+- Main risks:
+
+### Option 2
+- Model / route:
+- Hardware / provider / region:
+- Precision / quantization:
+- Scheduling mode:
+- Estimated or measured energy per request:
+- Estimated or measured energy per verified task:
+- Estimated or measured carbon per verified task:
+- Estimated or measured water per verified task:
+- Expected failure / retry / rework rate:
+- Confidence level:
+- Main risks:
+
+## Decision Outcome
+- Chosen option:
+- Justification:
+- Why smaller routes were rejected:
+- Why larger routes were rejected:
+- How the choice balances quality, latency, cost, carbon, water, privacy, and governance:
+
+## Implementation Plan
+- Routing rule:
+- Quantization / precision:
+- Cache policy:
+- Context compression policy:
+- Carbon-aware scheduling policy:
+- Telemetry integration:
+- Verification / eval gate:
+- Rollback or degraded-mode path:
+
+## Monitoring Plan
+- Energy metric:
+- Carbon metric:
+- Water metric:
+- Waste / retry metric:
+- Utilization metric:
+- Quality metric:
+- Review cadence:
+
+## Review Triggers
+- Workload volume growth:
+- Route/model/provider change:
+- Hardware generation change:
+- Regional grid/water change:
+- Failure or retry spike:
+- Cost spike:
+- New regulatory/procurement requirement:
+
+## Decommissioning Policy
+- Retirement condition:
+- Data/index/log cleanup:
+- Hardware or reserved-capacity release:
+- Vendor exit or route migration plan:
+
+## Sign-off
+- System Owner:
+- Platform / Infrastructure Lead:
+- FinOps Owner:
+- Sustainability / ESG Owner:
+- Governance / Compliance Owner:
+- Date:
+```
+
+## **Cross-Canon Handoff Map**
+
+AI-ENG-AE defines sustainability as an architectural constraint across model selection, serving, routing, scheduling, telemetry, procurement, and lifecycle management. It consumes runtime, governance, evaluation, and operations evidence from surrounding canon layers and returns sustainability controls back into routing, procurement, and lifecycle review.
+
+| Canon Report | Handoff Into AE | AE Sustainability Use | Handoff Back |
+| :---- | :---- | :---- | :---- |
+| **AI-ENG-B — Context Architecture** | Context size, memory state, context compiler policy. | Measures context bloat and prefill energy. | Context budgets and compression review triggers. |
+| **AI-ENG-D — Corpus Engineering** | Corpus lifecycle state, source duplication, dataset size, retention. | Identifies storage bloat, duplicate corpora, stale datasets, and zombie data. | Dataset pruning, retention, archival, and lifecycle controls. |
+| **AI-ENG-E — Retrieval Pipeline** | Retrieval traces, chunk counts, reranker use, citation evidence. | Measures retrieved-token usefulness and retrieval energy overhead. | Retrieval efficiency metrics, chunking review, reranker cost policy. |
+| **AI-ENG-F — Freshness and Conflict Detection** | Freshness state, stale-source ratio, conflict packets. | Avoids wasting compute on stale or conflicting evidence. | Freshness-aware scheduling and index cleanup triggers. |
+| **AI-ENG-J — Throughput Mechanics** | Batching, queueing, token throughput, prefill/decode behavior. | Optimizes useful utilization and energy per token/request. | Sustainability-aware batching and queue policies. |
+| **AI-ENG-K — Weight Dynamics** | Quantization, pruning, distillation, adapters, decoding behavior. | Selects precision and model variants by energy-quality tradeoff. | Quantization and model-size review requirements. |
+| **AI-ENG-L — Serving Architecture** | Model routes, serving pools, autoscaling, cache and replica topology. | Controls idle draw, cold replicas, route energy, and scale-to-zero. | Energy-aware route manifests and utilization SLOs. |
+| **AI-ENG-U — Supply Chain Security** | Hardware/software provenance, artifact registry, sandbox profile, AI-BOM. | Distinguishes trusted PCF/EPD/vendor evidence from weak footprint claims. | Sustainability fields in procurement and artifact inventory. |
+| **AI-ENG-V — Resource Abuse** | Token ceilings, loop controls, denial-of-wallet, runaway agent signals. | Treats runaway loops and retries as energy and carbon incidents. | Waste-energy thresholds and sustainability incident triggers. |
+| **AI-ENG-W — UX Resilience** | Degraded modes, fallback paths, user continuity. | Defines sustainable degraded modes that preserve safety and useful service. | Environmental degradation disclosures and fallback policies. |
+| **AI-ENG-Z — Strategic Telemetry** | Trace IDs, spans, metrics, redaction, routing telemetry. | Joins AI traces with power, carbon, water, utilization, and outcome metrics. | Sustainability metric schema and dashboard controls. |
+| **AI-ENG-AA — Evaluation Architecture** | Golden sets, task success, regression gates, verifier outcomes. | Defines “verified task” for energy/carbon per useful outcome. | Efficiency-weighted eval reporting and route acceptance gates. |
+| **AI-ENG-AB — Verification Artifacts** | Evidence packages, replay artifacts, audit references. | Attaches sustainability decisions to replayable route and telemetry evidence. | Sustainable ADR evidence, source-confidence labels, audit references. |
+| **AI-ENG-AC — AI Operations** | Incident response, rollback, runbooks, containment, postmortems. | Treats energy waste, runaway loops, zombie infrastructure, and carbon-budget breaches as operational events. | Sustainability runbooks and incident-to-efficiency improvements. |
+| **AI-ENG-AD — Governance Architecture** | Policy-as-code, inventory, procurement, vendor review, lifecycle ownership. | Makes environmental metadata executable at approval, procurement, and release gates. | Sustainability inventory fields, procurement controls, review triggers. |
+| **AI-ENG-AJ — Reference Architectures** | Gateway, telemetry, scheduler, registry, and platform blueprints. | Implements sustainable routing, scheduling, telemetry, and lifecycle patterns. | Reference designs for energy-aware AI platforms. |
+
+The core handoff principle is that sustainability cannot live in a separate reporting layer. It must be wired into the same routes, gates, inventories, evaluations, runbooks, and procurement controls that govern production AI behavior.
+
+#### **Works cited**
+
+1. Carbon-Aware Scheduling of AI Data Center Workloads Using Environmental and Energy Grid Forecasts - ESS Open Archive, accessed June 14, 2026, [https://essopenarchive.org/doi/pdf/10.22541/essoar.177248651.16591616](https://essopenarchive.org/doi/pdf/10.22541/essoar.177248651.16591616)  
+2. Carbon-Aware AI Workload Scheduling With Renewable Energy Sources - Scribd, accessed June 14, 2026, [https://www.scribd.com/document/1007342445/Carbon-Aware-AI-Workload-Scheduling-With-Renewable-Energy-Sources](https://www.scribd.com/document/1007342445/Carbon-Aware-AI-Workload-Scheduling-With-Renewable-Energy-Sources)  
+3. Google data centers shift their computations to cleaner times and locations - Electricity Maps, accessed June 14, 2026, [https://www.electricitymaps.com/resources/case-studies/google-data-centers-shift-their-computations-to-cleaner-times-and-locations](https://www.electricitymaps.com/resources/case-studies/google-data-centers-shift-their-computations-to-cleaner-times-and-locations)  
+4. Carbon-Aware Compute–Power Scheduling for AI Data Centers with Microgrid Prosumer Operations - arXiv, accessed June 14, 2026, [https://arxiv.org/html/2605.03751v1](https://arxiv.org/html/2605.03751v1)  
+5. Embodied carbon vs. operational carbon | One Click LCA, accessed June 14, 2026, [https://oneclicklca.com/en-us/resources/articles/embodied-carbon-vs-operational-carbon](https://oneclicklca.com/en-us/resources/articles/embodied-carbon-vs-operational-carbon)  
+6. Embodied Carbon and Its Role in Product Development - Ecochain, accessed June 14, 2026, [https://ecochain.com/blog/embodied-carbon/](https://ecochain.com/blog/embodied-carbon/)  
+7. Understanding embodied and operational carbon in data centers: ESG considerations, accessed June 14, 2026, [https://www.gresb.com/understanding-embodied-and-operational-carbon-in-data-centers-esg-considerations/](https://www.gresb.com/understanding-embodied-and-operational-carbon-in-data-centers-esg-considerations/)  
+8. Product Carbon Footprint (PCF) Summary for NVIDIA HGX H100, accessed June 14, 2026, [https://images.nvidia.com/aem-dam/Solutions/documents/HGX-H100-PCF-Summary.pdf](https://images.nvidia.com/aem-dam/Solutions/documents/HGX-H100-PCF-Summary.pdf)  
+9. Carbon Emissions of NVIDIA A100 and H100 GPUs with 100% Renewable Energy, accessed June 14, 2026, [https://massedcompute.com/faq-answers/?question=What%20are%20the%20estimated%20carbon%20emissions%20of%20NVIDIA%27s%20A100%20and%20H100%20GPUs%20in%20a%20data%20center%20with%20a%20100%%20renewable%20energy%20source?](https://massedcompute.com/faq-answers/?question=What%2520are%2520the%2520estimated%2520carbon%2520emissions%2520of%2520NVIDIA%2527s%2520A100%2520and%2520H100%2520GPUs%2520in%2520a%2520data%2520center%2520with%2520a%2520100%25%2520renewable%2520energy%2520source?)  
+10. Life-Cycle Emissions of AI Hardware: A Cradle-To-Grave Approach and Generational Trends - arXiv, accessed June 14, 2026, [https://arxiv.org/html/2502.01671v1](https://arxiv.org/html/2502.01671v1)  
+11. Ironwood TPUs deliver 3.7x carbon efficiency gains | Google Cloud Blog, accessed June 14, 2026, [https://cloud.google.com/blog/topics/systems/ironwood-tpus-deliver-37x-carbon-efficiency-gains](https://cloud.google.com/blog/topics/systems/ironwood-tpus-deliver-37x-carbon-efficiency-gains)  
+12. FinOps in GCCs: Managing AI & Cloud Spend with Intelligence - Polestar Analytics, accessed June 14, 2026, [https://www.polestaranalytics.com/blog/how-finops-in-gccs-is-transforming-finance-operations-with-ai-and-automation](https://www.polestaranalytics.com/blog/how-finops-in-gccs-is-transforming-finance-operations-with-ai-and-automation)  
+13. Where Do the Joules Go? Diagnosing Inference Energy Consumption - arXiv, accessed June 14, 2026, [https://arxiv.org/html/2601.22076v1](https://arxiv.org/html/2601.22076v1)  
+14. Babbling Suppression: Making LLMs Greener One Token at a Time - arXiv, accessed June 14, 2026, [https://arxiv.org/html/2604.06755v1](https://arxiv.org/html/2604.06755v1)  
+15. How much heat does an AI data centre produce, and where are they located? - Al Jazeera, accessed June 14, 2026, [https://www.aljazeera.com/news/2026/6/11/how-much-heat-does-an-ai-data-centre-produce-and-where-are-they-located](https://www.aljazeera.com/news/2026/6/11/how-much-heat-does-an-ai-data-centre-produce-and-where-are-they-located)  
+16. Whole Life Carbon Assessment vs. Embodied Carbon: Key Differences Explained - Cerclos, accessed June 14, 2026, [https://cerclos.com/whole-life-carbon-assessment-vs-embodied-carbon-key-differences-explained/](https://cerclos.com/whole-life-carbon-assessment-vs-embodied-carbon-key-differences-explained/)  
+17. Majority of US’s new AI datacenters to be built on drought-hit land, accessed June 14, 2026, [https://www.theguardian.com/us-news/2026/jun/08/datacenter-ai-drought-water](https://www.theguardian.com/us-news/2026/jun/08/datacenter-ai-drought-water)  
+18. [2508.12590] Energy-Efficient Wireless LLM Inference via Uncertainty and Importance-Aware Speculative Decoding - arXiv, accessed June 14, 2026, [https://arxiv.org/abs/2508.12590](https://arxiv.org/abs/2508.12590)  
+19. Local AI vs Cloud AI in 2026: When to Run Models on Your Own Hardware | MindStudio, accessed June 14, 2026, [https://www.mindstudio.ai/blog/local-ai-vs-cloud-ai-2026](https://www.mindstudio.ai/blog/local-ai-vs-cloud-ai-2026)  
+20. Data Drain: The Land and Water Impacts of the AI Boom - Lincoln Institute of Land Policy, accessed June 14, 2026, [https://www.lincolninst.edu/publications/land-lines-magazine/articles/land-water-impacts-data-centers/](https://www.lincolninst.edu/publications/land-lines-magazine/articles/land-water-impacts-data-centers/)  
+21. Global energy demands within the AI regulatory landscape | Brookings, accessed June 14, 2026, [https://www.brookings.edu/articles/global-energy-demands-within-the-ai-regulatory-landscape/](https://www.brookings.edu/articles/global-energy-demands-within-the-ai-regulatory-landscape/)  
+22. Big Tech Accused of AI 'Greenwashing' - Resilience.org, accessed June 14, 2026, [https://www.resilience.org/stories/2026-02-19/big-tech-accused-of-ai-greenwashing/](https://www.resilience.org/stories/2026-02-19/big-tech-accused-of-ai-greenwashing/)  
+23. The Great Green AI Hoax Machine | TechPolicy.Press, accessed June 14, 2026, [https://www.techpolicy.press/the-great-green-ai-hoax-machine/](https://www.techpolicy.press/the-great-green-ai-hoax-machine/)  
+24. Report exposes Big Tech's AI climate hoax: 74% of industry's claims about AI's climate benefits are unproven - Stand.earth, accessed June 14, 2026, [https://stand.earth/press-releases/report-exposes-big-techs-ai-climate-hoax-74-of-industrys-claims-about-ais-climate-benefits-are-unproven/](https://stand.earth/press-releases/report-exposes-big-techs-ai-climate-hoax-74-of-industrys-claims-about-ais-climate-benefits-are-unproven/)  
+25. Report exposes Big Tech's AI climate hoax: 74% of industry's claims about AI's climate benefits are unproven - Green Web Foundation, accessed June 14, 2026, [https://www.thegreenwebfoundation.org/news/report-exposes-big-techs-ai-climate-hoax-74-of-industrys-claims-about-ais-climate-benefits-are-unproven/](https://www.thegreenwebfoundation.org/news/report-exposes-big-techs-ai-climate-hoax-74-of-industrys-claims-about-ais-climate-benefits-are-unproven/)  
+26. Zombie Workloads: The Walking Dead of Your Cloud Bill | by FinOps Universe | Medium, accessed June 14, 2026, [https://finopsuniverse.medium.com/zombie-workloads-the-walking-dead-of-your-cloud-bill-585756ce44da](https://finopsuniverse.medium.com/zombie-workloads-the-walking-dead-of-your-cloud-bill-585756ce44da)  
+27. Gartner: Data Centres Electricity Consumption Up 26% in 2026, accessed June 14, 2026, [https://energydigital.com/news/gartner-data-centres-electricity-consumption-up-26-in-2026](https://energydigital.com/news/gartner-data-centres-electricity-consumption-up-26-in-2026)  
+28. AI, Data Centers, and the U.S. Electric Grid: A Watershed Moment, accessed June 14, 2026, [https://www.belfercenter.org/research-analysis/ai-data-centers-us-electric-grid](https://www.belfercenter.org/research-analysis/ai-data-centers-us-electric-grid)  
+29. ai-eng-ad-governance-architecture.md  
+30. Executive summary – Key Questions on Energy and AI – Analysis - IEA, accessed June 14, 2026, [https://www.iea.org/reports/key-questions-on-energy-and-ai/executive-summary](https://www.iea.org/reports/key-questions-on-energy-and-ai/executive-summary)  
+31. AI's secret water crisis: How data centres are draining freshwater reserves across the world, accessed June 14, 2026, [https://timesofindia.indiatimes.com/science/ais-secret-water-crisis-how-data-centres-are-draining-freshwater-reserves-across-the-world/articleshow/131590203.cms](https://timesofindia.indiatimes.com/science/ais-secret-water-crisis-how-data-centres-are-draining-freshwater-reserves-across-the-world/articleshow/131590203.cms)  
+32. AI Cost Optimization 2026: GPU, LLM & Infrastructure Spend Guide | Opslyft, accessed June 14, 2026, [https://www.opslyft.com/guides/ai-cost-optimization](https://www.opslyft.com/guides/ai-cost-optimization)  
+33. The AI Boom Has a Water Bill, accessed June 14, 2026, [https://medium.com/activated-thinker/the-ai-boom-has-a-water-bill-a77fae04505a](https://medium.com/activated-thinker/the-ai-boom-has-a-water-bill-a77fae04505a)  
+34. AI Energy Consumption Statistics - AIMultiple, accessed June 14, 2026, [https://aimultiple.com/ai-energy-consumption](https://aimultiple.com/ai-energy-consumption)  
+35. TPUs improved carbon-efficiency of AI workloads by 3x | Google Cloud Blog, accessed June 14, 2026, [https://cloud.google.com/blog/topics/sustainability/tpus-improved-carbon-efficiency-of-ai-workloads-by-3x](https://cloud.google.com/blog/topics/sustainability/tpus-improved-carbon-efficiency-of-ai-workloads-by-3x)  
+36. Towards Green AI: Decoding the Energy of LLM Inference in Software Development - arXiv, accessed June 14, 2026, [https://arxiv.org/html/2602.05712v1](https://arxiv.org/html/2602.05712v1)  
+37. Tokens per Joule: How to Quantify and Reduce the Energy Footprint of Clinical LLM Inference - John Snow Labs, accessed June 14, 2026, [https://www.johnsnowlabs.com/tokens-per-joule-how-to-quantify-and-reduce-the-energy-footprint-of-clinical-llm-inference/](https://www.johnsnowlabs.com/tokens-per-joule-how-to-quantify-and-reduce-the-energy-footprint-of-clinical-llm-inference/)  
+38. How to Build Context Compression - OneUptime, accessed June 14, 2026, [https://oneuptime.com/blog/post/2026-01-30-context-compression/view](https://oneuptime.com/blog/post/2026-01-30-context-compression/view)  
+39. Carbon-Aware Model Training: Scheduling GPU Workloads Around Electricity Carbon Intensity - DEV Community, accessed June 14, 2026, [https://dev.to/nilofer_tweets/carbon-aware-model-training-scheduling-gpu-workloads-around-electricity-carbon-intensity-b4b](https://dev.to/nilofer_tweets/carbon-aware-model-training-scheduling-gpu-workloads-around-electricity-carbon-intensity-b4b)  
+40. (PDF) Towards Green AI: Decoding the Energy of LLM Inference in Software Development, accessed June 14, 2026, [https://www.researchgate.net/publication/400506146_Towards_Green_AI_Decoding_the_Energy_of_LLM_Inference_in_Software_Development](https://www.researchgate.net/publication/400506146_Towards_Green_AI_Decoding_the_Energy_of_LLM_Inference_in_Software_Development)  
+41. LLM Inference Energy Use - Emergent Mind, accessed June 14, 2026, [https://www.emergentmind.com/topics/llm-inference-energy-consumption](https://www.emergentmind.com/topics/llm-inference-energy-consumption)  
+42. Context Compression Before the LLM: Cutting Tokens Without Cutting Recall - DEV Community, accessed June 14, 2026, [https://dev.to/gabrielanhaia/context-compression-before-the-llm-cutting-tokens-without-cutting-recall-9hh](https://dev.to/gabrielanhaia/context-compression-before-the-llm-cutting-tokens-without-cutting-recall-9hh)  
+43. Characterizing LLM Inference Energy-Performance Tradeoffs across Workloads and GPU Scaling - Shashikant Ilager, accessed June 14, 2026, [https://shashikantilager.com/assets/pdf/publications/LLM_charecterization_ccgrid_2026.pdf](https://shashikantilager.com/assets/pdf/publications/LLM_charecterization_ccgrid_2026.pdf)  
+44. An Introduction to Speculative Decoding for Reducing Latency in AI Inference | NVIDIA Technical Blog, accessed June 14, 2026, [https://developer.nvidia.com/blog/an-introduction-to-speculative-decoding-for-reducing-latency-in-ai-inference/](https://developer.nvidia.com/blog/an-introduction-to-speculative-decoding-for-reducing-latency-in-ai-inference/)  
+45. Babbling Suppression: Making LLMs Greener One Token at a Time - arXiv, accessed June 14, 2026, [https://arxiv.org/pdf/2604.06755](https://arxiv.org/pdf/2604.06755)  
+46. TokenPowerBench: Benchmarking the Power Consumption of LLM Inference - AAAI Publications, accessed June 14, 2026, [https://ojs.aaai.org/index.php/AAAI/article/view/40535/44496](https://ojs.aaai.org/index.php/AAAI/article/view/40535/44496)  
+47. Should I Use Cloud or Local AI Models for My Project? - Zen van Riel, accessed June 14, 2026, [https://zenvanriel.com/ai-engineer-blog/should-i-use-cloud-or-local-ai-models-complete-guide/](https://zenvanriel.com/ai-engineer-blog/should-i-use-cloud-or-local-ai-models-complete-guide/)  
+48. NVIDIA HGX B200 Reduces Embodied Carbon Emissions Intensity | NVIDIA Technical Blog, accessed June 14, 2026, [https://developer.nvidia.com/blog/nvidia-hgx-b200-reduces-embodied-carbon-emissions-intensity/](https://developer.nvidia.com/blog/nvidia-hgx-b200-reduces-embodied-carbon-emissions-intensity/)  
+49. Context Compression Techniques (2026) - SurePrompts, accessed June 14, 2026, [https://sureprompts.com/blog/context-compression-techniques](https://sureprompts.com/blog/context-compression-techniques)  
+50. Context compression finally works in production: new research cuts LLM input 16x without the accuracy hit | VentureBeat, accessed June 14, 2026, [https://venturebeat.com/data/context-compression-finally-works-in-production-new-research-cuts-llm-input-16x-without-the-accuracy-hit](https://venturebeat.com/data/context-compression-finally-works-in-production-new-research-cuts-llm-input-16x-without-the-accuracy-hit)  
+51. GreenOps & FinOps – WisdomAI: Why zombie data is the hidden cost of cloud, accessed June 14, 2026, [https://www.computerweekly.com/blog/CW-Developer-Network/GreenOps-FinOps-WisdomAI-Why-zombie-data-is-the-hidden-cost-of-cloud](https://www.computerweekly.com/blog/CW-Developer-Network/GreenOps-FinOps-WisdomAI-Why-zombie-data-is-the-hidden-cost-of-cloud)  
+52. Appendix A. - Greenpeace, accessed June 14, 2026, [https://www.greenpeace.org/static/planet4-eastasia-stateless/2025/04/c97a710a-energy_consumption_of_ai_appendix.pdf](https://www.greenpeace.org/static/planet4-eastasia-stateless/2025/04/c97a710a-energy_consumption_of_ai_appendix.pdf)  
+53. How Shadow AI Creates Zombie Infrastructure - Netscout, accessed June 14, 2026, [https://www.netscout.com/blog/how-shadow-ai-creates-zombie-infrastructure](https://www.netscout.com/blog/how-shadow-ai-creates-zombie-infrastructure)  
+54. Claims that AI can help fix climate dismissed as greenwashing - The Guardian, accessed June 14, 2026, [https://www.theguardian.com/technology/2026/feb/17/tech-companies-traditional-ai-generative-climate-breakdown-report](https://www.theguardian.com/technology/2026/feb/17/tech-companies-traditional-ai-generative-climate-breakdown-report)  
+55. Datacenter & AI water use is overblown, accessed June 14, 2026, [https://www.reddit.com/r/artificial/comments/1u4128s/datacenter_ai_water_use_is_overblown/](https://www.reddit.com/r/artificial/comments/1u4128s/datacenter_ai_water_use_is_overblown/)
+
+---
+
+# Part V - Vol. 11-12 AF-AK - Product Doctrine and Engineering Method
+
+---
+
+# Volume 11. AF-AH Product, Business, and Organizational Architecture
+
+---
+
+# AI-ENG-AF — AI Product Architecture - Use-Case Selection, Workflow Fit & Value Design
+
+## **1. Doctrinal Foundations and the AI-Shaped Hole Fallacy**
+
+AI product architecture is the engineering and systems discipline of selecting, shaping, rejecting, and structuring artificial intelligence capabilities based on their systemic fit within human workflows. It stands as the architectural gateway before software development begins, establishing the criteria that separate high-yield cognitive automation from expensive, non-deterministic failures.  
+Traditional digital product discovery focuses on establishing customer needs, usability, technical feasibility, and business viability.1 AI product architecture, however, must navigate a fundamentally different landscape: the transition from deterministic software—where inputs map reliably to outputs and pass standard quality assurance gates—to probabilistic systems that operate with varying degrees of accuracy and exhibit behavioral drift over time.2 In a traditional software release, shipping a feature allows the team to confirm its status as functional or broken; in an AI-driven architecture, a deployed agent may function correctly in only a portion of execution paths, necessitating continuous validation, feedback loops, and runtime governance to sustain business value.2  
+This probabilistic nature gives rise to the **AI-Shaped Hole Fallacy**. This fallacy is the systemic mistake of assuming that because an AI model *can* be integrated into a specific process, the workflow possesses a genuine, valuable, and structurally viable AI-shaped problem. It manifests when product teams start their discovery cycles with the mandate to deploy a specific model class rather than isolating a high-intensity workflow bottleneck, user friction point, or data processing constraint.4  
+As Matt Clifford observes, "There is no AI-shaped hole in most organizations".5 While modern frontier models can routinely outperform human experts on theoretical tests and clinical evaluations, the utility of this raw intelligence is constrained by human institutions, entrenched rules, regulatory compliance frameworks, and strict permission barriers.5 Adding unconstrained, probabilistic reasoning into tightly coupled, highly regulated systems introduces high latency, cost, and verification burdens that frequently outweigh the marginal cognitive utility of the model.5  
+To diagnose this fallacy early, product architects must dissect the proposed use case against deterministic alternatives, evaluating whether the core bottleneck is a lack of cognitive reasoning or simply a failure of traditional workflow design, database schema, or information architecture.4
+
+### **Doctrinal Governing Principle**
+
+AI product architecture begins by identifying where AI belongs and where it does not. A valid AI use case must have workflow friction, data readiness, user tolerance, evaluation clarity, acceptable risk, cost-to-serve viability, and a value model strong enough to justify probabilistic behavior. The useful question is not "Can we add AI?" but "Is AI the right mechanism for this workflow, for these users, with this data, under this risk, at this cost, with measurable value and a clear definition of success?"
+
+### **AI-Shaped Hole Fallacy Diagnostic**
+
+The diagnostic tool below is designed to isolate and expose instances of the AI-Shaped Hole Fallacy during the initial product discovery phase:
+
+| Symptom | Root Cognitive Cause | Failed Automation Assumption | Deterministic Alternative | Diagnostic Probe |
+| :---- | :---- | :---- | :---- | :---- |
+| **The Chatbot Anti-Pattern** Users are presented with an open-ended conversational canvas to complete highly structured tasks, resulting in high interaction friction. | Mistaking a model's conversational interface for a natural user workflow.8 | Conversational input is universally more intuitive than structured layouts. | Structured web forms, multi-select filters, relational search syntax, and dynamic templates.8 | Does the user need to converse with their data, or do they simply need a fast, precise way to filter, sort, and display structured fields? |
+| **Probabilistic Replacement** A deterministic rules engine or database lookup is replaced by an LLM pipeline, resulting in non-deterministic compliance failures and hallucinations. | Believing that LLMs are drop-in replacements for standard relational database queries or business rules. | Generative models can serve as highly reliable truth engines for exact data retrieval. | Standard SQL queries, structured APIs, rules-based validation engines, and deterministic workflow states.4 | Can this task be represented as a finite set of Boolean conditions, or does it genuinely require semantic context and synthesis of unstructured text? 4 |
+| **Verification Debt** The system drafts an artifact in seconds, but requires minutes of manual, line-by-line human verification, resulting in zero net time savings. | Designing for output creation while ignoring the cognitive overhead and liability of output validation.9 | Synthesizing content faster automatically translates to a reduction in total task cycle time. | Structured modular builders, boilerplate components, and rules-based formatting. | Is the cost of validating the probabilistic output higher than the cost of drafting it manually from a structured template? 9 |
+| **Unattributed Cost Cascades** The pilot operates at high volume, but the unit economics erode the product's gross margins as model execution costs scale.8 | Ignoring non-deterministic agent loop costs, long context windows, and tool-calling retries during early prototyping.12 | Model call costs scale linearly and remain predictable without active optimization layers.12 | Targeted deterministic automation, local lightweight classifiers, and semantic cache layers.8 | What is the maximum cost-to-serve limit per task, and does the model's non-deterministic execution path fit within that envelope at scale? 12 |
+| **The Passive Validation Loop** The user interface fails to capture explicit corrections, allowing model drift and errors to propagate silently into downstream systems. | Treating human-in-the-loop oversight as a passive checkbox rather than an active data collection interface.9 | Human operators will actively catch and correct every subtle semantic error without explicit UI forcing functions.13 | Explicit user confirmation fields, diff rejection tracking, and validation gates.14 | Does the system capture the exact differences between the model's output and the human's final edit to retrain and evaluate future runs? 14 |
+
+## **2. Conceptual Glossary of AI Product Architecture**
+
+Understanding AI product architecture requires a standardized, high-dimensional vocabulary that bridges the gap between machine learning capabilities, interface design, and SaaS financial economics.
+
+| Term | Doctrinal Definition | Systemic Implication |
+| :---- | :---- | :---- |
+| **AI Product Architecture** | The systemic discipline of selecting, shaping, rejecting, and designing AI capabilities based on workflow fit, user tolerance, data readiness, evaluation clarity, risk level, cost-to-serve, and measurable business value. | Acts as the architectural gateway and control gate before any technical implementation, code construction, or model selection begins. |
+| **AI-Shaped Hole Fallacy** | The erroneous assumption that because AI can be integrated into a workflow, the workflow has a genuine need for probabilistic reasoning, leading to features that add cognitive overhead, cost, and verification debt without resolving structural bottlenecks.5 | Causes high-investment product failures by substituting conversational interfaces or generative models where deterministic logic is superior.4 |
+| **Automation** | An operational strategy where an AI system executes a complete task or sequence of tasks within a workflow without requiring real-time human intervention or validation prior to execution.9 | Appropriate only where inputs are bounded, outcomes are highly verifiable, and the cost of occasional execution failure is low.9 |
+| **Augmentation** | An operational strategy where the AI system assists a human operator by drafting, summarizing, reviewing, or suggesting content, while the human retains full agency, execution authority, and legal accountability.9 | Preserves the human's interpretive space and cognitive engagement, making it highly suitable for nuanced, contextual, and high-consequence tasks.9 |
+| **Delegation** | The structured transfer of bounded subtasks from a human to an AI system under strict execution constraints, where the system performs the work but must present its outputs for human validation.16 | Minimizes human cognitive fatigue while maintaining clear accountability, acting as a middle-tier posture between automation and augmentation.17 |
+| **Decision Support** | An interaction paradigm where the AI system structures evidence, maps trade-offs, highlights risks, and ranks options, leaving the final selection and execution of authority entirely to the human operator.13 | Mitigates automation bias by preventing the system from proposing a single "correct" answer, forcing active human cognitive processing.13 |
+| **Workflow Fit** | The measure of how cleanly an AI capability integrates into the existing sequence of actions, data models, and user interfaces of an enterprise process, without introducing disruptive friction or validation bottlenecks.4 | Determines user adoption; high model accuracy cannot overcome a poor workflow fit that demands frequent context-switching or manual copy-pasting.4 |
+| **User Tolerance** | The maximum threshold of latency, uncertainty, error rates, and manual review overhead that a specific user class is willing to accept in exchange for the utility provided by an AI system.19 | Governs the choice of product surface; low-tolerance environments require invisible backend AI or autocomplete, while high-tolerance environments permit chat. |
+| **Data Readiness** | The state of structural, legal, and operational fitness of an organization's data assets, determined by whether the required information is accessible, governed, permissioned, clean, and representative of the target use case.21 | Evaluated on a use-case-specific basis; general-purpose data preparation is insufficient to support targeted model reasoning.22 |
+| **Evaluation Clarity** | The ability to establish objective, measurable success criteria, baseline performance thresholds, and systematic evaluation rubrics for a probabilistic system prior to writing production code.2 | Ensures the system is testable; if success cannot be programmatically or systematically evaluated, the product cannot be safely scaled.2 |
+| **Cost-to-Serve** | The comprehensive financial and infrastructure cost required to deliver a single completed AI task or transaction, spanning token consumption, retrieval overhead, hosting, API calls, logging, and human verification costs.8 | Directly impacts gross margins; high-token reasoning models must be reserved for high-value transactions to prevent margin erosion.8 |
+| **Value Design** | The strategic framework that aligns AI capabilities with concrete business outcomes, such as cycle-time reduction, accuracy improvements, and margin protection, rather than relying on qualitative engagement metrics.3 | Rejects the labor-replacement fantasy, focusing instead on throughput enhancement, error mitigation, and specialized knowledge democratization.23 |
+| **No-AI Decision** | The deliberate architectural determination that a deterministic software mechanism, workflow redesign, or interface improvement is more reliable, cost-effective, and safe than deploying a probabilistic model.4 | Handled as a positive, successful product outcome that conserves engineering capital and avoids technical debt.4 |
+| **Product Surface** | The specific user interface or API gateway through which the AI's capabilities are exposed to and controlled by the user, ranging from open-ended chat inputs to contextual inline suggestions and invisible backend ranking models.14 | Shapes user trust and interaction style; selected dynamically based on risk, latency requirements, and user tolerance metrics.14 |
+
+## **3. The Use-Case Selection Framework**
+
+Selecting viable AI use cases is not a search for technical feasibility alone. The fact that a frontier model can perform a task in a demo does not mean the workflow is ready for probabilistic automation, the data is usable, the users will tolerate the interaction, or the economics survive production scale.
+
+The Use-Case Selection Framework operates as a product architecture gate. It evaluates whether the proposed capability belongs in one of five paths:
+
+1. **No-AI / Deterministic Path** — solve with rules, workflow redesign, database structure, search, forms, templates, or conventional software.
+2. **Discovery Experiment** — validate the problem, workflow, user tolerance, and value before model work begins.
+3. **Prototype / Pilot** — run a bounded AI experiment with limited blast radius.
+4. **Production Design** — proceed to architecture, evals, governance, telemetry, and implementation.
+5. **Reject / Defer** — stop because a fatal flaw exists or the value case is weak.
+
+```text
+USE-CASE SELECTION FLOW
+
+[ Candidate Use Case ]
+        |
+        v
+[ 1. Is there a real workflow pain? ]
+        |
+        +-- no --> [ Reject / Defer ]
+        |
+        v
+[ 2. Is AI the right mechanism? ]
+        |
+        +-- no --> [ No-AI / Deterministic Path ]
+        |
+        v
+[ 3. Is required data available, permissioned, and representative? ]
+        |
+        +-- no --> [ Data Readiness Work / Defer ]
+        |
+        v
+[ 4. Can success be evaluated before production? ]
+        |
+        +-- no --> [ Discovery Experiment / Eval Design ]
+        |
+        v
+[ 5. Are risks reversible, governable, and acceptable? ]
+        |
+        +-- no --> [ Reject / Redesign / Human-Only Gate ]
+        |
+        v
+[ 6. Will users tolerate latency, uncertainty, and review burden? ]
+        |
+        +-- no --> [ Redesign Product Surface ]
+        |
+        v
+[ 7. Can the system integrate without workflow distortion? ]
+        |
+        +-- no --> [ Workflow Redesign / API Work First ]
+        |
+        v
+[ 8. Do unit economics survive production volume? ]
+        |
+        +-- no --> [ Route Optimization / No-AI / Reject ]
+        |
+        v
+[ 9. Can operations monitor, contain, and improve it? ]
+        |
+        +-- no --> [ Operational Readiness Work ]
+        |
+        v
+[ 10. Is adoption plausible and valuable? ]
+        |
+        +-- no --> [ Discovery Experiment / Defer ]
+        |
+        v
+[ Production Design Candidate ]
+```
+
+### **Use-Case Gate Dimensions**
+
+| Dimension | Core Question | Passing Evidence |
+| :---- | :---- | :---- |
+| **Workflow Pain** | Is there a real bottleneck, delay, error pattern, or unmet user need? | Baseline cycle time, error rate, support burden, user interviews, workflow observation. |
+| **AI Suitability** | Does the task require semantic interpretation, synthesis, classification, or language flexibility? | Clear reason deterministic alternatives are insufficient. |
+| **Data Readiness** | Is the required data accessible, permissioned, representative, and governed? | Source inventory, data lineage, access model, sample corpus, privacy review. |
+| **Evaluation Clarity** | Can success and failure be measured? | Golden set, rubric, task-specific metrics, human review procedure. |
+| **Risk and Reversibility** | What happens when the model is wrong? | Risk tier, reversibility plan, human gate, rollback/compensation policy. |
+| **User Tolerance** | Will users accept latency, uncertainty, corrections, and review burden? | Persona-specific tolerance model, usability test, correction-rate target. |
+| **Integration Fit** | Does the feature slot into the workflow without copy-paste theater? | API availability, UI surface plan, state ownership, transaction boundaries. |
+| **Cost-to-Serve** | Can the feature be delivered profitably at expected usage? | Route cost estimate, token/retrieval/tool/review costs, margin model. |
+| **Operational Readiness** | Can the system be monitored, rolled back, and improved? | Telemetry, evals, runbook, owner, incident and feedback loop. |
+| **Adoption and Value** | Will users actually change behavior, and will the business capture value? | Adoption hypothesis, value metric, incentive analysis, change plan. |
+
+Scoring is a structured decision aid, not a mathematical oracle. A high score does not override a fatal flaw. A low score does not always kill an idea; it may route the opportunity to workflow redesign, data readiness, or discovery experimentation.
+
+## **4. The Automation versus Augmentation Matrix**
+
+AI product architecture must decide how much authority the system receives. The key design question is not whether the model is “smart enough,” but where human judgment, machine execution, verification, and accountability belong in the workflow.
+
+Automation and augmentation are not opposites. A system can automate information retrieval while preserving human decision authority. It can automate drafting while requiring human approval. It can automate execution only where inputs are bounded, errors are reversible, and verification is reliable.
+
+### **Human-AI Allocation Principles**
+
+| Principle | Meaning |
+| :---- | :---- |
+| **Automate bounded work, not accountability.** | The system may perform tasks, but responsibility must remain assigned to a human role or organizational control. |
+| **Separate recommendation from execution.** | Advice, draft, approval, and action should be distinct workflow states. |
+| **Use humans where interpretation matters.** | High-context, high-liability, ambiguous, or value-laden decisions require human authority. |
+| **Use machines where verification is cheap.** | Automation fits best where outputs can be checked by schema, tests, source-of-record APIs, or deterministic constraints. |
+| **Preserve human situational awareness.** | Highly automated systems need handoff, explanation, rehearsal, and fallback controls. |
+| **Design against overtrust and undertrust.** | Interfaces should calibrate confidence, show evidence, capture corrections, and avoid fluent-but-false authority. |
+
+### **Automation vs. Augmentation Matrix**
+
+| Product Posture | System Authority | Best-Fit Task Type | Validation Cost | Failure Consequence | Product Surface | Required Controls |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| **No-AI / Deterministic** | No model authority. | Exact math, strict business rules, relational lookup, compliance checks with finite logic. | Low via deterministic tests, or impossibly high for probabilistic output. | Medium to extreme. | Forms, tables, filters, APIs, rules engines. | Schema validation, database constraints, deterministic tests, audit logs. |
+| **Decision Support** | System structures evidence and options; human decides. | Legal, medical, financial, compliance, strategy, incident review. | High. | High. | Evidence cockpit, option matrix, risk panel. | Human final decision, source links, independent judgment step, reason logging. |
+| **Augmentation** | System drafts or suggests; human edits and approves. | Writing, summarization, customer replies, internal analysis, document review. | Medium. | Low to high depending on domain. | Side-by-side editor, suggested reply card, review panel. | Accept/reject/edit capture, citation/evidence display, user-owned final action. |
+| **Delegation** | System performs bounded subtask; human reviews output or exceptions. | Extraction, routing, classification, test generation, structured document processing. | Low to medium. | Low to medium if reversible. | Queue, checklist, structured output panel. | Confidence thresholds, schema validation, exception queue, rollback/retry limits. |
+| **Automation** | System acts without real-time human approval. | High-volume, low-risk, reversible, easily verified workflows. | Low. | Low. | Invisible backend route, automated queue, rules-bound agent. | Hard policy gates, source-of-record verification, monitoring, circuit breakers. |
+| **Blocked / Human-Only** | System may assist with evidence but cannot decide or execute. | Irreversible, safety-critical, legally sensitive, or existential-risk workflows. | High or uncertain. | Extreme. | Manual workflow with optional evidence support. | Multi-human approval, deterministic controls, complete audit trail, model action disabled. |
+
+### **Design Controls by Cognitive Stage**
+
+| Cognitive Stage | Safe AI Role | Unsafe Anti-Pattern |
+| :---- | :---- | :---- |
+| **Information Acquisition** | Retrieve, classify, summarize, cluster, and surface relevant material. | Hide missing evidence or retrieve from unauthorized sources. |
+| **Information Analysis** | Compare evidence, extract patterns, detect anomalies, draft explanations. | Present unsupported synthesis as fact. |
+| **Decision Selection** | Rank options, show tradeoffs, identify risk, ask clarifying questions. | Pick a single “correct” decision in high-impact contexts. |
+| **Action Implementation** | Execute bounded, reversible, verified actions. | Mutate external systems without authorization, idempotency, or verification. |
+
+The correct posture is selected by risk, reversibility, validation cost, user tolerance, and workflow value—not by model capability alone.
+
+## **5. Workflow Fit Mapping and Task Decomposition**
+
+AI systems fail when they are treated as magic overlays on top of un-optimized, unchanged operational processes.4 True product value is unlocked when the workflow itself is systematically decomposed, decisions are isolated, and touchpoints are re-engineered around the capabilities and limitations of probabilistic models.4
+
+### **Task Decomposition Mechanics**
+
+Product architects must operate on the fundamental truth that **the model is not the unit of work**.4 Workflows must be decomposed into granular, discrete tasks (e.g., intake, triage, retrieval, synthesis, verification, write-back).4 This allows the architect to isolate the exact bottlenecks where cognitive variability, semantic ambiguity, or unstructured data processing create systemic delays.4 Instead of attempting to automate an entire role, the system targets only the highly specific sub-problems that decompose into independent, evaluable tasks.17
+
+### **Workflow Fit Map**
+
+The operational map below illustrates how AI should be inserted into a high-volume, unstructured document intake and compliance workflow. The model is not the workflow. The workflow is decomposed into stages, and each stage receives the lowest-risk mechanism that can satisfy its task.
+
+```text
+WORKFLOW FIT MAP: DOCUMENT INTAKE AND COMPLIANCE REVIEW
+
+[ Emails / customer feedback / PDF contracts / scanned attachments ]
+        |
+        v
++--------------------------------------------------------------+
+| STAGE 1: INTAKE AND NORMALIZATION                            
+| Mechanism: parser + OCR + lightweight extraction route        
+| Input: messy documents and message text                       
+| Output: validated structured JSON + source references         
+| AI role: extract and normalize where deterministic parsing ends
++-----------------------------+--------------------------------+
+                              |
+                              v
++--------------------------------------------------------------+
+| STAGE 2: EVIDENCE RETRIEVAL                                  
+| Mechanism: hybrid retrieval + permission filter + reranker   
+| Input: structured payload, account metadata, policy corpus    
+| Output: relevant source passages with citations               
+| AI role: retrieve and rank candidate evidence                 
++-----------------------------+--------------------------------+
+                              |
+                              v
++--------------------------------------------------------------+
+| STAGE 3: POLICY ANALYSIS AND DRAFT SYNTHESIS                  
+| Mechanism: governed synthesis route                           
+| Input: validated JSON + retrieved evidence + policy rules     
+| Output: draft memo, risk flags, missing evidence list         
+| AI role: synthesize, compare, explain                         
++-----------------------------+--------------------------------+
+                              |
+                              v
++--------------------------------------------------------------+
+| STAGE 4: HUMAN VERIFICATION GATE                              
+| Mechanism: evidence cockpit + diff review + approval capture  
+| Input: draft memo, citations, extracted fields, risk flags    
+| Output: approved, edited, rejected, or escalated package      
+| AI role: assist review; never silently approve                
++-----------------------------+--------------------------------+
+                              |
+                              v
++--------------------------------------------------------------+
+| STAGE 5: DETERMINISTIC WRITE-BACK                             
+| Mechanism: API / ERP / CRM transaction with schema validation 
+| Input: signed and verified payload                            
+| Output: committed transaction or explicit failure             
+| AI role: none at transaction boundary                         
++--------------------------------------------------------------+
+```
+
+### **Workflow-Fit Rules**
+
+| Workflow Stage | AI Belongs When | AI Does Not Belong When |
+| :---- | :---- | :---- |
+| **Intake** | Inputs are messy, varied, unstructured, or multilingual. | Inputs already arrive in clean structured fields. |
+| **Retrieval** | Evidence is spread across unstructured documents or semantic sources. | The answer is a direct database field or exact lookup. |
+| **Synthesis** | Human review benefits from summarized evidence, options, or risk flags. | Output requires exact arithmetic, legal execution, or direct authority. |
+| **Verification** | AI can highlight inconsistencies, missing evidence, or likely errors. | The system hides uncertainty or makes approval feel automatic. |
+| **Write-back** | AI has no direct authority; it may prepare a payload for review. | The model mutates systems without deterministic validation and authorization. |
+
+Use route classes rather than vendor names in architecture diagrams. Model catalogs change. Workflow responsibilities do not.
+
+### **High-Yield versus Low-Yield AI Insertion Points**
+
+When mapping workflows, architects must systematically identify where AI belongs and where it must be aggressively kept out:
+
+| High-Yield AI Insertion Points | Systemic Value Generated | Low-Yield / Prohibited AI Insertion Points | Structural Hazard / Failed Fit |
+| :---- | :---- | :---- | :---- |
+| **Messy Language Intake** Converting unstructured, multi-format PDFs, emails, and support tickets into validated JSON schemas.4 | Eliminates manual data-entry delays and reduces transcription errors.4 | **Deterministic Math Calculations** Using an LLM to sum line items, calculate tax rates, or process financial statements. | Models are statistically prone to calculation errors; math must always be routed to deterministic code. |
+| **Evidence Synthesis** Condensing multi-source policy documents or technical manuals into summaries grounded by direct citations.9 | Reduces manual lookup times, accelerating research and policy verification phases.9 | **Direct Compliance Decisions** Allowing a model to autonomously approve or deny claims, execute legal transactions, or lock user accounts. | High liability, potential for silent failures, and complete loss of human oversight.9 |
+| **Triage & Intent Routing** Classifying ambiguous customer requests and routing them to specialized queues based on semantic intent.4 | Automatically routes tasks to the correct expert queues while filtering out noise.4 | **High-Volume Low-Margin SEO Text** Programmatically generating massive volumes of content to flood search indexes. | Incurs massive API bills while degrading search quality and eroding long-term user trust.8 |
+| **Synthesized Review Packages** Highlighting missing data, legal risks, or policy violations in draft documents before execution.4 | Minimizes critical compliance errors and ensures consistent policy adherence across departments.4 | **Direct Database Lookups** Forcing users to query exact record fields (e.g., "what is customer X's phone number") via a conversational chat canvas. | Chat increases latency and cost; a simple relational filter UI is faster, cheaper, and exact.5 |
+
+## **6. AI Use-Case Feasibility Scorecard**
+
+Before approving a candidate AI use case for technical design, product leaders and system architects should evaluate it using a structured feasibility scorecard. The scorecard is not a funding slot machine. It is a shared decision artifact that exposes assumptions, fatal flaws, and required readiness work.
+
+### **Scoring Method**
+
+Each dimension is scored from 1 to 5.
+
+| Score | Meaning |
+| :---- | :---- |
+| **1** | Poor fit; major unresolved blocker. |
+| **2** | Weak fit; significant readiness work required. |
+| **3** | Plausible but unproven; discovery or prototype needed. |
+| **4** | Strong candidate; bounded pilot likely justified. |
+| **5** | Production-design candidate with clear evidence. |
+
+### **Feasibility Scorecard Rubric**
+
+| # | Dimension | Low Readiness: 1–2 | Medium Readiness: 3 | High Readiness: 4–5 |
+| :---- | :---- | :---- | :---- | :---- |
+| **1** | **Workflow Pain** | Low-frequency, low-value, or already solved by deterministic software. | Clear friction exists but baseline cost/error/time is weakly measured. | High-frequency or high-impact bottleneck with measured baseline. |
+| **2** | **AI Suitability** | Requires exact deterministic behavior, math, or finite business rules. | Requires extraction, drafting, classification, or bounded synthesis. | Requires semantic interpretation, ambiguous language, synthesis, or adaptive workflow support. |
+| **3** | **Data Readiness** | Data is inaccessible, unpermissioned, unrepresentative, or unowned. | Data exists but requires cleaning, lineage, permissions, or parser work. | Data is accessible, permissioned, representative, versioned, and governed. |
+| **4** | **Evaluation Clarity** | Success is subjective or undefined. | Human rubric exists but golden data and automated checks are incomplete. | Task-specific metrics, golden data, review process, and regression gates exist. |
+| **5** | **Risk and Reversibility** | Errors are high-impact, irreversible, or legally/safety critical. | Errors are contained but require human remediation. | Errors are reversible, detectable, low-impact, and bounded by controls. |
+| **6** | **User Tolerance** | Users demand exactness, instant response, and no review burden. | Users accept limited uncertainty or latency for clear benefit. | Users accept probabilistic assistance, review, async processing, or correction loops. |
+| **7** | **Integration Complexity** | Requires brittle UI automation, copy-paste, or legacy systems without APIs. | Standard APIs exist but permissions, transactions, or state boundaries are complex. | Clean APIs, state ownership, auth, and transaction boundaries exist. |
+| **8** | **Cost-to-Serve Viability** | Model, retrieval, tool, and review costs threaten margins. | Costs look plausible but depend on routing, caching, or usage controls. | Cost per verified task fits target margin with sensitivity analysis. |
+| **9** | **Operational Readiness** | No owner, telemetry, rollback, eval, or incident path. | Basic monitoring exists but behavior and quality tracking are immature. | Traceability, evals, runbooks, feedback loops, and owners exist. |
+| **10** | **Adoption Likelihood** | Users resist, workflow change is disruptive, or incentives conflict. | Users are interested but workflow/training burden is material. | Users actively want relief and feature slots into existing surfaces. |
+| **11** | **Governance Burden** | Regulated/high-impact use with weak lineage, audit, or policy controls. | Governance path exists but requires additional review or tooling. | Compliance, audit, access control, and review obligations are understood and supportable. |
+| **12** | **Strategic Value** | Novelty feature, no moat, easy to copy, weak business connection. | Improves workflow but depends heavily on generic third-party capability. | Builds durable advantage through proprietary workflow, data, distribution, or feedback loop. |
+
+### **Decision Bands**
+
+| Average Score / Condition | Decision |
+| :---- | :---- |
+| **Any fatal flaw present** | Stop, redesign, or route to deterministic/no-AI path. |
+| **Average below 2.5** | Reject or defer. |
+| **2.5–3.4** | Discovery experiment or readiness work. |
+| **3.5–4.2** | Bounded prototype or pilot. |
+| **Above 4.2 with no fatal flaws** | Production architecture design candidate. |
+
+### **Architectural Kill-Switches: Fatal Flaws**
+
+| Fatal Flaw | Hazard | Required Product Response |
+| :---- | :---- | :---- |
+| **No measured baseline** | Cannot prove improvement or ROI. | Measure current workflow time, cost, error, and user burden before building. |
+| **No evaluation path** | Model quality cannot be validated or regressed. | Build a seed golden set and review rubric proportional to risk. |
+| **Superior deterministic alternative** | AI adds cost and uncertainty where rules would work. | Route to conventional software design. |
+| **Unpermissioned or inaccessible data** | Creates privacy, legal, security, or hallucination risk. | Complete data governance and access work first. |
+| **High-impact irreversible action without human gate** | Probabilistic system can cause unrecoverable harm. | Block automation; require human approval and deterministic verification. |
+| **Unviable cost-to-serve** | Feature cannot survive production usage. | Redesign route, reduce scope, add caching/batching, or reject. |
+| **User review burden exceeds value** | AI shifts work rather than reducing it. | Redesign product surface or reject use case. |
+| **No operational owner** | Drift, failures, and incidents become orphaned. | Assign owner, runbook, telemetry, and review cadence before pilot. |
+
+## **7. The User Tolerance Model**
+
+User tolerance defines how much latency, uncertainty, correction work, review burden, and workflow interruption a user will accept in exchange for AI assistance. Product fit depends on the user’s task context, consequence of error, existing workflow habits, and perceived control.
+
+```text
+USER TOLERANCE =
+  latency tolerance
++ uncertainty tolerance
++ correction tolerance
++ review burden tolerance
++ consequence tolerance
++ workflow interruption tolerance
+```
+
+### **Tolerance Dimensions**
+
+| Dimension | Low Tolerance Looks Like | High Tolerance Looks Like | Product Implication |
+| :---- | :---- | :---- | :---- |
+| **Latency** | User expects instant or near-instant response. | User accepts async processing or long-running analysis. | Choose autocomplete, deterministic route, queue, or async review surface accordingly. |
+| **Uncertainty** | User needs exact, stable, repeatable outputs. | User accepts variation, drafts, alternatives, or exploration. | Use deterministic software for exactness; use AI for ambiguous or creative work. |
+| **Correction Work** | User will not edit, audit, or repair output. | User expects to review and refine. | Avoid draft-heavy surfaces for low-correction users. |
+| **Review Burden** | Verification is expensive or cognitively draining. | Verification is natural and already part of the workflow. | Use evidence displays and structured review only where review is valuable. |
+| **Consequence of Error** | Errors create legal, financial, safety, privacy, or trust damage. | Errors are low-impact and reversible. | Increase evidence, approval, and human authority as consequence rises. |
+| **Workflow Interruption** | User cannot leave primary task surface. | User can work in a dedicated review cockpit. | Inline UI for low interruption; separate cockpit for high-review workflows. |
+
+### **Product Surface Matrix**
+
+| User / Context | Tolerance Profile | Recommended Product Surface | Required Controls |
+| :---- | :---- | :---- | :---- |
+| **Writer / Creative Worker** | High variation tolerance; moderate latency tolerance; high edit tolerance. | Editor canvas, draft variants, rewrite controls. | Version history, easy undo, style controls, user-owned final text. |
+| **Software Engineer** | Low latency tolerance; low syntax-error tolerance; moderate correction tolerance. | Inline autocomplete, code-aware side panel, test-backed suggestions. | Compile/test hooks, diff view, dependency awareness, no blind execution. |
+| **Customer Support Agent** | Low false-fact tolerance; low-to-medium latency tolerance; moderate edit tolerance. | Suggested reply card, ticket summary, source-linked answer. | Human send action, citation to customer record, policy snippets, edit capture. |
+| **Corporate Lawyer / Compliance Reviewer** | Zero fake-citation tolerance; high review tolerance; accepts async analysis. | Evidence review cockpit, citation grid, risk checklist. | Source-of-record links, line-level evidence, independent human decision. |
+| **Financial Analyst** | Zero calculation tolerance; high audit tolerance; medium latency tolerance. | Exception checklist, deterministic calculation panel, AI explanation layer. | Calculations in code/database, audit trail, human approval for conclusions. |
+| **Operations Manager** | Low latency tolerance for triage; low manual review tolerance for benign events. | Background router, queue manager, escalation dashboard. | Confidence thresholds, exception queue, monitoring, rollback route. |
+| **Voice User** | Very low conversational latency tolerance; low tolerance for awkward pauses. | Streaming voice interface or hybrid voice/text surface. | Barge-in handling, confirmation for high-impact actions, transcript review. |
+
+### **Voice Latency as a Special Case**
+
+Realtime voice has unusually strict interaction constraints. Users experience long pauses as conversational failure. However, voice speed must not outrun safety, confirmation, or audit needs.
+
+| Voice Architecture | Strength | Risk | Product Rule |
+| :---- | :---- | :---- | :---- |
+| **Chained STT → LLM → TTS** | Modular, auditable, easier to govern. | Higher latency and turn-taking friction. | Use where auditability and control matter more than naturalness. |
+| **Native speech-to-speech** | Lower latency and more natural interaction. | Harder to inspect intermediate reasoning and policy state. | Use carefully for low-risk or strongly gated workflows. |
+| **Co-located modular stack** | Balances latency and auditability. | Higher infrastructure complexity. | Best for enterprise voice where both speed and control matter. |
+
+The product surface should be selected by user tolerance and consequence, not by fascination with the most conversational interface.
+
+## **8. The Evaluation Clarity Checklist**
+
+A probabilistic feature is not product-ready until the team can define what success means, how failure will be detected, and what happens when confidence drops. “It feels smarter” is not an evaluation architecture. It is a horoscope with a GPU bill.
+
+### **Evaluation Readiness Checklist**
+
+| # | Readiness Item | Required Artifact | Risk-Tier Notes |
+| :---- | :---- | :---- | :---- |
+| **1** | **Expected output defined** | Schema, rubric, acceptance criteria, or source-of-record predicate. | High-risk workflows require explicit invalid-output handling. |
+| **2** | **Human baseline measured** | Current task time, error rate, rework rate, cost, and user pain. | Without baseline, ROI and quality claims are guesswork. |
+| **3** | **Representative test set assembled** | Seed golden set or evaluation corpus proportional to risk. | Low-risk may start small; regulated/high-impact needs stronger expert validation. |
+| **4** | **Metrics selected by task type** | Extraction, retrieval, generation, tool-use, review, and business metrics. | LLM-as-judge may assist but should not be the only validator for high-risk tasks. |
+| **5** | **Failure taxonomy defined** | Hallucination, omission, citation failure, wrong action, unsafe output, privacy leak, bad routing, etc. | Failure classes should map to severity and remediation. |
+| **6** | **Escalation behavior specified** | Block, retry, ask clarification, route to human, degrade, or fail closed. | High-impact workflows require explicit human or deterministic gates. |
+| **7** | **Feedback capture designed** | Accept, reject, edit, override reason, source correction, user confidence. | Capture sensitive content through secure references and retention policy. |
+| **8** | **Release threshold defined** | Minimum quality, maximum failure rate, cost-to-serve ceiling, latency target. | Thresholds should be risk-tiered, not universal. |
+| **9** | **Production monitoring planned** | Live drift metrics, user correction trends, cost, latency, incident triggers. | Monitoring must connect to owner and runbook. |
+| **10** | **Business outcome mapped** | KPI tied to cycle time, throughput, error reduction, revenue, retention, or risk reduction. | Vanity engagement metrics are insufficient. |
+
+### **Metric Families by Task Type**
+
+| Task Type | Useful Metrics | Weak or Insufficient Metrics Alone |
+| :---- | :---- | :---- |
+| **Extraction** | Exact match, field-level precision/recall, schema validity, missing-field rate. | Overall thumbs-up score. |
+| **Classification / Routing** | Precision, recall, confusion matrix, escalation rate, false-negative cost. | Accuracy alone when classes are imbalanced. |
+| **Retrieval / RAG** | Context recall, citation validity, answer support, source permission correctness. | Similarity score alone. |
+| **Summarization / Drafting** | Claim support, omission rate, edit distance to accepted version, human acceptance reason. | BLEU/ROUGE alone. |
+| **Tool Use / Agentic Action** | Task completion, source-of-record verification, idempotency, action error rate. | Model-reported success. |
+| **Decision Support** | Evidence completeness, risk identification, calibration, human decision quality. | Persuasiveness or fluency. |
+| **Business Outcome** | Cycle-time reduction, rework reduction, throughput, margin, support deflection, risk reduction. | Session count or novelty engagement. |
+
+### **Evaluation Gate Outcomes**
+
+| Evaluation Result | Product Decision |
+| :---- | :---- |
+| **Clear improvement with acceptable risk and cost** | Proceed to pilot or production design. |
+| **Quality acceptable but cost too high** | Redesign routing, caching, model size, or task scope. |
+| **Quality promising but eval weak** | Continue evaluation design before pilot. |
+| **Output useful but verification burden too high** | Redesign product surface or reject. |
+| **High-risk failure modes unresolved** | Block production; add human gate or deterministic alternative. |
+| **No measurable baseline improvement** | Reject or return to workflow discovery. |
+
+Evaluation clarity is a prerequisite to product architecture. If the team cannot say what good means, it is not ready to build.
+
+## **9. The Data Readiness Model**
+
+AI product readiness is use-case-specific. An organization can have excellent analytics data and still be unready for a specific AI workflow if the needed sources are inaccessible, stale, unpermissioned, unrepresentative, or impossible to evaluate.
+
+Data readiness must be assessed before model selection. Poor data readiness does not merely reduce accuracy; it creates hallucination, leakage, evaluation failure, user distrust, and product abandonment.
+
+### **Core Dimensions of Data Readiness**
+
+| Dimension | Product Question | Required Evidence |
+| :---- | :---- | :---- |
+| **Availability** | Can the system access the required data at the moment of use? | API availability, latency, uptime, retrieval path, fallback behavior. |
+| **Permission and Governance** | Is the system allowed to use this data for this user, tenant, purpose, and model route? | ACL/RLS policy, data classification, consent/contract basis, tenant boundary. |
+| **Quality and Completeness** | Is the data accurate, deduplicated, complete, and fit for the task? | Data quality report, missingness analysis, duplicate detection, field validation. |
+| **Structure and Parseability** | Can the system reliably transform the data into usable context or features? | Schema, parser output, OCR/layout confidence, metadata, chunking policy. |
+| **Lineage and Provenance** | Can the system prove where the data came from and how it changed? | Source IDs, version history, transformation lineage, lifecycle state. |
+| **Freshness and Conflict State** | Is the data current, and what happens when sources disagree? | Freshness metadata, source-of-record hierarchy, conflict policy. |
+| **Representativeness** | Does the data match the real production population and edge cases? | Sampling analysis, historical cases, bias/coverage review. |
+| **Evaluation Data** | Does the team have examples with trusted target outputs? | Golden set, review rubric, expert-labeled cases, failure examples. |
+| **Retention and Deletion** | Can data be retained, archived, or deleted according to policy? | Retention schedule, deletion workflow, secure evidence references. |
+| **Operational Ownership** | Who owns fixes when data breaks? | Data owner, SLA, escalation path, incident workflow. |
+
+### **Data Readiness Maturity Model**
+
+| Level | Readiness State | Characteristics | Allowed Product Use | Required Next Step |
+| :---- | :---- | :---- | :---- | :---- |
+| **Level 0** | **Unknown** | Data sources, owners, permissions, and quality are undocumented. | No AI use. | Inventory sources and owners. |
+| **Level 1** | **Accessible but Ungoverned** | Data can be reached, but permissions, lineage, quality, or retention are unclear. | Offline exploration only with safe data. | Establish governance and classification. |
+| **Level 2** | **Prototype Ready** | Data sample exists; basic permissions and quality issues are known. | Local prototype or evaluation sandbox. | Build parser, lineage, and seed eval set. |
+| **Level 3** | **Pilot Ready** | Permissions, source lineage, parser behavior, and eval set exist for bounded scope. | Limited pilot with human review. | Add monitoring, freshness, and incident handling. |
+| **Level 4** | **Production Ready** | Data is governed, permissioned, versioned, monitored, and evaluable. | Production AI workflow within approved risk tier. | Continuous quality, drift, freshness, and access monitoring. |
+| **Level 5** | **Adaptive / Governed at Scale** | Data lifecycle, evals, access controls, telemetry, and feedback loops are automated. | Scaled production and agentic workflows where otherwise appropriate. | Periodic governance and product-value review. |
+
+### **Data Readiness Kill-Switches**
+
+| Kill-Switch | Product Decision |
+| :---- | :---- |
+| Required data is unpermissioned or legally unclear. | Stop. Complete governance review before model work. |
+| Required data is inaccessible at runtime. | Redesign workflow, API, or data pipeline. |
+| Source authority is unclear or conflicting. | Define source-of-record hierarchy before launch. |
+| Tenant isolation cannot be enforced. | Block production use. |
+| No evaluation examples exist. | Build seed evaluation set before pilot. |
+| Data is stale and freshness cannot be detected. | Restrict to low-risk or non-current workflows until fixed. |
+
+## **10. The Risk-to-Product Surface Map**
+
+Risk must shape the product surface. The same model behavior may be acceptable as a private draft, dangerous as a recommended decision, and unacceptable as an autonomous action. Product architecture should map risk tier to autonomy, interface, evidence, review, and execution authority.
+
+| Risk Tier | Failure Consequence | Maximum AI Authority | Recommended Product Surface | Evidence Requirement | Execution Control |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **Negligible** | Cosmetic, stylistic, or reversible formatting issue. | Suggest or apply reversible changes. | Inline suggestion, editor assist, low-friction autocomplete. | Basic trace and undo history. | User can undo or override immediately. |
+| **Low** | Minor inconvenience, benign misrouting, easily corrected internal error. | Delegate bounded task or suggest action. | Suggested draft card, queue route, structured form assist. | Confidence, reason, source field, or simple trace where useful. | Human can reject, edit, undo, or reroute. |
+| **Medium** | Meaningful business error, customer-facing mistake, or workflow delay. | Draft, classify, summarize, or recommend; human approves. | Side-by-side review, checklist, evidence-linked summary. | Source links, diff view, validation result, uncertainty display. | Explicit human approval before external send/write. |
+| **High** | Legal, financial, privacy, safety, or compliance exposure. | Decision support only; no autonomous execution. | Evidence cockpit, risk register, exception checklist. | Line-level grounding, source-of-record verification, audit trail. | Human decision required; override reason captured. |
+| **Extreme** | Physical harm, insolvency, irreversible transaction, regulated enforcement action, or systemwide security risk. | AI may organize evidence only; action authority blocked. | Manual control surface with optional evidence support. | Complete evidence package, deterministic checks, multi-party review. | Multi-human authorization or manual-only execution. |
+
+### **Surface Design Rules**
+
+| Rule | Meaning |
+| :---- | :---- |
+| **Higher risk requires less autonomy.** | Do not compensate for high consequence with prettier explanations. |
+| **Evidence must become more concrete as risk rises.** | Move from confidence hints to source links to source-of-record verification. |
+| **Execution is a separate permission.** | A model that can draft a decision is not automatically allowed to execute it. |
+| **Undo is not enough for high impact.** | Some actions require pre-approval, not post-hoc correction. |
+| **The UI must communicate system role.** | Users should know whether AI is suggesting, drafting, reviewing, deciding, or acting. |
+| **Trust repair must be designed.** | Corrections, appeals, overrides, and audit trails are product features, not support leftovers. |
+
+## **11. The ROI and Value Design Model**
+
+AI value is not created by generating outputs. It is created when the product improves a measurable workflow outcome after accounting for serving cost, verification cost, failure cost, adoption cost, and value capture. Time saved is not automatically money saved. A feature can reduce drafting time while increasing review burden, liability, support load, or infrastructure cost.
+
+### **Risk-Adjusted Value Formula**
+
+```text
+V_net =
+  V_captured
+- C_serve
+- C_verify
+- C_failure_expected
+- C_adoption
+- C_operational_change
+```
+
+Where:
+
+| Variable | Meaning | Examples |
+| :---- | :---- | :---- |
+| **V_captured** | Value the organization actually captures from the improved workflow. | Paid usage, reduced support tickets, faster cycle time converted to capacity, fewer errors, retained customers. |
+| **C_serve** | Cost to run the AI system. | Model calls, retrieval, tools, hosting, storage, telemetry, evals. |
+| **C_verify** | Cost of human or automated validation. | Review time, approval queues, expert audit, QA sampling. |
+| **C_failure_expected** | Expected remediation cost from model failures. | `P_failure × C_remediation`, including support, legal, refunds, rework, reputation, incidents. |
+| **C_adoption** | Cost to change behavior. | Training, workflow redesign, documentation, incentives, migration. |
+| **C_operational_change** | Cost to operate the new system over time. | Runbooks, monitoring, drift review, vendor management, governance, incident response. |
+
+### **Baseline-Delta Model**
+
+Product teams should calculate value as a delta from the current workflow:
+
+| Baseline Metric | AI System Metric | Value Question |
+| :---- | :---- | :---- |
+| Current cycle time | AI-assisted cycle time including review | Did total task time actually fall? |
+| Current error rate | AI error + human override + missed-error rate | Did quality improve after verification burden? |
+| Current cost per task | AI cost per verified task | Did unit economics improve? |
+| Current user effort | AI interaction + correction + review effort | Did the product reduce cognitive load? |
+| Current throughput | AI-assisted throughput | Did capacity increase without quality collapse? |
+| Current risk exposure | AI residual risk exposure | Did the system reduce or increase downside? |
+
+### **Value Capture Modes**
+
+| Value Mode | Valid When | Common Trap |
+| :---- | :---- | :---- |
+| **Cycle-Time Reduction** | Faster work creates usable capacity or revenue. | Saved minutes do not translate to actual economic value. |
+| **Error Reduction** | AI catches mistakes humans miss or standardizes quality. | AI creates new silent errors that are harder to detect. |
+| **Throughput Expansion** | Team can handle more cases without proportional staffing. | More throughput creates more downstream review bottlenecks. |
+| **Expertise Democratization** | Non-experts safely perform bounded expert-adjacent tasks. | Product hides uncertainty and encourages overconfidence. |
+| **Support Deflection** | Users self-serve accurately with fewer tickets. | Bad answers generate escalations and trust damage. |
+| **Risk Reduction** | System improves compliance, auditability, or detection. | Audit trail exists but decision quality does not improve. |
+| **Revenue Expansion** | AI unlocks a differentiated paid feature. | Feature is easy to copy or too costly to serve. |
+
+### **ROI Gate**
+
+| Condition | Product Decision |
+| :---- | :---- |
+| Positive value only under optimistic assumptions. | Run discovery or pilot; do not scale. |
+| Value depends on human review being unrealistically fast. | Redesign review surface or reject. |
+| Cost-to-serve exceeds margin envelope at expected usage. | Change route, scope, pricing, or reject. |
+| AI improves local metric but worsens downstream workflow. | Redesign workflow architecture. |
+| Value is measurable, captured, and robust under sensitivity analysis. | Proceed to production design. |
+
+## **12. The Cost-to-Serve Model**
+
+The long-term viability of an AI product is governed by unit economics. Aggregate cloud spend is too blunt. Product architecture needs cost per tenant, request, task, verified task, route, and customer segment.
+
+Static model rate cards should not be embedded as durable doctrine. Provider pricing changes, discounts vary, context tiers differ, cached-token pricing may apply, batch modes may reduce cost, and enterprise agreements can override public rates. Canon should preserve the cost model and rate-card snapshot method, not fossilize one month’s vendor catalog.
+
+### **Cost Allocation Formulas**
+
+```text
+Cost_per_tenant =
+  (allocated_infrastructure_cost
+ + allocated_model_api_cost
+ + allocated_storage_cost
+ + allocated_observability_cost
+ + allocated_support_and_review_cost)
+ / active_tenants
+```
+
+```text
+Cost_per_request =
+  request_model_cost
++ retrieval_cost
++ tool_cost
++ storage_and_trace_cost
++ safety_and_eval_cost
++ allocated_infrastructure_cost
+```
+
+```text
+Cost_per_verified_task =
+  total_cost_for_workflow_attempts
+  / count(verified_successful_tasks)
+```
+
+```text
+Cost_waste_ratio =
+  cost_of_failed_retried_rejected_or_unverified_work
+  / total_ai_workflow_cost
+```
+
+### **Cost Components**
+
+| Component | Examples | Product Question |
+| :---- | :---- | :---- |
+| **Input tokens** | Prompt, context, retrieved chunks, memory, tool descriptions. | Is context bloat driving cost? |
+| **Output tokens** | Generated answer, reasoning trace where billed, draft variants. | Is verbosity necessary for value? |
+| **Cached tokens** | Prefix cache, semantic cache, provider cache. | Are repeated workloads being deflected safely? |
+| **Retrieval** | Embeddings, vector search, reranking, document parsing. | Is evidence retrieval proportionate to task value? |
+| **Tool calls** | SaaS APIs, browser actions, database writes, external services. | Are tools bounded and verified? |
+| **Review labor** | Human approval, expert validation, QA sampling. | Does verification erase time savings? |
+| **Telemetry and evals** | Traces, logs, dashboards, regression runs, shadow evals. | Is operational overhead proportional to risk? |
+| **Retries and failures** | Repair loops, rejected outputs, failed tool calls. | Is poor reliability creating hidden COGS? |
+| **Infrastructure** | Hosted model pools, GPUs, queues, storage, networking. | Is capacity right-sized and utilized? |
+
+### **Rate-Card Snapshot Template**
+
+Use this table when evaluating a specific product decision. It should be dated and treated as a snapshot.
+
+| Field | Value |
+| :---- | :---- |
+| **Date checked** |  |
+| **Pricing source** |  |
+| **Provider** |  |
+| **Model / route name** |  |
+| **Input price per 1M tokens** |  |
+| **Cached input price per 1M tokens** |  |
+| **Output price per 1M tokens** |  |
+| **Batch discount** |  |
+| **Priority / latency premium** |  |
+| **Data residency or compliance premium** |  |
+| **Context window tier** |  |
+| **Tool or hosted feature charges** |  |
+| **Enterprise discount assumption** |  |
+| **Notes / caveats** |  |
+
+### **Cost-to-Serve Gate**
+
+| Cost Finding | Product Decision |
+| :---- | :---- |
+| Cost per verified task is below margin target and stable under expected usage. | Proceed. |
+| Cost is acceptable only with caching or routing assumptions. | Pilot with explicit telemetry and kill switch. |
+| Cost explodes under retries, long context, or agent loops. | Redesign architecture before launch. |
+| Cost exceeds willingness-to-pay or margin envelope. | Change pricing, scope, route, or reject. |
+| Cost cannot be measured at task level. | Build cost telemetry before scaling. |
+
+Cost-to-serve must be evaluated at the workflow level. A cheap model call can still produce an expensive product if it causes retries, review burden, bad routing, or user abandonment.
+
+## **13. AI Product Pattern Taxonomy**
+
+AI product patterns combine product surface, autonomy level, evaluation method, risk controls, and cost profile. A pattern is not just a UI shape. It defines what the system is allowed to do and how users verify, correct, trust, or reject its behavior.
+
+| Pattern | Best-Fit Workflows | Product Surface | Authority Level | Evaluation Method | Required Controls | Common Anti-Pattern |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| **Assistant** | Brainstorming, exploratory search, research support, low-risk drafting. | Chat or conversational workspace. | Suggests and explains. | Task success, answer support, user outcome, correction patterns. | Source display where factual, memory boundaries, clear limitations. | Using chat for structured tasks better served by forms or filters. |
+| **Copilot** | Code, writing, form completion, active task support. | Inline suggestions, ghost text, side panel. | Suggests; user accepts. | Acceptance rate, edit distance, compile/test result, task completion. | Easy reject/undo, context boundary, validation hooks. | Encouraging blind acceptance in high-risk work. |
+| **Autofill / Extraction** | Invoices, forms, CRM fields, receipts, structured document intake. | Field-level suggestions or extracted JSON. | Drafts structured fields. | Exact match, field-level F1, schema validity, missing-field rate. | Human review for material fields, schema validation, source highlights. | Direct database write without review or confidence gating. |
+| **Reviewer / Checker** | Contract review, compliance gap detection, security triage, QA. | Risk panel, checklist, highlighted evidence. | Flags issues; does not execute. | Precision/recall, false-negative rate, expert review. | Evidence links, severity labels, reviewer override capture. | Letting checker mutate the source artifact. |
+| **Retriever / Synthesizer** | Knowledge search, policy navigation, research synthesis. | Answer with citations, evidence packet, source panel. | Synthesizes from evidence. | Context relevance, citation validity, answer support, freshness. | Permission filters, citation verification, conflict disclosure. | Ingesting unmanaged corpora and trusting generated citations. |
+| **Triage / Router** | Support tickets, alerts, intake queues, lead routing. | Invisible or queue-facing classifier. | Routes or prioritizes bounded items. | Confusion matrix, escalation rate, false-negative cost. | Confidence threshold, manual queue, monitoring by class. | Using expensive reasoning models where metadata/rules suffice. |
+| **Advisor** | Planning, diagnosis support, risk analysis, expert decision support. | Evidence cockpit, option matrix, scenario panel. | Recommends and structures tradeoffs. | Expert rubric, decision quality, evidence completeness, calibration. | Human final decision, source-of-record links, uncertainty disclosure. | Allowing advisor to execute financial, legal, or medical actions. |
+| **Agent** | Bounded cross-application workflows, scheduling, information gathering, low-risk automation. | Task console, plan trace, approval checkpoints. | Executes bounded steps under policy. | Task completion, tool success, verification, intervention rate. | Tool contracts, idempotency, action verification, loop and budget caps. | Unmonitored agent with broad read/write access. |
+| **Background Automation** | Spam filtering, benign ranking, deduplication, low-risk routing. | Mostly invisible with settings/appeal surface. | Acts automatically inside bounded scope. | A/B tests, precision/recall, complaint rate, drift monitoring. | User override, audit trace, fallback rules, monitoring. | Hidden manipulation with no user control or appeal. |
+| **Evidence-Only AI** | Extreme-risk review, regulated decisions, safety-critical analysis. | Read-only evidence organization surface. | Organizes evidence only; cannot decide or execute. | Evidence completeness, source validity, reviewer usefulness. | Manual authority, deterministic controls, multi-party approval where required. | Treating generated synthesis as authorization. |
+
+Product patterns should be selected after use-case scoring, risk mapping, and user tolerance analysis. The same model can power multiple patterns, but each pattern grants different authority and requires different controls.
+
+## **14. The No-AI Decision Framework**
+
+The defining characteristic of an expert-level AI product architect is the ability to confidently identify when a proposed feature must *not* use artificial intelligence. Rejecting AI in favor of deterministic, robust alternatives is a marker of architectural success, preventing major infrastructure expenses, operational risk, and long-term maintenance burdens.4
+
+### **Deterministic & Relational Triggers**
+
+A proposed product capability must be routed to traditional software engineering development queues (fully bypassing machine learning pipelines) if it matches any of the triggers detailed below:
+
+| Deterministic Trigger Type | Specific Core Criteria | Optimal Software Alternative | Architectural Justification |
+| :---- | :---- | :---- | :---- |
+| **Exactness Requirements** | Task outputs require absolute mathematical accuracy or adhere to strict compliance rules. | Relational SQL database lookups, transactional rules engines, standard arithmetic calculators.4 | Probabilistic systems operate with statistical variance; they cannot guarantee exact calculations or deterministic logic. |
+| **High Validation Costs** | Verifying if a model output is correct is so cognitively demanding that it matches or exceeds the cost of manual work.9 | Standard templates, structured boilerplate builders, and relational database validation fields. | "Verification Debt" erodes the product's entire value proposition, leading to user fatigue and system abandonment.9 |
+| **Low Data Readiness** | The required training, fine-tuning, or RAG context data is absent, un-structured, or legally unpermissioned.21 | Clean web form design, structured API metadata capture, and manual data-entry validation flows.22 | AI cannot synthesize data out of thin air; clean structures must exist before deploying cognitive capabilities.22 |
+| **Ultra-Low Latency Needs** | Task execution times must remain strictly sub-50ms (e.g., search indexing, standard data table sorting).20 | Standard indexing algorithms, relational search indexing, and client-side JavaScript filters.5 | Large model inference, network routing, and retrieval runs require massive compute budgets that cannot fit within sub-50ms constraints.20 |
+| **Friction Out of System** | Process delays are driven by bad organizational incentives, slow human approvals, or outdated software APIs.4 | System process re-engineering, REST API pipeline construction, and user incentive redesigns.4 | Inserting a model on top of a structurally broken process adds complexity without fixing the underlying system constraints.4 |
+| **Unviable Gross Margins** | The long-context token, hosting, and retrieval compute costs represent > 30% of the task's transaction value.8 | Traditional, lightweight programming scripts, localized regex parsers, and static templates.8 | Unit economic viability is the backbone of sustainable product growth; unviable features must be built deterministically.8 |
+
+## **15. Product Discovery and Experiment Design Model**
+
+Before scaling production AI, product teams should run discovery experiments that validate workflow pain, user tolerance, data readiness, evaluation clarity, adoption behavior, and cost-to-serve. AI experiments must test the product system, not merely the model demo.
+
+### **Concierge vs. Wizard of Oz**
+
+| Experiment | User Knows What? | Best For | Cannot Prove | Governance Constraint |
+| :---- | :---- | :---- | :---- | :---- |
+| **Concierge Test** | User knows a human is delivering the service manually. | Validating whether the proposed value actually matters. | Whether users will trust or adopt an automated interface. | Be clear that the service is human-delivered. |
+| **Wizard of Oz Test** | User experiences a simulated automated interface while humans perform some backend work. | Validating interface behavior, willingness to use, trust, and workflow fit. | Real model performance, latency, cost, or automation reliability. | Must respect research ethics, privacy, consent, safety, and domain risk. |
+| **Hybrid Model-Assisted Pilot** | User or operator knows AI is assisting but bounded by human review. | Learning model limits and correction patterns safely. | Fully autonomous scalability. | Capture edits, failures, and review outcomes with appropriate retention. |
+| **Offline Evaluation** | No live user interaction. | Measuring model/task performance on historical cases. | Adoption, workflow fit, or user tolerance. | Use permissioned, representative data. |
+| **Internal Controlled Pilot** | Internal users know they are testing a bounded system. | Measuring real workflow impact with limited blast radius. | General market adoption. | Monitor quality, cost, feedback, and incident signals. |
+
+Wizard of Oz experimentation is not a license to deceive users in high-impact contexts. The higher the consequence, the more explicit the disclosure, consent, and review controls must be.
+
+### **Discovery Experiment Taxonomy**
+
+| Experiment Type | What It Proves | Key Metrics | Best Exit Decision |
+| :---- | :---- | :---- | :---- |
+| **Workflow Observation** | Where bottlenecks, workarounds, and hidden labor exist. | Cycle time, handoff count, rework, interruption, user frustration. | Redesign workflow or select target task. |
+| **User Interview** | Whether pain is real and meaningful. | Pain frequency, current workaround, willingness to change. | Continue discovery or reject weak pain. |
+| **Concierge MVP** | Whether the proposed service creates value. | Retention, willingness to pay, qualitative delight, task completion. | Define product surface and minimum feature set. |
+| **Wizard of Oz MVP** | Whether users behave as expected inside the simulated surface. | Drop-off, trust breakdowns, choices, correction behavior. | Redesign interface or proceed to prototype. |
+| **Hybrid Draft-and-Approve Pilot** | Where model output helps, fails, or burdens the user. | Accept rate, edit rate, rejection rate, time saved, failure taxonomy. | Build evals and route policy. |
+| **Offline Model Eval** | Whether candidate models/routes meet task thresholds. | Precision, recall, groundedness, schema validity, cost, latency. | Select route or reject model approach. |
+| **Internal Pilot** | Whether workflow, operations, and adoption survive real use. | Task delta, quality delta, cost-to-serve, incident rate, user retention. | Proceed, redesign, or stop. |
+
+### **Experiment Design Rules**
+
+| Rule | Meaning |
+| :---- | :---- |
+| **Test one uncertainty at a time where possible.** | Do not mix model quality, UI design, pricing, and workflow change into one unreadable experiment. |
+| **Capture correction data.** | Edits and rejections are product gold; they reveal evaluation cases and workflow mismatch. |
+| **Measure total task time.** | Draft speed is irrelevant if review time grows. |
+| **Use real-enough data safely.** | Synthetic demos often hide permission, format, edge-case, and messiness problems. |
+| **Protect users from high-impact simulation.** | Do not simulate autonomous authority in contexts where users could be harmed or misled. |
+| **Define stop conditions.** | Experiments should be able to kill bad ideas cleanly. |
+
+## **16. The Adoption and Change Model**
+
+AI product success is not defined at launch. It is defined when users integrate the system into durable work habits without overtrusting, ignoring, bypassing, or being cognitively dulled by it. Adoption is a behavioral architecture problem.
+
+### **Adoption States and Interventions**
+
+| User State | Observable Signals | Product Risk | Product Intervention | Change Management Response |
+| :---- | :---- | :---- | :---- | :---- |
+| **Healthy Calibration** | Users accept useful suggestions, reject bad ones, and understand system limits. | Low. | Maintain evidence, correction, and feedback surfaces. | Reinforce best practices and share quality wins. |
+| **Overtrust / Complacency** | Users accept outputs with little review; errors propagate downstream. | Silent quality collapse. | Require evidence display, independent judgment step, review prompts, confidence calibration. | Train users on failure modes; reward error catching. |
+| **Undertrust / Rejection** | Users ignore feature, revert to manual work, or disable suggestions. | No adoption; wasted investment. | Improve transparency, reliability feedback, undo, and user control. | Involve users in rubric design and pilot iteration. |
+| **Motivational Withdrawal** | Users become passive reviewers and stop thinking critically. | Reduced expertise and poor final quality. | Use sequential teaming: human frames problem first, AI assists second. | Redefine roles around expert judgment and final accountability. |
+| **Workflow Circumvention** | Users move to unapproved consumer tools or manual side channels. | Shadow AI, data leakage, inconsistent process. | Put useful AI inside the actual workflow with lower friction. | Improve approved tools and procurement path. |
+| **Correction Fatigue** | Users spend too much time editing or auditing outputs. | Abandonment or rubber-stamping. | Reduce scope, improve evals, show diffs, route only high-confidence cases. | Reassess value model and staffing assumptions. |
+| **Status Threat** | Users fear replacement, deskilling, or surveillance. | Resistance and sabotage. | Make AI role explicit: assistive, bounded, accountable. | Communicate role changes, incentives, and career path. |
+
+### **Adoption Metrics**
+
+| Metric | What It Shows |
+| :---- | :---- |
+| **Activation Rate** | Whether users try the feature after exposure. |
+| **Repeat Use** | Whether the feature becomes habit. |
+| **Acceptance / Rejection / Edit Rate** | Whether suggestions are useful and appropriately trusted. |
+| **Time-to-Verified-Completion** | Whether total task time improves after review. |
+| **Override Reason Distribution** | Why users reject or repair output. |
+| **Manual Bypass Rate** | Whether users leave the approved workflow. |
+| **Error Catch Rate** | Whether humans remain meaningfully engaged. |
+| **Support / Complaint Rate** | Whether the product creates confusion or harm. |
+| **Skill Retention Signal** | Whether users can still perform core tasks without AI when needed. |
+
+### **Change Model Requirements**
+
+| Requirement | Purpose |
+| :---- | :---- |
+| **Role clarity** | Users must know whether AI drafts, reviews, routes, recommends, or acts. |
+| **Accountability clarity** | Human and organizational responsibility must be explicit. |
+| **Training on failure modes** | Users need examples of plausible AI errors, not just feature demos. |
+| **Feedback loops** | Corrections must improve evals, routing, prompts, or product design. |
+| **Incentive alignment** | Users should be rewarded for quality and judgment, not blind throughput. |
+| **Shadow-AI alternative** | Approved tools must be good enough that users do not flee to unsanctioned ones. |
+| **Periodic recalibration** | Adoption patterns should be reviewed as model behavior, workload, and user skill change. |
+
+Adoption is not “users clicked the sparkle button.” Adoption is sustained, safe, value-producing integration into real work.
+
+## **17. Cross-Canon Handoff Map**
+
+AI-ENG-AF opens the Product, Business, and Organizational Architecture volume. It acts as the product gate before implementation: selecting use cases, rejecting bad fits, mapping workflows, defining value, choosing product surfaces, and determining whether AI belongs at all.
+
+AF consumes technical constraints from earlier canon layers and hands product decisions forward into business model, adoption, and enterprise transformation architecture.
+
+### **Upstream Canon Inputs**
+
+| Canon Report | What AF Consumes | Product Architecture Use |
+| :---- | :---- | :---- |
+| **AI-ENG-B — Context Architecture** | Context windows, memory, state, authority, and prompt/context boundaries. | Determines whether the workflow can fit into safe and usable context structures. |
+| **AI-ENG-D — Corpus Engineering** | Data ownership, provenance, lifecycle, metadata, and corpus quality. | Evaluates data readiness and corpus suitability for product use. |
+| **AI-ENG-E — Retrieval Pipeline** | Retrieval feasibility, citation support, ranking, and evidence quality. | Determines whether RAG can support the user promise. |
+| **AI-ENG-F — Freshness and Conflict Detection** | Source freshness, conflicts, and source-of-record hierarchy. | Determines whether product outputs can stay current and trustworthy. |
+| **AI-ENG-J — Throughput Mechanics** | Latency, batching, queueing, token throughput. | Shapes user tolerance, cost-to-serve, and surface choice. |
+| **AI-ENG-K — Weight Dynamics** | Model size, quantization, adaptation, capability boundaries. | Informs model suitability and route-class selection. |
+| **AI-ENG-L — Serving Architecture** | Routing, provider profiles, fallback, caching, scale. | Informs feasibility, latency, cost, and operational readiness. |
+| **AI-ENG-N — Tool Contracts** | Tool schemas, side effects, auth, idempotency. | Determines whether agentic or tool-using product patterns are viable. |
+| **AI-ENG-O — Action Verification** | State verification, action ledgers, false-success prevention. | Defines whether automation, delegation, or human approval is required. |
+| **AI-ENG-S — Production Pathologies** | Common AI failure modes and brittle-chain behavior. | Feeds fatal-flaw and risk-surface design. |
+| **AI-ENG-T — Boundary Defense** | Tenant isolation, prompt injection, egress, policy hierarchy. | Determines product risk tier and required security constraints. |
+| **AI-ENG-V — Resource Abuse** | Cost bombs, loop controls, denial-of-wallet. | Feeds cost-to-serve and agent pattern constraints. |
+| **AI-ENG-W — UX Resilience** | Degraded modes, continuity, fallback, user state. | Shapes user tolerance and failure UX. |
+| **AI-ENG-X — User Trust** | Transparency, calibration, contestability, evidence display. | Shapes product surface, trust repair, and adoption design. |
+| **AI-ENG-Y — Human Review** | Review queues, escalation, reviewer quality, approval patterns. | Determines augmentation, delegation, and decision-support boundaries. |
+| **AI-ENG-Z — Telemetry** | Traceability, cost, latency, behavior, user correction metrics. | Defines product success measurement and operational readiness. |
+| **AI-ENG-AA — Evaluation Architecture** | Golden sets, eval gates, rubrics, regression testing. | Determines evaluation clarity and launch readiness. |
+| **AI-ENG-AC — AI Operations** | Incident response, runbooks, rollback, containment. | Determines whether product risks can be operated after launch. |
+| **AI-ENG-AD — Governance Architecture** | Policy, audit, procurement, accountability, risk classification. | Defines compliance burden, approval path, and product authority limits. |
+| **AI-ENG-AE — Sustainable AI** | Energy, carbon, routing, lifecycle, and cost of compute. | Adds sustainability and resource efficiency to product fit and value design. |
+
+### **Forward Handoff to Volume 11**
+
+| Target Report | AF Concept Handed Forward | Downstream Use |
+| :---- | :---- | :---- |
+| **AI-ENG-AG — Business Model, Pricing & Packaging Design** | Cost-to-serve, value model, use-case score, route class, margin risk. | Pricing tiers, usage limits, packaging, COGS controls, expansion strategy. |
+| **AI-ENG-AH — Organizational Adoption, Training & Change** | User tolerance, adoption hazards, automation posture, workflow disruption. | Training, incentive design, role redesign, change management, skill retention. |
+| **AI-ENG-AI — Enterprise Transformation Reference Architecture** | Workflow fit maps, product pattern, integration constraints, no-AI decisions. | Enterprise rollout patterns, system integration, API architecture, governance pathways. |
+| **AI-ENG-AJ — Reference Architectures** | Approved product patterns and decision gates. | Reusable implementation blueprints and golden paths. |
+
+### **Core Handoff Rule**
+
+AF must happen before implementation. If the product architecture gate cannot identify workflow pain, AI suitability, data readiness, evaluation clarity, risk posture, user tolerance, cost-to-serve, and measurable value, the correct engineering action is not “try a better model.”
+
+The correct action is to stop, redesign, run discovery, or choose No-AI.
+
+#### **Works cited**
+
+1. Complete Guide to Product Discovery: Methods, Frameworks, - IdeaPlan, accessed June 14, 2026, [https://www.ideaplan.io/guides/the-complete-guide-to-product-discovery](https://www.ideaplan.io/guides/the-complete-guide-to-product-discovery)  
+2. What Is AI Product Management? | Galileo, accessed June 14, 2026, [https://galileo.ai/blog/ai-product-management-guide](https://galileo.ai/blog/ai-product-management-guide)  
+3. AI Product Management Roadmap & Frameworks: Step-by-Step Guide - Voltage Control, accessed June 14, 2026, [https://voltagecontrol.com/articles/ai-product-management-roadmap-frameworks-step-by-step-guide/](https://voltagecontrol.com/articles/ai-product-management-roadmap-frameworks-step-by-step-guide/)  
+4. Workflow Redesign and Human-AI Collaboration - Umbrex, accessed June 14, 2026, [https://umbrex.com/resources/chief-ai-officer-playbook/workflow-redesign-and-human-ai-collaboration/](https://umbrex.com/resources/chief-ai-officer-playbook/workflow-redesign-and-human-ai-collaboration/)  
+5. Technology Will Make the Pace of Change Even Faster - Articles - Advisor Perspectives, accessed June 14, 2026, [https://www.advisorperspectives.com/articles/2024/12/30/technology-will-make-the-pace-of-change-even-faster](https://www.advisorperspectives.com/articles/2024/12/30/technology-will-make-the-pace-of-change-even-faster)  
+6. Thinks 1499 – Rajesh Jain, accessed June 14, 2026, [https://rajeshjain.com/2025/02/07/thinks-1499/](https://rajeshjain.com/2025/02/07/thinks-1499/)  
+7. Austrian economics and AI scaling - Marginal REVOLUTION, accessed June 14, 2026, [https://marginalrevolution.com/marginalrevolution/2024/11/austrian-economics-and-ai-scaling.html](https://marginalrevolution.com/marginalrevolution/2024/11/austrian-economics-and-ai-scaling.html)  
+8. Kubernetes FinOps: SaaS Unit Economics | HostingX, accessed June 14, 2026, [https://hostingx.co.il/articles/kubernetes-finops-unit-economics](https://hostingx.co.il/articles/kubernetes-finops-unit-economics)  
+9. Structuring Human-AI Productive Interdependence by Strategic Level of Automation Selection for Qualitative Inquiry - arXiv, accessed June 14, 2026, [https://arxiv.org/html/2605.27634v1](https://arxiv.org/html/2605.27634v1)  
+10. Structuring Human-AI Productive Interdependence by Strategic Level of Automation Selection for Qualitative Inquiry - arXiv, accessed June 14, 2026, [https://arxiv.org/pdf/2605.27634](https://arxiv.org/pdf/2605.27634)  
+11. Cost-to-Serve in AI: The Most Overlooked Metric for Sustainable Margins - Mavvrik: AI, accessed June 14, 2026, [https://www.mavvrik.ai/blog/cost-to-serve-in-ai/](https://www.mavvrik.ai/blog/cost-to-serve-in-ai/)  
+12. What Is AI Agent Observability? Why Cost Is The Signal You're Missing - CloudZero, accessed June 14, 2026, [https://www.cloudzero.com/blog/ai-agent-observability/](https://www.cloudzero.com/blog/ai-agent-observability/)  
+13. Human–AI Collaboration Across Decision Support, Autonomous ..., accessed June 14, 2026, [https://www.mdpi.com/2071-1050/18/11/5313](https://www.mdpi.com/2071-1050/18/11/5313)  
+14. Wizard of Oz | The Real Startup Book - Kromatic, accessed June 14, 2026, [https://kromatic.com/real-startup-book/4-evaluative-product-experiments/wizard-of-oz/](https://kromatic.com/real-startup-book/4-evaluative-product-experiments/wizard-of-oz/)  
+15. LLM Training Data Lineage: Provenance, Tracking & Compliance - Atlan, accessed June 14, 2026, [https://atlan.com/know/training-data-lineage-for-llms/](https://atlan.com/know/training-data-lineage-for-llms/)  
+16. The Impact of AI Execution Autonomy on User Task Performance and Intervention Behavior in Digital Workflows - RPubs, accessed June 14, 2026, [https://rpubs.com/Ladan/ai-execution-autonomy](https://rpubs.com/Ladan/ai-execution-autonomy)  
+17. Toward Human-AI Complementarity Across Diverse Tasks - arXiv, accessed June 14, 2026, [https://arxiv.org/html/2605.04070v1](https://arxiv.org/html/2605.04070v1)  
+18. A Model for Types and Levels of Human Interaction with Automation - SlideServe, accessed June 14, 2026, [https://www.slideserve.com/hila/a-model-for-types-and-levels-of-human-interaction-with-automation](https://www.slideserve.com/hila/a-model-for-types-and-levels-of-human-interaction-with-automation)  
+19. [論文評述] Edge Intelligence Optimization for Large Language Model, accessed June 14, 2026, [https://www.themoonlight.io/tw/review/edge-intelligence-optimization-for-large-language-model-inference-with-batching-and-quantization](https://www.themoonlight.io/tw/review/edge-intelligence-optimization-for-large-language-model-inference-with-batching-and-quantization)  
+20. The enterprise voice AI split: Why architecture — not model quality — defines your compliance posture | VentureBeat, accessed June 14, 2026, [https://venturebeat.com/security/the-enterprise-voice-ai-split-why-architecture-not-model-quality-defines](https://venturebeat.com/security/the-enterprise-voice-ai-split-why-architecture-not-model-quality-defines)  
+21. An Introduction to AI-Ready Data - Alexander Thamm [at], accessed June 14, 2026, [https://www.alexanderthamm.com/en/blog/ai-ready-data/](https://www.alexanderthamm.com/en/blog/ai-ready-data/)  
+22. Data Readiness Assessment for AI: Checklist, Framework, and Scoring, accessed June 14, 2026, [https://agility-at-scale.com/ai/data/data-readiness-assessment-for-ai/](https://agility-at-scale.com/ai/data/data-readiness-assessment-for-ai/)  
+23. Product Frameworks: AI - Productboard, accessed June 14, 2026, [https://www.productboard.com/wp-content/uploads/2024/01/AI-Product-Framework-Guide.pdf](https://www.productboard.com/wp-content/uploads/2024/01/AI-Product-Framework-Guide.pdf)  
+24. The AI-shaped hole in personal finance – Z-Connect by Zerodha, accessed June 14, 2026, [https://zerodha.com/z-connect/subtext/the-ai-shaped-hole-in-personal-finance](https://zerodha.com/z-connect/subtext/the-ai-shaped-hole-in-personal-finance)  
+25. Human-Centered Artificial Intelligence: Reliable, Safe & Trustworthy - arXiv, accessed June 14, 2026, [https://arxiv.org/pdf/2002.04087](https://arxiv.org/pdf/2002.04087)  
+26. Designing Human-Automation Interaction: a new level of Automation Taxonomy - HFES Europe, accessed June 14, 2026, [https://www.hfes-europe.org/wp-content/uploads/2014/06/Save.pdf](https://www.hfes-europe.org/wp-content/uploads/2014/06/Save.pdf)  
+27. Chapter: 6 Human-AI Team Interaction - National Academies of Sciences, Engineering, and Medicine, accessed June 14, 2026, [https://www.nationalacademies.org/read/26355/chapter/8](https://www.nationalacademies.org/read/26355/chapter/8)  
+28. Preparing Data for AI and Machine Learning: A Production-Ready Playbook - instinctools, accessed June 14, 2026, [https://www.instinctools.com/blog/preparing-data-for-ml-ai/](https://www.instinctools.com/blog/preparing-data-for-ml-ai/)  
+29. LLM API Pricing Comparison In 2026: Every Major Model, Ranked By Cost - CloudZero, accessed June 14, 2026, [https://www.cloudzero.com/blog/llm-api-pricing-comparison/](https://www.cloudzero.com/blog/llm-api-pricing-comparison/)  
+30. Page 97 – Marketing, Entrepreneurship, India. Updated daily. - Rajesh Jain, accessed June 14, 2026, [https://rajeshjain.com/page/97/?source=user_profile---------0-](https://rajeshjain.com/page/97/?source=user_profile---------0-)  
+31. The Top AI Models And Trends Shaping SaaS in 2026 - CloudZero, accessed June 14, 2026, [https://www.cloudzero.com/blog/top-ai-models/](https://www.cloudzero.com/blog/top-ai-models/)  
+32. How SaaS Companies Can Profitably Price AI Agents - CloudZero, accessed June 14, 2026, [https://www.cloudzero.com/blog/ai-agent-pricing-models/](https://www.cloudzero.com/blog/ai-agent-pricing-models/)  
+33. AI Product Discovery Frameworks Overview - Productboard, accessed June 14, 2026, [https://www.productboard.com/blog/ai-product-discovery-frameworks/](https://www.productboard.com/blog/ai-product-discovery-frameworks/)  
+34. Concierge vs. Wizard of Oz Experiments - Learning Loop, accessed June 14, 2026, [https://learningloop.io/blog/concierge-vs-wizard-of-oz](https://learningloop.io/blog/concierge-vs-wizard-of-oz)  
+35. Two MVPs every product manager should know, and how to tell them apart, accessed June 14, 2026, [https://www.mindtheproduct.com/wizard-of-oz-vs-concierge-testing-behind-the-curtain-or-behind-the-desk/](https://www.mindtheproduct.com/wizard-of-oz-vs-concierge-testing-behind-the-curtain-or-behind-the-desk/)  
+36. Wizard of Oz Experiment: Definition, How It Works, Examples, Tools, Pros and Cons, accessed June 14, 2026, [https://learningloop.io/plays/wizard-of-oz](https://learningloop.io/plays/wizard-of-oz)  
+37. Can LLM Agents Simulate Customers to Evaluate Agentic-AI-based Shopping Assistants?, accessed June 14, 2026, [https://arxiv.org/html/2509.21501v1](https://arxiv.org/html/2509.21501v1)  
+38. Modeling the Dynamic Agency in Human-AI Collaboration - DRS Digital Library, accessed June 14, 2026, [https://dl.designresearchsociety.org/cgi/viewcontent.cgi?article=1608&context=iasdr](https://dl.designresearchsociety.org/cgi/viewcontent.cgi?article=1608&context=iasdr)
+
+---
+
+# AI-ENG-AG — Adoption Systems - Training, Feedback Loops & Change Management
+
+## **The Sociotechnical Architecture of Enterprise AI Adoption**
+
+AI adoption systems represent the structural, organizational, and psychological transmission layer that converts a valid artificial intelligence product into a durable, safe, and value-producing human workflow. Within high-dimensional enterprise product architectures, a foundational doctrine governs this transition: AI adoption is not achieved by access. It is achieved by trained, incentivized, supported, feedback-connected humans using AI inside redesigned workflows with clear boundaries, visible value, trusted escalation paths, and correction loops that improve the system over time.1 Consequently, the primary query for an enterprise program owner is not whether users have been provisioned license access, but rather whether those users possess the structural support and behavioral telemetry required to know when to use the AI system, when to refuse it, how to verify its outputs, how to correct its failures, and how the organization systematically rewards safe, useful adoption rather than blind, complacent usage.  
+To establish this architecture, organizations must transition from a pure technology deployment mindset toward sociotechnical and job design frameworks.2 Job design acts as the structural enabler of technology adoption by shaping how tasks, autonomy, and feedback are allocated across human and machine actors.4 When integrating intelligent technologies, work design parameters must be intentionally configured to prevent technology from standardizing human labor into highly specialized, deskilled micro-tasks, which systematically erodes cognitive motivation and professional agency.4 Instead, system designers should leverage AI to enhance skill variety—the degree to which a job requires a diverse range of cognitive activities, such as drafting, synthesis, ideation, troubleshooting, and iterative refinement.4 High skill variety creates repeated, high-value use cases for generative models, which naturally increases the frequency and depth of tool integration.4
+
+### **Parker & Grote Work Design Parameters in AI Workflows**
+
+| Work Design Parameter | Legacy Technology Pattern | Generative AI Risk State | Optimized AI Adoption State |
+| :---- | :---- | :---- | :---- |
+| **Skill Variety** 4 | Low variety; highly repetitive data entry or administrative execution.4 | Hyper-specialization; human reduced to a passive, repetitive "button-clicker" verifying automated outputs.4 | High cognitive variety; human orchestrates multi-agent systems, focusing on edge-case exceptions and strategic design.4 |
+| **Task Discretion & Autonomy** 4 | Rigid execution paths dictated by deterministic legacy software rules.4 | Algorithmic management; machine-driven pacing, surveillance, and automated performance ranking.4 | Dynamic authority allocation; user maintains ultimate veto rights, choosing when and how to delegate tasks to AI.5 |
+| **Feedback Loop Integration** 4 | Delayed performance metrics or manual supervisory reviews.4 | Algorithmic feedback loops optimized for surveillance and punitive enforcement.4 | Bidirectional, real-time feedback; telemetry tracks edit distance to improve RAG accuracy and reward human insight.9 |
+| **Task Significance** 4 | Human executes isolated micro-tasks with limited visibility into systemic outcomes.4 | Demoralization; human feels their intellectual contributions are trivialized by automated generators.5 | Outcome-based significance; human is accountable for context calibration, ethical alignment, and ultimate output quality.3 |
+
+To guide the enterprise toward a mature adoption state, the organization must assess its progress against the four stages of the MIT Center for Information Systems Research (CISR) AI Maturity Model.12 Moving through these stages requires deliberate investments in both technical capabilities and human enablement systems:
+
+### **MIT CISR AI Maturity Model Progression**
+
+To guide enterprise adoption, organizations can assess progress against the MIT CISR Enterprise AI Maturity Model. The model describes four broad stages: **Experiment and Prepare**, **Build Pilots and Capabilities**, **Develop AI Ways of Working**, and **Become AI Future Ready**. These stages should not be treated as a software deployment ladder alone. Each stage requires both technical capability and human adoption capability.
+
+| Maturity Stage | Behavioral Characteristics | Adoption System Capability | Technical Capability | Change Management Intervention |
+| :---- | :---- | :---- | :---- | :---- |
+| **Stage 1: Experiment and Prepare** | Isolated experimentation; inconsistent prompt sharing; uneven literacy; unclear boundaries. | Basic AI literacy, acceptable-use policy, early role-specific examples. | Sandboxes, limited data access, initial model/tool exploration. | Establish steering group, define safe-use rules, identify priority workflows, and create baseline training. |
+| **Stage 2: Build Pilots and Capabilities** | Bounded pilots; emerging champions; early workflow redesign; growing demand for support. | Champion network, pilot playbooks, feedback capture, initial support channel. | Approved tools, basic RAG or workflow integrations, early evals and telemetry. | Run structured pilots, protect learning time, define success metrics, and capture corrections. |
+| **Stage 3: Develop AI Ways of Working** | AI becomes embedded in daily workflows; roles and review habits change; teams learn when not to use AI. | Role-specific training, manager coaching, review rituals, adoption telemetry, escalation paths. | Production routes, policy gates, operational monitoring, evaluation loops. | Redesign jobs and incentives around verified outcomes, not raw AI usage. |
+| **Stage 4: Become AI Future Ready** | Organization continuously updates workflows, roles, governance, and platforms as AI capability changes. | Adaptive learning system, mature change network, skill-preservation practices, institutional feedback loops. | Governed platform, reusable patterns, lifecycle management, cross-system telemetry. | Tie AI adoption to strategy, workforce planning, governance, and continuous improvement. |
+
+The adoption lesson is that maturity is not measured by license count. It is measured by whether people, workflows, data, governance, training, and incentives have changed enough for AI to produce durable value.
+
+## **The Psychological Dimensions of Change: Identity, Status, and Resistance**
+
+AI adoption is identity-relevant. Intelligent systems do not merely change tools; they change how people understand their expertise, status, autonomy, and value inside the organization. Resistance should therefore be treated as diagnostic signal, not as laziness, irrationality, or simple anti-technology sentiment.
+
+When AI enters a workflow, employees may reasonably ask:
+
+```text
+What part of my work is still mine?
+What judgment am I expected to retain?
+Will this tool make me better, replace me, monitor me, or deskill me?
+Who is accountable when the system is wrong?
+Will productivity gains become relief, or just more work?
+```
+
+A mature adoption system answers those questions structurally through role design, workflow boundaries, governance, training, incentives, and support.
+
+### **Identity-Relevant Adoption Concerns**
+
+| Concern | What It Means | Adoption Risk | Product / Change Response |
+| :---- | :---- | :---- | :---- |
+| **Autonomy Concern** | Users fear losing professional discretion, pacing, or judgment. | Passive resistance, tool avoidance, low-quality compliance. | Preserve human authority where judgment matters; make delegation voluntary or bounded where possible. |
+| **Skill Erosion Concern** | Users fear that expertise will decay or become irrelevant. | Under-use, resentment, anxiety, or overdependence. | Preserve skill-building tasks, unassisted practice, critique steps, and expert calibration roles. |
+| **Status Concern** | Users fear loss of distinctiveness, influence, or career value. | Defensive dismissal, political resistance, public skepticism. | Reframe expert roles around review, policy, calibration, edge cases, and workflow design. |
+| **Surveillance Concern** | Users fear telemetry will be used to punish or rank them unfairly. | Shadow workflows, data withholding, distrust of feedback systems. | Separate improvement telemetry from punitive monitoring; define transparency, access, appeal, and privacy rules. |
+| **Quality Concern** | Users have seen AI fail and do not trust it for serious work. | Rejection or manual bypass. | Show eval results, known limits, confidence, evidence, and escalation paths. |
+| **Workload Concern** | Users experience AI as extra review, cleanup, or documentation burden. | Burnout, correction fatigue, abandonment. | Reduce output volume, improve routing, protect learning time, and measure total task time. |
+| **Ethical / Labor Concern** | Users object to data use, attribution, labor displacement, or social impact. | Organized opposition or reputational risk. | Create participatory governance, provenance rules, opt-out paths where feasible, and transparent policy. |
+
+### **Resistance Pattern Diagnostic**
+
+| Resistance Pattern | Possible Signal | What Not To Do | Useful Intervention |
+| :---- | :---- | :---- | :---- |
+| **Open Skepticism** | Users doubt reliability, value, or safety. | Label skeptics as blockers. | Invite them into eval design, red-team pilots, and workflow-fit review. |
+| **Quiet Under-Use** | Feature does not fit real work, or users fear looking incompetent. | Increase pressure or mandate usage blindly. | Run manager check-ins, usability studies, and workflow observation. |
+| **Shadow Tool Use** | Approved tools are too weak, slow, restricted, or disconnected. | Respond only with bans. | Improve approved tools, clarify policy, and create fast procurement/review paths. |
+| **Rubber-Stamping** | Users overtrust outputs or feel pressured for speed. | Reward raw throughput alone. | Require evidence review, correction capture, and quality metrics. |
+| **Excessive Manual Rework** | AI output is not good enough or review surface is poor. | Blame users for not “prompting better.” | Redesign route, data, prompt, UI, or task scope. |
+| **Public Moral Objection** | Ethical, labor, privacy, or status concerns are unresolved. | Treat objections as bad faith by default. | Create governance forums and make tradeoffs explicit. |
+| **Champion Burnout** | Early adopters are doing enablement as unpaid extra labor. | Praise them while adding more work. | Allocate time, recognition, manager support, and backfill capacity. |
+
+### **AI-Inclusive Professional Identity**
+
+The adoption goal is not to make employees subordinate to AI. It is to help them form an AI-inclusive professional identity:
+
+| Dimension | Healthy Form |
+| :---- | :---- |
+| **Agency** | “I decide when and how to use AI.” |
+| **Expertise** | “AI handles some execution; I own judgment, context, and quality.” |
+| **Status** | “My role becomes more valuable because I can design, verify, and improve higher-leverage workflows.” |
+| **Learning** | “The system helps me grow rather than bypassing the skills I need.” |
+| **Accountability** | “The organization has clear rules for who approves, acts, and bears responsibility.” |
+
+Resistance is not a defect to crush. It is information about where the adoption architecture is incomplete.
+
+## **Cognitive Engineering: Skill Preservation and Cognitive Apprenticeship**
+
+AI systems can help people work faster, but they can also change what people practice. When users repeatedly outsource reading, synthesis, drafting, debugging, judgment, or explanation, the organization may lose the very human capabilities it needs to supervise AI well.
+
+The risk is not that every user becomes cognitively weaker. The risk is more specific:
+
+```text
+Experts may stop practicing skills they already have.
+Novices may skip the practice needed to build those skills in the first place.
+Teams may mistake fluent output for retained understanding.
+```
+
+Adoption systems must therefore preserve human learning, judgment, and explanation ability while still allowing AI to remove low-value toil.
+
+### **Skill Preservation Model**
+
+| User Class | Adoption Risk | Failure Pattern | Design Response |
+| :---- | :---- | :---- | :---- |
+| **Novice** | Uses AI before building internal schemas. | Can produce work but cannot explain, debug, or transfer knowledge. | Require pre-draft reasoning, worked examples, manual reps, source explanation, and mentor review. |
+| **Intermediate** | Uses AI to avoid difficult synthesis. | Accepts plausible drafts, misses edge cases, weakens independent critique. | Require critique steps, evidence checks, comparison of alternatives, and periodic unassisted tasks. |
+| **Expert** | Offloads routine work and loses sharpness in rare cases. | Maintains output volume but becomes slower at novel, ambiguous, or out-of-distribution problems. | Preserve edge-case drills, red-team review, calibration work, and unassisted intervals. |
+| **Manager / Reviewer** | Treats AI output as proof of work. | Rewards volume instead of understanding or quality. | Evaluate explanation quality, correction quality, and downstream outcomes. |
+| **Team** | Normalizes machine-generated output without shared standards. | Quality appears high until unusual failures reveal weak understanding. | Maintain shared rubrics, review rituals, incident learning, and examples of known AI failure modes. |
+
+### **Desirable Difficulty UX Matrix**
+
+| Cognitive Risk | Interface Intervention | Purpose | Use Carefully When |
+| :---- | :---- | :---- | :---- |
+| **Blind Acceptance** | Require users to review highlighted claims, calculations, or citations before acceptance. | Prevents passive approval of fluent output. | Low-risk creative drafting may not need heavy friction. |
+| **Weak Problem Framing** | Ask user for a short goal, constraints, or proposed outline before generating. | Builds problem formulation skill. | Time-critical workflows may need templates instead. |
+| **Poor Source Evaluation** | Show source snippets, provenance, freshness, and confidence next to generated claims. | Keeps evidence visible during review. | Evidence display must not overwhelm the user. |
+| **Loss of Explanation Ability** | Ask user to select or write a brief rationale for final decision in high-impact workflows. | Preserves accountability and reasoning. | Do not require rationales for trivial tasks. |
+| **Over-Reliance in Novices** | Use apprenticeship mode: hints, examples, partial completions, and delayed full answers. | Helps users learn rather than bypassing learning. | Must be balanced against productivity needs. |
+| **Expert Skill Decay** | Schedule unassisted review, drills, or manual fallback practice. | Maintains readiness for AI failure or edge cases. | Avoid turning practice into meaningless compliance theater. |
+
+### **Cognitive Apprenticeship Pattern**
+
+```text
+novice observes -> novice attempts -> AI critiques -> human mentor reviews
+       -> user retries -> system records learning gaps -> training improves
+```
+
+AI training should not only teach prompts. It should teach users how to frame problems, inspect evidence, challenge outputs, understand failure modes, and explain final decisions.
+
+The adoption objective is not frictionless acceptance. It is calibrated assistance that preserves the human ability to think when the machine is unavailable, wrong, or insufficient.
+
+## **Dynamic Authority Regulation and Trust Calibration**
+
+Human-AI collaboration requires explicit authority states. A user should always know whether the AI is informing, drafting, recommending, executing, waiting for approval, or blocked from action. Authority must be dynamic because risk, confidence, task type, user role, and context change during a workflow.
+
+Dynamic Authority Regulation defines how authority moves between human and machine during a task.
+
+### **Authority State Model**
+
+| Authority State | AI Role | Human Role | Allowed Actions | Typical Trigger |
+| :---- | :---- | :---- | :---- | :---- |
+| **Human Primacy** | Organizes evidence or answers questions. | Makes decision and executes. | Read, summarize, compare, explain. | High ambiguity, high consequence, low confidence, regulated context. |
+| **AI Assist** | Drafts, suggests, extracts, or highlights. | Reviews, edits, approves, or rejects. | Draft, classify, flag, recommend. | Medium-risk work with reviewable output. |
+| **Shared Review** | Produces analysis and uncertainty; waits for human judgment. | Resolves ambiguity or approves next step. | Risk analysis, options, evidence packages. | Conflicting evidence, edge cases, low confidence, high-value workflow. |
+| **AI Delegation** | Executes bounded subtasks under policy. | Monitors exceptions and reviews results. | Route, extract, transform, test, queue. | Low-to-medium risk, reversible, verifiable tasks. |
+| **AI Automation** | Acts independently inside narrow constraints. | Owns oversight and periodic audit. | Low-risk routing, filtering, deduplication, background classification. | High-volume, low-consequence, easily verified work. |
+| **Human Override / Safe Hold** | Stops, preserves state, and explains why. | Decides recovery path. | Freeze, escalate, rollback, route to manual review. | Safety, privacy, policy, uncertainty, or verification failure. |
+
+### **Authority Transition Triggers**
+
+| Trigger | Direction of Movement |
+| :---- | :---- |
+| **Confidence drops** | Toward human primacy or shared review. |
+| **Risk tier increases** | Toward human approval or safe hold. |
+| **Action becomes irreversible** | Toward human approval or manual-only execution. |
+| **Task becomes routine and verified** | Toward delegation or automation. |
+| **User lacks permission** | Toward block or escalation. |
+| **Evidence conflict appears** | Toward shared review. |
+| **Policy boundary is hit** | Toward safe hold. |
+| **Repeated user correction appears** | Toward lower autonomy and retraining/review. |
+| **Long passive monitoring period occurs** | Toward revalidation or human check-in. |
+
+### **Handoff Controls**
+
+| Control | Purpose |
+| :---- | :---- |
+| **Authority Banner** | UI clearly states whether AI is suggesting, drafting, reviewing, acting, or blocked. |
+| **Reason for Handoff** | System explains why authority changed. |
+| **Evidence Packet** | Human receives context, source references, uncertainty, and prior actions. |
+| **Override Reason Capture** | Human override is recorded as improvement signal, not punishment by default. |
+| **Hysteresis Thresholds** | Prevent rapid oscillation between human and AI control. |
+| **Safe-Exit Timers** | Require human revalidation after prolonged autonomous monitoring. |
+| **State Preservation** | Workflow can pause without losing context or corrupting downstream systems. |
+| **Retention Policy** | Authority logs are retained according to risk, privacy, and audit requirements. |
+
+### **Trust Rupture and Recovery**
+
+| Rupture Pattern | What Happened | Recovery Requirement |
+| :---- | :---- | :---- |
+| **Graceful Limitation** | System disclosed uncertainty and handed off safely. | Reinforce accurate mental model; improve guidance if needed. |
+| **Silent Failure** | System appeared confident but was wrong. | Incident review, user notification where appropriate, eval update, visible fix. |
+| **Repeated Minor Errors** | Small failures accumulate and erode confidence. | Analyze correction patterns, improve route/data/UI, communicate known limits. |
+| **Over-Automation Event** | System acted with too much authority. | Reduce autonomy, add approval gate, update policy and training. |
+| **User Overtrust** | Human rubber-stamped output. | Add friction, evidence review, independent judgment step, or manager coaching. |
+| **User Undertrust** | Human rejects useful system behavior. | Improve transparency, reliability, onboarding, and scope clarity. |
+
+Trust calibration is not achieved by telling users to “trust the AI.” It is achieved by making system authority visible, bounded, reversible, explainable, and correctable.
+
+## **Change Management Transmission: Champion Networks, Sprints, and Frameworks**
+
+Enterprise transformation programs that rely strictly on top-down executive mandates fail because employees trust peer credibility over corporate policy.13 To bridge the gap between strategic leadership and front-line execution, successful AI adoption systems deploy a coordinated, three-tier change management transmission layer 13:
+
+```
+ (5-9 Leaders, Biweekly)  
+         │  
+         ▼  (Air Cover, Budget & Strategic Mandate)  
+ (6-10 Enablement/Ops, Weekly)  
+         │  
+         ▼  (Playbooks, Tools & Guardrail Templates)  
+[Champion Network] (1 Champion per 50-75 Employees)  
+         │  
+         ▼  (Hands-on Peer Training & Ground-up Use Case Discovery)
+```
+
+At the execution layer, organizations often struggle to choose between Kotter's 8-Step Model and the Prosci ADKAR framework.2 In technical and engineering environments, Kotter’s heavy emphasis on creating a top-down sense of organizational urgency often conflicts with technical teams, who prefer evidence-based decision-making over executive mandates.2  
+Further, Kotter's extended sequential timeline can introduce bureaucratic overhead that stifles developer autonomy.2  
+In contrast, the Prosci ADKAR model focuses on the individual's skill progression, aligning naturally with iterative, sprint-level technical changes.2
+
+### **Comparative Framework Alignment for AI Adoption**
+
+| Change Phase | Kotter 8-Step Application | Prosci ADKAR Application | Recommended Technical Synthesis |
+| :---- | :---- | :---- | :---- |
+| **Phase 1: Preparation** 1 | **Create Urgency:** Highlight the competitive threat of non-adoption.2 | **Awareness:** Build understanding of the specific strategic need for AI.1 | Execute Prosci Phase 1 (Prepare Approach); run maturity diagnostics and stakeholder power mapping.28 |
+| **Phase 2: Enablement** 1 | **Build Guiding Coalition:** Assemble key sponsors and departmental heads.13 | **Desire & Knowledge:** Foster willingness to engage; deliver targeted learning.1 | Launch the Champion Network; establish the Working Group; deliver role-specific hands-on training.13 |
+| **Phase 3: Integration** 1 | **Empower Action:** Remove obstacles; update systems and workflows.2 | **Ability:** Provide real-world coaching and structured integration opportunities.1 | Run Two-Week Champion Sprints in live, messy operational conditions to validate playbooks.13 |
+| **Phase 4: Reinforcement** 1 | **Institutionalize Change:** Embed technology into corporate culture.29 | **Reinforcement:** Implement rewards, recognition, and continuous correction loops.1 | Connect telemetry (edit distance, click tracking) to performance scorecards and digital rewards.10 |
+
+To operationalize this transmission layer, champions execute iterative **Two-Week Champion Sprints** to discover and validate high-value use cases.13  
+During **Week 1 (Explore and Test)**, three to five champions in a specific department pick a real, repetitive manual task and execute it using the AI tool chain under live, messy operational conditions where edge cases naturally surface.13  
+During **Week 2 (Validate and Package)**, the champions refine their prompt strategies, draft a simple, highly actionable one-page guide, and present a structured recommendation to the Working Group: roll out the workflow widely, modify its parameters, or kill it.13
+
+Week 1: Real-World Testing ──> Identify Friction & Edge Cases ──> Week 2: Package & Standardize ──> Deploy to Production
+
+To ensure the durability of this network, the Working Group must monitor and actively remediate several enablement anti-patterns 13:
+
+* **Treating Enablement as Unpaid Extra Work:** Champions already have full-time jobs; expecting them to drive change without workload adjustments leads directly to burnout.13 Organizations must explicitly allocate 10% to 20% of their contracted time to enablement and make it a formal part of their performance goals.13  
+* **The Expanded Workload Trap:** UC Berkeley research reveals that productivity gains from AI often morph into expanded workloads rather than freed-up time.13 When champions automate tasks, managers frequently dump more tasks onto their plates, collapsing the incentive to innovate.13 Leadership must step in to protect champions from this workflow inflation.13  
+* **Technical Echo Chambers:** Recruiting only technologists or enthusiasts to the champion network creates a bias bubble.13 Program owners must intentionally recruit pragmatists, skeptics, and non-technical business users to ensure the tools actually work for everyday employees.13  
+* **Unstructured Enthusiasm:** Relying on early volunteer excitement instead of putting established structures, cadences, and boundaries in place.13 Unstructured enthusiasm is unsustainable and eventually kills the program.13
+
+## **Enablement Architectures: The Workload Paradox and Training Curriculum**
+
+AI adoption often creates a workload paradox. Leaders expect productivity gains, while front-line employees experience more review, correction, training, coordination, and tool-management work. A credible adoption system must plan for this transition cost instead of pretending AI instantly creates free capacity.
+
+Published workforce research has reported a sharp gap between executive expectations and employee experience: many leaders expect AI to improve productivity, while many employees report that AI has increased workload. The architectural lesson is not “AI fails.” It is that AI produces value only when workflow redesign, training, review burden, support, and incentives are managed together.
+
+### **The Workload Paradox**
+
+```text
+Management expectation:
+  AI reduces effort immediately.
+
+Operational reality:
+  AI can increase review, correction, training, prompt iteration,
+  support load, governance work, and output volume.
+
+Adoption architecture:
+  protect learning time, reduce old workload temporarily,
+  measure total task time, and redesign workflows around verified outcomes.
+```
+
+| Workload Source | Why It Appears | Adoption Control |
+| :---- | :---- | :---- |
+| **Review Burden** | More AI drafts means more material to inspect. | Limit output volume; use evidence display and risk-tiered review. |
+| **Correction Burden** | Early outputs fail in edge cases or messy workflows. | Capture corrections and route them into evals, prompts, data, and training. |
+| **Training Burden** | Users need new mental models and safe-use practices. | Provide protected time and role-specific practice. |
+| **Coordination Burden** | Teams must decide where AI fits and who owns outcomes. | Define workflow roles, authority states, and escalation paths. |
+| **Governance Burden** | Users must learn data, privacy, IP, and policy boundaries. | Build policy into product surfaces and training examples. |
+| **Output Inflation** | Faster generation creates more artifacts than teams can validate. | Reward quality and verified outcomes, not volume. |
+
+### **Protected Time Policy**
+
+Protected time is not a perk. It is adoption infrastructure. Teams cannot learn new workflows while being measured as if nothing changed.
+
+| Rollout Intensity | Recommended Protected Time | Management Adjustment |
+| :---- | :---- | :---- |
+| **Lightweight tool introduction** | Short training blocks and office hours. | Do not penalize early experimentation time. |
+| **Role-specific workflow adoption** | Recurring weekly practice or lab time during rollout. | Temporarily reduce competing delivery expectations. |
+| **Major workflow redesign** | Formal sprint capacity allocation. | Plan backfill, slower throughput, and manager coaching. |
+| **High-risk / regulated workflow** | Structured training, certification, and supervised practice. | Gate access by demonstrated competence. |
+
+Exact time allocations should be set by role, risk, workload, and rollout intensity. The principle is durable: adoption requires protected capacity.
+
+### **Doctrinal Enablement Curriculum**
+
+| Training Level | Core Objective | Target Audience | Curriculum Topics | Evidence of Completion |
+| :---- | :---- | :---- | :---- | :---- |
+| **Level 1: AI Literacy** | Establish basic understanding and safe boundaries. | All employees exposed to AI tools. | Probabilistic outputs, hallucination, data boundaries, privacy/IP basics, when not to use AI. | Scenario quiz, safe-use acknowledgment, basic practice task. |
+| **Level 2: Workflow Adoption** | Teach role-specific use inside real tasks. | Business units and functional teams. | Prompt/context patterns, verification, review surfaces, escalation, correction capture. | Completed workflow lab, accepted/rejected examples, manager sign-off. |
+| **Level 3: Domain Transformation** | Redesign work around AI-assisted capability. | Power users, champions, analysts, technical leads. | Workflow decomposition, eval design, feedback loops, authority states, operational metrics. | Validated use-case package, pilot results, playbook contribution. |
+| **Level 4: System Stewardship** | Govern, monitor, and improve AI-enabled workflows. | Champions, product owners, governance, operations. | Drift, incidents, runbooks, audit, telemetry, model/data limitations, change management. | Runbook drill, evaluation review, incident simulation, governance review. |
+
+### **Complementary Human Capabilities for AI Adoption**
+
+The MIT EPOCH framing identifies human capabilities that complement AI rather than merely compete with it: empathy, presence, opinion/judgment, creativity, and hope. In enterprise adoption, these map to practical workforce capabilities.
+
+| Capability | Adoption Meaning | Workflow Application |
+| :---- | :---- | :---- |
+| **Empathy** | Understanding human needs, fears, context, and stakeholder impact. | Customer support, change management, sensitive communications, employee coaching. |
+| **Presence** | Being accountable, attentive, and socially available in real situations. | Leadership, facilitation, negotiation, escalation, conflict resolution. |
+| **Opinion / Judgment** | Making value-laden decisions under ambiguity. | Risk review, policy interpretation, prioritization, exception handling. |
+| **Creativity** | Reframing problems and generating novel constraints or approaches. | Product design, workflow redesign, strategy, synthesis beyond pattern replay. |
+| **Hope / Leadership** | Creating shared direction and confidence during uncertainty. | Transformation narratives, adoption sponsorship, team resilience. |
+
+AI training should not merely increase tool usage. It should strengthen the human capabilities that make AI safe and valuable in real organizations.
+
+## **Help Desk and Support Operations: Deflection, Resolution, and Escalation Handoffs**
+
+Support operations are a proving ground for AI adoption because they expose the difference between apparent automation and actual resolution. A bot can inflate deflection numbers by trapping users, hiding escalation, or forcing repeated rephrasing. That is not adoption success. That is containment theater with a headset.
+
+A mature support AI program measures resolved outcomes, customer experience, handoff quality, and repeat-contact reduction.
+
+### **Support Stack Architecture**
+
+```text
+SUPPORT AI STACK
+
+Layer 1: Self-Service / Autonomous Resolution
+  Best for: high-volume, low-risk, well-documented intents
+  Controls: confidence threshold, source grounding, easy escalation
+
+Layer 2: Agent Assist
+  Best for: human-led support with AI summaries, suggested replies, policy lookup
+  Controls: human send action, source links, edit capture
+
+Layer 3: Human Escalation
+  Best for: complex, emotional, regulated, ambiguous, or high-value cases
+  Controls: structured handoff packet, full context, escalation reason
+
+Layer 4: Knowledge and Improvement Loop
+  Best for: turning failures, repeats, and corrections into better workflows
+  Controls: intent review, article updates, evals, routing changes
+```
+
+### **Deflection vs. Resolution Metrics**
+
+| Metric | What It Measures | Failure Mode If Used Alone |
+| :---- | :---- | :---- |
+| **Deflection / Containment Rate** | Share of interactions not escalated to a human. | Can reward trapping users. |
+| **True Resolution Rate** | Share of issues solved without repeat contact or negative follow-up. | Requires good identity and ticket linking. |
+| **CSAT / Sentiment Delta** | Customer experience by intent, tier, and handoff path. | Can hide failures if only averaged globally. |
+| **Repeat Contact Rate** | Whether users return with the same unresolved issue. | Needs intent matching and time-window definition. |
+| **Escalation Quality** | Whether handoff to human contains useful context. | Poor packets create “tell me again” frustration. |
+| **Context-Loss Rate** | How often users must repeat information after escalation. | Direct indicator of failed AI-human handoff. |
+| **Wrong-Answer Rate** | Unsupported, stale, or policy-incorrect answers. | Requires audit sampling or user correction capture. |
+| **Agent Handle-Time Delta** | Whether AI assist helps human agents. | Can hide quality decline if speed is overvalued. |
+| **Knowledge Gap Rate** | Intents where AI fails due to missing or bad content. | Should feed knowledge-base improvement. |
+
+### **Launch-Control Model**
+
+| Phase | Traffic Exposure | Core Work | Exit Gate |
+| :---- | :---- | :---- | :---- |
+| **Phase 1: Knowledge and Instrumentation** | No live autonomous traffic. | Inventory intents, SOPs, knowledge articles, escalation paths, baseline CSAT and repeat contact. | Held-out evaluation passes; escalation packet format approved. |
+| **Phase 2: Shadow / Agent-Assist Pilot** | Human-visible assist only or shadow mode. | Compare AI suggestions to human actions; tune retrieval and confidence thresholds. | No material quality degradation; useful agent feedback; known failure modes documented. |
+| **Phase 3: Limited Self-Service Pilot** | Small slice of low-risk intents. | Allow autonomous resolution only for high-confidence, well-grounded cases. | Stable CSAT, low repeat contact, audited answer quality, clean escalation handoffs. |
+| **Phase 4: Controlled Ramp** | Gradual expansion by intent, not blanket traffic. | Add intents only after evidence, knowledge coverage, and handoff quality pass. | Intent-level performance remains within thresholds. |
+| **Phase 5: Continuous Improvement** | Mature operation. | Weekly failure review, knowledge updates, eval additions, routing changes. | Measured improvement in resolution, cost, and customer experience. |
+
+### **Escalation Handoff Packet**
+
+Every escalation from AI to human should include:
+
+| Packet Field | Purpose |
+| :---- | :---- |
+| **Customer intent** | Explains what the user is trying to solve. |
+| **Conversation summary** | Prevents the user from repeating the whole interaction. |
+| **Known account/context fields** | Gives the agent relevant source-of-record facts. |
+| **AI actions already taken** | Prevents duplicate troubleshooting. |
+| **Confidence and failure reason** | Explains why escalation occurred. |
+| **Relevant source articles / policies** | Supports fast human resolution. |
+| **User sentiment / urgency signal** | Helps prioritize distressed or high-risk cases. |
+| **Compliance or privacy flags** | Prevents unsafe handling. |
+
+### **Support Platform Selection Criteria**
+
+Instead of embedding a brittle vendor comparison, evaluate support platforms by capability class:
+
+| Capability | Product Requirement |
+| :---- | :---- |
+| **System-of-record integration** | Connects to ticketing, CRM, account, billing, and knowledge systems. |
+| **Grounded answer generation** | Uses approved knowledge with citations and freshness controls. |
+| **Escalation orchestration** | Passes structured handoff packets to human agents. |
+| **Intent-level analytics** | Reports CSAT, repeat contact, deflection, and failure by intent. |
+| **Governance controls** | Supports permissions, audit logs, data retention, and redaction. |
+| **Feedback loop** | Converts corrections and unresolved tickets into knowledge/eval updates. |
+| **Model/provider flexibility** | Allows route changes as cost, quality, and policy needs change. |
+
+Support AI success is not “fewer humans touched the ticket.” Success is fewer unresolved issues, less repetition, faster correct resolution, better agent leverage, and safer customer experience.
+
+## **Quantitative Telemetry: Feedback Loops, Corrections, and Adoption Signals**
+
+Adoption systems need behavioral telemetry, but not all telemetry should become performance surveillance. The goal is to learn whether AI improves work, where users correct it, when they ignore it, where it creates burden, and how the system should improve.
+
+Telemetry should be designed around product improvement, workflow safety, and user trust.
+
+### **Adoption Telemetry Model**
+
+| Signal Family | Example Metrics | What It Reveals | Guardrail |
+| :---- | :---- | :---- | :---- |
+| **Usage** | Activation, repeat use, feature path, session frequency. | Whether users try and return to the feature. | Usage alone is not success. |
+| **Acceptance** | Accept, reject, edit, regenerate, abandon. | Whether AI output is useful. | Avoid rewarding blind acceptance. |
+| **Correction** | Edit distance, field corrections, override reasons, rejected claims. | Where the model, data, prompt, or UI fails. | Store sensitive content by secure reference where needed. |
+| **Verification** | Citation checks, schema validation, source-of-record confirmation. | Whether output is safe to use. | Do not rely on model self-report. |
+| **Workflow Outcome** | Time-to-completion, repeat work, rework, escalation, handoff success. | Whether total work improved. | Measure end-to-end task, not draft speed. |
+| **Trust Calibration** | Over-acceptance, under-use, repeated overrides, manual bypass. | Whether users trust appropriately. | Interpret as signal, not employee defect. |
+| **Support Load** | Help tickets, training questions, failure reports, confusion signals. | Whether adoption burden is rising. | Feed training and product redesign. |
+| **Quality Drift** | Error trends, eval degradation, correction clusters. | Whether model/data/workflow performance changes. | Connect to owner and runbook. |
+
+### **Edit Distance as One Signal**
+
+Edit distance can be useful for draft workflows: it compares AI-generated text with the human-approved final version. Low edit distance may indicate high usefulness, but it can also indicate rubber-stamping. High edit distance may indicate poor output, but it can also indicate active expert refinement.
+
+| Edit Pattern | Possible Interpretation | Follow-Up |
+| :---- | :---- | :---- |
+| **Near-zero edits** | Strong fit, or blind acceptance. | Check error rate, task risk, and review behavior. |
+| **Moderate edits** | Useful draft with human refinement. | Inspect correction categories and improve prompts/data. |
+| **High edits** | Poor model fit, wrong context, or user using AI as rough ideation. | Segment by task type before judging. |
+| **Repeated same edits** | Systematic prompt/data/style gap. | Add eval case, template, or product control. |
+| **Edits concentrated in sensitive fields** | Risky extraction or hallucination pattern. | Add validation, evidence display, or human gate. |
+
+There is no universal “optimal” edit-distance band. The expected range depends on task, role, risk, surface, and whether the AI is drafting, extracting, summarizing, or brainstorming.
+
+### **Structured Feedback Event Schema**
+
+Use a structured event model rather than raw transcript dumps wherever possible.
+
+```json
+{
+  "event_type": "ai_feedback_event",
+  "workflow_id": "contract_review",
+  "route_id": "governed_synthesis",
+  "task_type": "draft_review",
+  "user_role": "legal_reviewer",
+  "risk_tier": "high",
+  "ai_action": "drafted_summary",
+  "human_action": "edited_and_approved",
+  "edit_summary": {
+    "edit_distance_bucket": "moderate",
+    "correction_categories": ["missing_citation", "overbroad_claim"],
+    "sensitive_content_ref": "secure-ref://payload/abc123"
+  },
+  "verification": {
+    "schema_valid": true,
+    "citations_verified": false,
+    "source_of_record_checked": true
+  },
+  "outcome": {
+    "task_completed": true,
+    "escalated": false,
+    "rework_required": false
+  }
+}
+```
+
+### **Feedback Routing**
+
+| Signal | Routed To | Action |
+| :---- | :---- | :---- |
+| Repeated user correction | Product / Prompt owner | Revise template, UI, or route. |
+| Citation failure | Retrieval / Corpus owner | Fix source, chunking, ranking, or citation verifier. |
+| Schema failure | Tool / Workflow owner | Tighten schema, validators, or field-level UI. |
+| High rejection rate | Product owner | Reassess use case, user tolerance, or model fit. |
+| Over-acceptance in risky workflow | Adoption / Governance owner | Add friction, training, or independent review. |
+| Rising support questions | Enablement owner | Improve training and documentation. |
+| Drift or regression | Eval / Ops owner | Add eval case, rollback, or incident review. |
+| Privacy-sensitive correction | Governance / Privacy owner | Review retention, redaction, and access controls. |
+
+Adoption telemetry should improve the system and support users. If telemetry becomes a punishment machine, users will route around it, corrupt it, or stop trusting the adoption program.
+
+## **Behavioral Incentives, Performance Systems, and Compensation Architectures**
+
+AI adoption is shaped by incentives. If employees are rewarded only for raw output volume, they will generate more artifacts. If they are rewarded only for speed, they will skip verification. If they are measured by prompts submitted or licenses used, they will game usage metrics. If telemetry feels punitive, they will avoid the system or move work into shadow channels.
+
+The goal is to reward safe, useful, workflow-improving adoption—not AI activity for its own sake.
+
+### **Incentive Design Principles**
+
+| Principle | Meaning |
+| :---- | :---- |
+| **Reward outcomes, not usage.** | License activation, prompt count, and click volume are weak adoption metrics. |
+| **Reward verification, not rubber-stamping.** | Users should be recognized for catching errors, improving workflows, and preserving quality. |
+| **Protect learning time.** | Adoption requires time; do not punish teams for the temporary slowdown needed to learn. |
+| **Avoid surveillance incentives.** | Telemetry should support improvement, not opaque individual punishment. |
+| **Make managers accountable for workflow redesign.** | Front-line workers cannot realize value if managers simply add AI on top of old workloads. |
+| **Recognize shared improvement.** | Champions, reviewers, prompt maintainers, data stewards, and support staff all contribute. |
+| **Preserve fairness and appeal.** | AI-informed performance systems need transparency, bias review, and human appeal paths. |
+
+### **Adoption Incentive Scorecard**
+
+| Dimension | Good Evidence | Bad Proxy to Avoid | Reward Pattern |
+| :---- | :---- | :---- | :---- |
+| **Workflow Improvement** | Reduced total task time, lower rework, higher verified throughput. | Number of AI-generated artifacts. | Team recognition, process improvement credit. |
+| **Quality and Verification** | Error catches, source corrections, improved eval cases, fewer downstream defects. | Blind accept rate. | Quality credit and reviewer recognition. |
+| **Knowledge Sharing** | Reusable playbooks, validated examples, peer coaching, office hours. | Posting random prompt tricks. | Champion credit, protected time, promotion evidence. |
+| **Responsible Use** | Safe data handling, correct escalation, policy adherence, good judgment. | Zero reported issues because nobody reports problems. | Recognition for reporting and fixing issues. |
+| **Adoption Learning** | Training completion plus demonstrated task competence. | LMS completion alone. | Role readiness badge, access expansion. |
+| **Innovation** | Validated use cases with measured value and adoption. | Novel demos with no workflow impact. | Pilot funding, team-level reward. |
+| **Manager Enablement** | Protected time, workload adjustment, support of experimentation, reduced blockers. | Mandated usage targets. | Leadership score tied to safe realized value. |
+
+### **Telemetry Use Guardrails**
+
+| Guardrail | Requirement |
+| :---- | :---- |
+| **Transparency** | Employees should know what adoption telemetry is collected and why. |
+| **Purpose Limitation** | Telemetry collected for product improvement should not silently become disciplinary evidence. |
+| **Aggregation First** | Prefer team/workflow-level analysis over individual ranking where possible. |
+| **Human Review** | Performance decisions should not be made solely by automated telemetry. |
+| **Bias Review** | Check whether adoption metrics disadvantage certain roles, regions, disabilities, seniority levels, or work types. |
+| **Appeal Path** | Employees need a way to contest or contextualize AI-derived performance signals. |
+| **Retention Limits** | Keep telemetry only as long as needed for improvement, audit, or policy. |
+| **Sensitive Data Handling** | Store raw content only when necessary, with redaction, secure references, and access controls. |
+
+### **Compensation and Pay Transparency Considerations**
+
+AI-informed performance systems must be designed carefully around fairness, explainability, and equal-treatment obligations. In the EU, the Pay Transparency Directive is Directive (EU) 2023/970, with member states required to transpose it by June 7, 2026. Adoption scorecards should therefore avoid opaque or biased AI-driven compensation effects.
+
+| Risk | Control |
+| :---- | :---- |
+| **AI usage becomes hidden performance pressure.** | State whether AI adoption is expected, optional, or role-specific. |
+| **Telemetry rewards high-volume roles unfairly.** | Normalize by workflow, role, risk, and opportunity. |
+| **Correction-heavy users look “less efficient.”** | Treat corrections as quality signals, not automatic negatives. |
+| **Managers dump more work onto AI-capable employees.** | Track workload inflation and protect capacity. |
+| **Employees fear reporting AI failures.** | Reward transparent failure reporting and improvement contributions. |
+
+The mature incentive system does not ask, “Who used AI the most?” It asks, “Which teams improved verified outcomes safely, fairly, and sustainably?”.16
+
+## **Cross-Canon Handoff Map**
+
+AI-ENG-AG defines the adoption layer of the AI Engineering Systems Canon. It explains how valid AI products become durable human workflows through training, role design, feedback loops, support systems, trust calibration, incentives, and change management.
+
+AG consumes product, governance, UX, telemetry, review, and operations constraints from earlier reports and hands organizational adoption patterns forward to business and enterprise transformation architecture.
+
+### **Upstream Canon Inputs**
+
+| Canon Report | What AG Consumes | Adoption Use |
+| :---- | :---- | :---- |
+| **AI-ENG-AF — AI Product Architecture** | Use-case fit, workflow mapping, user tolerance, product pattern, no-AI decisions. | Determines what users are being asked to adopt and whether adoption is structurally plausible. |
+| **AI-ENG-AD — Governance Architecture** | Policy, accountability, audit, procurement, risk classification. | Defines safe-use rules, escalation paths, and adoption boundaries. |
+| **AI-ENG-Y — Human Review** | Review queues, reviewer quality, escalation, maker-checker patterns. | Shapes human oversight training and review workload design. |
+| **AI-ENG-X — User Trust** | Transparency, contestability, disclosure, trust calibration. | Informs trust repair, user education, and product-surface expectations. |
+| **AI-ENG-W — UX Resilience** | Degraded modes, fallback, continuity, user state. | Defines how adoption survives outages, uncertainty, and fallback states. |
+| **AI-ENG-Z — Strategic Telemetry** | Traces, metrics, correction signals, privacy-aware observability. | Feeds adoption telemetry, workflow learning, and support intervention. |
+| **AI-ENG-AA — Evaluation Architecture** | Golden sets, rubrics, regression gates, quality thresholds. | Turns user corrections into eval cases and role-specific training. |
+| **AI-ENG-AC — AI Operations** | Incidents, runbooks, rollback, containment, postmortems. | Connects adoption failures to operational response and learning loops. |
+| **AI-ENG-AE — Sustainable AI** | Workload burden, output inflation, resource efficiency, lifecycle review. | Prevents adoption programs from generating wasteful output and review overload. |
+| **AI-ENG-N — Tool Contracts** | Tool authority, schemas, side effects, permission boundaries. | Teaches users what AI can safely do and where approval is required. |
+| **AI-ENG-O — Action Verification** | Source-of-record verification, action ledgers, false-success prevention. | Defines when users can trust completion claims and when they must verify. |
+| **AI-ENG-T — Boundary Defense** | Prompt injection, tenant isolation, egress, policy hierarchy. | Shapes safe-use training and shadow-AI prevention. |
+| **AI-ENG-S — Production Pathologies** | Failure modes, brittle chains, loop failures, false confidence. | Supplies adoption training examples and trust-calibration scenarios. |
+
+### **Forward Handoff to Organizational Architecture**
+
+| Target Report | AG Concept Handed Forward | Downstream Use |
+| :---- | :---- | :---- |
+| **AI-ENG-AH — Organizational Architecture and Change** | Champion networks, protected time, adoption states, resistance diagnostics, skill preservation. | Defines organizational structures, team incentives, role redesign, and training operations. |
+| **AI-ENG-AI — Enterprise Transformation Reference Architecture** | Adoption telemetry, workflow enablement, governance-aware training, support handoffs. | Integrates adoption systems into enterprise rollout, platform support, and management operating model. |
+| **AI-ENG-AJ — Reference Architectures** | Adoption playbooks, feedback loops, support stack, authority-state UX patterns. | Converts adoption doctrine into reusable rollout blueprints and golden paths. |
+
+### **Core Handoff Rule**
+
+Adoption is not the final mile of AI deployment. It is part of the architecture. If users are not trained, incentivized, supported, protected from overload, connected to feedback loops, and given clear authority boundaries, the system has not actually been deployed. It has merely been installed.
+
+#### **Works cited**
+
+1. AI Adoption: Driving Change With a People-First Approach - Prosci, accessed June 14, 2026, [https://www.prosci.com/ai-change-management](https://www.prosci.com/ai-change-management)  
+2. 6 Change Management Strategies to Scale AI Adoption in Engineering Teams, accessed June 14, 2026, [https://www.augmentcode.com/guides/6-change-management-strategies-to-scale-ai-adoption-in-engineering-teams](https://www.augmentcode.com/guides/6-change-management-strategies-to-scale-ai-adoption-in-engineering-teams)  
+3. Your AI change-management plan: How to bring employees along successfully | Robert Half, accessed June 14, 2026, [https://www.roberthalf.com/us/en/insights/management-tips/ai-change-management-for-leaders](https://www.roberthalf.com/us/en/insights/management-tips/ai-change-management-for-leaders)  
+4. Work Design and Multidimensional AI Threat as - arXiv, accessed June 14, 2026, [https://arxiv.org/pdf/2602.23278](https://arxiv.org/pdf/2602.23278)  
+5. A Moderated Mediation Model of AI-Driven Identity Threats and ..., accessed June 14, 2026, [https://www.mdpi.com/2254-9625/16/4/52](https://www.mdpi.com/2254-9625/16/4/52)  
+6. When Humans Stop Thinking: Cognitive Offloading, Atrophy Risk ..., accessed June 14, 2026, [https://digitalcommons.kennesaw.edu/cgi/viewcontent.cgi?article=1005&context=cognoconproceedings](https://digitalcommons.kennesaw.edu/cgi/viewcontent.cgi?article=1005&context=cognoconproceedings)  
+7. Change Management in Agentic AI Adoption: A Practical Guide to ..., accessed June 14, 2026, [https://medium.com/aimonks/change-management-in-agentic-ai-adoption-a-practical-guide-to-the-full-journey-5143ebb60fd6](https://medium.com/aimonks/change-management-in-agentic-ai-adoption-a-practical-guide-to-the-full-journey-5143ebb60fd6)  
+8. Human–AI Handovers: A Dynamic Authority Reversal Framework for ..., accessed June 14, 2026, [https://www.preprints.org/manuscript/202603.0390](https://www.preprints.org/manuscript/202603.0390)  
+9. LLM Evaluation Metrics: The Ultimate LLM Evaluation Guide - Confident AI, accessed June 14, 2026, [https://www.confident-ai.com/blog/llm-evaluation-metrics-everything-you-need-for-llm-evaluation](https://www.confident-ai.com/blog/llm-evaluation-metrics-everything-you-need-for-llm-evaluation)  
+10. How Can Companies Incentivize AI Adoption? - Knowledge at ..., accessed June 14, 2026, [https://knowledge.wharton.upenn.edu/article/how-can-companies-incentivize-ai-adoption/](https://knowledge.wharton.upenn.edu/article/how-can-companies-incentivize-ai-adoption/)  
+11. I asked ChatGPT why reddit users hate AI, and DAMN it went all out, accessed June 14, 2026, [https://www.reddit.com/r/ChatGPT/comments/1qgg3ed/i_asked_chatgpt_why_reddit_users_hate_ai_and_damn/](https://www.reddit.com/r/ChatGPT/comments/1qgg3ed/i_asked_chatgpt_why_reddit_users_hate_ai_and_damn/)  
+12. Use these 3 MIT guides when implementing AI in your organization, accessed June 14, 2026, [https://mitsloan.mit.edu/ideas-made-to-matter/use-these-3-mit-guides-when-implementing-ai-your-organization](https://mitsloan.mit.edu/ideas-made-to-matter/use-these-3-mit-guides-when-implementing-ai-your-organization)  
+13. How to build an AI champions network that actually drives adoption ..., accessed June 14, 2026, [https://amitkoth.com/ai-champions-network-guide/](https://amitkoth.com/ai-champions-network-guide/)  
+14. Writing ClickHouse queries for new products - Handbook - PostHog, accessed June 14, 2026, [https://posthog.com/handbook/engineering/databases/clickhouse-queries-new-products](https://posthog.com/handbook/engineering/databases/clickhouse-queries-new-products)  
+15. AI Performance Reviews: Avoiding 5 Critical Pitfalls - Giftronaut, accessed June 14, 2026, [https://www.giftronaut.com/blog/ai-performance-reviews](https://www.giftronaut.com/blog/ai-performance-reviews)  
+16. AI is Changing the Face of Reward, accessed June 14, 2026, [https://www.people-performance-reward.co.uk/post/ai-is-changing-the-face-of-reward](https://www.people-performance-reward.co.uk/post/ai-is-changing-the-face-of-reward)  
+17. GENERATIVE ARTIFICIAL INTELLIGENCE: BETWEEN ENHANCEMENT AND COGNITIVE OFFLOADING - Cultura, Ciencia y Deporte, accessed June 14, 2026, [https://ccd.ucam.edu/index.php/revista/article/view/2698/1527](https://ccd.ucam.edu/index.php/revista/article/view/2698/1527)  
+18. Full article: Dilemmas of resistance: How concerns for cultural aspects of identity shape and constrain resistance among minority groups - Taylor & Francis, accessed June 14, 2026, [https://www.tandfonline.com/doi/full/10.1080/10463283.2023.2176663](https://www.tandfonline.com/doi/full/10.1080/10463283.2023.2176663)  
+19. What happens when trust in an AI system breaks? Do human–AI relationships follow recognizable trajectories? | ResearchGate, accessed June 14, 2026, [https://www.researchgate.net/post/What_happens_when_trust_in_an_AI_system_breaks_Do_human-AI_relationships_follow_recognizable_trajectories](https://www.researchgate.net/post/What_happens_when_trust_in_an_AI_system_breaks_Do_human-AI_relationships_follow_recognizable_trajectories)  
+20. Is AI dulling our minds? - Harvard Gazette, accessed June 14, 2026, [https://news.harvard.edu/gazette/story/2025/11/is-ai-dulling-our-minds/](https://news.harvard.edu/gazette/story/2025/11/is-ai-dulling-our-minds/)  
+21. Trust Calibration in Human-AI Teaming: Within-Session Dynamics, Transparency, and Performance Effects, accessed June 14, 2026, [https://repository.rit.edu/theses/12379/](https://repository.rit.edu/theses/12379/)  
+22. Adults Lose Skills to AI. Children Never Build Them. | Psychology Today, accessed June 14, 2026, [https://www.psychologytoday.com/us/blog/the-algorithmic-mind/202603/adults-lose-skills-to-ai-children-never-build-them](https://www.psychologytoday.com/us/blog/the-algorithmic-mind/202603/adults-lose-skills-to-ai-children-never-build-them)  
+23. AI Tools in Society: Impacts on Cognitive Offloading and the Future of Critical Thinking, accessed June 14, 2026, [https://www.mdpi.com/2075-4698/15/1/6](https://www.mdpi.com/2075-4698/15/1/6)  
+24. 16 Best AI-Powered Helpdesk Software on the Market Right Now - Kustomer, accessed June 14, 2026, [https://www.kustomer.com/resources/blog/ai-powered-help-desk-software/](https://www.kustomer.com/resources/blog/ai-powered-help-desk-software/)  
+25. Designing for Doubt: How to Prevent Automation Complacency in AI ..., accessed June 14, 2026, [https://www.uxmatters.com/mt/archives/2026/06/designing-for-doubt-how-to-prevent-automation-complacency-in-ai-workflows.php](https://www.uxmatters.com/mt/archives/2026/06/designing-for-doubt-how-to-prevent-automation-complacency-in-ai-workflows.php)  
+26. Calibrating AI Trust in Complementary Human-AI Collaboration - OpenReview, accessed June 14, 2026, [https://openreview.net/pdf?id=6KcewDz76A](https://openreview.net/pdf?id=6KcewDz76A)  
+27. AI Customer Support 2026: 50+ Adoption + ROI Data Points, accessed June 14, 2026, [https://www.digitalapplied.com/blog/ai-customer-support-statistics-2026-adoption-roi-data](https://www.digitalapplied.com/blog/ai-customer-support-statistics-2026-adoption-roi-data)  
+28. How to Do Change Management for M365 Copilot AI Implementation - OCM Solution, accessed June 14, 2026, [https://www.ocmsolution.com/best-change-management-for-m365-copilot-implementation/](https://www.ocmsolution.com/best-change-management-for-m365-copilot-implementation/)  
+29. Change Management – AI's Secret Weapon Part 1: Adopting AI? Seven key change management strategies to drive success - Oracle Blogs, accessed June 14, 2026, [https://blogs.oracle.com/futurestate/change-management-ais-secret-weapon-part-1](https://blogs.oracle.com/futurestate/change-management-ais-secret-weapon-part-1)  
+30. the AI support metrics that actually matter vs the ones that feel good - Reddit, accessed June 14, 2026, [https://www.reddit.com/r/CustomerSuccess/comments/1t5kdbp/the_ai_support_metrics_that_actually_matter_vs/](https://www.reddit.com/r/CustomerSuccess/comments/1t5kdbp/the_ai_support_metrics_that_actually_matter_vs/)  
+31. AI service desk: Benefits, features + top 8 tools of 2026 - Zendesk, accessed June 14, 2026, [https://www.zendesk.com/service/help-desk-software/ai-help-desk/](https://www.zendesk.com/service/help-desk-software/ai-help-desk/)  
+32. 8 Best AI Tools for IT Support Ticket Triage (2026) - Elementum AI, accessed June 14, 2026, [https://www.elementum.ai/blog/ai-tools-for-it-support-ticket-triage](https://www.elementum.ai/blog/ai-tools-for-it-support-ticket-triage)  
+33. 5 best AI help desk software solutions for 2025 : r/CustomerSuccess - Reddit, accessed June 14, 2026, [https://www.reddit.com/r/CustomerSuccess/comments/1qh1ehd/5_best_ai_help_desk_software_solutions_for_2025/](https://www.reddit.com/r/CustomerSuccess/comments/1qh1ehd/5_best_ai_help_desk_software_solutions_for_2025/)  
+34. 7 best free and open source LLM observability tools - PostHog, accessed June 14, 2026, [https://posthog.com/blog/best-open-source-llm-observability-tools](https://posthog.com/blog/best-open-source-llm-observability-tools)  
+35. How to Build Feedback Loops for LLMs | newline, accessed June 14, 2026, [https://www.newline.co/@zaoyang/how-to-build-feedback-loops-for-llms--386075af](https://www.newline.co/@zaoyang/how-to-build-feedback-loops-for-llms--386075af)  
+36. A list of metrics for evaluating LLM-generated content - Microsoft Learn, accessed June 14, 2026, [https://learn.microsoft.com/en-us/ai/playbook/technology-guidance/generative-ai/working-with-llms/evaluation/list-of-eval-metrics](https://learn.microsoft.com/en-us/ai/playbook/technology-guidance/generative-ai/working-with-llms/evaluation/list-of-eval-metrics)  
+37. How I finally got LLMs to return reliable structured data - DEV Community, accessed June 14, 2026, [https://dev.to/__c1b9e06dc90a7e0a676b/how-i-finally-got-llms-to-return-reliable-structured-data-280i](https://dev.to/__c1b9e06dc90a7e0a676b/how-i-finally-got-llms-to-return-reliable-structured-data-280i)  
+38. How JSON Schema Works for LLM Data - Latitude.so, accessed June 14, 2026, [https://latitude.so/blog/how-json-schema-works-for-llm-data](https://latitude.so/blog/how-json-schema-works-for-llm-data)  
+39. AI products - Handbook - PostHog, accessed June 14, 2026, [https://posthog.com/handbook/engineering/ai/products](https://posthog.com/handbook/engineering/ai/products)
+
+---
+
+# AI-ENG-AH — Build, Buy, Open Source & Vendor Strategy - Doctrinal Knowledge Base for Strategic Dependency Architecture
+
+## **Conceptual Glossary of AI Sourcing Architecture**
+
+To establish a mathematically precise and legally rigorous foundation for enterprise technology acquisition, the vocabulary of artificial intelligence sourcing must be strictly standardized:
+
+* **AI Sourcing Architecture**: The technical and procurement discipline of designing, deploying, and continuously auditing the mix of proprietary interfaces, self-hosted models, open-weight artifacts, and native code layers that comprise an enterprise execution plane. It establishes how an organization balances operational agility against systemic dependency risk.  
+* **Build**: The direct engineering and deployment of proprietary software components, custom orchestration layers, fine-tuned model adapters, or specialized base-model architectures on managed or owned infrastructure.  
+* **Buy**: The commercial acquisition of fully integrated, vendor-hosted applications where the software vendor defines the user interface, workflow engine, orchestration logic, and underlying model endpoints.  
+* **Managed API**: A consumption-based cloud endpoint hosted by a model provider that delivers inference outputs via standard HTTPS requests, charging fees based on token or request volume while withholding access to model weights and parameters.  
+* **Vendor Application**: A finished software-as-a-service (SaaS) product that wraps model capabilities within a specific business workflow, assuming operational control over retrieval pipelines, model routing, and output formatting.  
+* **Open Source Software (OSS)**: Code distributed under licenses approved by the Open Source Initiative (OSI) that grant the unrestricted rights to use, study, modify, and share the software system.1  
+* **Open Weight Model**: An artificial intelligence model whose learned parameters and weights are made available for download, but whose commercial distribution, training modifications, and usage scale are governed by custom, non-OSI-compliant community agreements.3  
+* **Source-Available Model**: A machine learning model whose code and parameter architectures are visible for audit and study, but whose licensing explicitly restricts commercial application, redistribution, or competitive derivative creation.3  
+* **Self-Hosting**: The operation of open-weight or proprietary models on infrastructure directly leased, owned, or logically isolated by the deploying organization, including virtual private clouds (VPCs) and private hardware clusters.  
+* **Local Deployment**: The execution of models on physical, non-cloud edge hardware, local workstations, or closed on-premises data centers, operating entirely decoupled from external network dependencies.  
+* **Hybrid Architecture**: An engineering pattern that partitions execution across both proprietary managed endpoints and self-hosted models, controlled by an internally owned gateway layer to balance cost, latency, and compliance constraints.5  
+* **Control Plane**: The central architectural layer that governs routing, identity and access management, policy enforcement, semantic caching, rate limiting, and audit logging across all underlying model executions.5  
+* **Execution Plane**: The runtime infrastructure where raw inference calculations are executed, whether hosted on a vendor's public cloud API, a private GPU cluster, or a localized edge device.8  
+* **Data Rights**: The contractual terms governing who owns, can access, and can use inputs (prompts), outputs (completions), vector embeddings, telemetry logs, and user feedback generated during model operations.9  
+* **Lock-In**: The structural, mathematical, and financial coupling of an application to a specific model provider's API, prompt formatting, embedding coordinate geometry, or commercial terms.11  
+* **Exit Plan**: A pre-vetted, contractually supported, and technically validated decommissioning protocol that details how an organization can transition a workload away from a vendor without service interruption, data loss, or degradation of system behavior.10  
+* **Real Total Cost of Ownership (TCO)**: The comprehensive, fully loaded financial calculation of all capital and operational expenditures associated with an AI system throughout its lifecycle, extending far beyond raw infrastructure or subscription pricing.14
+
+## **AI Sourcing Strategy Doctrine**
+
+The core tenet of modern enterprise system design is that sourcing decisions must not be driven by model leaderboard rankings, developer advocacy, or temporary demonstration quality. Sourcing strategy is a discipline of strategic dependency design. The primary objective is to optimize for capability, control, cost, compliance, security, portability, and long-term lifecycle viability. The modern enterprise must operate under a foundational mandate: **own the control plane; vary the execution plane**.5
+
+```
+                  ┌──────────────────────────────────────────────┐  
+                  │          ENTERPRISE CONTROL PLANE            │  
+                  │  (SSO/RBAC, CEL Routing, Semantic Cache,     │  
+                  │   Audit Logging, Policy Gates, Evals)        │  
+                  └──────────────────────┬───────────────────────┘  
+                                         │  
+                 ┌───────────────────────┼───────────────────────┐  
+                 ▼                       ▼                       ▼  
+     ┌───────────────────────┐ ┌───────────────────┐ ┌───────────────────────┐  
+     │    PROPRIETARY API    │ │  PRIVATE CLOUD    │ │     LOCAL / ON-PREM   │  
+     │   (Managed Frontier)  │ │ (Open/Self-Host)  │ │   (Sensitive/Edge)    │  
+     └───────────────────────┘ └───────────────────┘ └───────────────────────┘  
+     └───────────────────────────────────┬───────────────────────────────────┘  
+                                         ▼  
+                             ┌───────────────────────┐  
+                             │    EXECUTION PLANE    │  
+                             └───────────────────────┘
+```
+
+An organization cedes strategic viability when it allows its core business logic, proprietary data representations, and user feedback systems to become trapped inside vendor-owned wrappers. The strategic value of artificial intelligence does not reside in the commodity intelligence rented from frontier foundation model providers; it resides in the proprietary data corpus, the domain-specific evaluation metrics, the workflow integration, and the accumulated user interaction loops.  
+Consequently, enterprise architects must construct an internal control plane that abstracts away provider-specific dependencies.12 By intercepting all traffic through an internally managed gateway, the enterprise can dynamically direct workloads to the cheapest, fastest, or most compliant execution environment without altering application code.12  
+Workloads must be ruthlessly classified. Generic reasoning tasks can be rented from managed APIs, provided robust data boundaries and zero-data-retention terms are contractually guaranteed.9 Conversely, core product differentiators, regulated data pipelines, and high-frequency automated workflows must utilize self-hosted open-weight models, private clouds, or hybrid routing to preserve operational autonomy, ensure cost predictability at scale, and eliminate the existential risk of vendor deprecation.16  
+This approach inherits critical constraints from surrounding engineering disciplines:
+
+* **Product-Fit Alignment**: Sourcing choices must directly map to real, validated user workflows and acceptable latency bounds, rejecting complex multi-billion parameter configurations if an optimized small local model satisfies the use case.6  
+* **Adoption Compatibility**: Vendor selections must integrate cleanly with corporate training infrastructures, ensuring model behaviors are explainable, supportable, and aligned with real feedback loops.9  
+* **Environmental Sustainability**: Sourcing decisions must calculate hardware utilization, power consumption, and carbon impact, balancing local GPU operations against the efficiency gains of centralized cloud architectures.16  
+* **Supply Chain Resilience**: Downloaded models, libraries, and containers must undergo rigorous Software Bill of Materials (SBOM) audits to verify provenance, validate cryptographic trust, and eliminate unpatched vulnerability vectors.24
+
+## **Build, Buy, Open, and Hybrid Decision Matrix**
+
+AI sourcing strategy is not a binary build-versus-buy question. Enterprises must choose among finished vendor applications, managed APIs, hosted open models, self-hosted models, open-source stack assembly, in-house build, and hybrid control-plane architectures. The right answer depends on workflow differentiation, data sensitivity, latency, cost profile, internal engineering capacity, compliance exposure, portability needs, and exit risk.
+
+| Sourcing Category | Best-Fit Conditions | Primary Advantages | Primary Risks | Governance Requirements | Cost Shape | Operational Burden | Exit Complexity |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| **Buy Vendor Application** | Commodity workflow; limited internal engineering capacity; speed-to-market matters more than deep customization. | Fast deployment, managed UX, vendor support, reduced platform burden. | Workflow lock-in, opaque model behavior, subprocessor cascade, limited eval visibility, roadmap dependence. | Vendor risk review, DPA, subprocessor tracking, export rights, audit logging, admin controls. | Seat/license fees plus possible usage tiers. | Low internally, but vendor-management burden remains. | Low to extreme depending on data export, API access, workflow depth, and user retraining cost. |
+| **Managed API** | Need frontier capability, variable/spiky demand, rapid experimentation, or multimodal functionality. | Strong capability, fast integration, no hardware operations, elastic scaling. | Provider drift, rate limits, deprecation, data boundary concerns, price changes. | Gateway abstraction, version/eval controls, quota limits, data processing terms, fallback route. | Usage-based; can scale sharply with volume/context. | Medium: integration, gateway, eval, retry, and monitoring required. | Moderate if gateway and eval abstraction exist; high if provider SDKs/prompts are hardcoded. |
+| **Hosted Open Model** | Need more control than proprietary API without full self-hosting burden. | More model transparency, potentially better data isolation, simpler operations than self-host. | Hosting-provider lock-in, runtime differences, limited hardware control, unclear support boundaries. | Model/license review, hosting DPA, telemetry access, portability test. | Capacity-based or token-based. | Low-to-medium. | Moderate; portable if weights, adapters, configs, prompts, and evals are exportable. |
+| **Self-Hosted Private Model** | Regulated data, predictable high volume, sovereign/private deployment, low-latency internal workflows. | Strong control over data, routing, telemetry, and deployment lifecycle. | Hardware/VRAM limits, talent needs, reliability burden, patching, utilization risk. | AI-BOM/SBOM, model provenance, security review, eval gates, access controls, operational runbooks. | Fixed capacity plus staffing, power, cooling, and lifecycle costs. | High. | Low for weights, higher for serving stack, adapters, quantization format, and operational knowledge. |
+| **Open-Source Stack Assembly** | Strong platform engineering team; need custom orchestration, RAG, evals, gateways, or tool execution. | High flexibility, lower vendor coupling, internal control. | Dependency sprawl, license compliance, supply-chain vulnerabilities, upgrade burden. | SBOM, license scanning, dependency patching, maintainer health review. | Engineering payroll dominates. | High. | Moderate; open components reduce lock-in but skills and integration choices still bind. |
+| **In-House Build** | Core differentiating capability; proprietary data/feedback loop; no vendor product fits. | Maximum strategic control and differentiation. | Scope creep, long timelines, high staffing cost, eval failures, maintenance burden. | Full lifecycle governance, model/data lineage, eval program, security and compliance review. | High to extreme. | Extreme. | Low for ownership; high for internal maintenance obligations. |
+| **Hybrid Architecture** | Mixed sensitivity, variable workload classes, need cost optimization and resilience. | Best balance of control, flexibility, and execution-plane diversity when done well. | Orchestration complexity, split debugging, inconsistent behavior across routes. | Owned control plane, policy-as-code, route manifests, eval-by-route, fallback tests. | Potentially optimized, but not automatically cheaper. | High. | Low if abstraction is real; high if “hybrid” is only informal provider sprawl. |
+
+### **Decision Rule**
+
+The preferred architecture is the lowest-complexity sourcing posture that satisfies:
+
+```text
+workflow fit
++ data rights
++ risk tier
++ cost-to-serve
++ operational readiness
++ portability
++ strategic differentiation
+```
+
+Do not self-host to look sophisticated. Do not buy a vendor app that captures the core workflow. Do not use managed APIs without an exit route. The goal is controlled optionality, not ideological purity.
+
+## **AI Stack Ownership Map**
+
+An AI system is a layered dependency graph. Each layer should be classified by the degree of strategic control required. Not every layer must be literally owned, but every critical layer must be controlled through architecture, contract, abstraction, export rights, or operational policy.
+
+```text
+AI STACK CONTROL MAP
+
+[ User Interface / Workflow Surface ]
+        |
+[ Prompts / Context / Product Logic ]
+        |
+[ Evals / Rubrics / Quality Gates ]
+        |
+[ Internal Gateway / Routing / Policy Plane ]
+        |
+[ Retrieval Corpus / Embeddings / Indexes ]
+        |
+[ Tool and Action Execution Layer ]
+        |
+[ Telemetry / Feedback / Audit Evidence ]
+        |
+[ Model Providers / Weights / Serving Runtime ]
+        |
+[ Compute Infrastructure / Hosting Region ]
+```
+
+### **Control States**
+
+| Control State | Meaning |
+| :---- | :---- |
+| **Own** | Enterprise directly controls source, data, configuration, or artifact. |
+| **Control** | Enterprise may not own the layer, but governs access, policy, export, and behavior. |
+| **Abstract** | Enterprise hides implementation behind a stable internal interface. |
+| **Rent** | Enterprise consumes external capability while preserving portability. |
+| **Escrow / Export** | Enterprise requires contractual recovery, migration, or extraction rights. |
+| **Avoid** | Layer creates unacceptable lock-in, data exposure, legal, or operational risk. |
+
+### **Layer Ownership and Control Requirements**
+
+| AI Stack Layer | Target Control State | Rationale | Minimum Control Requirement |
+| :---- | :---- | :---- | :---- |
+| **User Interface / Workflow Surface** | Own or strongly control. | The workflow surface captures user habit, trust, corrections, and process structure. | Exportable workflow data, admin controls, UX authority, role-specific configuration. |
+| **Prompts / Context Compiler** | Own. | Prompts encode domain logic and task policy. | Version-controlled prompt library, route-specific prompt tests, migration path across models. |
+| **Model Route and Provider Selection** | Abstract. | Provider choice should not be hardcoded into applications. | Internal gateway, route aliases, model manifests, fallback configuration. |
+| **Base Model Weights** | Rent, swap, or own depending on use case. | Weights are powerful but not always strategic. | License review, eval baseline, portability assessment, version tracking. |
+| **Fine-Tunes / Adapters** | Own or export. | Adapters may encode proprietary behavior and training investment. | Contractual export rights, lineage, training-data record, reproducibility notes. |
+| **Retrieval Corpus / Knowledge Base** | Own. | Proprietary knowledge is usually more strategic than the base model. | Source ownership, access controls, lineage, retention policy, source-of-record hierarchy. |
+| **Embeddings / Vector Indexes** | Own or preserve migration path. | Embedding geometry can create representation lock-in. | Embedding model registry, reindex plan, raw source preservation, index export. |
+| **Rerankers / Search Components** | Abstract or own. | Search quality matters, but components should be swappable. | Stable retrieval interface, eval set, ranking metrics, fallback search. |
+| **Tool and Action Execution Layer** | Own/control. | This is the system boundary where AI can cause side effects. | Internal authorization, idempotency, action verification, sandboxing, audit logs. |
+| **Policy Engine / Access Control** | Own/control. | Policy cannot be delegated blindly to vendors. | RBAC/ABAC, tenant boundaries, policy-as-code, pre-egress controls. |
+| **Evaluation Sets and Rubrics** | Own. | Evals define whether models work for the enterprise’s task. | Proprietary golden sets, evaluation harness, model/provider comparison history. |
+| **Telemetry and Observability** | Own/control. | Multi-provider systems require independent visibility. | Internal traces, normalized metrics, retention policy, provider-independent dashboards. |
+| **Feedback and Correction Data** | Own/control. | User corrections improve workflow and create proprietary learning loops. | Local capture, no-training default unless approved, export rights, privacy controls. |
+| **Audit Trails and Evidence** | Own/control with retention policy. | Compliance evidence must survive vendor changes. | Secure references, evidence package, retention/deletion rules, audit access. |
+| **Deployment Infrastructure** | Rent or own. | Compute can be rented if workloads remain portable. | Containerization, IaC, region controls, fallback environment, capacity plan. |
+| **Support and Adoption Materials** | Own. | Adoption depends on local workflows and roles. | Internal playbooks, training records, champion feedback, workflow-specific examples. |
+
+The durable rule is: own what differentiates you, control what can harm you, abstract what changes quickly, and rent what is commodity.
+
+## **Open Source, Open Weight, and License Model**
+
+A downloadable model is not automatically open source. AI sourcing must distinguish open-source software, open-source AI systems, permissive open-weight models, restricted open-weight models, research-only models, source-available systems, and hosted proprietary APIs.
+
+The term “open source” should be used carefully. Under the Open Source AI Definition, an Open Source AI system must provide freedoms to use, study, modify, and share, and must make available the preferred forms needed to modify the system, including sufficient data information, code, and parameters.
+
+```text
+MODEL / AI ASSET LICENSING FLOW
+
+[ AI Asset ]
+      |
+      v
+[ Does it grant rights to use, study, modify, and share? ]
+      |
+      +-- no --> [ Proprietary / Source-Available / Restricted ]
+      |
+      v
+[ Are required modification artifacts available? ]
+  data information | code | parameters
+      |
+      +-- no --> [ Open Weights or Source-Available, not full Open Source AI ]
+      |
+      v
+[ Are usage, field, scale, or competition restrictions absent? ]
+      |
+      +-- no --> [ Restricted Open Weights / Custom License ]
+      |
+      v
+[ Open Source AI Candidate ]
+```
+
+### **License and Asset Taxonomy**
+
+| Asset Class | Typical Artifacts Available | Commercial Rights | Strategic Risk | Procurement Treatment |
+| :---- | :---- | :---- | :---- | :---- |
+| **Open Source Software** | Source code under OSI-approved license. | Usually broad commercial use, depending on license. | Standard OSS dependency risk. | SBOM, license scan, vulnerability management. |
+| **Open Source AI System** | Data information, training/inference code, parameters, and rights to use/study/modify/share. | Broad rights if definition and license obligations are met. | Capability, provenance, data documentation, maintenance quality. | Legal review plus AI-BOM/model card/provenance review. |
+| **Permissive Open-Weight Model** | Weights and sometimes inference/training code under permissive terms. | Often broad commercial use. | May not satisfy full Open Source AI definition if training data information or code is incomplete. | License review, provenance review, model-risk evaluation. |
+| **Restricted Open-Weight Model** | Weights available under custom community or acceptable-use license. | Commercial use may be allowed but limited by scale, field, competition, or redistribution terms. | Hidden restrictions, acquisition diligence risk, migration limits. | Legal approval required before production. |
+| **Research / Non-Commercial Model** | Weights/code available for evaluation or academic use. | Commercial production prohibited or unclear. | Accidental production misuse. | Sandbox only unless commercial license obtained. |
+| **Source-Available System** | Code or architecture visible but rights restricted. | Limited by license. | Misclassified as open source; legal exposure. | Treat as proprietary for procurement purposes. |
+| **Hosted Proprietary API** | No weights; behavior exposed through service endpoint. | Governed by contract and terms of service. | Provider lock-in, data rights, drift, deprecation. | Contract, DPA, SLA, data-use review, exit plan. |
+
+### **Required License Review Questions**
+
+| Review Question | Why It Matters |
+| :---- | :---- |
+| Does the license allow commercial use? | Prevents accidental non-commercial use in production. |
+| Are there scale thresholds or revenue/user caps? | Large enterprises may trip thresholds through affiliates or parent-company aggregation. |
+| Are there field-of-use restrictions? | Some licenses ban particular industries, products, or competitive uses. |
+| Are outputs restricted? | Output-use limits can block synthetic data, distillation, or migration strategies. |
+| Are derivative models allowed? | Fine-tuning, adapters, merges, and distillation may be restricted. |
+| Is redistribution allowed? | Determines whether the model can be packaged in products or shipped to customers. |
+| Is there an explicit patent grant? | Important for enterprise legal risk, especially for code and model artifacts. |
+| Are training data details available? | Required for many provenance, risk, and “open source AI” claims. |
+| Are acceptable-use policies incorporated by reference? | Policy changes may alter usable scope over time. |
+| Does the license survive acquisition, affiliate use, and subcontractor deployment? | Enterprise usage rarely maps cleanly to one legal entity. |
+
+### **Procurement Rule**
+
+Do not ask, “Is the model open?” Ask:
+
+```text
+What exact artifact is available?
+Under what exact license?
+For what exact use?
+At what scale?
+With what derivative rights?
+With what output rights?
+With what provenance?
+With what exit path?
+```
+
+The answer should be recorded in the AI inventory before production use.
+
+## **Managed API Evaluation Model**
+
+Managed APIs provide rapid access to high-capability models without operating the underlying infrastructure. They are often the correct sourcing choice for frontier reasoning, variable demand, multimodal workloads, and fast experimentation. They also introduce dependency, drift, data, availability, cost, and portability risks.
+
+### **Managed API Risk and Control Matrix**
+
+| Evaluation Vector | Risk | Required Control | Risk-Tier Notes |
+| :---- | :---- | :---- | :---- |
+| **Model Drift** | Provider updates can change output quality, formatting, latency, or safety behavior. | Private eval sets, route-specific regression tests, change monitoring. | Critical workflows may require scheduled evals; low-risk workflows may use periodic sampling. |
+| **Endpoint Deprecation** | Model versions may be retired or renamed. | Internal route aliases, migration calendar, fallback model, deprecation notice tracking. | Production routes should never depend on undocumented endpoints. |
+| **Version Pinning** | Auto-updating endpoints can silently alter behavior. | Pin model versions where supported; otherwise eval-gate provider changes. | If pinning is unavailable, increase monitoring and fallback readiness. |
+| **Rate Limits and Throttling** | Bursts can create user-visible failures or agent stalls. | Gateway quotas, token budgets, backoff queues, circuit breakers. | High-volume workflows need capacity reservation or multi-provider fallback. |
+| **Availability and SLA** | Provider outage can interrupt business workflow. | SLA review, status monitoring, fallback route, degraded mode. | SLA requirements should match workflow criticality. |
+| **Data Residency** | Requests may be processed or stored in disallowed regions. | Region controls, DPA review, geo-aware routing, approved provider list. | Regulated workflows require explicit evidence. |
+| **Data Use and Retention** | Prompts, outputs, files, logs, or telemetry may be retained or used in ways the enterprise does not permit. | Contractual no-training terms, retention limits, enterprise configuration, audit rights. | Consumer tools should not be assumed safe for enterprise data. |
+| **Cost Volatility** | Pricing changes, long contexts, retries, and agents can inflate spend. | Cost telemetry, budget caps, route optimization, semantic/prefix caching where safe. | Agentic workflows need hard budget and loop limits. |
+| **Provider-Specific Behavior** | Prompts and outputs become tuned to one model’s quirks. | Multi-model evals, prompt compiler, response schemas, portability tests. | Critical workflows should run migration drills. |
+| **Security Boundary** | API keys, files, tool outputs, or PII can leak through integration paths. | Key vaulting, secret rotation, DLP, request filtering, tenant isolation. | Central gateway strongly preferred. |
+
+### **Gateway Abstraction Imperative**
+
+Application code should call an internal AI gateway rather than directly hardcoding provider SDKs and endpoints.
+
+```text
+[ Application ]
+      |
+      v
+[ Enterprise AI Gateway ]
+  identity | quota | policy | routing | logging | cache | eval hooks
+      |
+      +--> Provider A
+      +--> Provider B
+      +--> Hosted open model
+      +--> Self-hosted model
+      +--> Degraded deterministic route
+```
+
+### **Gateway Responsibilities**
+
+| Responsibility | Purpose |
+| :---- | :---- |
+| **Credential Management** | Centralize provider keys, rotate secrets, and prevent developer key sprawl. |
+| **Policy Enforcement** | Apply data, tenant, risk, and tool-use policy before requests leave enterprise control. |
+| **Quota and Budget Control** | Enforce usage limits by tenant, app, user, route, and workflow. |
+| **Routing and Fallback** | Move traffic across providers or local models without application rewrites. |
+| **Version and Route Registry** | Record which model/provider/config served each request. |
+| **Caching Controls** | Use prefix or semantic caching only with tenant, freshness, permission, and policy scope. |
+| **Telemetry Normalization** | Normalize latency, token, cost, error, and quality signals across providers. |
+| **Evaluation Hooks** | Run sampled or scheduled evals by route and risk tier. |
+| **Degraded Modes** | Route to deterministic, cached, local, or human-review fallback when providers fail. |
+
+Managed APIs are rented capability. The enterprise control plane is what prevents rented capability from becoming strategic captivity.
+
+## **Vendor Application Evaluation Model**
+
+Buying a finished AI vendor application can be the right decision when the workflow is commodity, the vendor product fits the user surface, internal engineering capacity is limited, and speed-to-market matters. The risk is that the vendor may capture the workflow, user feedback, data flows, evaluation surface, and operational dependency.
+
+```text
+VENDOR APPLICATION DEPENDENCY CHAIN
+
+[ Enterprise Buyer ]
+        |
+        v
+[ Vendor Application / SaaS UI ]
+        |
+        +--> model provider
+        +--> cloud host
+        +--> analytics provider
+        +--> support tooling
+        +--> subprocessors
+        +--> data stores
+```
+
+### **Vendor Application Evaluation Matrix**
+
+| Evaluation Area | Risk Question | Required Evidence / Control |
+| :---- | :---- | :---- |
+| **Workflow Fit** | Does the vendor product fit the actual workflow, or will users create side channels? | Workflow test, pilot feedback, admin configurability, role-based UX review. |
+| **Data Ownership** | Who owns prompts, outputs, files, embeddings, corrections, and feedback? | Contractual data ownership clause and export rights. |
+| **Subprocessor Chain** | Which downstream providers touch data or model execution? | Current subprocessor list, notification terms, DPA, data-flow diagram. |
+| **Model Transparency** | What models, providers, and routing logic are used? | Model/provider disclosure appropriate to risk tier, change-notice terms. |
+| **Admin and Identity Controls** | Can the enterprise manage users, roles, groups, and access centrally? | SSO/OIDC/SAML, SCIM, RBAC/ABAC, audit logs. |
+| **Data Protection** | What is retained, where, for how long, and for what purpose? | Retention policy, no-training terms, region controls, deletion terms. |
+| **Evaluation and Auditability** | Can the enterprise independently verify quality and risk? | Exportable logs, eval access, audit evidence, incident reports. |
+| **Integration Depth** | Does the vendor integrate with systems of record without brittle copying? | API coverage, webhooks, event logs, transaction boundaries. |
+| **Operational Stability** | What happens if the vendor changes models, pricing, roadmap, or support? | SLA, deprecation notice, change notice, financial health review. |
+| **Exit Path** | Can the enterprise leave without losing data, workflow continuity, or audit evidence? | Export format, termination assistance, deletion certificate, migration plan. |
+
+### **Wrapper Risk**
+
+A vendor application may be a thin workflow layer over a foundation model API. This is not automatically bad, but the buyer must understand what value the vendor actually provides.
+
+| Vendor Value Layer | Good Sign | Warning Sign |
+| :---- | :---- | :---- |
+| **Workflow Design** | Vendor deeply understands the business process. | Generic chat UI over customer data. |
+| **Data Integration** | Clean connectors, permissions, lineage, and source sync. | Manual uploads and unclear access boundaries. |
+| **Evaluation** | Vendor can show task-specific quality evidence. | Only demos and generic benchmark claims. |
+| **Governance** | Admin controls, audit trails, retention, and policy support. | “Trust us” controls with no evidence export. |
+| **Model Operations** | Provider changes are tested and communicated. | Silent model swaps and no version visibility. |
+| **Support** | Clear incident path and customer success process. | No meaningful escalation beyond generic support. |
+
+### **Federal Procurement Planning Note**
+
+Some federal procurement environments may impose special AI disclosure, data-handling, domestic-sourcing, or use-rights requirements. Proposed GSA AI terms in 2026 illustrate the direction of travel: disclosure of AI systems used in contract performance, downstream provider visibility, data segregation, and special government-use rights may become relevant for contractors.
+
+Treat these requirements as jurisdiction- and contract-specific. Do not generalize draft federal procurement terms into universal enterprise doctrine. For government-related work, legal and contracts teams must verify the current clause status before procurement approval.
+
+### **Vendor Application Decision Rule**
+
+Buy the application when:
+
+```text
+workflow is commodity
++ vendor fit is strong
++ data rights are clear
++ exit is tolerable
++ integration burden is lower than building
++ the vendor’s roadmap risk is acceptable
+```
+
+Do not buy when the vendor would own the enterprise’s strategic workflow, feedback loop, evaluation surface, or customer relationship.
+
+## **Open Model and Self-Hosting Strategy**
+
+Self-hosting open-weight or proprietary models can improve data control, cost predictability, latency, and sovereign deployment posture. It also transfers operational responsibility to the enterprise. The organization becomes responsible for serving reliability, GPU capacity, memory pressure, patching, model upgrades, telemetry, security, evaluation, and incident response.
+
+### **Self-Hosting Decision Drivers**
+
+| Driver | Self-Hosting Is Attractive When | Warning |
+| :---- | :---- | :---- |
+| **Data Sensitivity** | Data cannot leave a private environment or approved region. | Self-hosting does not automatically solve access control or logging risk. |
+| **Volume Predictability** | Workload is high-volume and steady enough to utilize reserved capacity. | Low utilization destroys the economics. |
+| **Latency** | Local/private inference meaningfully improves user experience or operational SLOs. | Model size and batching may still dominate latency. |
+| **Cost Control** | Fixed capacity beats variable token pricing at expected utilization. | Staffing and lifecycle costs must be included. |
+| **Portability** | Organization needs model and route independence. | Quantization/runtime choices can create new lock-in. |
+| **Regulatory / Sovereign Need** | Contract or law requires controlled environment. | Governance burden usually rises, not falls. |
+
+### **VRAM and Memory Planning**
+
+VRAM is often the binding constraint in self-hosted inference. A simple parameter-memory heuristic is useful for early planning, but production sizing must include KV cache, batch size, context length, precision, runtime overhead, parallelism, and fragmentation.
+
+```text
+Approximate model memory:
+  model_weight_memory
++ KV_cache_memory
++ runtime_overhead
++ batch_overhead
++ safety_margin
+<= available_accelerator_memory
+```
+
+### **Parameter Memory Heuristic**
+
+| Precision / Quantization | Approximate Weight Memory Per Billion Parameters | Notes |
+| :---- | :---- | :---- |
+| **FP16 / BF16** | ~2 GB per 1B parameters. | Higher quality and compatibility; expensive memory footprint. |
+| **INT8 / 8-bit** | ~1 GB per 1B parameters. | Common compression point. |
+| **4-bit** | ~0.5 GB per 1B parameters. | Useful heuristic; actual memory varies by quantization method and runtime. |
+| **Lower than 4-bit** | Less than ~0.5 GB per 1B parameters. | Requires careful quality and compatibility testing. |
+
+### **KV Cache Scaling**
+
+The KV cache scales with:
+
+```text
+context length
+× batch size
+× number of layers
+× hidden dimensions / attention heads
+× cache precision
+```
+
+Longer context windows and larger batches can exhaust VRAM even when model weights fit. Increasing context is not free. It can reduce throughput, increase memory pressure, and force smaller batch sizes. For many enterprise workflows, better retrieval, chunking, reranking, and context compression are more efficient than simply expanding the active context window.
+
+### **Common Self-Hosting Failure Modes**
+
+| Failure Mode | Cause | Mitigation |
+| :---- | :---- | :---- |
+| **Model fits alone but fails under traffic** | KV cache and batch overhead were ignored. | Load test with realistic context lengths and concurrency. |
+| **CPU offload / fallback collapse** | VRAM exceeded; runtime spills to system memory. | Reduce model size, precision, context, batch, or use larger GPU pool. |
+| **Low utilization economics** | Reserved GPUs sit idle. | Consolidate routes, batch jobs, autoscale, or use managed API for spiky demand. |
+| **Quality regression after quantization** | Compression harms target task behavior. | Run task-specific evals for every precision tier. |
+| **Serving runtime lock-in** | Runtime-specific config, kernels, or formats become hard to migrate. | Document runtime, quantization format, adapter format, and migration tests. |
+| **Patch and driver drift** | CUDA, drivers, runtime, and dependencies diverge. | Maintain reproducible images, SBOM, patch cadence, and rollback images. |
+
+Self-hosting is a control strategy, not a virtue signal. It should be chosen when the organization can operate the system better than it can rent it.
+
+## **Local Deployment Readiness Model**
+
+Local, on-premises, private-cloud, or edge deployment requires more than purchasing GPUs. The organization must be ready to operate hardware, serving runtimes, security controls, telemetry, model lifecycle, incident response, and user support.
+
+### **Readiness Tiers**
+
+| Readiness Tier | Description | Allowed Use |
+| :---- | :---- | :---- |
+| **Tier 0: Not Ready** | No clear owner, hardware plan, security model, evals, or operations path. | No deployment. |
+| **Tier 1: Prototype Only** | Small team can run local models experimentally, but no production SLO or governance. | Offline experiments with non-sensitive or approved test data. |
+| **Tier 2: Pilot Ready** | Serving runtime, access controls, evals, telemetry, and support path exist for bounded scope. | Limited pilot with explicit rollback and human oversight. |
+| **Tier 3: Production Ready** | Capacity, reliability, security, evals, monitoring, incident response, and lifecycle management are in place. | Production deployment for approved risk tier. |
+| **Tier 4: Regulated / Sovereign Ready** | Strong isolation, audit evidence, data residency, supply-chain controls, and compliance operating model exist. | Regulated, high-sensitivity, sovereign, or air-gapped workflows where appropriate. |
+
+### **Readiness Assessment**
+
+| Dimension | Prototype Only | Pilot Ready | Production Ready | Regulated / Sovereign Ready |
+| :---- | :---- | :---- | :---- | :---- |
+| **Model Serving Expertise** | Can run model manually. | Can deploy serving runtime with basic monitoring. | Can operate runtime with batching, autoscaling, rollback, and SLOs. | Can validate runtime in isolated or compliant environment. |
+| **Hardware / Capacity** | Single workstation or ad-hoc GPU. | Known capacity for pilot workload. | Capacity plan, utilization targets, failover, lifecycle plan. | Dedicated or controlled infrastructure with audit evidence. |
+| **Power / Cooling / Facility** | Informal. | Verified pilot environment. | Documented power, cooling, thermal, and maintenance plan. | Facility controls meet regulatory/security needs. |
+| **Security** | Local access only. | SSO or controlled access for pilot users. | RBAC/ABAC, secrets, network controls, tenant isolation. | Strong isolation, evidence logging, vulnerability management. |
+| **Model Provenance** | Informal download. | Hashes, source, license checked. | AI-BOM/model registry, signed artifacts where available. | Formal supply-chain review and approval. |
+| **Evaluation** | Manual spot checks. | Seed eval set. | Regression suite by route/task/risk tier. | Auditable eval evidence and review cadence. |
+| **Telemetry** | Logs only. | Basic latency/error/cost traces. | Full operational, quality, utilization, and incident telemetry. | Tamper-resistant evidence appropriate to risk. |
+| **Operations** | Best effort. | Named owner and pilot runbook. | On-call path, incident response, rollback, patch cadence. | Formal operating procedures and audit trail. |
+| **Support and Training** | Expert-only usage. | Pilot support channel. | User onboarding, support desk, escalation path. | Role-based training and access gating. |
+
+### **Consumer GPU and Commodity Hardware Note**
+
+Consumer or prosumer GPUs can be useful for prototyping, labs, edge cases, and cost-sensitive internal workflows. They may also introduce warranty, availability, driver, cooling, power, memory, and support limitations. Use them deliberately, not because the spreadsheet looked heroic before anyone added operations.
+
+
+## **Hybrid Architecture Pattern Library**
+
+Hybrid AI architectures combine owned control surfaces with multiple execution environments. Their purpose is not complexity for its own sake. A hybrid pattern is justified when it improves cost, privacy, reliability, latency, compliance, or capability while preserving a coherent control plane.
+
+| Pattern | Routing Logic | Best Fit | Core Control Plane Requirement | Primary Risk | Exit Implication |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **Owned Control Plane, Rented Model Plane** | Internal UI/gateway/policy routes to managed APIs. | Fast delivery with strong internal product ownership. | Gateway, route registry, evals, quota, data policy. | Provider drift/deprecation. | Good if provider abstraction is real. |
+| **Sensitive-Local / General-Cloud Split** | Sensitive data stays private; non-sensitive complex tasks use cloud. | Mixed data sensitivity and capability needs. | Data classifier, policy gate, route audit. | Misclassification can leak sensitive data. | Strong if local route can operate independently. |
+| **Small-Local-First Cascade** | Start with small/private model; escalate when confidence/eval fails. | High-volume bounded tasks with occasional complex cases. | Confidence/eval gate, escalation policy, cost telemetry. | Bad confidence scores create poor routing. | Good if prompts/evals work across routes. |
+| **Open Baseline with Proprietary Escalation** | Open/self-hosted model handles standard work; frontier API handles hard cases. | Cost control plus occasional high capability. | Route manifest, model comparison evals, fallback logic. | Behavior inconsistency across model classes. | Strong baseline fallback if proprietary route fails. |
+| **Vendor App with Owned Data/Eval Layer** | SaaS app used for workflow; enterprise owns exports, evals, and correction data. | Commodity workflow with strategic data retention needs. | Export contracts, audit logs, internal eval mirror. | Vendor UI/workflow lock-in. | Moderate if data and correction history are portable. |
+| **Commodity SaaS plus Internal Gateway** | Vendor app or API must pass through enterprise policy/logging layer. | Teams need SaaS speed but governance cannot be delegated. | Proxy/gateway integration, DLP, identity, audit capture. | Vendor API changes or unsupported interception. | Better if vendor supports official APIs/webhooks. |
+| **Private Inference for Regulated Workflows** | Approved workloads route only to isolated private environment. | Regulated, sovereign, confidential, or air-gapped workflows. | Strong identity, audit, model registry, operational runbooks. | High cost and operational burden. | Strong if weights, configs, and data are owned. |
+| **Multi-Provider Resilience Route** | Gateway routes across multiple providers based on health, cost, latency, and eval. | Availability-sensitive and provider-risk-sensitive workloads. | Provider abstraction, health checks, eval parity, fallback policy. | Lowest-common-denominator API design. | Strong if route-specific quality is validated. |
+| **Batch-Private / Interactive-Managed Split** | Offline jobs use self-hosted batch capacity; interactive tasks use managed API. | Heavy batch workloads plus variable user-facing demand. | Scheduler, workload classifier, cost/carbon telemetry. | Queue delays and inconsistent output profile. | Good if artifacts and evals are shared. |
+
+### **Hybrid Architecture Rule**
+
+Hybrid systems need a single owned policy, telemetry, evaluation, and routing story. Without that, “hybrid” means vendor sprawl wearing a fake mustache.
+
+## **Vendor Selection Scorecard**
+
+AI vendors should be evaluated by risk tier, not by a single universal score threshold. A low-risk internal productivity tool, a customer-facing support agent, and a regulated decision-support workflow do not require identical evidence. They do require a consistent review structure.
+
+### **Scoring Dimensions**
+
+| Dimension | Review Question | Evidence Examples |
+| :---- | :---- | :---- |
+| **Capability Fit** | Does the vendor solve the actual workflow better than alternatives? | Pilot results, proprietary evals, latency tests, user acceptance data. |
+| **Security Posture** | Can the vendor protect data, identities, tenants, and infrastructure? | SOC 2 Type II or equivalent, ISO 27001, pen test summary, vulnerability process. |
+| **Data Rights and Retention** | Are prompts, outputs, files, embeddings, telemetry, and feedback protected? | DPA, no-training terms, retention schedule, deletion terms. |
+| **Subprocessor Transparency** | Are downstream providers known and controlled? | Subprocessor list, notification terms, data-flow diagram. |
+| **Governance and Compliance** | Can the vendor support the system’s regulatory and policy obligations? | Risk classification, audit logs, model documentation, region controls. |
+| **Integration Depth** | Does it support enterprise identity, admin, provisioning, and APIs? | SSO/OIDC/SAML, SCIM, RBAC/ABAC, webhooks, admin API. |
+| **Operational Stability** | Can the vendor provide continuity, support, and change notice? | SLA, incident history, roadmap, deprecation policy, support terms. |
+| **Cost Predictability** | Can the enterprise forecast and cap usage cost? | Pricing schedule, overage controls, usage telemetry, renewal terms. |
+| **Portability and Exit** | Can the enterprise leave without losing strategic assets? | Export rights, data format, termination assistance, deletion certificate. |
+| **Financial and Strategic Viability** | Will the vendor survive and remain aligned with the buyer’s needs? | Funding/financial review, customer references, roadmap dependency assessment. |
+
+### **Risk-Tier Evidence Requirements**
+
+| Risk Tier | Minimum Review Posture |
+| :---- | :---- |
+| **Low** | Security questionnaire, DPA where data is processed, basic admin controls, export path. |
+| **Medium** | Security evidence, SSO/SCIM where needed, audit logs, retention terms, pilot eval. |
+| **High** | Legal/security/governance review, data-flow diagram, subprocessor review, SLA, eval evidence, incident process. |
+| **Regulated / Critical** | Formal risk assessment, contractual controls, strong auditability, region controls, exit plan, business-continuity review. |
+
+### **Fatal Flaws**
+
+| Fatal Flaw | Applies Especially To | Decision |
+| :---- | :---- | :---- |
+| Vendor uses customer data for model training without explicit approved consent. | All enterprise tiers. | Reject or renegotiate. |
+| Vendor cannot explain data retention, subprocessors, or region handling. | Medium and above. | Reject until clarified. |
+| Vendor cannot support required identity and access controls. | Medium and above. | Reject for production. |
+| Vendor blocks export of customer-owned data, prompts, corrections, or audit evidence. | Strategic workflows. | Reject or require contractual fix. |
+| Vendor cannot meet required regulatory or contractual constraints. | High / regulated. | Reject. |
+| Vendor refuses reasonable security or incident disclosure terms. | Medium and above. | Reject or escalate. |
+| Product fails proprietary evaluation baseline. | All AI capability claims. | Reject or limit to non-production. |
+| Cost cannot be capped, forecasted, or monitored for expected usage. | High-volume workflows. | Reject or require usage controls. |
+
+A scorecard should support judgment, not replace it. Procurement decisions should record risk tier, accepted residual risks, required mitigations, and the named owner of the vendor relationship.
+
+## **Data Rights and Training-Use Checklist**
+
+AI contracts must define rights and restrictions for prompts, completions, uploaded files, embeddings, vector indexes, telemetry, user corrections, fine-tunes, adapters, logs, and derived artifacts. Marketing assurances are not enough. The controlling terms must appear in the contract, DPA, order form, enterprise settings, or incorporated policy.
+
+### **Contract Review Checklist**
+
+| Checklist Item | Required Question | Required Evidence |
+| :---- | :---- | :---- |
+| **Processing Purpose** | Is customer data processed solely to provide the contracted service? | DPA/service terms. |
+| **No-Training Commitment** | Are prompts, completions, files, embeddings, telemetry, and feedback excluded from vendor model training unless explicitly approved? | Contractual no-training clause or enterprise configuration. |
+| **Retention Period** | How long does the vendor retain each data class? | Retention schedule by data type. |
+| **Deletion Rights** | Can the customer delete data and receive confirmation? | Deletion workflow, certificate/attestation terms. |
+| **Subprocessor Disclosure** | Which downstream providers process customer data? | Subprocessor list and notice period. |
+| **Region and Residency** | Where is data processed, stored, logged, and backed up? | Region controls and data-flow diagram. |
+| **Human Access** | Can vendor personnel review customer inputs/outputs? | Access policy, support access controls, “eyes-off” terms where needed. |
+| **Embeddings and Vector Indexes** | Who owns vector representations and derived search indexes? | Ownership/export clause. |
+| **Feedback and Corrections** | Who owns user edits, ratings, corrections, and workflow telemetry? | Feedback data clause and export rights. |
+| **Fine-Tunes / Adapters** | Who owns custom weights, adapters, datasets, and resulting artifacts? | Fine-tune ownership/export terms. |
+| **Output Rights** | Can outputs be used commercially, redistributed, or used for downstream training? | Output-use clause. |
+| **Audit Rights** | Can the customer verify compliance with data terms? | Audit reports, certifications, contractual audit language. |
+| **Termination Export** | Can the customer export data before termination? | Export format, timeline, assistance clause. |
+
+### **Consumer and Shadow-AI Caution**
+
+Consumer AI tools often have different data-use, retention, training, and admin-control terms than enterprise products. Current provider policies may allow users to opt out of training or choose data-use settings, but those defaults change and vary by product tier. Enterprises should not rely on consumer settings for corporate data protection.
+
+| Tool Type | Enterprise Treatment |
+| :---- | :---- |
+| **Consumer AI account** | Block or restrict for confidential, regulated, or customer data unless explicitly approved. |
+| **Team / Business account** | Review admin settings, data-use terms, retention, and export controls. |
+| **Enterprise contract** | Require negotiated data rights, DPA, retention, audit, and no-training language. |
+| **Vendor-embedded AI feature** | Treat as a subprocessed AI system and review data flow. |
+
+### **Data Rights Rule**
+
+No production AI system should launch until the organization can answer:
+
+```text
+What data enters?
+Where does it go?
+Who can see it?
+How long is it retained?
+Can it train a model?
+Who owns derived artifacts?
+Can we export it?
+Can we delete it?
+Can we prove the answers?
+```
+
+## **AI Security Review Checklist**
+
+AI security review must cover software supply chain, model artifacts, provider infrastructure, tenant isolation, prompt/tool boundaries, data egress, secrets, and incident response. Traditional SaaS security review is necessary but not sufficient.
+
+| Security Area | Review Question | Required Artifact | Fatal Flaw |
+| :---- | :---- | :---- | :---- |
+| **Model Provenance** | Do we know where the model, weights, tokenizer, adapters, and runtime came from? | Model registry entry, source URL, hash/signature where available. | Unverified model artifact from unofficial source. |
+| **AI-BOM / SBOM** | Are model, code, containers, dependencies, datasets, and tools inventoried? | AI-BOM/SBOM with dependency and license metadata. | No inventory for production dependency. |
+| **License Compliance** | Are use, modification, redistribution, output, and training rights understood? | Legal review and license record. | Production use violates license or unclear commercial rights. |
+| **Provider Security** | Does hosted provider meet required security posture? | SOC 2/ISO evidence or equivalent, pen-test summary, vulnerability process. | Vendor refuses reasonable security evidence for risk tier. |
+| **Tenant Isolation** | Can one tenant/user access another tenant’s data, indexes, prompts, or logs? | Isolation design, access tests, row/index-level controls. | Tenant isolation cannot be demonstrated. |
+| **Secrets Management** | Are API keys, tokens, and credentials centrally managed? | Vault/KMS configuration, rotation policy, access logs. | Hardcoded or developer-local production secrets. |
+| **Prompt Injection and Data Egress** | Can malicious content redirect the system to reveal secrets or exfiltrate data? | Boundary tests, DLP filters, policy hierarchy, red-team cases. | Model can access or leak unauthorized data. |
+| **Tool Execution** | Are model-triggered actions sandboxed, authorized, and verified? | Tool contracts, sandbox policy, idempotency and verification tests. | Model can execute unbounded actions. |
+| **Logging and Retention** | Are prompts, outputs, files, and traces stored safely and minimally? | Retention policy, redaction, secure references, access controls. | Sensitive logs stored broadly or indefinitely without justification. |
+| **Runtime Security** | Are containers, drivers, serving runtimes, and dependencies patched? | Image registry, vulnerability scan, patch cadence. | Unpatched critical vulnerabilities in production path. |
+| **Network Controls** | Is model traffic restricted to approved endpoints and regions? | Egress policy, firewall rules, private networking where needed. | Open outbound network from sensitive AI runtime. |
+| **Incident Response** | Can AI-specific incidents be detected and contained? | Runbook, owner, escalation path, rollback route. | No owner or containment path for production AI system. |
+| **Vulnerability Disclosure** | Does vendor/project report and remediate security issues? | Disclosure policy, SLA, security contact, CVE history. | No credible security response path for critical dependency. |
+
+AI security review should be performed before procurement approval, before production launch, and after material model, provider, tool, or data-flow changes.
+
+## **Integration Cost Model**
+
+The purchase price of an AI dependency is only one part of integration cost. Real integration cost includes identity, permissions, data preparation, retrieval, evals, telemetry, support, governance, fallback, migration, and user enablement.
+
+Avoid universal engineering-hour estimates. Instead, estimate each cost center from system complexity, number of integrations, data volume, risk tier, and required assurance level.
+
+### **Integration Cost Centers**
+
+| Cost Center | Work Included | Estimation Drivers |
+| :---- | :---- | :---- |
+| **Identity and Provisioning** | SSO, OIDC/SAML, SCIM, RBAC/ABAC, group mapping. | Number of directories, roles, tenants, environments. |
+| **Permission Mapping** | Translating enterprise ACLs into retrieval, search, UI, and tool access. | Number of source systems, permission models, tenant boundaries. |
+| **Data Preparation** | Cleaning, parsing, OCR, metadata, deduplication, lineage. | Corpus size, format variety, quality, ownership clarity. |
+| **Embedding and Indexing** | Embedding generation, vector DB setup, chunking, reindexing. | Document/chunk count, dimensions, model choice, update frequency. |
+| **Retrieval Quality** | Reranking, citation verification, source freshness, conflict handling. | Required precision, source complexity, regulated evidence needs. |
+| **Gateway Integration** | Routing, provider abstraction, quota, budget, policy, fallback. | Number of providers/routes/apps/tenants. |
+| **Observability** | Traces, logs, cost, latency, quality, adoption telemetry. | Risk tier, retention, dashboard, incident requirements. |
+| **Evaluation Program** | Golden sets, regression tests, human review, acceptance gates. | Task complexity, failure consequence, domain expertise needed. |
+| **Security and Compliance** | DPA, legal review, SBOM/AI-BOM, pen testing, privacy review. | Data sensitivity, jurisdiction, vendor count, audit obligations. |
+| **Support and Adoption** | Training, documentation, champion network, help desk, onboarding. | User count, workflow change depth, role diversity. |
+| **Resilience and Fallback** | Circuit breakers, retry queues, degraded modes, alternate providers. | Criticality, SLA, provider dependence, traffic volume. |
+| **Exit and Migration** | Export tooling, reindexing, prompt migration, eval comparison, user retraining. | Lock-in dimensions, data volume, workflow coupling. |
+
+### **Reindexing and Embedding Migration Cost**
+
+Changing embedding models often requires rebuilding the vector index. The cost depends on:
+
+```text
+number of source documents
+× chunks per document
+× embedding model cost or infrastructure cost
+× dimensions and storage footprint
+× metadata reconstruction
+× validation and retrieval eval effort
+× downtime or blue-green migration requirements
+```
+
+The safe planning assumption is that embedding migration is a project, not a config flip.
+
+### **Integration Cost Estimate Template**
+
+| Estimate Field | Value |
+| :---- | :---- |
+| Use case / workflow |  |
+| Risk tier |  |
+| Vendor / route |  |
+| Number of user groups |  |
+| Number of source systems |  |
+| Number of data classes |  |
+| Corpus size / chunk estimate |  |
+| Identity integration complexity | Low / Medium / High |
+| Permission mapping complexity | Low / Medium / High |
+| Evaluation burden | Low / Medium / High |
+| Governance burden | Low / Medium / High |
+| Migration/exit burden | Low / Medium / High |
+| Internal teams required |  |
+| External vendor dependency |  |
+| One-time integration estimate |  |
+| Recurring operating estimate |  |
+| Major assumptions |  |
+
+Integration cost is where “cheap API” fantasies go to be politely mugged by reality.
+
+## **Lock-In Taxonomy**
+
+Lock-in is not a singular commercial concern; it is a multi-dimensional technical dependency. Enterprise architects must identify, track, and mitigate eleven distinct dimensions of lock-in.
+
+```
+                  ┌──────────────────────────────────────────────┐  
+                  │              LOCK-IN CATEGORY                │  
+                  └──────────────────────┬───────────────────────┘  
+                                         │  
+        ┌───────────────┬────────────────┼───────────────┬───────────────┐  
+        ▼               ▼                ▼               ▼               ▼  
+  ┌───────────┐   ┌───────────┐    ┌───────────┐   ┌───────────┐   ┌───────────┐  
+  │   MODEL   │   │    API    │    │  PROMPT   │   │ EMBEDDING │   │   DATA    │  
+  └───────────┘   └───────────┘    └───────────┘   └───────────┘   └───────────┘  
+        ▼               ▼                ▼               ▼               ▼  
+  ┌───────────┐   ┌───────────┐    ┌───────────┐   ┌───────────┐   ┌───────────┐  
+  │ WORKFLOW  │   │   EVAL    │    │ AGENT/TOOL│   │COMMERCIAL │   │COMPLIANCE │  
+  └───────────┘   └───────────┘    └───────────┘   └───────────┘   └───────────┘  
+                                         ▼  
+                                   ┌───────────┐  
+                                   │ ADOPTION  │  
+                                   └───────────┘
+```
+
+1. **Model Lock-In**: Product functionality depends on the unique edge-case behaviors, formatting styles, or reasoning quirks of a specific provider's model.12  
+2. **API Lock-In**: Application code directly imports vendor-specific SDKs and endpoints, requiring a codebase refactor to swap providers.12  
+3. **Prompt Lock-In**: System prompts are highly optimized and tuned to one model architecture, producing degraded or incorrect outputs when sent to other models.12  
+4. **Embedding Lock-In (Representation Lock-In)**: Stored vector indexes are tied to the specific mathematical coordinate system and dimensionality of a single embedding model.11 Upgrading or changing the model renders the entire index obsolete overnight.11  
+5. **Data Lock-In**: Interaction history, training data, and user correction logs are stored in a vendor's proprietary cloud and cannot be easily exported.9  
+6. **Workflow Lock-In**: Internal business processes are redesigned around a vendor's custom SaaS user interface, making system migration difficult.10  
+7. **Eval Lock-In**: Performance monitoring and evaluation metrics are managed exclusively inside a vendor’s proprietary dashboard, preventing independent verification.21  
+8. **Agent & Tool Lock-In**: The orchestration platform is tied to a vendor's proprietary tool-calling schema, blocking migration to open-source agent runtimes.23  
+9. **Commercial Lock-In**: High usage-based discounts or multi-year commitments hide future pricing increases and limit bargaining leverage.10  
+10. **Compliance Lock-In**: Audit records, safety proofs, and regulatory reports reside inside a vendor's system, leaving the organization vulnerable during external compliance audits.27  
+11. **Adoption Lock-In**: Staff are trained exclusively on a vendor-specific interface, requiring retraining during system migrations.22
+
+## **AI Vendor Exit Plan Template**
+
+Every production AI dependency must have an exit plan before launch. Exit planning is not pessimism. It is dependency hygiene. Vendors change prices, models, policies, regions, roadmaps, ownership, and terms. Systems that cannot leave cannot negotiate.
+
+### **Exit Plan Summary**
+
+| Field | Required Detail |
+| :---- | :---- |
+| Vendor / dependency |  |
+| Workload / product surface |  |
+| Risk tier |  |
+| Exit trigger | price, outage, breach, deprecation, performance regression, legal change, roadmap failure, acquisition, etc. |
+| Replacement route | secondary provider, self-hosted model, deterministic fallback, manual workflow. |
+| RTO target | Risk-tier-specific recovery time objective. |
+| RPO target | Risk-tier-specific recovery point objective for data/evidence loss. |
+| Critical data to export | prompts, outputs, files, embeddings, indexes, logs, evals, feedback, adapters, configs. |
+| Non-exportable data | vendor-owned or unavailable artifacts. |
+| User impact | retraining, UI change, workflow disruption. |
+| Owner | named business, technical, legal, and operational owners. |
+
+### **Exit Phases**
+
+| Phase | Purpose | Required Actions | Acceptance Criteria |
+| :---- | :---- | :---- | :---- |
+| **1. Trigger and Triage** | Decide whether exit is required. | Confirm trigger, freeze risky changes, notify owners, preserve evidence. | Exit decision recorded with risk and timeline. |
+| **2. Alternative Route Activation** | Maintain service continuity. | Shift traffic through gateway, activate fallback provider/model/manual route. | Error, latency, quality, and safety remain within approved thresholds. |
+| **3. Data Export** | Recover customer-owned and operational artifacts. | Export prompts, outputs, files, logs, feedback, configs, eval results, and metadata. | Export manifest reconciles against inventory. |
+| **4. Embedding / Index Migration** | Avoid representation lock-in. | Rebuild index with target embedding model; run retrieval evals; perform blue-green cutover. | Retrieval quality and latency meet workload-specific thresholds. |
+| **5. Prompt and Route Migration** | Preserve behavior. | Recompile prompts for target model/route; validate schema, safety, and task quality. | Eval suite passes acceptance gate. |
+| **6. Tool and Integration Migration** | Preserve side-effect safety. | Rebind APIs, credentials, webhooks, tool schemas, action verification. | End-to-end transaction tests pass. |
+| **7. User and Support Transition** | Preserve adoption and continuity. | Update training, support docs, announcements, escalation path. | Users can complete critical workflows. |
+| **8. Deletion and Termination** | End dependency cleanly. | Request deletion/return, revoke access, rotate keys, obtain deletion attestation where contractually available. | Legal/procurement sign-off complete. |
+| **9. Post-Exit Review** | Improve future sourcing. | Document causes, surprises, missing clauses, migration pain, residual risks. | Lessons feed procurement and architecture standards. |
+
+### **Exit Drill Requirements**
+
+| Dependency Criticality | Drill Cadence |
+| :---- | :---- |
+| **Low** | Paper review before renewal. |
+| **Medium** | Annual export and route-switch test. |
+| **High** | Semiannual fallback and data-export test. |
+| **Critical / Regulated** | Regular operational drills with measured RTO/RPO and evidence review. |
+
+Exit plans should define thresholds by workload. A support chatbot and a regulated transaction system do not need the same RTO, but both need to know how they leave.
+
+## **Real Total Cost of Ownership (TCO) Model**
+
+AI sourcing decisions must be evaluated using real total cost of ownership, not subscription price or token price alone.
+
+```text
+Real TCO =
+  C_vendor
++ C_infra
++ C_integration
++ C_governance
++ C_ops
++ C_support
++ C_eval
++ C_security
++ C_risk
++ C_lifecycle
++ C_exit
+```
+
+| Cost Variable | Meaning |
+| :---- | :---- |
+| **C_vendor** | SaaS subscription, managed API usage, support tier, overages, renewal increases. |
+| **C_infra** | GPUs, cloud instances, storage, networking, power, cooling, reserved capacity. |
+| **C_integration** | Identity, permissions, API work, data pipelines, gateway, reindexing, workflow changes. |
+| **C_governance** | Legal review, DPA, procurement, compliance documentation, audit preparation. |
+| **C_ops** | Platform engineering, MLOps, SRE, incident response, monitoring. |
+| **C_support** | User training, help desk, champion network, documentation, change management. |
+| **C_eval** | Golden sets, regression testing, human review, model comparison, eval infrastructure. |
+| **C_security** | SBOM/AI-BOM, pen testing, vulnerability management, access review. |
+| **C_risk** | Expected loss from outages, breaches, hallucinations, compliance failures, support incidents. |
+| **C_lifecycle** | Upgrades, patching, hardware refresh, model migration, data retention, decommissioning. |
+| **C_exit** | Export, reindexing, prompt migration, retraining, contract termination, deletion verification. |
+
+### **TCO Worksheet**
+
+| Cost Center | Year 0 / Setup | Annual Recurring | Scaling Driver | Confidence |
+| :---- | :---- | :---- | :---- | :---- |
+| Vendor fees |  |  | seats / tokens / requests / usage tier | High / Medium / Low |
+| Infrastructure |  |  | GPU hours / storage / traffic / regions | High / Medium / Low |
+| Integration |  |  | source systems / APIs / identity / data volume | High / Medium / Low |
+| Governance and legal |  |  | risk tier / jurisdictions / vendors | High / Medium / Low |
+| Operations |  |  | routes / SLOs / incidents / model count | High / Medium / Low |
+| Support and adoption |  |  | users / roles / training intensity | High / Medium / Low |
+| Evaluation |  |  | task types / risk / release cadence | High / Medium / Low |
+| Security |  |  | dependencies / data sensitivity / tools | High / Medium / Low |
+| Lifecycle |  |  | hardware / model changes / retention | High / Medium / Low |
+| Exit |  |  | lock-in dimensions / data volume / migration complexity | High / Medium / Low |
+
+### **Sensitivity Variables**
+
+| Variable | Why It Matters |
+| :---- | :---- |
+| Token volume growth | Turns small usage fees into major COGS. |
+| Context length | Drives input token cost and latency. |
+| Output length | Drives generation cost and review burden. |
+| Retry / failure rate | Creates hidden cost. |
+| Human review time | Can erase AI productivity gains. |
+| Utilization | Determines whether self-hosting economics work. |
+| Provider price changes | Alters managed API/vendor app economics. |
+| Data growth | Drives storage, embedding, and reindexing cost. |
+| Risk tier changes | Increases governance, eval, and audit cost. |
+| Migration frequency | Turns exit cost into recurring architecture burden. |
+
+### **TCO Comparison Template**
+
+| Decision Option | Strength | Major Cost Driver | Major Risk | Exit Burden | Best When |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **Vendor Application** | Fastest workflow deployment. | Seats, premium features, renewal pricing. | Workflow and data lock-in. | Medium to high. | Workflow is commodity and vendor fit is strong. |
+| **Managed API** | Fast capability access. | Token/context/retry volume. | Provider drift and cost volatility. | Medium if gateway exists. | Demand is variable or frontier capability matters. |
+| **Hosted Open Model** | More control without full ops burden. | Hosting capacity and support. | Runtime/provider dependence. | Medium. | Need data isolation and portable weights. |
+| **Self-Hosted Model** | Strong control and predictable capacity. | Staffing, utilization, hardware lifecycle. | Operational complexity. | Medium; depends on serving stack. | High predictable volume or strict data control. |
+| **Hybrid Architecture** | Flexible optimization. | Gateway/platform complexity. | Debugging and governance complexity. | Low to medium if designed well. | Workloads differ by sensitivity, cost, and capability. |
+
+TCO should be recalculated at renewal, major model migration, workload growth, incident, regulatory change, and hardware refresh.
+
+## **Procurement Reality Model**
+
+AI procurement is a multi-disciplinary operating process. Legal, security, engineering, governance, finance, product, operations, and the business owner must review different parts of the dependency. The goal is not to slow every request equally. The goal is to route each request through the review depth appropriate to its risk.
+
+```text
+AI PROCUREMENT FLOW
+
+[ Intake Request ]
+  use case | data classes | users | vendor | model route | risk hypothesis
+        |
+        v
+[ Triage ]
+  low | medium | high | regulated / prohibited
+        |
+        +--> [ Fast Track Review ]
+        |
+        +--> [ Standard Review ]
+        |
+        +--> [ Enhanced Review ]
+        |
+        +--> [ Block / Legal Escalation ]
+        |
+        v
+[ Parallel Review ]
+  legal/DPA
+  security
+  engineering/integration
+  governance/compliance
+  finance/TCO
+  product/workflow fit
+  adoption/support
+        |
+        v
+[ Decision ]
+  approve
+  approve with controls
+  sandbox only
+  revise and resubmit
+  reject
+        |
+        v
+[ Inventory + Monitoring + Renewal Review ]
+```
+
+### **Risk-Tier Review Matrix**
+
+| Procurement Tier | Example Use | Review Requirements | Decision Options | Review Cadence |
+| :---- | :---- | :---- | :---- | :---- |
+| **Tier 1: Low Risk** | Internal productivity tool with non-sensitive data. | Lightweight security/privacy review, acceptable-use rules, vendor terms check. | Approve, approve with limits, sandbox only. | Renewal or material change. |
+| **Tier 2: Medium Risk** | Customer-facing drafting, internal RAG, workflow automation with limited data. | DPA, security evidence, data-flow review, admin controls, eval/pilot. | Approve with controls, pilot, revise. | Annual or material change. |
+| **Tier 3: High Risk** | Sensitive data, external outputs, important business decisions, automated tool use. | Legal, security, governance, eval, incident plan, exit plan, SLA, subprocessor review. | Controlled approval, limited scope, revise, reject. | Semiannual, renewal, incident, model/provider change. |
+| **Tier 4: Regulated / Critical** | High-impact, regulated, safety, employment, finance, healthcare, law, or irreversible actions. | Formal risk assessment, human oversight, audit evidence, model documentation, operational controls. | Executive/legal approval, manual-only support, reject. | Continuous or event-triggered review. |
+| **Prohibited / Unacceptable** | Unlawful, discriminatory, non-consensual, unsafe, or policy-prohibited use. | Legal escalation and technical block. | Reject/block. | Immediate. |
+
+### **Review Workstreams**
+
+| Workstream | Reviews |
+| :---- | :---- |
+| **Product / Business Owner** | Workflow fit, value, user population, adoption burden, success metrics. |
+| **Legal / Privacy** | DPA, data rights, retention, subprocessors, SCCs, IP, output rights, deletion. |
+| **Security** | Vendor security, tenant isolation, access control, secrets, supply chain, incident terms. |
+| **Engineering** | Integration complexity, gateway compatibility, APIs, fallback, telemetry, scalability. |
+| **Governance / Compliance** | Risk classification, audit evidence, human oversight, regulatory obligations. |
+| **Finance / FinOps** | TCO, cost caps, renewal exposure, usage-based pricing, exit cost. |
+| **Operations / Support** | Runbooks, owner, help desk, user support, escalation, incident handling. |
+| **Adoption / Enablement** | Training, role impact, champion needs, communication, feedback loop. |
+
+### **Mandatory Procurement Artifacts**
+
+| Artifact | Required When |
+| :---- | :---- |
+| Intake form | All AI procurements. |
+| Data-flow diagram | Medium risk and above. |
+| Vendor security evidence | All production uses; depth by risk. |
+| DPA / data rights review | Any customer, employee, confidential, or regulated data. |
+| AI inventory entry | All approved systems. |
+| Evaluation result | Any AI capability claim used in workflow. |
+| TCO estimate | Medium/high volume or paid production use. |
+| Exit plan | Medium risk and above; all strategic dependencies. |
+| Adoption/support plan | Any broad user rollout. |
+| Risk acceptance record | Any residual material risk. |
+
+Procurement should end with an owned inventory record, not an email saying “approved.” The inventory record is what enables renewal review, incident response, audit, and exit.
+
+## **Cross-Canon Handoff Map**
+
+AI-ENG-AH defines sourcing architecture and strategic dependency design. It determines when to build, buy, self-host, use open-weight models, consume managed APIs, assemble open-source stacks, or route across hybrid execution planes. It connects product strategy, governance, runtime architecture, security, sustainability, telemetry, evaluation, procurement, and exit planning.
+
+| Canon Report | Handoff Into AH | AH Use | Handoff Back |
+| :---- | :---- | :---- | :---- |
+| **AI-ENG-AF — Product Architecture** | Use-case fit, workflow value, risk tier, product pattern. | Determines whether sourcing is justified and what capability is actually needed. | Sourcing constraints inform product surface and use-case viability. |
+| **AI-ENG-AG — Adoption Systems** | Training, support, role impact, feedback loops, adoption burden. | Evaluates vendor support, change cost, and user migration risk. | Vendor choice informs enablement and support architecture. |
+| **AI-ENG-AD — Governance Architecture** | Policy, audit, procurement controls, accountability, risk classification. | Defines approval paths, vendor obligations, and evidence requirements. | Sourcing decisions populate AI inventory and governance records. |
+| **AI-ENG-AE — Sustainable AI** | Energy, lifecycle, hardware utilization, carbon/water impact. | Adds sustainability to build/buy/self-host decisions. | Deployment choice feeds sustainability telemetry and lifecycle review. |
+| **AI-ENG-J — Throughput Mechanics** | Batching, latency, queueing, token economics. | Informs serving cost and provider/runtime selection. | Sourcing choices constrain throughput design. |
+| **AI-ENG-K — Weight Dynamics** | Quantization, adapters, model variants, portability. | Evaluates open-weight/self-host viability and migration risk. | License and hosting choices constrain model adaptation. |
+| **AI-ENG-L — Serving Architecture** | Gateways, routing, fallback, model serving topologies. | Implements “own control plane; vary execution plane.” | Vendor/provider choices become route manifests. |
+| **AI-ENG-N — Tool Contracts** | Tool schemas, permissions, side effects. | Evaluates vendor/tool integration risk. | Vendor tools must comply with internal tool contract requirements. |
+| **AI-ENG-O — Action Verification** | Verification, idempotency, source-of-record checks. | Determines whether vendor or agentic systems may execute actions. | Procurement requires action verification evidence. |
+| **AI-ENG-T — Boundary Defense** | Tenant isolation, prompt injection, egress, data boundaries. | Shapes security review and provider eligibility. | Vendor risks feed boundary defense controls. |
+| **AI-ENG-U — Supply Chain Security** | SBOM, AI-BOM, provenance, cryptographic trust, vulnerability management. | Drives open-source, open-weight, and vendor security diligence. | Sourcing records feed supply-chain inventory. |
+| **AI-ENG-V — Resource Abuse** | Cost bombs, loop limits, denial-of-wallet. | Requires budget caps, gateway quotas, and agent loop controls in contracts/design. | Vendor/API choices feed resource-abuse controls. |
+| **AI-ENG-W — UX Resilience** | Fallback, degraded modes, user continuity. | Requires continuity planning and exit-aware user experience. | Sourcing choices define degraded-mode options. |
+| **AI-ENG-X — Trust** | Transparency, contestability, user confidence. | Vendor opacity and workflow capture are trust risks. | Vendor disclosures and UI controls feed trust design. |
+| **AI-ENG-Y — Human Review** | Human approval, reviewer burden, escalation. | Determines whether vendor app or automation needs human gates. | Sourcing choices affect review workload and staffing. |
+| **AI-ENG-Z — Telemetry** | Traces, metrics, cost, latency, quality, adoption telemetry. | Requires provider-independent observability and cost tracking. | Vendor route data feeds telemetry schema. |
+| **AI-ENG-AA — Evaluation** | Golden sets, regression gates, model comparisons. | Vendor/model selection must pass proprietary evals. | Sourcing strategy defines eval-by-route requirements. |
+| **AI-ENG-AB — Verification Artifacts** | Evidence packages, replay, audit records. | Requires exportable evidence and audit trails. | Vendor contracts define evidence availability. |
+| **AI-ENG-AC — AI Operations** | Incident response, rollback, runbooks, containment. | Requires vendor incident terms, fallback routes, and exit drills. | Procurement decisions become operational dependencies. |
+| **AI-ENG-AJ — Reference Architectures** | Reusable enterprise architecture patterns. | Converts sourcing doctrine into implementation blueprints. | AH patterns become reference architecture variants. |
+
+### **Core Handoff Rule**
+
+Sourcing is architecture. A vendor contract, model license, API endpoint, embedding model, gateway, support term, or export clause can determine whether an AI system is portable, governable, profitable, safe, and durable.
+
+The enterprise should not merely ask:
+
+```text
+Which model is best?
+```
+
+It should ask:
+
+```text
+Which dependencies are we creating?
+Who controls them?
+How do we verify them?
+How do we operate them?
+How do we leave?
+```
+
+#### **Works cited**
+
+1. Open Source AI, accessed June 15, 2026, [https://opensource.org/ai](https://opensource.org/ai)  
+2. The Open Source AI Definition – 1.0 – Open Source Initiative, accessed June 15, 2026, [https://opensource.org/ai/open-source-ai-definition](https://opensource.org/ai/open-source-ai-definition)  
+3. The Future of Open Source in the AI Era - Blog - One Horizon, accessed June 15, 2026, [https://onehorizon.ai/blog/the-future-of-open-source-in-the-ai-era](https://onehorizon.ai/blog/the-future-of-open-source-in-the-ai-era)  
+4. Meta Llama 3 and the 700M MAU Limit: Who This License Does Not ..., accessed June 15, 2026, [https://wcr.legal/llama-3-license-700m-mau-limit/](https://wcr.legal/llama-3-license-700m-mau-limit/)  
+5. AI Gateway Architecture: A Guide for Technical Teams | MLflow, accessed June 15, 2026, [https://mlflow.org/articles/ai-gateway-architecture-a-guide-for-technical-teams/](https://mlflow.org/articles/ai-gateway-architecture-a-guide-for-technical-teams/)  
+6. Hybrid AI routing | Services - SLM-Works, accessed June 15, 2026, [https://slm-works.ai/services/hybrid-routing](https://slm-works.ai/services/hybrid-routing)  
+7. LLM Gateway: Architecture, Routing & Governance Guide | Axiom Studio, accessed June 15, 2026, [https://axiomstudio.ai/learn/what-is-an-llm-gateway](https://axiomstudio.ai/learn/what-is-an-llm-gateway)  
+8. Deployment - Truefoundry, accessed June 15, 2026, [https://www.truefoundry.com/deployment](https://www.truefoundry.com/deployment)  
+9. Enterprise AI Procurement & Contract Negotiation: The Complete Guide (2026), accessed June 15, 2026, [https://thenegotiationexperts.com/blog/ai-complete-guide](https://thenegotiationexperts.com/blog/ai-complete-guide)  
+10. AI Vendor Agreements & Enterprise AI Transactions Explained - Altawil Law Group, accessed June 15, 2026, [https://thepathtojustice.com/ai-vendor-agreements-enterprise-ai-transactions/](https://thepathtojustice.com/ai-vendor-agreements-enterprise-ai-transactions/)  
+11. Vendor Lock-In in the Embedding Layer: A Migration Story | by Vassiliki Dalakiari | ITNEXT, accessed June 15, 2026, [https://itnext.io/vendor-lock-in-in-the-embedding-layer-a-migration-story-183ea58e3668](https://itnext.io/vendor-lock-in-in-the-embedding-layer-a-migration-story-183ea58e3668)  
+12. What Is an LLM Gateway and How Does It Work? - Truefoundry, accessed June 15, 2026, [https://www.truefoundry.com/blog/llm-gateway](https://www.truefoundry.com/blog/llm-gateway)  
+13. Vector Migration Explained: 7 Reasons Moving Vector Data Is Harder Than It Looks | by Syed | Medium, accessed June 15, 2026, [https://medium.com/@syed_33931/vector-migration-explained-7-reasons-moving-vector-data-is-harder-than-it-looks-1edd66f6c439](https://medium.com/@syed_33931/vector-migration-explained-7-reasons-moving-vector-data-is-harder-than-it-looks-1edd66f6c439)  
+14. LLM Hosting Cost 2026: Self-Host vs API Pricing Guide - AI Superior, accessed June 15, 2026, [https://aisuperior.com/llm-hosting-cost/](https://aisuperior.com/llm-hosting-cost/)  
+15. Self-Hosting LLMs: Hidden Costs You're Missing - Azumo, accessed June 15, 2026, [https://azumo.com/artificial-intelligence/ai-insights/self-hosting-llms-cost](https://azumo.com/artificial-intelligence/ai-insights/self-hosting-llms-cost)  
+16. Self-Hosted LLM Guide: Costs, Architecture & Breakeven Point ..., accessed June 15, 2026, [https://alpacked.io/blog/self-hosted-llm-guide/](https://alpacked.io/blog/self-hosted-llm-guide/)  
+17. The LLM layer you're probably missing (LLM gateway pattern explained) - Redgate, accessed June 15, 2026, [https://www.red-gate.com/simple-talk/ai/the-llm-layer-youre-probably-missing-llm-gateway-pattern-explained/](https://www.red-gate.com/simple-talk/ai/the-llm-layer-youre-probably-missing-llm-gateway-pattern-explained/)  
+18. Top 5 Enterprise AI Gateways for Multi-Model Routing in 2026 - Maxim AI, accessed June 15, 2026, [https://www.getmaxim.ai/articles/top-5-enterprise-ai-gateways-for-multi-model-routing-in-2026/](https://www.getmaxim.ai/articles/top-5-enterprise-ai-gateways-for-multi-model-routing-in-2026/)  
+19. DPA for AI vendors: what to actually check before you sign ..., accessed June 15, 2026, [https://companyscope.io/topics/dpa-for-ai-vendors](https://companyscope.io/topics/dpa-for-ai-vendors)  
+20. Vector Database Pricing Models: The Hidden Cost, accessed June 15, 2026, [https://www.actian.com/blog/databases/the-hidden-cost-of-vector-database-pricing-models/](https://www.actian.com/blog/databases/the-hidden-cost-of-vector-database-pricing-models/)  
+21. LLM Gateway Architecture: 2026 Engineering Reference - Digital Applied, accessed June 15, 2026, [https://www.digitalapplied.com/blog/llm-gateway-architecture-2026-engineering-reference](https://www.digitalapplied.com/blog/llm-gateway-architecture-2026-engineering-reference)  
+22. Preparing for EU AI Act Compliance with ISO 42001 - A-LIGN, accessed June 15, 2026, [https://www.a-lign.com/articles/preparing-for-eu-ai-act-compliance](https://www.a-lign.com/articles/preparing-for-eu-ai-act-compliance)  
+23. The Full Picture of 2026 Enterprise AI Architecture: A New World of Autonomous Infrastructure Opened by Hybrid LLMs, AI Gateways, and AgentOS - note, accessed June 15, 2026, [https://note.com/betaitohuman/n/n1c9b6d466f6b?hl=en](https://note.com/betaitohuman/n/n1c9b6d466f6b?hl=en)  
+24. SOFTWARE BILL OF MATERIAL FOR AI - BSI, accessed June 15, 2026, [https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/KI/SBOM-for-AI_minimum-elements.pdf?__blob=publicationFile&v=4](https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/KI/SBOM-for-AI_minimum-elements.pdf?__blob=publicationFile&v=4)  
+25. What Is an AI-BOM (AI Bill of Materials)? & How to Build It - Palo Alto ..., accessed June 15, 2026, [https://www.paloaltonetworks.com/cyberpedia/what-is-an-ai-bom](https://www.paloaltonetworks.com/cyberpedia/what-is-an-ai-bom)  
+26. What Is an LLM Gateway? The Missing Layer Between Your App and AI Models, accessed June 15, 2026, [https://openrouter.ai/blog/insights/llm-gateway/](https://openrouter.ai/blog/insights/llm-gateway/)  
+27. ISO 42001 Documentation: What's Required for Compliance? - Hicomply, accessed June 15, 2026, [https://www.hicomply.com/en-us/hub/documentation-requirements](https://www.hicomply.com/en-us/hub/documentation-requirements)  
+28. ISO 42001 Checklist (2026): 38 Controls for AI Management | Knowlee, accessed June 15, 2026, [https://www.knowlee.ai/blog/iso-42001-checklist-ai-management](https://www.knowlee.ai/blog/iso-42001-checklist-ai-management)  
+29. What Is Gemma 4's Apache 2.0 License? Why It Matters More Than the Model Itself, accessed June 15, 2026, [https://www.mindstudio.ai/blog/gemma-4-apache-2-license-commercial-use](https://www.mindstudio.ai/blog/gemma-4-apache-2-license-commercial-use)  
+30. Vector Database: Everything You Need to Know - WEKA, accessed June 15, 2026, [https://www.weka.io/learn/guide/ai-ml/vector-database/](https://www.weka.io/learn/guide/ai-ml/vector-database/)  
+31. The State of “Open” Source AI – Gabriel Toscano - Sites@Duke Express, accessed June 15, 2026, [https://sites.duke.edu/gabrieltoscano/2026/02/05/the-state-of-open-source-ai/](https://sites.duke.edu/gabrieltoscano/2026/02/05/the-state-of-open-source-ai/)  
+32. FinOps for AI: Tools & Services Considerations, accessed June 15, 2026, [https://www.finops.org/wg/finops-for-ai-tools-services-considerations/](https://www.finops.org/wg/finops-for-ai-tools-services-considerations/)  
+33. What Is the Gemma 4 Apache 2.0 License? Why It Changes ..., accessed June 15, 2026, [https://www.mindstudio.ai/blog/what-is-gemma-4-apache-2-license-commercial-ai-deployment](https://www.mindstudio.ai/blog/what-is-gemma-4-apache-2-license-commercial-ai-deployment)  
+34. GSA AI Procurement Rules Would Introduce New Disclosure and Use-Rights Requirements for Federal Contractors - Gibson Dunn, accessed June 15, 2026, [https://www.gibsondunn.com/gsa-ai-procurement-rules-would-introduce-new-disclosure-and-use-rights-requirements-for-federal-contractors/](https://www.gibsondunn.com/gsa-ai-procurement-rules-would-introduce-new-disclosure-and-use-rights-requirements-for-federal-contractors/)  
+35. "Additional Commercial Terms" must be removed from LICENSE to make Llama 3 open source #156 - GitHub, accessed June 15, 2026, [https://github.com/meta-llama/llama3/issues/156](https://github.com/meta-llama/llama3/issues/156)  
+36. meta-llama/Llama-3.3-70B-Instruct - Hugging Face, accessed June 15, 2026, [https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct)  
+37. Significant Risks in Using AI Models Governed by the Llama License - Open Source Guy, accessed June 15, 2026, [https://shujisado.org/2025/01/27/significant-risks-in-using-ai-models-governed-by-the-llama-license/](https://shujisado.org/2025/01/27/significant-risks-in-using-ai-models-governed-by-the-llama-license/)  
+38. Eight essential clauses for AI contracts: A guide for vendors and customers in Northern Ireland - A&L Goodbody, accessed June 15, 2026, [https://www.algoodbody.com/insights-publications/eight-essential-clauses-for-ai-contracts-a-guide-for-vendors-and-customers-in-northern-ireland](https://www.algoodbody.com/insights-publications/eight-essential-clauses-for-ai-contracts-a-guide-for-vendors-and-customers-in-northern-ireland)  
+39. Vector Database Challenges: What Breaks in Production - Redis, accessed June 15, 2026, [https://redis.io/blog/common-challenges-working-with-vector-databases/](https://redis.io/blog/common-challenges-working-with-vector-databases/)
+
+---
+
+# [Volume 12. AI-AK - Engineering Method and System Doctrine]
+
+---
+
+# AI-ENG-AI — Contract Thinking - Deterministic Edges Around Probabilistic Cores
+
+## **Doctrinal Introduction & The Contract Thinking Doctrine**
+
+In high-dimensional artificial intelligence engineering, the primary challenge is not the elimination of model non-determinism, but rather the containment of that non-determinism within safe, verifiable boundaries. This paradigm, formulated as probabilistic containment architecture, recognizes that the cognitive flexibility of large language models is highly valuable during internal inference, but presents severe risks when allowed to interface directly with stateful, authoritative, or public-facing systems. Good systems design does not attempt to force the entire model into absolute predictability; instead, it establishes a rigid, deterministic envelope around the model's probabilistic core. The model may execute complex synthesis, logical deduction, and creative planning within this bounded space, but every boundary crossing—or seam—must conform to a strict, typed, and enforceable contract.  
+This methodology generalizes Bertrand Meyer’s Design by Contract (DbC) framework, originally formulated in 1986 to improve traditional software reliability.1 Meyer identified correctness—the ability of software to perform its exact tasks as defined by its specification—as the supreme quality of software, supplemented by robustness, efficiency, extendibility, reusability, and compatibility.3 While defensive programming suggests adding redundant checks everywhere, it leads to code complexity—the primary obstacle to software quality.2 DbC advocates an "offensive programming" posture: establish clear preconditions, postconditions, and invariants, and "fail hard" immediately when assertions are violated, simplifying debugging and ensuring correctness.1  
+Applying the Liskov Substitution Principle to AI contract boundaries establishes clear constraints on function execution 4:
+
+* **Preconditions cannot be strengthened:** An implementation must not accept a narrower range of input than the interface specification dictates.4  
+* **Postconditions cannot be weakened:** An implementation must not return a wider, more ambiguous range of output than the specification guarantees.4  
+* **Invariants cannot be weakened:** An implementation must maintain core system state within specified tolerances throughout execution.4
+
+In AI engineering, the model is inherently probabilistic. We cannot make the model itself fully deterministic. The useful question is: *Can we make every boundary around the model explicit, enforceable, observable, testable, and safe to breach-handle?* Inside the box, the model operates with probabilistic freedom; at the edges, it must sign deterministic paperwork.  
+To establish this discipline, systems architects must maintain clean distinctions across multiple operational dimensions:
+
+* **Flexibility versus Authority:** The generative core is permitted to reason, draft, and propose, but it holds zero administrative authority. Any execution of state changes, data mutation, or outbound communication must be mediated by a deterministic runtime that validates permissions and rules before execution.5  
+* **Schema Validity versus Truth:** A model output conforming perfectly to a JSON schema is structurally valid, but syntactic correctness does not imply factual accuracy. Structuring constraints ensure format compliance; separate semantic and factual verifications are required to confirm truth.7  
+* **Prompt Instruction versus Enforceable Boundary:** Instructions embedded within prompts (e.g., "never reveal system keys") are instructions, not security controls.6 Actual boundaries must be enforced by isolated software filters, input-scrubbing routines, and policy-as-code sidecars that are completely outside the model's context window.  
+* **Model Capability versus System Permission:** A model’s computational ability to generate a tool invocation, generate SQL, or draft a financial transaction must never be confused with systemic authorization to perform that action.5  
+* **Generated Action versus Authorized Action:** Actions drafted by the model are treated as unauthenticated proposals. They are only translated into physical side effects after passing through a deterministic authorization engine (such as Open Policy Agent or Cedar).6  
+* **Grounding versus Citation-Shaped Decoration:** The presence of inline footnotes and citation links in a generated output often serves as a persuasive UX element rather than factual proof.8 Rigid grounding contracts must programmatically verify that claims are supported by retrieved sources, with proper temporal and logical qualifiers.7  
+* **Memory versus Surveillance:** Persistent agentic memory must not become an unconstrained data sink. It requires strict tenant isolation, local pseudonymization, automatic retention rules, and user-controlled deletion paths to prevent liability and privacy leakage.9  
+* **Eval Score versus Release Contract:** An eval is a formal release gate, not a subjective vibe check.14  
+* **Logs versus Compliance Evidence:** Raw diagnostic logs track errors; immutable, cryptographically signed events serve as compliance evidence.11  
+* **User Trust versus User Expectation Contract:** UX must cultivate calibrated trust, ensuring users rely on the system when correct and override it when it fails.17  
+* **Vendor Route versus Model-Route Contract:** Gateway abstraction maintains system stability across changing provider deployments.20  
+* **Fallback versus Contract Downgrade:** Fault tolerance must preserve safety properties even when dropping back to less capable local models.20
+
+## **Conceptual Glossary**
+
+The following standardized terms form the core vocabulary of the contract thinking doctrine and are defined for uniform engineering application:
+
+| Term | Doctrinal Definition |
+| :---- | :---- |
+| **Contract Thinking** | The engineering practice of placing deterministic, typed, versioned, enforceable, observable, and testable interfaces around probabilistic model behavior at every architectural seam. |
+| **Probabilistic Core** | The internal non-deterministic execution domain of a generative model where token generation, reasoning, and conceptual synthesis occur. |
+| **Deterministic Edge** | The rigid, software-enforced boundary surrounding a probabilistic core that validates inputs, filters outputs, enforces budgets, checks permissions, and handles failures. |
+| **Contract Surface** | Any distinct architectural seam where model outputs or inputs interface with structured systems, human users, external APIs, or storage. |
+| **Contract Stack** | The layered hierarchy of active agreements (from user expectations to deployment manifests) that must remain aligned to prevent silent system failures. |
+| **Schema Contract** | A programmatically enforced definition of output structure, typing, and constraints, typically implemented via constrained decoding at the token level.22 |
+| **Prompt Contract** | A versioned, testable deployment configuration that formalizes the task boundary, instruction hierarchy, and input/output expectations of a model step. |
+| **Retrieval Contract** | An agreement governing context injection, specifying source authority, permission filtering, freshness tolerances, and citation requirements.14 |
+| **Tool Contract** | A highly specific API interface that maps natural language intents to deterministic code execution, enforcing schema validation, auth, and idempotency.5 |
+| **Permission Contract** | A zero-trust authorization boundary that separates model-generated proposals from system-level action execution based on the underlying user's identity.6 |
+| **Resource Contract** | A set of hard runtime constraints governing execution envelopes, including token budgets, call limits, latency ceilings, and cost budgets.16 |
+| **Memory Contract** | Rules governing long-term writable state, defining write validation, retention periods, read scoping, and on-device privacy mapping.12 |
+| **Model Route Contract** | The operational envelope defining which task classes and risk tiers are mapped to specific models, providers, and fallbacks.21 |
+| **Eval Contract** | The quantifiable release gate specifying the performance benchmarks, regression thresholds, and behavioral tests a configuration must pass to ship. |
+| **Deployment Contract** | A cryptographically signed or version-pinned bundle containing prompts, schemas, routing policies, and verification artifacts. |
+| **Observability Contract** | The schema defining tracing spans, telemetry events, redacted logs, and compliance evidence emitted during system execution.16 |
+| **User Expectation Contract** | The user interface patterns and disclosure frameworks that align human trust with actual system competence, preventing automation bias.17 |
+| **Breach Behavior** | The deterministic error-handling pipeline executed immediately when any contract boundary is violated at runtime. |
+| **Contract Drift** | A progressive misalignment between layered contracts (e.g., a product promise exceeding model capability) that leads to silent, systemic failure. |
+
+## **The Contract Stack Model & Drift Diagnostic**
+
+AI systems fail when contract layers silently diverge. A product promise may imply current policy compliance, while retrieval pulls stale documents. A schema may require citations, while the citation verifier only checks that a field exists. A UI may show an action as complete, while the downstream transaction failed. Contract thinking prevents these failures by aligning every layer from user expectation to deployment evidence.
+
+```text
+CONTRACT STACK
+
+[ User Expectation Contract ]
+        |
+[ Product / Workflow Contract ]
+        |
+[ Policy / Permission Contract ]
+        |
+[ Prompt / Context Contract ]
+        |
+[ Retrieval / Memory Contract ]
+        |
+[ Model Route Contract ]
+        |
+[ Schema / Output Contract ]
+        |
+[ Tool / Action Contract ]
+        |
+[ Eval / Verification Contract ]
+        |
+[ Deployment / Observability Contract ]
+```
+
+Each layer must be supported by the layers beneath it. The user interface must not promise a capability the product workflow cannot verify. The prompt must not request evidence the retrieval system cannot supply. The model route must not be assigned to a task class it has not passed. The tool contract must not execute an action the permission contract has not authorized.
+
+### **Contract Drift Diagnostic**
+
+| Drift Pattern | Detection Signal | Safe Runtime Response | Structural Owner | Preventive Practice |
+| :---- | :---- | :---- | :---- | :---- |
+| **User Promise vs. Product Capability** | Users complain that the system did not do what the interface implied. | Downgrade claim, add disclosure, route to human or safer workflow. | Product Owner | Product promises must map to tested capabilities and known limits. |
+| **Product Workflow vs. Model Route** | Complex/high-risk tasks routed to low-capability or low-cost model. | Re-route to approved model class or block with explanation. | Product Architect / Platform Owner | Route manifests tied to task class, risk tier, and eval evidence. |
+| **Prompt vs. Retrieval** | Prompt asks for current/grounded answer but retrieval lacks current or authoritative sources. | Refuse, ask for source, or disclose unsupported status. | Prompt / Retrieval Owner | Prompt context requirements must be checked against corpus metadata. |
+| **Retrieval vs. Freshness** | Retrieved source is stale, superseded, or outside time scope. | Remove stale source, rerun retrieval, disclose conflict or absence. | Corpus / Retrieval Owner | Freshness metadata, source-of-record hierarchy, index lifecycle controls. |
+| **Schema vs. Truth** | Output passes schema validation but fails citation, math, or policy checks. | Block downstream use; send to factual/semantic repair or human review. | Eval / Verification Owner | Multi-layer validation beyond JSON shape. |
+| **Schema vs. Tool Contract** | Model emits structurally valid arguments that violate tool preconditions. | Deny tool call; return structured breach reason. | Tool Owner | Shared typed schemas, preconditions, and postcondition tests. |
+| **Permission vs. Tool Execution** | Tool call authorized by prompt language but not by user identity, role, tenant, or resource policy. | Block before side effect; log policy decision. | Security / Governance Owner | External policy engine, ABAC/RBAC, user-bound delegation. |
+| **Fallback vs. Risk Tier** | Failover route has lower capability, weaker policy, or different data handling. | Degrade authority, disable actions, or route to human. | Platform SRE | Fallbacks must preserve safety properties, not just availability. |
+| **Memory vs. Authority** | Memory from prior sessions influences a task outside active scope. | Restrict memory read, clear active memory, or require user confirmation. | Memory / Privacy Owner | Principal-scoped memory, provenance tags, retention and deletion rules. |
+| **Eval vs. Production Reality** | Offline evals pass but production corrections, incidents, or complaints rise. | Freeze rollout, sample production failures, update eval set. | Evaluation Owner | Production-like eval data and continuous drift monitoring. |
+| **Cost vs. Loop Design** | Spend spike from retries, tool loops, long context, or agent recursion. | Terminate loop, return partial result, alert owner. | Platform / FinOps Owner | Hard budgets, retry caps, loop limits, task-level cost telemetry. |
+| **Observability vs. Evidence** | Logs exist but cannot prove what happened for audit or incident review. | Preserve scoped evidence package; open evidence-quality issue. | Observability / Compliance Owner | Separate telemetry schema from audit-evidence schema. |
+
+### **Drift Response Rule**
+
+When drift is detected, the system should prefer:
+
+```text
+block unsafe action
+downgrade authority
+disclose uncertainty
+reroute only to approved routes
+preserve scoped evidence
+open review when drift repeats
+```
+
+It should not silently “repair” contract drift in ways that hide misalignment. A patched-looking response can be worse than a clean refusal.
+
+## **Contract Surface Inventory**
+
+A contract surface is any seam where probabilistic behavior touches structured systems, users, tools, memory, retrieval, policy, deployment, or evidence. Every surface needs an owner, enforcer, validation method, breach behavior, and evidence boundary.
+
+| Contract Surface | Purpose | Allowed Inputs | Expected Outputs | Owner | Enforcer | Validation | Default Breach Behavior | Evidence Boundary |
+| :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
+| **Prompt Contract** | Defines task, instruction hierarchy, allowed behavior, refusal behavior. | Typed variables, task state, approved context blocks. | Model request package and expected response mode. | Prompt / Product Owner | Prompt compiler / Gateway | Prompt unit tests, eval linkage, version checks. | Use last stable prompt or block route. | Prompt version, hash, route ID, input references. |
+| **Context Contract** | Controls what state enters the model. | User input, session state, retrieved context, system variables. | Permission-filtered context bundle. | Context Owner | Gateway / Context Builder | ACL/RLS, redaction, source allowlist, token budget. | Remove unauthorized context or abort. | Context manifest, source IDs, redaction record. |
+| **Schema Contract** | Makes output machine-readable. | Model output stream or structured decoding result. | Typed object or validation failure. | API / Schema Owner | Parser / Validator | JSON/schema validation, enum checks, required fields. | Retry once if safe; otherwise fail closed. | Schema version, validation result, error class. |
+| **Semantic Contract** | Checks whether field values make business sense. | Parsed object. | Semantically valid object or violation. | Domain Owner | Business-rule validator | Ranges, invariants, cross-field checks. | Reject or route to human. | Rule version, failed invariant, secure payload reference. |
+| **Retrieval Contract** | Defines evidence entering generation. | Query, user permissions, task scope. | Ranked, permissioned, fresh source set. | Retrieval / Corpus Owner | Retriever / Permission Filter | Source authority, freshness, dedupe, relevance, conflict checks. | Refuse grounded answer or disclose unsupported state. | Source IDs, timestamps, retrieval manifest. |
+| **Grounding Contract** | Verifies claims against evidence. | Generated claims, cited sources. | Supported, unsupported, or conflicting claim labels. | Evaluation / RAG Owner | Citation / Claim Verifier | Claim-to-evidence, qualifier, time-scope, contradiction checks. | Block or mark unsupported claims. | Claim IDs, source refs, verifier result. |
+| **Memory Contract** | Governs persistent writable state. | User-approved memory candidates, feedback, preferences. | Scoped memory write/read or rejection. | Memory / Privacy Owner | Memory Controller | Consent, provenance, scope, retention, conflict, delete rules. | Reject memory write or restrict read. | Memory event hash, provenance, retention class. |
+| **Tool Contract** | Converts proposed actions into deterministic calls. | Typed tool arguments and actor context. | Execution result, denial, or error. | Tool Owner | Execution Harness | Preconditions, schema, idempotency, postconditions. | Deny before side effect or compensate if needed. | Action ID, idempotency key, result status. |
+| **Permission Contract** | Determines whether a subject may perform an action. | Subject, tenant, resource, action, arguments, environment. | Allow, deny, require approval, or escalate. | Security / Governance Owner | Policy Engine | RBAC/ABAC, tenant, risk, approval, separation-of-duty rules. | Deny by default. | Policy version, decision, reason codes. |
+| **Resource Contract** | Limits spend, latency, concurrency, retries, loops, and context. | Request, route, session, tenant, budget state. | Continue, throttle, degrade, or terminate. | Platform / FinOps Owner | Gateway / Runtime Monitor | Token, time, cost, queue, retry, loop limits. | Stop loop, return partial, or route to human. | Budget event, usage counters, route ID. |
+| **Model Route Contract** | Maps task class and risk tier to model/provider/fallback. | Task class, data class, risk tier, latency/cost constraints. | Approved route or refusal. | Platform Owner | Model Gateway | Route manifest, eval pass, policy compatibility. | Use approved fallback or fail closed. | Route manifest, provider snapshot, eval status. |
+| **Eval Contract** | Defines release and regression gate. | Candidate prompt/schema/route/tool package. | Pass, fail, conditional pass, or block. | Eval Owner | CI/CD / Eval Harness | Task metrics, safety tests, regression thresholds. | Block deployment or rollback. | Eval report, dataset version, manifest hash. |
+| **Deployment Contract** | Packages active production configuration. | Prompts, schemas, policies, model routes, tools, eval artifacts. | Signed deployment manifest. | SRE / Release Owner | CI/CD Pipeline | Hashes, signatures, approval checks, canary health. | Halt rollout or rollback. | Manifest, approval, rollout status. |
+| **Observability Contract** | Defines runtime telemetry. | Spans, metrics, errors, redacted event fields. | Structured telemetry stream. | Observability Owner | Telemetry Pipeline | Schema validation, redaction, exporter health. | Spool locally or alert. | Trace IDs, metrics, redacted spans. |
+| **Audit Evidence Contract** | Preserves proof for compliance or incident review. | Scoped evidence records. | Tamper-evident evidence package. | Compliance / Security Owner | Evidence Store | Hashing, signatures, retention, access controls. | Preserve minimal required evidence; restrict access. | Evidence package ID, hashes, secure references. |
+| **User Expectation Contract** | Aligns UI claims with system capability. | Rendered output, evidence, controls, disclosures. | Calibrated user action or review. | Product / UX Owner | UI Runtime | Disclosure checks, evidence display, action-state integrity. | Show uncertainty, block action, or require confirmation. | UI state, action confirmation, user decision event. |
+| **Vendor / Sourcing Contract** | Governs external dependency. | Outbound request, data class, provider route. | Service result under contract terms. | Procurement / Legal Owner | Gateway / Vendor Manager | DPA, retention, SLA, no-training, subprocessor controls. | Failover, block route, or open vendor incident. | Vendor route event, contract reference, SLA record. |
+
+The inventory should be maintained as a registry, not as prose buried in a design doc. If a surface has no owner, it has no contract.
+
+## **Prompt Contract Specification**
+
+A prompt is not decorative prose or a venue for model coaxing; it is production code and must be engineered as versioned, testable, and deterministic configuration. Treating the model as the reliability layer is an architectural mistake.5 Instead, prompts must be written inside structured files (such as YAML, JSON, or TOML) that clearly outline the precise runtime conditions under which the model will execute.  
+The system context must also conform to a context contract. This contract specifies exactly what state enters the model, from where, and under what systemic authority.6 To prevent context bleed—which degrades model reasoning capacity by up to 90.2% when irrelevant data is carried across distinct tasks—sub-agents must be isolated by job function.5 Context isolation must be structurally enforced, ensuring that user data does not leak across session boundaries and system instructions remain shielded from malicious user manipulation.  
+The following Prompt Contract Template defines the schema and execution rules for a production-grade prompt configuration:
+
+```YAML  
+meta:  
+  name: "InvoiceExtractionContract"  
+  owner: "FinanceEngineeringGroup"  
+  version: "2.4.1"  
+  last_modified: "2026-03-15T09:30:00Z"  
+  linked_eval_suite: "eval_invoice_extraction_v2"  
+  rollback_target: "2.4.0"  
+  change_log: "Added tax identifier extraction field and updated failure escalation rules."
+
+task_boundary:  
+  description: "Extract line-item billing information from raw unstructured text files."  
+  allowed_languages: ["en", "de", "fr"]  
+  max_input_length_characters: 50000  
+  instruction_hierarchy:  
+    system_directives: 1 # Highest priority, protected from user override  
+    formatting_rules: 2  
+    context_data: 3  
+    user_inputs: 4 # Evaluated as untrusted payload only
+
+input_assumptions:  
+  expected_variables:  
+    - name: "raw_invoice_text"  
+      type: "string"  
+      required: true  
+    - name: "client_id"  
+      type: "uuid"  
+      required: true  
+  context_sources:  
+    - name: "organization_billing_rules"  
+      origin: "postgres_db"  
+      freshness_tolerance_seconds: 86400
+
+behavioral_constraints:  
+  allowed_behavior:  
+    - "Extract merchant name, total, subtotal, tax amounts, line-items, and invoice date."  
+    - "Perform currency code standardization using ISO-4217."  
+  forbidden_behavior:  
+    - "Do not calculate or infer missing values; report them as null."  
+    - "Do not append conversational text, explanations, or markdown commentary outside the structured schema."  
+  uncertainty_behavior:  
+    low_confidence_threshold: 0.85  
+    action: "Set extraction_confidence metric and populate low_confidence_fields array; do not omit the field."  
+  refusal_and_escalation:  
+    condition: "Text does not resemble an invoice or is written in an unsupported language."  
+    response_mode: "explicit_refusal"  
+    refusal_payload:  
+      error_code: "UNSUPPORTED_DOCUMENT_TYPE"  
+      message: "The provided document could not be identified as a valid invoice."  
+      escalate_to: "manual_review_queue"
+
+output_requirements:  
+  format: "json_schema"  
+  schema_reference: "invoice_extraction_schema_v3.json"  
+  evidence_and_citation:  
+    require_grounding: true  
+    citation_scope: "line_level"  
+    minimum_grounding_score: 0.90
+```
+
+## **Schema Contract Model & Multi-Layer Validation**
+
+Schemas turn model output into typed artifacts that software can inspect. A schema contract proves structure, not truth. A perfectly valid JSON object can still contain false claims, unsupported citations, unsafe recommendations, or unauthorized actions.
+
+Structured-output mechanisms and constrained decoding can improve schema adherence, but production systems must still validate outputs at multiple layers.
+
+```text
+SCHEMA VALIDATION STACK
+
+[ Probabilistic Core ]
+        |
+        v
+[ Structured Output / Constrained Decoding Where Supported ]
+        |
+        v
+[ Serialization Validation ]
+  valid JSON / XML / CSV / function call envelope
+        |
+        v
+[ Schema Validation ]
+  required fields | types | enums | object shape
+        |
+        v
+[ Semantic Validation ]
+  domain rules | ranges | invariants | cross-field logic
+        |
+        v
+[ Factual Validation ]
+  evidence | math | source-of-record | citations
+        |
+        v
+[ Policy Validation ]
+  safety | privacy | tenant | compliance | risk tier
+        |
+        v
+[ Action Validation ]
+  preconditions | authorization | idempotency | postconditions
+        |
+        v
+[ Accepted Artifact or Breach Behavior ]
+```
+
+### **Validation Layers**
+
+| Layer | What It Proves | What It Does Not Prove | Enforcement Point | Breach Behavior |
+| :---- | :---- | :---- | :---- | :---- |
+| **Serialization Validation** | Output can be parsed. | Correct schema, truth, safety. | Parser. | Reject or request one safe repair. |
+| **Schema Validation** | Output matches required shape and types. | Values are meaningful or factual. | JSON Schema, Pydantic, Zod, Protobuf, typed SDK. | Reject, retry once, or route to human depending on risk. |
+| **Semantic Validation** | Values obey business rules and invariants. | Claims are sourced or policy-safe. | Business-rule validators. | Reject invalid fields or block artifact. |
+| **Factual Validation** | Claims match evidence, math, or source-of-record data. | User should act or system has permission. | Grounding verifier, calculation engine, database check. | Mark unsupported, remove, refuse, or escalate. |
+| **Policy Validation** | Output is allowed under safety, privacy, tenant, and compliance policy. | Output is useful or complete. | Policy engine / gateway. | Block or redact. |
+| **Action Validation** | Proposed side effect satisfies preconditions, authorization, and postconditions. | User expectation is calibrated. | Tool execution harness. | Deny, compensate, rollback, or escalate. |
+
+### **Schema Contract Requirements**
+
+| Requirement | Purpose |
+| :---- | :---- |
+| **Schema version** | Allows output changes to be tracked and tested. |
+| **Required fields** | Prevents missing data from being silently ignored. |
+| **Closed object policy where appropriate** | Prevents extra unreviewed fields from entering downstream code. |
+| **Explicit nullable fields** | Distinguishes missing, unknown, and not applicable. |
+| **Enum constraints** | Prevents invented status labels. |
+| **Numeric and string constraints** | Enforces ranges and length where supported; always revalidate client-side. |
+| **Cross-field validators** | Catches contradictions such as subtotal greater than total. |
+| **Evidence fields** | Links claims to source IDs or verification references. |
+| **Breach behavior** | Defines reject, repair, clarify, or escalate. |
+
+### **Important Rule**
+
+Do not treat schema adherence as success.
+
+```text
+valid JSON ≠ correct answer
+valid schema ≠ grounded answer
+grounded answer ≠ authorized action
+authorized action ≠ completed action
+completed action ≠ user understood the result
+```
+
+Each equality must be earned by a separate contract.
+
+## **Retrieval Contract Model & RAG Grounding Verification**
+
+Retrieval determines what reality enters the model. The retrieval contract defines which sources may be used, who may access them, how fresh they must be, how conflicts are handled, and what level of evidence is required before the model may make a claim.
+
+The core doctrine is:
+
+```text
+No evidence, no grounded claim.
+Weak evidence, weak claim.
+Conflicting evidence, disclosed conflict.
+Stale evidence, time-bounded claim.
+Unauthorized evidence, no context injection.
+```
+
+### **Retrieval Contract Specification**
+
+| Contract Element | Required Definition |
+| :---- | :---- |
+| **Source Authority** | Which sources are authoritative for the task, and in what order. |
+| **Permission Filtering** | Which user, tenant, role, or workflow may access each source. |
+| **Freshness Requirement** | How current evidence must be for the task. |
+| **Time Scope** | Whether the answer is valid as of a date, version, or policy period. |
+| **Deduplication Rule** | How duplicate or near-duplicate sources are removed or clustered. |
+| **Conflict Policy** | Whether conflicts are disclosed, escalated, or resolved by source hierarchy. |
+| **Citation Granularity** | Document, page, paragraph, line, field, or record-level evidence. |
+| **Null-Evidence Behavior** | Refuse, ask clarification, or answer explicitly as ungrounded. |
+| **Source Exclusion Disclosure** | Whether omitted sources must be disclosed to users. |
+| **Grounding Verification** | How claims are checked against cited evidence. |
+| **Retrieval Telemetry** | Source IDs, rank, freshness, permission result, and verifier status. |
+
+### **Grounding Verification Checks**
+
+| Check | Purpose |
+| :---- | :---- |
+| **Claim-to-Evidence Alignment** | Each atomic claim must be supported by cited evidence. |
+| **Citation Specificity** | Citation points to the exact passage, record, page, or field used. |
+| **Qualifier Preservation** | “Except,” “unless,” “only,” “as of,” and thresholds are preserved. |
+| **Temporal Validity** | Source date/version matches the user’s time scope. |
+| **Source Authority** | Claim uses the correct source-of-record, not merely a keyword match. |
+| **Conflict Disclosure** | Conflicting sources are surfaced rather than flattened. |
+| **Cross-Chunk Synthesis** | Logical links between chunks are themselves supported. |
+| **Null-Evidence Refusal** | Plausible but unsupported questions do not trigger hallucinated answers. |
+| **Paraphrase Fidelity** | Summary preserves obligations, exclusions, numbers, and conditions. |
+| **Answer-Context Sensitivity** | Removing or changing evidence changes the answer appropriately. |
+| **Human Replayability** | A reviewer can verify the claim from the cited evidence without archaeology. |
+
+### **Retrieval Breach Behaviors**
+
+| Breach | Runtime Behavior |
+| :---- | :---- |
+| Source unauthorized | Remove source and rerun retrieval; log permission denial. |
+| Source stale | Exclude or mark as stale; ask whether historical answer is acceptable. |
+| Evidence missing | Refuse grounded answer or ask for source. |
+| Evidence weak | Use uncertainty language or require human review. |
+| Evidence conflicting | Disclose conflict and source hierarchy. |
+| Citation unsupported | Remove claim or block response. |
+| Corpus poisoning suspected | Quarantine source and open corpus review. |
+
+A retrieval pipeline that cannot refuse unsupported claims is not grounded. It is just hallucination with footnotes.
+
+## **Tool and Action Contract Model**
+
+Language becomes operationally dangerous at the tool seam. A model may propose an action, but only deterministic code may authorize, execute, verify, and record that action.
+
+A tool contract defines the complete boundary between a model proposal and a real side effect.
+
+### **Tool Contract Structure**
+
+| Contract Field | Meaning |
+| :---- | :---- |
+| **tool_id** | Stable identifier for the tool. |
+| **owner** | Team responsible for behavior, safety, and maintenance. |
+| **allowed_callers** | Which routes, agents, users, or services may request this tool. |
+| **input_schema** | Typed arguments accepted by the tool. |
+| **preconditions** | Required state before execution. |
+| **authorization_policy** | Permission rules evaluated outside the model. |
+| **idempotency_policy** | How retries avoid duplicate side effects. |
+| **execution_timeout** | Maximum runtime. |
+| **postconditions** | Required state after execution. |
+| **compensation_policy** | How to reverse, repair, or reconcile failure. |
+| **evidence_policy** | What evidence is retained and for how long. |
+| **breach_behavior** | Deny, retry, compensate, escalate, or open incident. |
+
+### **Idempotency Key Doctrine**
+
+An idempotency key must identify the same logical operation across retries. It should not depend on attempt-specific IDs that change when the framework retries, unless those IDs are guaranteed stable for the logical operation.
+
+```text
+idempotency_key =
+  hash(
+    actor_id
+  + operation_id
+  + tool_id
+  + target_resource_id
+  + normalized_arguments
+  + authorization_context_hash
+  )
+```
+
+| Key Component | Purpose |
+| :---- | :---- |
+| **actor_id** | Binds action to user/service principal. |
+| **operation_id** | Stable ID for the intended logical operation. |
+| **tool_id** | Prevents collisions across tools. |
+| **target_resource_id** | Binds key to affected object. |
+| **normalized_arguments** | Ensures equivalent retries deduplicate. |
+| **authorization_context_hash** | Prevents reuse under changed permission conditions. |
+
+### **Action State Machine**
+
+```text
+ACTION CONTRACT STATE MACHINE
+
+[ Proposed ]
+    |
+    v
+[ Parsed and Schema-Valid ]
+    |
+    v
+[ Permission Checked ]
+    |
+    +-- deny --> [ Denied ]
+    |
+    v
+[ Preconditions Verified ]
+    |
+    +-- fail --> [ Blocked / Needs Clarification ]
+    |
+    v
+[ Idempotency Key Reserved ]
+    |
+    +-- duplicate --> [ Return Prior Result ]
+    |
+    v
+[ Submitted ]
+    |
+    v
+[ Confirmed by Source of Record ]
+    |
+    +-- fail --> [ Compensate / Escalate ]
+    |
+    v
+[ Completed ]
+```
+
+### **Postcondition Verification**
+
+A tool call is not complete when the API returns. It is complete when the source of record confirms the expected state.
+
+| Action Type | Required Postcondition |
+| :---- | :---- |
+| **Create** | New object exists with expected fields and owner. |
+| **Update** | Target object version changed and fields match requested delta. |
+| **Delete** | Object removed or marked deleted according to policy. |
+| **Send** | Message accepted by delivery system with recipient and content hash. |
+| **Payment / Transfer** | Transaction ID confirmed and amount/recipient match approved payload. |
+| **Booking / Reservation** | Reservation exists with correct time, party, price, and cancellation terms. |
+| **Permission Change** | Policy state reflects intended access and no unintended grants. |
+
+### **Tool Breach Behavior**
+
+| Breach | Behavior |
+| :---- | :---- |
+| Invalid arguments | Reject before execution. |
+| Unauthorized actor | Deny and log policy decision. |
+| Failed precondition | Ask clarification or route to human. |
+| Duplicate retry | Return cached result for same logical operation. |
+| Partial side effect | Compensate or reconcile. |
+| Unknown final state | Query source of record; escalate if unresolved. |
+| High-impact action | Require human approval before submission. |
+
+The model proposes. The tool contract disposes.
+
+## **Permission and Security Contract Model**
+
+A model’s ability to generate an action is not permission to execute it. Permission must be evaluated by deterministic policy outside the model, using the authenticated subject, tenant, resource, action, arguments, environment, risk tier, and approval state.
+
+The default decision is deny.
+
+### **Permission Decision Inputs**
+
+| Input | Meaning |
+| :---- | :---- |
+| **subject** | Human user, service account, agent identity, or delegated actor. |
+| **tenant** | Organizational boundary for data and authority. |
+| **resource** | Object, account, document, record, system, or environment being affected. |
+| **action** | Read, write, delete, send, approve, execute, export, etc. |
+| **tool** | Tool or API being invoked. |
+| **arguments** | Normalized proposed payload. |
+| **risk_tier** | Consequence class of the action. |
+| **environment** | Production, staging, sandbox, region, network, time, device posture. |
+| **approval_state** | Whether required maker-checker, human approval, or dual control exists. |
+| **policy_version** | Active policy bundle used to decide. |
+
+### **Permission Contract Outcomes**
+
+| Outcome | Meaning |
+| :---- | :---- |
+| **allow** | Action may proceed to precondition and idempotency checks. |
+| **deny** | Action is blocked. |
+| **require_approval** | Human or multi-party approval needed. |
+| **require_clarification** | Action intent or target is ambiguous. |
+| **degrade_authority** | System may draft or review but not execute. |
+| **escalate** | Route to security, compliance, or workflow owner. |
+
+### **Policy Contract Pattern**
+
+```json
+{
+  "decision_request": {
+    "subject": {
+      "id": "user_123",
+      "role": "finance_reviewer",
+      "tenant": "tenant_a",
+      "scopes": ["invoice:read", "invoice:review"]
+    },
+    "resource": {
+      "type": "invoice",
+      "id": "inv_789",
+      "tenant": "tenant_a",
+      "classification": "confidential"
+    },
+    "tool": {
+      "id": "invoice_approval_api",
+      "action": "approve_payment"
+    },
+    "arguments": {
+      "amount": "1250.00",
+      "currency": "USD",
+      "payee_id": "vendor_456"
+    },
+    "context": {
+      "risk_tier": "high",
+      "environment": "production",
+      "approval_state": "maker_submitted_checker_pending",
+      "route_id": "finance_review_governed"
+    }
+  }
+}
+```
+
+### **Security Contract Controls**
+
+| Control | Purpose |
+| :---- | :---- |
+| **External Policy Engine** | Keeps authorization outside model context. |
+| **Least Privilege** | Agents inherit only the user’s approved scopes, not platform-wide authority. |
+| **Tenant Isolation** | Subject, resource, memory, retrieval, and tool scopes must align. |
+| **Argument-Level Policy** | Authorization checks the proposed payload, not just the tool name. |
+| **Separation of Duties** | Maker and checker roles must be distinct for high-impact actions. |
+| **Approval Binding** | Approval must bind to the exact payload hash, not a vague intent. |
+| **Time and Environment Conditions** | Sensitive actions may depend on maintenance windows, regions, or environment. |
+| **Policy Reason Codes** | Denials should be explainable to system owners and users where safe. |
+| **Policy Versioning** | Every decision references the active policy bundle. |
+
+### **Anti-Patterns**
+
+| Anti-Pattern | Why It Fails |
+| :---- | :---- |
+| Prompt says “only do authorized actions.” | Prompt text is not authorization. |
+| Tool name is allowed, so all payloads are allowed. | Argument-level abuse bypasses intent checks. |
+| String blacklist blocks dangerous commands. | Attackers route around brittle keyword filters. |
+| Agent runs under service-admin identity. | Confused-deputy failure. |
+| Approval is recorded before payload finalization. | User approved an intent, not the executed action. |
+| Fallback route skips policy sidecar. | Availability destroys security. |
+
+Security contracts must be enforced before side effects, not explained after them.
+
+## **Resource, Memory, and Model Route Contracts**
+
+Resource, memory, and model-route contracts define the runtime envelope around model behavior. They prevent runaway loops, privacy leakage, stale personalization, unsafe fallback, and provider-specific dependency drift.
+
+### **Resource Contract Model**
+
+A resource contract constrains the amount of time, money, context, concurrency, and retry effort a model workflow may consume.
+
+| Resource Limit | Purpose | Breach Behavior |
+| :---- | :---- | :---- |
+| **max_input_tokens** | Prevents unbounded context growth. | Compress, retrieve less, ask user, or block. |
+| **max_output_tokens** | Prevents verbose or runaway generation. | Stop generation and mark truncated. |
+| **max_total_tokens** | Caps full session cost. | Return partial result or escalate. |
+| **max_loop_iterations** | Prevents agent recursion. | Stop loop; return current state. |
+| **max_tool_calls** | Prevents tool abuse and cost bombs. | Block further tool use. |
+| **max_retries** | Prevents retry storms. | Fail with structured error. |
+| **latency_ceiling_ms** | Protects user experience and workflow SLO. | Timeout, fallback, or queue. |
+| **cost_budget** | Controls spend by user, tenant, route, or workflow. | Throttle, degrade, or require approval. |
+| **concurrency_limit** | Prevents overload and rate-limit exhaustion. | Queue or reject. |
+| **queue_deadline** | Prevents stale work. | Expire or revalidate task. |
+
+### **Resource Contract Template**
+
+```yaml
+resource_contract:
+  contract_id: "<resource_contract_id>"
+  owner: "<platform_or_finops_owner>"
+  applies_to_routes:
+    - "<route_id>"
+  limits:
+    max_input_tokens: 0
+    max_output_tokens: 0
+    max_total_tokens: 0
+    max_loop_iterations: 0
+    max_tool_calls: 0
+    max_retries: 0
+    latency_ceiling_ms: 0
+    cost_budget_usd: 0
+    concurrency_limit: 0
+  breach_behavior:
+    token_limit: "compress_or_refuse"
+    loop_limit: "return_partial_and_escalate"
+    cost_limit: "require_approval"
+    latency_timeout: "fallback_or_queue"
+```
+
+### **Memory Contract Model**
+
+Memory is writable state. It must be scoped, permissioned, reviewable, and deletable. Memory should not become a surveillance landfill or a prompt-injection persistence layer.
+
+| Memory Rule | Purpose |
+| :---- | :---- |
+| **Write Validation** | Prevents poisoned, false, sensitive, or unauthorized memory writes. |
+| **User / Principal Scope** | Prevents memory from leaking across users, tenants, roles, or workflows. |
+| **Provenance Tagging** | Records where the memory came from and when. |
+| **Confidence and Status** | Distinguishes user-confirmed memory from inferred memory. |
+| **Retention Class** | Defines when memory expires or must be reviewed. |
+| **Read Authorization** | Checks whether memory may be used in the current task. |
+| **Conflict Resolution** | Handles contradictory memories. |
+| **User Control** | Provides inspect, edit, disable, and delete where appropriate. |
+| **Rollback / Quarantine** | Allows poisoned or harmful memory to be removed. |
+
+### **Memory Contract Template**
+
+```yaml
+memory_contract:
+  contract_id: "<memory_contract_id>"
+  owner: "<memory_owner>"
+  allowed_memory_types:
+    - preference
+    - workflow_context
+    - user_confirmed_fact
+  prohibited_memory_types:
+    - secrets
+    - unsupported_inferences
+    - sensitive_data_without_policy_basis
+  write_policy:
+    require_user_confirmation: true
+    require_provenance: true
+    injection_scan_required: true
+  read_policy:
+    scope: "user | tenant | workflow | role"
+    require_active_task_relevance: true
+    require_permission_check: true
+  retention:
+    default_ttl_days: 0
+    review_required: true
+  user_controls:
+    inspect: true
+    edit: true
+    delete: true
+    disable: true
+  breach_behavior:
+    suspected_poisoning: "quarantine_memory_and_open_review"
+    unauthorized_read: "deny_and_log"
+    conflict: "ask_user_or_disclose_conflict"
+```
+
+### **Model Route Contract Model**
+
+A model route contract maps task classes and risk tiers to approved execution routes. Routes should be expressed as capability profiles, not as brittle vendor catalogs.
+
+| Route Field | Meaning |
+| :---- | :---- |
+| **route_id** | Stable internal route name. |
+| **task_classes** | Workloads approved for this route. |
+| **risk_tiers** | Maximum risk tier allowed. |
+| **data_classes** | Data types allowed to enter this route. |
+| **capability_profile** | Required reasoning, modality, context, tool, or latency capability. |
+| **provider_profile** | Managed API, hosted model, self-hosted, local, deterministic fallback. |
+| **eval_gate** | Eval suite and minimum pass condition. |
+| **fallback_chain** | Approved fallbacks that preserve safety contract. |
+| **degraded_authority** | What actions are disabled under fallback. |
+| **observability** | Required telemetry emitted by route. |
+| **cost_budget** | Cost limits for route use. |
+
+### **Model Route Contract Template**
+
+```yaml
+model_route_contract:
+  route_id: "<route_id>"
+  owner: "<platform_owner>"
+  approved_task_classes:
+    - "<task_class>"
+  maximum_risk_tier: "low | medium | high | regulated"
+  allowed_data_classes:
+    - "public"
+    - "internal"
+  capability_profile:
+    context_window: "small | medium | large"
+    modalities: ["text"]
+    tool_use: "none | read_only | write_with_approval"
+    latency_class: "interactive | batch | async"
+  execution_profile:
+    primary_route: "<provider_or_runtime_alias>"
+    fallback_routes:
+      - route: "<fallback_route_id>"
+        authority_downgrade: "disable_tool_execution"
+        reason: "primary_unavailable"
+  eval_gate:
+    required_suite: "<eval_suite_id>"
+    required_status: "pass"
+  observability:
+    emit_trace: true
+    emit_cost: true
+    emit_quality_sample: true
+  breach_behavior:
+    eval_expired: "block_route"
+    provider_unavailable: "use_approved_fallback"
+    fallback_not_safe: "fail_closed"
+```
+
+A fallback route must preserve the safety contract. If the fallback cannot meet the same permission, privacy, grounding, or action-verification requirements, it is not a fallback. It is a contract downgrade and must reduce authority.
+
+## **Evaluation, Deployment, and Observability Contracts**
+
+Evaluation, deployment, and observability contracts turn AI behavior from a demo into an operated system. The eval contract decides whether a configuration may ship. The deployment contract defines exactly what shipped. The observability contract proves what happened at runtime.
+
+### **Evaluation Contract Model**
+
+An evaluation contract defines the test suite, dataset, metrics, thresholds, owners, and release decision for a model route, prompt, schema, retrieval pipeline, tool, or full workflow.
+
+| Eval Contract Element | Required Definition |
+| :---- | :---- |
+| **eval_suite_id** | Stable identifier for the evaluation suite. |
+| **scope** | Prompt, route, retrieval, schema, tool, workflow, or full system. |
+| **risk_tier** | Determines required evidence and threshold strictness. |
+| **dataset_version** | Golden set, adversarial set, production sample, synthetic set. |
+| **metrics** | Task-specific success, failure, safety, cost, and latency metrics. |
+| **thresholds** | Pass/fail or conditional release thresholds. |
+| **regression_window** | Allowed delta from prior stable manifest. |
+| **human_review_required** | Whether expert review is required before release. |
+| **failure_behavior** | Block release, allow canary, require mitigation, or rollback. |
+| **owner** | Person/team accountable for eval validity. |
+
+### **Risk-Tiered Evaluation Gates**
+
+| Risk Tier | Evaluation Posture |
+| :---- | :---- |
+| **Low** | Lightweight task tests, schema validation, basic safety and latency checks. |
+| **Medium** | Golden set, regression checks, sampled human review, cost/latency gates. |
+| **High** | Strong golden set, adversarial tests, grounding/policy checks, human sign-off. |
+| **Regulated / Critical** | Formal evidence package, independent review, replayability, approval record. |
+
+Avoid universal thresholds like “1,000 cases” or “100% refusal” unless the workflow justifies them. Thresholds must match task consequence, data quality, and measurement confidence.
+
+### **Deployment Contract Model**
+
+A deployment contract is the signed manifest of the active AI system configuration.
+
+```yaml
+deployment_manifest:
+  manifest_id: "<manifest_id>"
+  release_version: "<version>"
+  owner: "<release_owner>"
+  created_at: "<iso_datetime>"
+  applies_to:
+    workflow: "<workflow_id>"
+    environment: "staging | production"
+  components:
+    prompt_contract: "<prompt_contract_id>@<version>"
+    schema_contract: "<schema_contract_id>@<version>"
+    retrieval_contract: "<retrieval_contract_id>@<version>"
+    memory_contract: "<memory_contract_id>@<version>"
+    tool_contracts:
+      - "<tool_contract_id>@<version>"
+    permission_policy_bundle: "<policy_bundle_hash>"
+    model_route_contract: "<route_contract_id>@<version>"
+    resource_contract: "<resource_contract_id>@<version>"
+  eval_gate:
+    eval_suite: "<eval_suite_id>"
+    status: "pass | conditional | fail"
+    report_hash: "<hash>"
+  approvals:
+    product_owner: "<approval_ref>"
+    security_owner: "<approval_ref>"
+    eval_owner: "<approval_ref>"
+  rollback:
+    previous_manifest_id: "<manifest_id>"
+    rollback_conditions:
+      - "schema_error_spike"
+      - "policy_denial_spike"
+      - "eval_regression"
+```
+
+Any change to prompt, schema, route, retrieval, memory, tool, policy, eval threshold, or resource envelope is a deployment event.
+
+### **Observability Contract Model**
+
+The observability contract defines runtime telemetry. It should record enough to debug, evaluate, and govern the system without overcollecting sensitive data.
+
+| Signal | Purpose |
+| :---- | :---- |
+| **trace_id / workflow_id** | Correlate steps in a request or task. |
+| **manifest_id** | Identify active deployment package. |
+| **route_id** | Identify model/provider/runtime path. |
+| **contract versions** | Link runtime behavior to exact contract stack. |
+| **validation results** | Schema, semantic, factual, policy, and action checks. |
+| **resource usage** | Tokens, cost, latency, retries, tool calls, queueing. |
+| **breach events** | Contract violations and breach behavior. |
+| **user decisions** | Accept, reject, edit, approve, override, escalate. |
+| **redaction status** | Whether sensitive fields were removed or referenced securely. |
+
+### **Telemetry vs. Audit Evidence**
+
+| Dimension | Telemetry | Audit Evidence |
+| :---- | :---- | :---- |
+| **Purpose** | Debugging, monitoring, optimization, drift detection. | Proving policy, compliance, approval, or incident facts. |
+| **Content** | Redacted spans, metrics, errors, counters. | Minimal structured records, hashes, approvals, policy decisions, secure refs. |
+| **Retention** | Shorter, operationally scoped. | Risk/legal/compliance scoped. |
+| **Mutability** | Rotated and managed as operational data. | Tamper-evident where required. |
+| **Access** | Engineering and operations access by role. | Strictly controlled access by legal/security/compliance need. |
+
+Audit evidence should not be raw logs with a fancy hat. It should be scoped, structured, minimized, and defensible.
+
+## **User Expectation & Trust Calibration Contract**
+
+The user interface is a contract boundary. It tells the user what the system can do, what it cannot do, what evidence it used, what was excluded, what authority it has, and when the user must verify or decide.
+
+Trust calibration means user reliance matches system competence. Overtrust creates rubber-stamping. Undertrust creates abandonment. The contract must make the system’s role legible.
+
+### **Expectation Contract Elements**
+
+| Element | User-Facing Question |
+| :---- | :---- |
+| **System Role** | Is the AI drafting, reviewing, recommending, deciding, or acting? |
+| **Authority Boundary** | Can the AI execute, or only propose? |
+| **Evidence Used** | What sources support this output? |
+| **Evidence Excluded** | What sources were unavailable, unauthorized, stale, or omitted? |
+| **Uncertainty State** | What is known, uncertain, unsupported, or conflicting? |
+| **User Responsibility** | What must the user review or approve? |
+| **Action State** | Is this a draft, pending approval, submitted, confirmed, failed, or rolled back? |
+| **Correction Path** | How can the user reject, edit, appeal, override, or report an issue? |
+| **Fallback State** | Is the system in degraded, reduced-fidelity, or fallback mode? |
+
+### **Trust Calibration Controls**
+
+| Control | Purpose |
+| :---- | :---- |
+| **Role Label** | Shows whether AI is assistant, reviewer, router, or executor. |
+| **Evidence Panel** | Makes source support visible and replayable. |
+| **Unsupported Claim Marker** | Prevents unsupported text from appearing equally authoritative. |
+| **Conflict Banner** | Surfaces unresolved disagreement among sources. |
+| **Omitted Source Notice** | Tells users when search or retrieval was incomplete. |
+| **Action Proximity Warning** | Places risk and approval requirements near execution controls. |
+| **Draft / Final State Separation** | Prevents users from mistaking generated text for committed action. |
+| **Human Approval Gate** | Requires explicit decision for high-impact actions. |
+| **Undo / Appeal / Correction Path** | Supports trust repair and contestability. |
+| **Degraded Mode Indicator** | Shows when capability or evidence has been reduced. |
+
+### **Confidence Display Rule**
+
+Raw model confidence can mislead users. Prefer concrete status labels tied to verification:
+
+| Weak Display | Better Display |
+| :---- | :---- |
+| “95% confident” | “Cited source supports this claim.” |
+| “High confidence” | “Verified against source of record.” |
+| “Probably correct” | “Needs human review: conflicting evidence.” |
+| “Low confidence” | “Missing required evidence.” |
+| “AI completed this” | “Submitted; awaiting source-of-record confirmation.” |
+
+### **Expectation Breach Examples**
+
+| Breach | Example | Required Response |
+| :---- | :---- | :---- |
+| **Capability Overclaim** | UI promises “policy compliant” when retrieval is incomplete. | Change language, block claim, or show unsupported status. |
+| **Authority Confusion** | User thinks draft was sent. | Separate draft, approval, submitted, confirmed states. |
+| **Evidence Illusion** | Citation exists but does not support claim. | Remove claim or mark unsupported. |
+| **Fallback Concealment** | System silently uses weaker fallback model. | Show degraded mode and reduce authority. |
+| **Automation Bias** | User can one-click approve high-impact output without review. | Add evidence gate or independent judgment step. |
+
+The UI should not ask users to trust the model. It should give users enough context to trust, verify, correct, or refuse the system appropriately.
+
+## **Contract Breach Playbook**
+
+A contract breach occurs when any deterministic edge rejects, cannot verify, or cannot safely process model behavior, context, retrieval, memory, tool execution, policy, route, deployment, or user expectation.
+
+Breach handling must be deterministic. The system should not improvise safety.
+
+```text
+CONTRACT BREACH FLOW
+
+[ Breach Detected ]
+        |
+        v
+[ Classify Breach ]
+  schema | semantic | factual | policy | permission | tool | resource
+  memory | retrieval | route | deployment | observability | user expectation
+        |
+        v
+[ Determine Severity ]
+  low | medium | high | security/compliance incident
+        |
+        v
+[ Contain ]
+  block action | stop loop | freeze state | remove source | restrict memory | fail closed
+        |
+        v
+[ Resolve or Escalate ]
+  repair | retry | clarify | reroute | degrade | human review | incident
+        |
+        v
+[ Preserve Scoped Evidence ]
+        |
+        v
+[ Notify / Recover / Review ]
+```
+
+### **Breach Response Matrix**
+
+| Breach Type | Default Response | Notes |
+| :---- | :---- | :---- |
+| **Serialization Failure** | Reject or safe single repair attempt. | Do not regex-hack high-risk outputs into existence. |
+| **Schema Failure** | Retry once if low-risk; otherwise reject or escalate. | Preserve validation error class. |
+| **Semantic Failure** | Reject field/object or route to human. | Business invariants beat model fluency. |
+| **Factual / Grounding Failure** | Remove unsupported claim, refuse, or request evidence. | Do not hide weak grounding behind citations. |
+| **Policy Failure** | Block and log policy decision. | No model retry should bypass policy. |
+| **Permission Failure** | Deny before side effect. | Return reason where safe. |
+| **Tool Precondition Failure** | Ask clarification, block, or route to human. | Never execute with ambiguous target. |
+| **Tool Postcondition Failure** | Query source of record; compensate or escalate. | API return is not proof of completion. |
+| **Resource Breach** | Stop loop, throttle, degrade, or require approval. | Cost and loop breaches can become incidents. |
+| **Memory Breach** | Quarantine memory, restrict read, or delete per policy. | Preserve provenance and review path. |
+| **Retrieval Breach** | Exclude source, rerun retrieval, disclose conflict, or refuse. | Poisoned or stale sources require corpus review. |
+| **Route Breach** | Use approved fallback or fail closed. | Fallback must preserve safety properties. |
+| **Deployment Breach** | Halt rollout or rollback manifest. | Treat prompt/policy/schema changes as deploys. |
+| **Observability Breach** | Spool locally, alert owner, or block high-risk route. | Systems without evidence may be unsafe to operate. |
+| **User Expectation Breach** | Update UI state, disclose limitation, require confirmation. | Trust repair is part of breach handling. |
+
+### **Evidence Preservation Rule**
+
+Preserve enough evidence to investigate, prove, and repair the breach without creating an uncontrolled sensitive-data archive.
+
+| Evidence Type | Preferred Form |
+| :---- | :---- |
+| Prompt / schema / policy / route versions | Hashes and manifest IDs. |
+| Input/output payloads | Secure references, redacted excerpts, or hashes by default. |
+| Tool/action details | Action ID, idempotency key, target resource, status, payload hash. |
+| Policy decision | Policy version, decision, reason code, subject/resource references. |
+| Retrieval evidence | Source IDs, timestamps, rank, verifier status. |
+| Memory event | Memory ID, provenance, retention class, operation type. |
+| User approval | Approval ID, approver role, payload hash, timestamp. |
+
+Raw payload capture should be reserved for incident classes and environments where policy, legal basis, access control, and retention are explicitly defined.
+
+### **Incident Escalation Triggers**
+
+| Trigger | Escalation |
+| :---- | :---- |
+| Repeated breach of same contract | Open owner review. |
+| Breach affects high-risk workflow | Escalate to human/governance owner. |
+| Unauthorized data exposure | Security/privacy incident. |
+| Tool action executed incorrectly | Operations incident. |
+| Vendor route drift causes regression | Vendor/platform incident. |
+| Breach evidence cannot be preserved | Observability/compliance incident. |
+| Users were misled by UI state | Product/trust incident. |
+
+A breach is not just an error. It is a signal that a contract boundary either worked, failed, or was missing.
+
+## **Contract Review and Lifecycle Model**
+
+Contracts are living system artifacts. They must be created, approved, tested, released, monitored, reviewed, migrated, deprecated, and retired. A contract that exists only in prose is not a contract; it is a wish with headers.
+
+### **Contract Lifecycle**
+
+| Stage | Required Activity | Output |
+| :---- | :---- | :---- |
+| **1. Creation** | Define purpose, owner, inputs, outputs, validation, breach behavior, evidence boundary. | Draft contract artifact. |
+| **2. Review** | Product, security, governance, eval, platform, and domain review as appropriate. | Approval or required changes. |
+| **3. Testing** | Run unit tests, schema tests, evals, policy tests, route tests, and breach tests. | Test report. |
+| **4. Release** | Bundle into deployment manifest with hashes, versions, and rollback target. | Signed manifest. |
+| **5. Monitoring** | Track validation errors, breaches, cost, latency, user overrides, drift, incidents. | Runtime telemetry and evidence. |
+| **6. Drift Review** | Compare production behavior to contract assumptions. | Contract update, route change, or incident. |
+| **7. Migration** | Move to new model, provider, schema, policy, corpus, tool, or UI surface. | Migration plan and eval comparison. |
+| **8. Deprecation** | Mark old contract as no longer preferred; route traffic away. | Deprecation notice and timeline. |
+| **9. Retirement** | Disable execution and preserve required evidence. | Archived contract and retirement record. |
+
+### **Review Triggers**
+
+| Trigger | Contracts Affected |
+| :---- | :---- |
+| **Model/provider change** | Model route, eval, prompt, schema, observability. |
+| **Prompt update** | Prompt, eval, schema, user expectation. |
+| **Schema/API change** | Schema, tool, deployment, eval. |
+| **New tool side effect** | Tool, permission, action verification, evidence. |
+| **New data class** | Context, retrieval, memory, permission, privacy. |
+| **New user population** | User expectation, adoption, permission, support. |
+| **New jurisdiction or regulation** | Policy, memory, evidence, vendor, retention. |
+| **Vendor term or subprocessor change** | Vendor, data rights, route, procurement. |
+| **Retrieval corpus/index rebuild** | Retrieval, grounding, eval, observability. |
+| **Embedding model change** | Retrieval, index, eval, route, exit plan. |
+| **Eval regression** | Eval, deployment, route, prompt, retrieval. |
+| **Cost anomaly** | Resource, route, tool, observability. |
+| **Security incident** | Permission, tool, memory, evidence, deployment. |
+| **User trust/adoption failure** | User expectation, workflow, prompt, evaluation. |
+| **Repeated contract breach** | Affected contract and upstream/downstream layers. |
+
+### **Contract Registry Fields**
+
+| Field | Purpose |
+| :---- | :---- |
+| contract_id | Stable identifier. |
+| contract_type | Prompt, schema, tool, memory, route, etc. |
+| owner | Accountable team/person. |
+| status | Draft, active, deprecated, retired. |
+| version | Semantic or manifest version. |
+| linked_contracts | Related surfaces in the stack. |
+| linked_eval_suite | Required eval gate. |
+| risk_tier | Determines approval and evidence requirements. |
+| deployment_manifest | Active release bundle. |
+| evidence_policy | Retention and evidence requirements. |
+| breach_policy | Deterministic failure behavior. |
+| last_reviewed | Review timestamp. |
+| next_review_trigger | Time or event-based trigger. |
+
+Contract lifecycle management is the maintenance discipline that keeps probabilistic systems from becoming folklore.
+
+## **Cross-Canon Handoff Map**
+
+AI-ENG-AI defines the seam discipline that unifies the AI Engineering Systems Canon. Contract thinking turns prompts, schemas, retrieval, memory, tools, permissions, resources, model routes, evaluations, deployments, observability, vendor dependencies, and user expectations into enforceable boundaries around probabilistic cores.
+
+| Canon Report | Handoff Into AI | Contract-Thinking Integration |
+| :---- | :---- | :---- |
+| **AI-ENG-B — Context Architecture** | Context windows, state, instruction hierarchy, authority. | Context Contract and Prompt Contract define what enters the model and under what priority. |
+| **AI-ENG-D — Corpus Engineering** | Source ownership, lineage, metadata, lifecycle. | Retrieval Contract requires source authority, provenance, and corpus lifecycle state. |
+| **AI-ENG-E — Retrieval Pipeline** | Chunking, ranking, reranking, citation, retrieval telemetry. | Retrieval and Grounding Contracts define evidence admission and claim support. |
+| **AI-ENG-F — Freshness and Conflict Detection** | Source freshness, conflict packets, source-of-record logic. | Retrieval Contract requires time scope, freshness, and conflict behavior. |
+| **AI-ENG-J — Throughput Mechanics** | Latency, batching, queues, prefill/decode constraints. | Resource and Model Route Contracts define runtime envelopes and latency ceilings. |
+| **AI-ENG-K — Weight Dynamics** | Quantization, adapters, model behavior shifts. | Model Route and Eval Contracts bind model variants to tested task classes. |
+| **AI-ENG-L — Serving Architecture** | Gateways, routing, failover, deployment patterns. | Model Route and Deployment Contracts control route manifests and fallback safety. |
+| **AI-ENG-M — Agentic Orchestration** | Planner/executor loops, agent roles, multi-step tasks. | Resource, Tool, Permission, and Memory Contracts bound agent behavior. |
+| **AI-ENG-N — Tool Contracts** | Tool schemas, idempotency, execution interfaces. | AI-ENG-AI generalizes tool boundaries into full contract-stack discipline. |
+| **AI-ENG-O — Action Verification** | Source-of-record checks, postconditions, false-success prevention. | Tool and Action Contracts require preconditions, postconditions, and confirmation. |
+| **AI-ENG-P — Multimodal Understanding** | Image/audio/video input uncertainty and evidence. | Schema, Context, and User Expectation Contracts define modality-specific confidence and review. |
+| **AI-ENG-Q — Speech, Voice, and Real-Time Systems** | Latency, interruption, streaming, voice UX. | Resource and User Expectation Contracts define realtime boundaries and confirmation gates. |
+| **AI-ENG-R — UI Agents** | Browser/UI actions, screen state, user authority. | Tool, Permission, and User Expectation Contracts govern UI-side effects. |
+| **AI-ENG-S — Production Pathologies** | Failure modes, brittleness, hallucination, drift. | Contract Drift Diagnostic maps pathologies to breached seams. |
+| **AI-ENG-T — Boundary Defense** | Tenant isolation, prompt injection, egress, policy hierarchy. | Permission, Context, Retrieval, and Tool Contracts enforce boundaries outside the model. |
+| **AI-ENG-U — Supply Chain Security** | SBOM, AI-BOM, provenance, artifact trust. | Deployment and Vendor Contracts require signed artifacts and dependency evidence. |
+| **AI-ENG-V — Resource Abuse** | Loop abuse, denial-of-wallet, cost bombs. | Resource Contract enforces budgets, loop caps, retry caps, and concurrency limits. |
+| **AI-ENG-W — UX Resilience** | Degraded modes, fallback UX, continuity. | Breach Playbook and User Expectation Contract define safe degradation. |
+| **AI-ENG-X — User Trust** | Transparency, contestability, disclosure, trust repair. | User Expectation Contract formalizes trust calibration and user authority. |
+| **AI-ENG-Y — Human Review** | Maker-checker, approval queues, reviewer burden. | Permission and Tool Contracts bind approvals to payloads and action states. |
+| **AI-ENG-Z — Strategic Telemetry** | Traces, metrics, behavior observability. | Observability Contract defines runtime emission and redaction. |
+| **AI-ENG-AA — Evaluation Architecture** | Golden sets, rubrics, regression gates. | Eval Contract defines release gates and drift response. |
+| **AI-ENG-AB — Verification Artifacts** | Evidence packages, replay, audit references. | Audit Evidence Contract defines what proof is retained. |
+| **AI-ENG-AC — AI Operations** | Incidents, rollback, runbooks, containment. | Breach Playbook and Contract Lifecycle Model define operational response. |
+| **AI-ENG-AD — Governance Architecture** | Policy, audit, compliance, accountability. | Permission, Evidence, Vendor, and Deployment Contracts make governance executable. |
+| **AI-ENG-AE — Sustainable AI** | Cost, energy, routing, lifecycle efficiency. | Resource and Model Route Contracts enforce cost/resource envelopes. |
+| **AI-ENG-AF — Product Architecture** | Use-case fit, workflow value, product surface. | User Expectation and Product/Workflow Contracts bind promises to capability. |
+| **AI-ENG-AG — Adoption Systems** | Training, feedback loops, incentives, change. | User Expectation and Observability Contracts feed adoption telemetry and correction loops. |
+| **AI-ENG-AH — Sourcing and Vendor Strategy** | Build/buy/open/vendor decisions, exit plans. | Vendor and Model Route Contracts prevent sourcing decisions from becoming invisible lock-in. |
+| **AI-ENG-AJ — Reference Architectures** | Reusable implementation patterns. | AI-ENG-AI supplies the contract surfaces each reference architecture must instantiate. |
+
+### **Core Canon Rule**
+
+Every probabilistic capability must cross deterministic boundaries before it can affect users, systems, memory, tools, money, permissions, evidence, or production state.
+
+
+> The model may be probabilistic.
+> The **system** must not be.
+
+
+#### **Works cited**
+
+1. Design by contract - Wikipedia, accessed June 15, 2026, [https://en.wikipedia.org/wiki/Design_by_contract](https://en.wikipedia.org/wiki/Design_by_contract)  
+2. Applying 'design by contract' - Michigan Technological University, accessed June 15, 2026, [https://pages.mtu.edu/~aebnenas/teaching/spring2010/cs3141/readings/meyerPDF.pdf](https://pages.mtu.edu/~aebnenas/teaching/spring2010/cs3141/readings/meyerPDF.pdf)  
+3. Design By Contract: A Missing Link In The Quest For Quality Software, accessed June 15, 2026, [https://wstomv.win.tue.nl/edu/2ip30/references/design-by-contract/index.html](https://wstomv.win.tue.nl/edu/2ip30/references/design-by-contract/index.html)  
+4. API Security through Contract-Driven Programming | CMU Software Engineering Institute, accessed June 15, 2026, [https://www.sei.cmu.edu/blog/api-security-through-contract-driven-programming/](https://www.sei.cmu.edu/blog/api-security-through-contract-driven-programming/)  
+5. AI Agent Tool Use Best Practices for Practitioners - MLflow, accessed June 15, 2026, [https://mlflow.org/articles/ai-agent-tool-use-best-practices-for-practitioners/](https://mlflow.org/articles/ai-agent-tool-use-best-practices-for-practitioners/)  
+6. Why Open Policy Agent is the Missing Guardrail for Your AI Agents, accessed June 15, 2026, [https://codilime.com/blog/why-use-open-policy-agent-for-your-ai-agents/](https://codilime.com/blog/why-use-open-policy-agent-for-your-ai-agents/)  
+7. Groundedness detection in Azure AI Content Safety - Microsoft Learn, accessed June 15, 2026, [https://learn.microsoft.com/en-us/azure/ai-services/content-safety/concepts/groundedness](https://learn.microsoft.com/en-us/azure/ai-services/content-safety/concepts/groundedness)  
+8. RAG Grounding: 11 Tests That Expose Fake Citations | by Nexumo ..., accessed June 15, 2026, [https://medium.com/@Nexumo_/rag-grounding-11-tests-that-expose-fake-citations-30d84140831a](https://medium.com/@Nexumo_/rag-grounding-11-tests-that-expose-fake-citations-30d84140831a)  
+9. LLMs and Data Privacy: How to Protect Sensitive Information - Duality Technologies, accessed June 15, 2026, [https://dualitytech.com/blog/llm-data-privacy/](https://dualitytech.com/blog/llm-data-privacy/)  
+10. OPA Guardrails - TrueFoundry Docs, accessed June 15, 2026, [https://www.truefoundry.com/docs/ai-gateway/opa-guardrails](https://www.truefoundry.com/docs/ai-gateway/opa-guardrails)  
+11. Enforce least-privilege authorization in multi-agent AI delegation chains using Cedar on AWS - GitHub, accessed June 15, 2026, [https://github.com/aws-samples/sample-cedar-agentic-ai-authorization](https://github.com/aws-samples/sample-cedar-agentic-ai-authorization)  
+12. A Survey on Long-Term Memory Security in LLM Agents: Attacks, Defenses, and Governance Across the Memory Lifecycle - arXiv, accessed June 15, 2026, [https://arxiv.org/html/2604.16548v2](https://arxiv.org/html/2604.16548v2)  
+13. MemPrivacy is a privacy-preserving personalized memory management framework for edge-cloud agents. - GitHub, accessed June 15, 2026, [https://github.com/MemTensor/MemPrivacy](https://github.com/MemTensor/MemPrivacy)  
+14. RAG Evals: Retrieval Relevance, Grounding, and Citation Fidelity - Vikas Goyal, accessed June 15, 2026, [https://vikasgoyal.github.io/agentic/observe/rag-evals.html](https://vikasgoyal.github.io/agentic/observe/rag-evals.html)  
+15. RAG Testing — Validating Retrieval Accuracy, Grounding, and Context Leakage - Medium, accessed June 15, 2026, [https://medium.com/@gunashekarr11/rag-testing-validating-retrieval-accuracy-grounding-and-context-leakage-b3145e3a7b26](https://medium.com/@gunashekarr11/rag-testing-validating-retrieval-accuracy-grounding-and-context-leakage-b3145e3a7b26)  
+16. Building Idempotent Tools for Long-Running Agents | PADISO Blog, accessed June 15, 2026, [https://www.padiso.co/blog/building-idempotent-tools-for-long-running-agents/](https://www.padiso.co/blog/building-idempotent-tools-for-long-running-agents/)  
+17. Designing for Trust Calibration: Why AI Tools Need to Stop Pretending to Be Certain | by Lena C | Bootcamp | Medium, accessed June 15, 2026, [https://medium.com/design-bootcamp/designing-for-trust-calibration-why-ai-tools-need-to-stop-pretending-to-be-certain-0e7b74d285be](https://medium.com/design-bootcamp/designing-for-trust-calibration-why-ai-tools-need-to-stop-pretending-to-be-certain-0e7b74d285be)  
+18. Design Patterns For Building Trust, accessed June 15, 2026, [https://smart-interface-design-patterns.com/articles/the-trust-calibration-spectrum-in-ux/](https://smart-interface-design-patterns.com/articles/the-trust-calibration-spectrum-in-ux/)  
+19. From Trust in Automation to Trust in AI in Healthcare: A 30-Year Longitudinal Review and an Interdisciplinary Framework - PMC, accessed June 15, 2026, [https://pmc.ncbi.nlm.nih.gov/articles/PMC12562135/](https://pmc.ncbi.nlm.nih.gov/articles/PMC12562135/)  
+20. Best LLM Router and AI Gateway (2026) - Inworld AI, accessed June 15, 2026, [https://inworld.ai/resources/best-llm-router-ai-gateway](https://inworld.ai/resources/best-llm-router-ai-gateway)  
+21. What Is an AI Gateway? Why Your Enterprise LLM Infrastructure Needs One - LiteLLM, accessed June 15, 2026, [https://www.litellm.ai/blog/what-is-an-ai-gateway](https://www.litellm.ai/blog/what-is-an-ai-gateway)  
+22. Structured outputs with OpenAI and Pydantic - dida.do, accessed June 15, 2026, [https://dida.do/blog/structured-outputs-with-openai-and-pydantic](https://dida.do/blog/structured-outputs-with-openai-and-pydantic)  
+23. Agent Idempotency: Build Tool Calls That Are Safe to Retry | Chanl ..., accessed June 15, 2026, [https://www.channel.tel/blog/idempotent-tool-calls-agent-retry-safety](https://www.channel.tel/blog/idempotent-tool-calls-agent-retry-safety)  
+24. Explainable recommendation: when design meets trust calibration - PMC, accessed June 15, 2026, [https://pmc.ncbi.nlm.nih.gov/articles/PMC8327305/](https://pmc.ncbi.nlm.nih.gov/articles/PMC8327305/)  
+25. Memory scaling for AI agents | Databricks Blog, accessed June 15, 2026, [https://www.databricks.com/blog/memory-scaling-ai-agents](https://www.databricks.com/blog/memory-scaling-ai-agents)  
+26. Structured model outputs | OpenAI API, accessed June 15, 2026, [https://developers.openai.com/api/docs/guides/structured-outputs](https://developers.openai.com/api/docs/guides/structured-outputs)  
+27. Stop Parsing JSON by Hand: Structured LLM Outputs With Pydantic - DEV Community, accessed June 15, 2026, [https://dev.to/klement_gunndu/stop-parsing-json-by-hand-structured-llm-outputs-with-pydantic-1pg0](https://dev.to/klement_gunndu/stop-parsing-json-by-hand-structured-llm-outputs-with-pydantic-1pg0)  
+28. NeurIPS Poster SeCon-RAG: A Two-Stage Semantic Filtering and Conflict-Free Framework for Trustworthy RAG, accessed June 15, 2026, [https://neurips.cc/virtual/2025/poster/115589](https://neurips.cc/virtual/2025/poster/115589)  
+29. LLM Gateway Comparison 2025 - what I learned testing 5 options in production : r/AIQuality, accessed June 15, 2026, [https://www.reddit.com/r/AIQuality/comments/1q57lfc/llm_gateway_comparison_2025_what_i_learned/](https://www.reddit.com/r/AIQuality/comments/1q57lfc/llm_gateway_comparison_2025_what_i_learned/)  
+30. The Complete Guide to Using Pydantic for Validating LLM Outputs, accessed June 15, 2026, [https://machinelearningmastery.com/the-complete-guide-to-using-pydantic-for-validating-llm-outputs/](https://machinelearningmastery.com/the-complete-guide-to-using-pydantic-for-validating-llm-outputs/)
+
+---
+
+# AI-ENG-AJ — AI System Design Patterns - Reference Architectures & Failure-Aware Blueprints
+
+## **Conceptual Glossary**
+
+* **AI System Design Pattern**: A formalized, reusable template addressing a recurring coordination and execution challenge in non-deterministic computing environments. Unlike traditional software patterns that assume static control flows, an AI design pattern maps state transitions while managing the variability and latent risks of foundation model completions.1  
+* **Reference Architecture**: A highly structured blueprint defining the canonical components, data flows, integration surfaces, and interface boundaries required to instantiate a specific class of AI system.3 It details both functional blocks and the exact contracts that isolate failures and enforce deterministic behavior at probabilistic boundaries.4  
+* **Failure-Aware Blueprint**: An engineering specification that treats operational failure as a statistical certainty rather than an exceptional anomaly. It embeds detection, mitigation, containment, and recovery mechanisms directly into the system topology to ensure graceful degradation under failure states.4  
+* **Pattern Card**: A standardized, multi-dimensional specification document used to evaluate, select, implement, and audit a specific AI system design pattern. It operates as the definitive schema of record for an architecture, establishing boundary conditions, testing obligations, and operational controls.  
+* **No-Use Condition**: A set of technical, operational, or business constraints under which a specific AI design pattern must not be deployed. It defines the boundaries of the pattern's viability, routing architects to deterministic or non-AI alternatives when those boundaries are breached.  
+* **Anti-Pattern**: A common, superficially attractive design choice or implementation shortcut that consistently yields systemic failures, uncontrollable costs, security vulnerabilities, or operational degradation in production environments.1  
+* **Degraded Mode**: A predefined, safe, lower-capability operational state that a system autonomously or semi-autonomously downshifts into when its primary probabilistic pathways fail.4 It prioritizes structural safety, data integrity, and predictability over complete functionality.  
+* **Contract Surface Map**: A multi-dimensional cross-reference index defining which structural contracts (such as schema, permission, prompt, and tool contracts) are mandatory, conditional, or optional across a portfolio portfolio of reference architectures.  
+* **Eval-by-Pattern**: The systematic mapping of specialized, quantitative evaluation metrics (e.g., faithfulness, context precision, and tool-call validity) to specific system design patterns to validate execution safety and performance.7  
+* **Telemetry-by-Pattern**: The prescriptive specification of the exact trace elements, telemetry attributes, and state variables that must be captured and logged for a given pattern to ensure comprehensive observability, auditing, and debugging.4  
+* **Human Review Map**: A governance matrix specifying the precise interfaces, roles, and levels of authority reserved for human operators within agentic and semi-autonomous systems, calibrated against operational risk tiers.1  
+* **Security Boundary Map**: A structural specification of the isolation zones, data egress controls, credentials access parameters, and sandboxing requirements across different patterns to defend against prompt injection, privilege escalation, and data exfiltration.9  
+* **Pattern Maturity**: A six-tier progression framework used to assess the readiness of an AI pattern implementation from initial local prototype (Level 0) to a highly platformized, automated golden path (Level 5).
+
+## **AI Reference Architecture Doctrine**
+
+The foundational thesis of high-dimensional AI engineering asserts that a reference architecture is not merely an illustrative collection of boxes and arrows; it is a decision artifact. A pattern is reusable only when its boundaries, assumptions, and breach behaviors are explicit. Probabilistic cores—such as large language and vision models—must be tightly surrounded by deterministic, typed, versioned, and observable edges. Consequently, an effective reference architecture must encode its contract surfaces, evaluation gates, failure modes, anti-patterns, operating controls, degraded modes, and no-use conditions directly into the structural design.  
+Traditional systems engineering optimizes for deterministic reliability: inputs are transformed into outputs via known, verifiable code paths. In contrast, AI engineering systems govern probabilistic engines where identical inputs can yield divergent, semantic completions.1 This non-deterministic quality introduces systemic failure modes—including silent drift, tool-use parameter hallucination, cascade failures, and context attention dilution—which cannot be resolved by standard debugging paradigms.5  
+To build production-grade systems, architects must apply the principles of contract-driven architecture. Every transition point between a deterministic service and a probabilistic model must be governed by an explicit contract stack, as established in the systemic canon. This stack spans user expectations, workflows, policies, prompts, retrievals, routes, schemas, tools, evaluations, deployments, and sourcing models. A design pattern represents the repeatable composition of these contracts to resolve a specific workload class. By structuring patterns as failure-aware blueprints, engineering teams can guarantee that when a probabilistic core fails to meet a contract, the surrounding deterministic architecture isolates the failure, records the complete trajectory, triggers appropriate recovery mechanisms, and downgrades the service controlledly.4
+
+## **Pattern Card Template**
+
+Every reference architecture in this doctrine is documented as a Pattern Card. A Pattern Card is not a decorative summary. It is the reusable architecture record for a workload class: when to use the pattern, when not to use it, what contracts are required, how it fails, how it degrades, how it is evaluated, and who remains accountable.
+
+### **Canonical Pattern Card Schema**
+
+| Field | Required Content |
+| :---- | :---- |
+| **Pattern Name** | Canonical architecture name. |
+| **Problem Class** | The recurring system problem this pattern solves. |
+| **Best-Fit Use Cases** | Workloads where the pattern is structurally appropriate. |
+| **No-Use Conditions** | Conditions that route the team to deterministic software, another pattern, or no-AI. |
+| **User Surface** | Chat, inline UI, queue, cockpit, API, background service, review panel, etc. |
+| **Architecture Shape** | Primary components and dataflow. |
+| **Required Contracts** | Mandatory AI-ENG-AI contract surfaces. |
+| **Human Authority** | Human role, approval boundary, veto power, and review burden. |
+| **Model Route Strategy** | Capability profile and route class, not brittle provider names. |
+| **Retrieval / Context Strategy** | What context enters the system and how it is governed. |
+| **Tool / Action Strategy** | Whether tools are read-only, write-capable, sandboxed, or human-approved. |
+| **Core Evals** | Pattern-specific quality, safety, latency, cost, and regression checks. |
+| **Telemetry** | Operational metrics needed to debug and improve the pattern. |
+| **Audit / Evidence Boundary** | Minimal evidence required for compliance, incident review, or replay. |
+| **Security Boundary** | Isolation, permission, data egress, credential, and sandbox requirements. |
+| **Primary Cost Drivers** | Tokens, retrieval, GPU, storage, review labor, tool calls, or platform operations. |
+| **Failure Modes** | Known ways the pattern fails in production. |
+| **Anti-Patterns** | Common tempting but unsafe implementations. |
+| **Degraded Mode** | Safe reduced-capability behavior. |
+| **Adoption and Support** | Training, workflow change, support, and user enablement needs. |
+| **Sourcing / Exit** | Portability, vendor dependency, and migration considerations. |
+| **Maturity Target** | Expected implementation maturity level for production use. |
+
+### **Pattern Card Markdown Form**
+
+Each card should be written as real Markdown, not fenced pseudo-documentation. This makes the pattern searchable, linkable, diffable, and indexable.
+
+```markdown
+### **Pattern Name**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** |  |
+| **Best-Fit Use Cases** |  |
+| **No-Use Conditions** |  |
+| **User Surface** |  |
+| **Architecture Shape** |  |
+| **Required Contracts** |  |
+| **Human Authority** |  |
+| **Model Route Strategy** |  |
+| **Retrieval / Context Strategy** |  |
+| **Tool / Action Strategy** |  |
+| **Core Evals** |  |
+| **Telemetry** |  |
+| **Audit / Evidence Boundary** |  |
+| **Security Boundary** |  |
+| **Primary Cost Drivers** |  |
+| **Failure Modes** |  |
+| **Anti-Patterns** |  |
+| **Degraded Mode** |  |
+| **Adoption and Support** |  |
+| **Sourcing / Exit** |  |
+| **Maturity Target** |  |
+```
+
+The Pattern Card is the handoff object between product architecture, engineering implementation, governance, evaluation, operations, adoption, and sourcing.
+
+## **Architecture Pattern Taxonomy**
+
+AI system patterns should be organized by workflow archetype, authority level, state mutation, evidence burden, and user-review structure. A taxonomy is useful only if it helps teams route a real requirement to the correct architecture and reject bad fits early.
+
+```text
+AI SYSTEM DESIGN PATTERN TAXONOMY
+
+1. Interactive & Embedded
+   ├── Copilot / Embedded Assistant
+   └── Personal or Team Productivity Assistant
+
+2. Retrieval & Synthesis
+   ├── Research Agent
+   └── Enterprise Knowledge System
+
+3. Extraction & Classification
+   ├── Document Intelligence Pipeline
+   ├── Multimodal Review System
+   └── Background Classifier / Router
+
+4. Analytics & Decision Intelligence
+   ├── Analytics Assistant
+   └── Decision-Support Cockpit
+
+5. Support & Service Operations
+   └── Support Assistant
+
+6. Action-Oriented / Agentic
+   ├── Workflow Automation Agent
+   ├── Coding Agent
+   └── Governed Agentic Workflow
+
+7. Human Review & Governance
+   └── Human Review and Escalation Queue
+
+8. Platform Infrastructure
+   ├── AI Gateway / Control Plane
+   └── Evaluation and Shadow-Mode Pattern
+```
+
+### **Taxonomy by Control Property**
+
+| Pattern Family | Primary User Surface | Runtime Authority | Primary Risk | Core Contract Emphasis |
+| :---- | :---- | :---- | :---- | :---- |
+| **Interactive & Embedded** | Inline assistant, sidebar, editor surface. | Suggests; user accepts or edits. | Overtrust, context leakage, poor fit. | Prompt, context, route, observability, user expectation. |
+| **Retrieval & Synthesis** | Search portal, research console, cited answer. | Synthesizes from evidence. | Citation theater, stale/unauthorized evidence. | Retrieval, grounding, freshness, permission, eval. |
+| **Extraction & Classification** | Queue, parser, background service, review panel. | Produces structured output or route label. | Silent field errors, misrouting, reviewer fatigue. | Schema, evidence, confidence, exception queue, eval. |
+| **Analytics & Decision Intelligence** | BI workspace, risk cockpit, scenario panel. | Explains, computes, or recommends; human decides. | Metric hallucination, biased framing, wrong calculation. | Semantic metric, SQL/query, grounding, human review, audit. |
+| **Support & Service Operations** | Customer chat, agent assist, support console. | Drafts, triages, or resolves bounded issues. | Deflection theater, policy hallucination, poor handoff. | Retrieval, escalation, user expectation, audit, telemetry. |
+| **Action-Oriented / Agentic** | Task dashboard, PR interface, process portal. | Plans or executes bounded steps under policy. | Unauthorized side effects, loops, partial execution. | Tool, permission, idempotency, resource, action verification. |
+| **Human Review & Governance** | Review queue, approval panel, audit cockpit. | Human validates and authorizes. | Rubber-stamping, queue overload, weak evidence. | Human review, evidence, override, audit, telemetry. |
+| **Platform Infrastructure** | Internal API, gateway, release dashboard. | Controls routes, policy, eval, and observability. | Central failure, bypass, weak evidence, cost blowout. | Deployment, route, policy, resource, observability, sourcing. |
+
+Pattern selection is not model selection. It is authority design.
+
+## **Pattern Selection Tree**
+
+The selection tree routes a workload to the safest viable architecture pattern. It includes deterministic and no-AI paths because not every valuable workflow deserves a model-shaped hole punched through it.
+
+```text
+PATTERN SELECTION TREE
+
+[ Candidate Workflow ]
+        |
+        v
+Q1. Is the task fully deterministic, exact, or better solved by rules/database/forms?
+        |
+        +-- yes --> [ Deterministic Software / No-AI Path ]
+        |
+        v
+Q2. Does the system need to mutate external state or execute side effects?
+        |
+        +-- yes --> Q3
+        |
+        +-- no  --> Q7
+
+Q3. Is the task software codebase modification, build/test, or PR generation?
+        |
+        +-- yes --> [ Coding Agent ]
+        |
+        +-- no  --> Q4
+
+Q4. Is the action path mostly fixed, schema-bound, and workflow-driven?
+        |
+        +-- yes --> [ Workflow Automation Agent ]
+        |
+        +-- no  --> Q5
+
+Q5. Does the task require dynamic planning, multi-step reasoning, or multi-agent checks?
+        |
+        +-- yes --> [ Governed Agentic Workflow ]
+        |
+        +-- no  --> Q6
+
+Q6. Is the action high-risk, irreversible, regulated, or approval-sensitive?
+        |
+        +-- yes --> [ Human Review and Escalation Queue + Deterministic Execution ]
+        |
+        +-- no  --> [ Workflow Automation Agent ]
+
+Q7. Is the primary task factual retrieval, synthesis, or evidence search?
+        |
+        +-- yes --> Q8
+        |
+        +-- no  --> Q11
+
+Q8. Is the corpus enterprise-owned, multi-repository, permissioned, and lifecycle-managed?
+        |
+        +-- yes --> [ Enterprise Knowledge System ]
+        |
+        +-- no  --> Q9
+
+Q9. Is the search open-ended, multi-hop, external, or research-oriented?
+        |
+        +-- yes --> [ Research Agent ]
+        |
+        +-- no  --> Q10
+
+Q10. Is the output a high-stakes recommendation with alternatives and rationale?
+        |
+        +-- yes --> [ Decision-Support Cockpit ]
+        |
+        +-- no  --> [ Enterprise Knowledge System or Deterministic Search ]
+
+Q11. Is the primary task structured extraction from documents or media?
+        |
+        +-- yes --> Q12
+        |
+        +-- no  --> Q14
+
+Q12. Does the input include image, audio, video, scanned media, or spatial evidence?
+        |
+        +-- yes --> [ Multimodal Review System ]
+        |
+        +-- no  --> Q13
+
+Q13. Is the target output typed fields from documents?
+        |
+        +-- yes --> [ Document Intelligence Pipeline ]
+        |
+        +-- no  --> [ Deterministic Parser / No-AI Path ]
+
+Q14. Is the primary task governed analytics, SQL, metrics, or dashboard explanation?
+        |
+        +-- yes --> [ Analytics Assistant ]
+        |
+        +-- no  --> Q15
+
+Q15. Is the primary task customer or internal support?
+        |
+        +-- yes --> [ Support Assistant ]
+        |
+        +-- no  --> Q16
+
+Q16. Is the workload high-throughput background classification or routing?
+        |
+        +-- yes --> [ Background Classifier / Router ]
+        |
+        +-- no  --> Q17
+
+Q17. Is the AI embedded inside an active workspace as inline assistance?
+        |
+        +-- yes --> [ Copilot / Embedded Assistant ]
+        |
+        +-- no  --> Q18
+
+Q18. Is the system a personal/team assistant with local context and low action authority?
+        |
+        +-- yes --> [ Personal or Team Productivity Assistant ]
+        |
+        +-- no  --> Q19
+
+Q19. Is the requirement infrastructure for model access, routing, policy, or cost control?
+        |
+        +-- yes --> [ AI Gateway / Control Plane ]
+        |
+        +-- no  --> Q20
+
+Q20. Is the requirement validating candidate models/prompts/routes without affecting users?
+        |
+        +-- yes --> [ Evaluation and Shadow-Mode Pattern ]
+        |
+        +-- no  --> [ Return to Product Discovery / Pattern Not Selected ]
+```
+
+### **Selection Rule**
+
+If two patterns appear plausible, choose the one with less autonomy, clearer evidence, lower integration burden, and safer degraded mode. If the task can be solved cleanly without AI, that is not a failure of imagination. It is architecture doing its job.
+
+## **Reference Blueprint Set**
+
+The reference blueprint set defines reusable AI system patterns. Each pattern is expressed as a real Markdown card so it can be searched, indexed, diffed, linked, and reused by architecture teams.
+
+### **1. Copilot / Embedded Assistant Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Interactive, context-aware assistance inside an active workspace. |
+| **Best-Fit Use Cases** | Inline code suggestions, prose completion, spreadsheet assistance, structured form guidance, drafting aids. |
+| **No-Use Conditions** | High-liability transactions, exact calculations, background batch processing, or actions requiring autonomous write authority. |
+| **User Surface** | Inline suggestions, ghost text, side panel, contextual menu. |
+| **Architecture Shape** | Workspace event → context builder → policy/data filter → fast model route → suggestion renderer → user accept/edit/reject → telemetry/eval loop. |
+| **Required Contracts** | Prompt, context, schema where structured, resource, model route, observability, user expectation. |
+| **Human Authority** | Human remains active controller; AI suggests only. |
+| **Model Route Strategy** | Low-latency route optimized for short completions; escalation only for explicitly requested deeper help. |
+| **Retrieval / Context Strategy** | Local workspace state, selected document/code region, nearby context, active user intent. |
+| **Tool / Action Strategy** | No external side effects; local UI modifications only. |
+| **Core Evals** | Acceptance quality, edit distance, compile/test result where applicable, latency, user correction patterns. |
+| **Telemetry** | Suggestion hash, route ID, prompt/schema version, accept/reject/edit event, latency, cost bucket. |
+| **Audit / Evidence Boundary** | Usually operational telemetry only; sensitive content should be redacted or referenced securely. |
+| **Security Boundary** | Workspace context must be scoped; cloud routes require data filtering and tenant policy. |
+| **Primary Cost Drivers** | High-frequency small completions, context assembly, streaming latency. |
+| **Failure Modes** | Context distraction, stale suggestions, overtrust, low-quality accepted code/text. |
+| **Anti-Patterns** | Chatbox on everything; acceptance rate treated as correctness. |
+| **Degraded Mode** | Static templates, local autocomplete, deterministic snippets. |
+| **Adoption and Support** | Low training burden, but users need calibration on review and acceptance. |
+| **Sourcing / Exit** | Keep completion interface provider-neutral. |
+| **Maturity Target** | Level 3–4 for production; Level 5 when platformized across teams. |
+
+### **2. Research Agent Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Open-ended multi-source discovery, analysis, and factual synthesis. |
+| **Best-Fit Use Cases** | Market research, literature review, policy analysis, competitor research, legal or technical source aggregation. |
+| **No-Use Conditions** | Exact database lookup, simple FAQ retrieval, high-speed customer answer, or unsupported evidence domains. |
+| **User Surface** | Research console, plan editor, citation panel, source browser, draft workspace. |
+| **Architecture Shape** | Research question → plan/query decomposition → bounded search → source authority filter → evidence clustering → synthesis → citation verifier → human audit. |
+| **Required Contracts** | Prompt, retrieval, grounding, source authority, freshness, resource, eval, observability, user expectation. |
+| **Human Authority** | Human sets objective, approves plan, reviews sources, and accepts final synthesis. |
+| **Model Route Strategy** | Planning/synthesis route for reasoning; cheaper extraction/summarization routes for source processing. |
+| **Retrieval / Context Strategy** | Multi-hop search with source authority, freshness, dedupe, and conflict handling. |
+| **Tool / Action Strategy** | Read-only search/document tools; sandboxed browsing or parsers. |
+| **Core Evals** | Citation fidelity, claim support, source quality, context recall, contradiction handling, synthesis usefulness. |
+| **Telemetry** | Query plan, search calls, source IDs, citation verifier status, loop count, cost, user edits. |
+| **Audit / Evidence Boundary** | Source manifest, claim/evidence map, verifier result, final draft version. |
+| **Security Boundary** | Prevent leakage of confidential queries to external search where prohibited. |
+| **Primary Cost Drivers** | Search loops, long-context synthesis, citation verification, human review time. |
+| **Failure Modes** | Citation theater, source laundering, endless search, weak source authority, stale evidence. |
+| **Anti-Patterns** | Searching until confident; citing documents the system did not verify. |
+| **Degraded Mode** | Present source directory and extracted notes without synthesis. |
+| **Adoption and Support** | Users need training on source audit and uncertainty handling. |
+| **Sourcing / Exit** | Preserve outputs and source maps in open formats. |
+| **Maturity Target** | Level 3–4. |
+
+### **3. Support Assistant Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Customer or internal support automation and agent-assist. |
+| **Best-Fit Use Cases** | Routine support answers, policy explanations, ticket summarization, suggested replies, triage. |
+| **No-Use Conditions** | Emergency services, high-emotion disputes without human path, legal/medical advice, unresolved policy exceptions. |
+| **User Surface** | Chat, support widget, CRM agent-assist panel, ticket console. |
+| **Architecture Shape** | Message/ticket → intent classifier → account/context retrieval → policy/KB retrieval → answer/draft generation → escalation gate → resolution telemetry. |
+| **Required Contracts** | Intent schema, retrieval, grounding, permission, escalation, user expectation, observability, eval. |
+| **Human Authority** | Human handles exceptions, low-confidence cases, sensitive accounts, and transactional approvals. |
+| **Model Route Strategy** | Fast classifier plus governed generation route; fallback to human queue. |
+| **Retrieval / Context Strategy** | Customer/account data through permission filters plus versioned support knowledge. |
+| **Tool / Action Strategy** | Read-only by default; write actions require deterministic API and approval where material. |
+| **Core Evals** | True resolution, repeat-contact rate, escalation quality, policy compliance, CSAT/sentiment, hallucination rate. |
+| **Telemetry** | Intent, source IDs, route ID, escalation reason, resolution status, repeat contact, agent edits. |
+| **Audit / Evidence Boundary** | Ticket ID, source policy version, final sent message, escalation packet. |
+| **Security Boundary** | Tenant isolation, PII redaction, support-role access control. |
+| **Primary Cost Drivers** | Multi-turn context, support volume, human escalation, KB maintenance. |
+| **Failure Modes** | Deflection theater, policy hallucination, customer frustration, hidden escalation suppression. |
+| **Anti-Patterns** | Trapping users in bot loops; optimizing containment over resolution. |
+| **Degraded Mode** | Route to human queue with context handoff and static help links. |
+| **Adoption and Support** | Requires support-team training and escalation playbooks. |
+| **Sourcing / Exit** | Preserve KB, intent taxonomy, ticket metadata, and correction logs. |
+| **Maturity Target** | Level 4–5. |
+
+### **4. Document Intelligence Pipeline Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Structured extraction from unstructured or semi-structured documents. |
+| **Best-Fit Use Cases** | Invoices, claims, leases, forms, contracts, financial statements, intake packets. |
+| **No-Use Conditions** | Clean API/JSON input, exact deterministic parsing availability, high-speed subsecond transaction need. |
+| **User Surface** | Review queue with document preview, field table, coordinates, correction UI. |
+| **Architecture Shape** | Document ingest → OCR/layout parser → document classifier → extraction model → schema/semantic validator → exception queue → staging write. |
+| **Required Contracts** | Input asset, OCR/layout, schema, semantic, evidence coordinate, human review, write-back, eval. |
+| **Human Authority** | Auditors correct low-confidence or high-impact fields before commit. |
+| **Model Route Strategy** | Extraction route matched to document class and modality; deterministic validators at edge. |
+| **Retrieval / Context Strategy** | Layout, OCR, metadata, document class, field schema; no general RAG unless needed. |
+| **Tool / Action Strategy** | No direct production write without validator and review/threshold gate. |
+| **Core Evals** | Field-level precision/recall, table extraction, coordinate grounding, schema validity, correction rate. |
+| **Telemetry** | Document hash, class, field confidence, validation errors, reviewer corrections, processing time. |
+| **Audit / Evidence Boundary** | Source document reference, extracted fields, coordinate/evidence refs, reviewer decision. |
+| **Security Boundary** | Ephemeral parsing, malware scanning, PII controls, storage permissions. |
+| **Primary Cost Drivers** | OCR/layout, visual tokens, storage, review labor. |
+| **Failure Modes** | OCR errors, table misalignment, missing pages, wrong document class, reviewer fatigue. |
+| **Anti-Patterns** | Direct ERP writes from unverified extraction; ignoring visual layout. |
+| **Degraded Mode** | Manual indexing/review queue. |
+| **Adoption and Support** | Requires reviewer training and document-class governance. |
+| **Sourcing / Exit** | Preserve schemas and extraction records in portable formats. |
+| **Maturity Target** | Level 4. |
+
+### **5. Workflow Automation Agent Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Multi-step workflow execution across systems with bounded side effects. |
+| **Best-Fit Use Cases** | Employee onboarding, ticket synchronization, procurement coordination, IT operations runbooks. |
+| **No-Use Conditions** | Irreversible actions without approval, ambiguous goals, APIs without idempotency, missing source-of-record verification. |
+| **User Surface** | Task dashboard, execution plan, approval checkpoints, state timeline. |
+| **Architecture Shape** | Goal → plan graph → policy/permission check → tool execution → source-of-record verification → approval gate → ledger. |
+| **Required Contracts** | Plan schema, tool, permission, idempotency, resource, action verification, audit, observability. |
+| **Human Authority** | Human approves plan and high-impact steps; can halt, edit, or roll back. |
+| **Model Route Strategy** | Reasoning route for planning; deterministic execution harness for actions. |
+| **Retrieval / Context Strategy** | API specs, workflow state, policy rules, system-of-record data. |
+| **Tool / Action Strategy** | Write-capable only through typed tools with idempotency and postcondition checks. |
+| **Core Evals** | Task completion, tool validity, permission denial correctness, postcondition success, loop budget. |
+| **Telemetry** | Plan graph, tool call IDs, idempotency keys, verification results, approvals, breaches. |
+| **Audit / Evidence Boundary** | Execution ledger, payload hashes, approval records, source-of-record confirmation. |
+| **Security Boundary** | Least-privilege tools, sandboxing, no broad admin agent identity. |
+| **Primary Cost Drivers** | Planning loops, tool retries, approval latency, integration maintenance. |
+| **Failure Modes** | Partial transaction, loop, state divergence, unauthorized action. |
+| **Anti-Patterns** | Agent with admin rights; missing idempotency; no postcondition checks. |
+| **Degraded Mode** | Freeze state, serialize plan, route to manual operator. |
+| **Adoption and Support** | Requires operators trained on execution graphs and exception handling. |
+| **Sourcing / Exit** | Keep tool schemas and workflow state portable. |
+| **Maturity Target** | Level 4. |
+
+### **6. Coding Agent Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Codebase analysis, patch generation, testing, and pull-request preparation. |
+| **Best-Fit Use Cases** | Dependency updates, scaffolding, test generation, routine bug fixes, migrations. |
+| **No-Use Conditions** | Untestable systems, critical infrastructure without review, production auto-merge, missing sandbox. |
+| **User Surface** | IDE, CLI, issue tracker, pull request, CI dashboard. |
+| **Architecture Shape** | Issue/request → repo context selector → plan/diff generation → sandbox build/test → security scan → PR → human review. |
+| **Required Contracts** | Repo access, context, patch format, sandbox, test execution, security scan, human review, deployment. |
+| **Human Authority** | Developer reviews, edits, approves, and merges. |
+| **Model Route Strategy** | Reasoning route for patch planning; cheaper route for log analysis. |
+| **Retrieval / Context Strategy** | AST, dependency graph, related files, issue text, tests, build logs. |
+| **Tool / Action Strategy** | File edits and commands only in sandbox; merge requires human/CI gate. |
+| **Core Evals** | Compile success, test pass, security scan, diff minimality, reviewer acceptance, regression rate. |
+| **Telemetry** | Diff hash, build logs, test results, scan findings, reviewer edits, merge status. |
+| **Audit / Evidence Boundary** | PR record, commit hashes, test reports, reviewer approval. |
+| **Security Boundary** | Network-restricted sandbox; secrets masked; no unreviewed production writes. |
+| **Primary Cost Drivers** | Repo context, build/test loops, reasoning tokens. |
+| **Failure Modes** | Plausible broken code, test overfitting, vulnerability injection, context poisoning. |
+| **Anti-Patterns** | Auto-merge coding agent; writing tests to satisfy broken code. |
+| **Degraded Mode** | Suggestion-only mode; disable write/PR creation. |
+| **Adoption and Support** | Requires issue-writing discipline and reviewer workflow integration. |
+| **Sourcing / Exit** | Store patches and scripts in standard Git workflows. |
+| **Maturity Target** | Level 3–4. |
+
+### **7. Analytics Assistant Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Governed natural-language analytics, metric explanation, SQL/query generation, and dashboard assistance. |
+| **Best-Fit Use Cases** | Ad-hoc business questions, operational reporting, metric exploration, dashboard drafting. |
+| **No-Use Conditions** | Regulated filings without deterministic controls, missing semantic metric layer, unrestricted database access. |
+| **User Surface** | BI assistant, metric builder, SQL preview, chart explanation panel. |
+| **Architecture Shape** | User question → metric/schema selector → permission check → query generator → deterministic validator → read-only execution → visualization/explanation. |
+| **Required Contracts** | Semantic metric, schema, permission, SQL/query, resource, provenance, eval, observability. |
+| **Human Authority** | Analyst validates metric meaning, query, and chart interpretation. |
+| **Model Route Strategy** | Reasoning route for query generation; deterministic validator and metric layer are authoritative. |
+| **Retrieval / Context Strategy** | Metric definitions, schema metadata, join rules, row-level policy. |
+| **Tool / Action Strategy** | Read-only queries with timeouts, row limits, and query validation. |
+| **Core Evals** | SQL validity, metric correctness, row-level security, chart-data consistency, explanation fidelity. |
+| **Telemetry** | Question, generated query hash, metric IDs, validation result, query cost, user corrections. |
+| **Audit / Evidence Boundary** | Query, metric definition, result reference, chart spec, user approval where needed. |
+| **Security Boundary** | Read-only credentials, row-level security, query sandbox/resource limits. |
+| **Primary Cost Drivers** | Warehouse compute, complex joins, metadata retrieval, explanation generation. |
+| **Failure Modes** | Metric hallucination, wrong joins, unauthorized data exposure, misleading charts. |
+| **Anti-Patterns** | Querying raw tables without metric layer; model-generated audit numbers. |
+| **Degraded Mode** | Disable ad-hoc query; show verified dashboards and metric glossary. |
+| **Adoption and Support** | Requires data literacy and metric-governance alignment. |
+| **Sourcing / Exit** | Use portable semantic-layer definitions and SQL artifacts. |
+| **Maturity Target** | Level 4. |
+
+### **8. Multimodal Review System Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Review and audit of images, audio, video, scanned documents, or spatial/temporal evidence. |
+| **Best-Fit Use Cases** | Site inspections, media policy review, brand compliance, real-estate review, document-image validation. |
+| **No-Use Conditions** | Clinical/safety-critical diagnosis without regulated validation, poor media quality, no expert review path. |
+| **User Surface** | Timeline, media canvas, bounding boxes, transcript, annotation review panel. |
+| **Architecture Shape** | Media ingest → preprocessing/sampling → modality route → multimodal analysis → coordinate/timecode mapping → expert review → record. |
+| **Required Contracts** | Asset schema, modality, sampling, coordinate/timecode, detection label, human review, audit, eval. |
+| **Human Authority** | Domain expert confirms or corrects detections and final judgment. |
+| **Model Route Strategy** | Multimodal route selected by asset type and evidence requirements. |
+| **Retrieval / Context Strategy** | Metadata, checklists, prior reference images, transcripts where relevant. |
+| **Tool / Action Strategy** | Media parsers/samplers in sandbox; no autonomous final decision in high-risk cases. |
+| **Core Evals** | Detection precision/recall, coordinate grounding, transcription accuracy, reviewer agreement, false-negative rate. |
+| **Telemetry** | Media hash, sampling settings, detection labels, coordinates/timecodes, reviewer adjustments. |
+| **Audit / Evidence Boundary** | Media reference, annotation IDs, reviewer decision, coordinate/timecode evidence. |
+| **Security Boundary** | Media sandbox, codec exploit protection, PII redaction/blurring where required. |
+| **Primary Cost Drivers** | Video/audio processing, visual tokens, storage, expert review. |
+| **Failure Modes** | Missed anomalies, timecode drift, bounding errors, transcript hallucination, reviewer fatigue. |
+| **Anti-Patterns** | Generic visual descriptions with no coordinate evidence. |
+| **Degraded Mode** | Disable overlays; present raw media and manual checklist. |
+| **Adoption and Support** | Requires expert review training and annotation standards. |
+| **Sourcing / Exit** | Store annotations in open schema with media references. |
+| **Maturity Target** | Level 3–4. |
+
+### **9. Enterprise Knowledge System Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Governed enterprise knowledge retrieval and synthesis across permissioned repositories. |
+| **Best-Fit Use Cases** | Policy search, internal documentation, compliance research, support grounding, product knowledge. |
+| **No-Use Conditions** | Exact transactional lookup, unmanaged corpora, missing ACLs, no content lifecycle. |
+| **User Surface** | Search portal, chat/search UI, document preview, citation panel. |
+| **Architecture Shape** | Repository sync → ACL processing → chunk/index → hybrid search/rerank → grounding verifier → answer synthesis → feedback loop. |
+| **Required Contracts** | Ingestion, permission, retrieval, freshness, grounding, citation, lifecycle, eval, observability. |
+| **Human Authority** | Content owners manage source quality; users verify cited answers. |
+| **Model Route Strategy** | Retrieval-first; synthesis route only after evidence is permissioned and sufficient. |
+| **Retrieval / Context Strategy** | Hybrid retrieval with ACL/RLS, source authority, freshness, dedupe, conflict handling. |
+| **Tool / Action Strategy** | Read-only retrieval; no document mutation unless separately governed. |
+| **Core Evals** | Context precision/recall, answer faithfulness, citation support, permission safety, freshness. |
+| **Telemetry** | Query, user/role scope reference, source IDs, retrieval rank, citation verification, feedback. |
+| **Audit / Evidence Boundary** | Source refs, answer version, citation verifier status, access-decision record. |
+| **Security Boundary** | Chunk-level permissions, tenant isolation, restricted corpus ingestion. |
+| **Primary Cost Drivers** | Ingestion, embeddings/indexes, reranking, storage, source lifecycle. |
+| **Failure Modes** | Permission leakage, stale summaries, duplicate/conflicting docs, vector dump chaos. |
+| **Anti-Patterns** | Vector Dump Knowledge System; RAG-as-database. |
+| **Degraded Mode** | Keyword/file search with document links; no synthesis. |
+| **Adoption and Support** | Requires knowledge management and content-owner workflows. |
+| **Sourcing / Exit** | Preserve source documents, metadata, and index rebuild path. |
+| **Maturity Target** | Level 4. |
+
+### **10. Decision-Support Cockpit Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | High-stakes evidence review, scenario analysis, and human decision support. |
+| **Best-Fit Use Cases** | Underwriting, legal strategy, healthcare support, risk review, supply-chain contingency planning. |
+| **No-Use Conditions** | Autonomous final decision, high-volume low-review tasks, no expert validation path. |
+| **User Surface** | Evidence cockpit, scenario matrix, risk panel, rationale capture. |
+| **Architecture Shape** | Case file → evidence gathering → policy/guideline retrieval → scenario generation → risk/uncertainty analysis → human decision record. |
+| **Required Contracts** | Case assembly, retrieval, grounding, risk, human review, rationale, audit, user expectation. |
+| **Human Authority** | Human is final decision-maker; AI frames options and evidence only. |
+| **Model Route Strategy** | High-reasoning route for scenario framing; deterministic calculators for numbers. |
+| **Retrieval / Context Strategy** | Case record, policies, historical precedents, external evidence where approved. |
+| **Tool / Action Strategy** | Simulations/read-only analysis; external writes require human approval and deterministic execution. |
+| **Core Evals** | Evidence completeness, option relevance, risk coverage, calibration, rationale quality, bias review. |
+| **Telemetry** | Case ID, evidence refs, scenarios generated, user choice, rationale, override/correction. |
+| **Audit / Evidence Boundary** | Decision record, evidence refs, human rationale, versioned policy sources. |
+| **Security Boundary** | Regulated workspace, role access, strict retention and evidence policy. |
+| **Primary Cost Drivers** | Expert review, long-case context, reasoning, audit requirements. |
+| **Failure Modes** | Automation bias, biased framing, missing risk, information overload. |
+| **Anti-Patterns** | Human as rubber-stamp for automated decision. |
+| **Degraded Mode** | Static checklist and raw evidence package. |
+| **Adoption and Support** | Requires training on automation bias and evidence inspection. |
+| **Sourcing / Exit** | Preserve case/rationale records and scenario schemas. |
+| **Maturity Target** | Level 4. |
+
+### **11. Background Classifier / Router Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | High-throughput classification, triage, and routing. |
+| **Best-Fit Use Cases** | Ticket routing, alert triage, anomaly tagging, document category routing, moderation queues. |
+| **No-Use Conditions** | High-liability decisions without review, deterministic metadata routing, low-volume tasks. |
+| **User Surface** | Mostly headless; exception and audit dashboard. |
+| **Architecture Shape** | Event ingest → feature extraction → classifier → confidence/threshold gate → deterministic router → exception queue. |
+| **Required Contracts** | Event schema, class taxonomy, confidence threshold, exception queue, route/action schema, eval, observability. |
+| **Human Authority** | Queue managers review exceptions and taxonomy drift. |
+| **Model Route Strategy** | Fast classifier route; fallback to deterministic rules or manual queue. |
+| **Retrieval / Context Strategy** | Taxonomy, route definitions, metadata, short event body. |
+| **Tool / Action Strategy** | Queue writes only; high-impact outcomes require human review. |
+| **Core Evals** | Precision/recall, confusion matrix, false-negative cost, drift, exception rate. |
+| **Telemetry** | Event hash, class, confidence bucket, route target, exception reason, correction. |
+| **Audit / Evidence Boundary** | Event reference, class label, route decision, taxonomy version. |
+| **Security Boundary** | Input sanitization, queue permission, no arbitrary payload execution. |
+| **Primary Cost Drivers** | Event volume, classification calls, exception labor. |
+| **Failure Modes** | Silent misrouting, class drift, queue overload, payload manipulation. |
+| **Anti-Patterns** | No exception queue; automating high-liability routing. |
+| **Degraded Mode** | Route all events to manual triage or deterministic rules. |
+| **Adoption and Support** | Requires taxonomy ownership and queue SLA review. |
+| **Sourcing / Exit** | Preserve class taxonomy and labeled examples. |
+| **Maturity Target** | Level 4–5. |
+
+### **12. Personal or Team Productivity Assistant Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Local or team-scoped drafting, summarization, note search, and lightweight assistance. |
+| **Best-Fit Use Cases** | Meeting notes, email drafts, personal knowledge search, team document drafting. |
+| **No-Use Conditions** | System-of-record writes, regulated workflows, customer-facing automation, enterprise-wide authority. |
+| **User Surface** | Sidebar, desktop widget, team chat assistant, document pane. |
+| **Architecture Shape** | User prompt → local/team context assembly → safety/policy filter → optional memory/retrieval → model route → user review/copy. |
+| **Required Contracts** | Prompt, context, memory where active, resource, user expectation, observability. |
+| **Human Authority** | User owns final copy/send/paste/action. |
+| **Model Route Strategy** | Low/medium capability route; local/private route for sensitive contexts where needed. |
+| **Retrieval / Context Strategy** | Local notes, team docs, current workspace, permissioned memory. |
+| **Tool / Action Strategy** | No direct external execution unless separately governed. |
+| **Core Evals** | User utility, memory relevance, formatting, safety policy, latency. |
+| **Telemetry** | Minimal usage/correction signals; avoid surveillance-style individual monitoring. |
+| **Audit / Evidence Boundary** | Usually none beyond operational telemetry unless enterprise data/risk requires. |
+| **Security Boundary** | Protect notes, credentials, local files, and team permissions. |
+| **Primary Cost Drivers** | Frequent low-value calls, local indexes, memory storage. |
+| **Failure Modes** | Memory drift, hallucinated summaries, context leakage, overcollection. |
+| **Anti-Patterns** | Mixing team databases without permission boundaries. |
+| **Degraded Mode** | Standard editor/search without AI. |
+| **Adoption and Support** | Basic training on data boundaries and review. |
+| **Sourcing / Exit** | Export notes/memory/context indexes where appropriate. |
+| **Maturity Target** | Level 2–3, higher if enterprise-governed. |
+
+### **13. Governed Agentic Workflow Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Complex, stateful, multi-step agentic workflow with governance and checkpoints. |
+| **Best-Fit Use Cases** | Compliance auditing, multi-step underwriting support, controlled security review, complex operational routing. |
+| **No-Use Conditions** | Linear deterministic workflow, subsecond latency, missing rollback, missing schema/state model. |
+| **User Surface** | Process portal, graph visualization, checkpoint ledger, approval queue. |
+| **Architecture Shape** | Goal → graph/state machine → planner/executor/auditor nodes → checkpoint ledger → deterministic gate → human escalation. |
+| **Required Contracts** | Graph, prompt, context, retrieval, tool, permission, resource, memory, checkpoint, eval, observability, audit. |
+| **Human Authority** | Process owner approves plan, handles escalations, can halt/rollback. |
+| **Model Route Strategy** | Reasoning route for planning/auditing; deterministic state machine controls execution. |
+| **Retrieval / Context Strategy** | Node-specific context, policies, APIs, state, prior checkpoints. |
+| **Tool / Action Strategy** | Tool calls gated by node contract, idempotency, permission, and postcondition checks. |
+| **Core Evals** | Node transition correctness, loop/budget compliance, task completion, rollback, checkpoint replay. |
+| **Telemetry** | Graph path, node states, tool calls, approvals, resource use, breaches. |
+| **Audit / Evidence Boundary** | Checkpoints, payload hashes, approval records, state transitions, final confirmation. |
+| **Security Boundary** | Isolated node execution, scoped credentials, no cross-agent privilege leakage. |
+| **Primary Cost Drivers** | Multi-agent loops, long contexts, checkpoints, human escalation. |
+| **Failure Modes** | Consensus deadlock, runaway graph, state divergence, tool abuse. |
+| **Anti-Patterns** | Multi-agent framework for a simple linear workflow. |
+| **Degraded Mode** | Pause graph, serialize state, route to process supervisor. |
+| **Adoption and Support** | Requires operator training on graph debugging and escalation. |
+| **Sourcing / Exit** | Keep graph definitions, state, tools, and checkpoints portable. |
+| **Maturity Target** | Level 4. |
+
+### **14. AI Gateway / Control Plane Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Central model access, routing, policy, observability, quota, budget, and provider abstraction. |
+| **Best-Fit Use Cases** | Enterprise model access, multi-provider routing, cost control, credentials management, policy enforcement. |
+| **No-Use Conditions** | Local throwaway prototype with no enterprise data, no shared users, and no production route. |
+| **User Surface** | Developer API, platform dashboard, admin console. |
+| **Architecture Shape** | App request → identity/policy/quota → cache where safe → route selection → provider/self-hosted model → validation/telemetry. |
+| **Required Contracts** | Route, permission, resource, vendor, observability, deployment, eval, sourcing. |
+| **Human Authority** | Platform team controls routes, keys, budgets, policy, and emergency shutdown. |
+| **Model Route Strategy** | Provider-neutral route aliases tied to task/risk/eval contracts. |
+| **Retrieval / Context Strategy** | Optional cache/retrieval only with tenant, freshness, and permission scope. |
+| **Tool / Action Strategy** | Usually no direct business action; may broker tool calls through separate contracts. |
+| **Core Evals** | Gateway latency, route correctness, policy block correctness, cost control, provider failover. |
+| **Telemetry** | Route ID, contract versions, tokens, cost, latency, policy decisions, errors, breaches. |
+| **Audit / Evidence Boundary** | Route manifest, vendor contract refs, policy decisions, incident events. |
+| **Security Boundary** | Key vault, egress controls, tenant isolation, DLP/policy before provider call. |
+| **Primary Cost Drivers** | High-volume proxying, logs/traces, caching, provider calls. |
+| **Failure Modes** | Single point of failure, gateway bypass, cache leakage, policy misroute. |
+| **Anti-Patterns** | Direct provider SDK sprawl; gateway bypass. |
+| **Degraded Mode** | Fail closed or use approved fallback routes preserving contracts. |
+| **Adoption and Support** | Requires developer onboarding and platform support. |
+| **Sourcing / Exit** | Central mechanism for provider exit and route migration. |
+| **Maturity Target** | Level 5. |
+
+### **15. Human Review and Escalation Queue Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Exception handling, human validation, approval, and correction capture. |
+| **Best-Fit Use Cases** | Low-confidence extraction, high-risk actions, support escalations, moderation, regulated review. |
+| **No-Use Conditions** | Very low-risk high-volume tasks with reliable deterministic validation, or no reviewer capacity. |
+| **User Surface** | Review queue, evidence panel, correction editor, approval/deny controls. |
+| **Architecture Shape** | AI proposal → escalation gate → priority queue → review canvas → human decision → deterministic validator → downstream commit or rejection. |
+| **Required Contracts** | Escalation, human review, evidence, schema, permission, audit, observability. |
+| **Human Authority** | Reviewer can approve, reject, correct, escalate, or block. |
+| **Model Route Strategy** | Use AI to pre-process and prioritize; do not rely on high-cost retries to avoid review. |
+| **Retrieval / Context Strategy** | Evidence packet, source refs, policy, prior corrections. |
+| **Tool / Action Strategy** | Human-approved payload goes through deterministic validator and action contract. |
+| **Core Evals** | Reviewer agreement, false negatives, correction categories, queue latency, fatigue indicators. |
+| **Telemetry** | Queue age, reviewer action, correction delta, approval/rejection, downstream result. |
+| **Audit / Evidence Boundary** | Proposal, evidence refs, reviewer ID/role, payload hash, decision reason. |
+| **Security Boundary** | Reviewer RBAC, sensitive data minimization, queue access logging. |
+| **Primary Cost Drivers** | Skilled review labor, queue tooling, evidence prep. |
+| **Failure Modes** | Rubber-stamping, backlog, reviewer fatigue, feedback loss. |
+| **Anti-Patterns** | Fake human-in-the-loop with no evidence or veto. |
+| **Degraded Mode** | Pause automated writes; hold items in staging queue. |
+| **Adoption and Support** | Requires reviewer training and SLA ownership. |
+| **Sourcing / Exit** | Keep review records exportable. |
+| **Maturity Target** | Level 4. |
+
+### **16. Evaluation and Shadow-Mode Pattern**
+
+| Field | Specification |
+| :---- | :---- |
+| **Problem Class** | Candidate model, prompt, route, retrieval, or tool validation before production exposure. |
+| **Best-Fit Use Cases** | Model upgrades, prompt migrations, retrieval changes, route comparison, regression detection. |
+| **No-Use Conditions** | Production data cannot be mirrored safely, no validation metrics exist, or candidate path may create side effects. |
+| **User Surface** | Release dashboard, eval report, regression matrix. |
+| **Architecture Shape** | Production sample or mirrored request → candidate route in isolated mode → evaluator → regression detector → release decision. |
+| **Required Contracts** | Eval, route, deployment, observability, data handling, evidence, security. |
+| **Human Authority** | Release owner approves rollout based on evidence. |
+| **Model Route Strategy** | Candidate route isolated from production side effects. |
+| **Retrieval / Context Strategy** | Mirrors retrieval where allowed; otherwise uses representative offline dataset. |
+| **Tool / Action Strategy** | Read-only or mocked writes; no candidate side effects. |
+| **Core Evals** | Quality delta, regression rate, safety, latency, cost, grounding, tool-call validity. |
+| **Telemetry** | Candidate output, eval score, cost/latency delta, data class, route IDs. |
+| **Audit / Evidence Boundary** | Eval report, dataset/sample version, manifest, approval decision. |
+| **Security Boundary** | Shadow data must match production policy; candidate path isolated. |
+| **Primary Cost Drivers** | Duplicate calls, evaluator cost, trace storage, review time. |
+| **Failure Modes** | Evaluator bias, shadow leakage, candidate side effects, false confidence. |
+| **Anti-Patterns** | Production upgrade without shadow/eval evidence. |
+| **Degraded Mode** | Disable candidate path; production path unaffected. |
+| **Adoption and Support** | Requires release discipline and eval ownership. |
+| **Sourcing / Exit** | Enables provider/model migration decisions. |
+| **Maturity Target** | Level 4–5. |
+
+## **Systemic Integration and Control Surfaces**
+
+Patterns become production architectures only when their controls are explicit. The matrices below define required contract packs, evaluation classes, telemetry/evidence boundaries, human authority, security boundaries, and cost drivers.
+
+### **1. Pattern Control Pack Matrix**
+
+| Pattern | Mandatory Control Pack |
+| :---- | :---- |
+| **Copilot / Embedded Assistant** | Prompt, context, route, resource, user expectation, observability. |
+| **Research Agent** | Prompt, retrieval, grounding, source authority, freshness, resource, eval, observability. |
+| **Support Assistant** | Intent, retrieval, grounding, escalation, permission, user expectation, support telemetry. |
+| **Document Intelligence** | Asset, OCR/layout, schema, evidence coordinate, validation, review queue, audit. |
+| **Workflow Automation Agent** | Plan, tool, permission, idempotency, resource, action verification, ledger. |
+| **Coding Agent** | Repo access, sandbox, patch, test, security scan, human review, CI gate. |
+| **Analytics Assistant** | Semantic metric, schema, permission, query validation, read-only execution, provenance. |
+| **Multimodal Review** | Asset, modality, coordinate/timecode, detection label, expert review, audit. |
+| **Enterprise Knowledge System** | Ingestion, ACL, retrieval, freshness, grounding, citation, lifecycle, eval. |
+| **Decision-Support Cockpit** | Case assembly, evidence, scenario, risk, human decision, rationale, audit. |
+| **Background Classifier / Router** | Event schema, taxonomy, confidence threshold, exception queue, route validation. |
+| **Productivity Assistant** | Prompt, local/team context, memory if active, resource, user expectation. |
+| **Governed Agentic Workflow** | Graph, tool, permission, memory, resource, checkpoint, action verification, audit. |
+| **AI Gateway / Control Plane** | Route, vendor, permission, resource, deployment, observability, eval, policy. |
+| **Human Review Queue** | Escalation, evidence, reviewer role, override, audit, downstream validation. |
+| **Evaluation / Shadow Mode** | Eval, route, sample/data policy, candidate isolation, deployment, evidence. |
+
+### **2. Eval-by-Pattern Matrix**
+
+| Pattern | Core Evaluation Classes |
+| :---- | :---- |
+| **Copilot** | Suggestion usefulness, edit distance, latency, acceptance quality, downstream correctness. |
+| **Research Agent** | Citation fidelity, claim support, source authority, contradiction handling, synthesis usefulness. |
+| **Support Assistant** | True resolution, repeat contact, policy compliance, escalation quality, CSAT/sentiment. |
+| **Document Intelligence** | Field precision/recall, schema validity, table extraction, coordinate grounding, correction rate. |
+| **Workflow Automation Agent** | Plan validity, tool-call validity, postcondition success, rollback/compensation, loop budget. |
+| **Coding Agent** | Compile/test pass, static scan, diff minimality, reviewer approval, regression rate. |
+| **Analytics Assistant** | SQL/query validity, metric correctness, row-level security, chart consistency, explanation fidelity. |
+| **Multimodal Review** | Detection precision/recall, coordinate/timecode grounding, transcript accuracy, reviewer agreement. |
+| **Enterprise Knowledge System** | Context precision/recall, faithfulness, citation support, permission safety, freshness. |
+| **Decision-Support Cockpit** | Evidence completeness, risk coverage, option relevance, calibration, rationale quality. |
+| **Background Classifier / Router** | Precision/recall, confusion matrix, false-negative cost, drift, exception rate. |
+| **Productivity Assistant** | Utility, memory relevance, safety policy, latency, user correction. |
+| **Governed Agentic Workflow** | Node transition correctness, graph safety, checkpoint replay, tool verification, budget compliance. |
+| **AI Gateway** | Route correctness, policy enforcement, latency overhead, cost control, failover safety. |
+| **Human Review Queue** | Reviewer agreement, queue latency, fatigue, false negatives, downstream correction. |
+| **Evaluation / Shadow Mode** | Candidate delta, regression, cost/latency delta, evaluator reliability, release decision quality. |
+
+### **3. Telemetry and Evidence Boundary Matrix**
+
+| Pattern | Operational Telemetry | Evidence / Audit Boundary |
+| :---- | :---- | :---- |
+| **Copilot** | Accept/reject/edit, latency, route, cost bucket. | Usually none beyond hashes/versions unless regulated. |
+| **Research Agent** | Plan, source IDs, verifier status, loop count, cost. | Source manifest, claim-evidence map, final report version. |
+| **Support Assistant** | Intent, source IDs, escalation reason, resolution, repeat contact. | Ticket record, final message, policy version, handoff packet. |
+| **Document Intelligence** | Field confidence, validation errors, correction, runtime. | Document ref, extracted fields, coordinate refs, reviewer decision. |
+| **Workflow Automation Agent** | Plan graph, tool calls, postconditions, approvals, breaches. | Execution ledger, payload hashes, approvals, state confirmation. |
+| **Coding Agent** | Diff, build/test, scan, reviewer edits. | PR, commit hash, test report, reviewer approval. |
+| **Analytics Assistant** | Query hash, metric IDs, validation, cost, corrections. | Query, metric definition, result ref, chart spec. |
+| **Multimodal Review** | Media hash, sampling, detections, reviewer edits. | Media ref, annotation IDs, coordinates/timecodes, final decision. |
+| **Enterprise Knowledge System** | Query, retrieval rank, source IDs, citation verification. | Answer version, source refs, access decision, verifier status. |
+| **Decision-Support Cockpit** | Evidence refs, options, choice, rationale, overrides. | Decision record, evidence packet, rationale, policy version. |
+| **Background Classifier** | Event hash, class, confidence, route, exception. | Event ref, taxonomy version, routing decision. |
+| **Productivity Assistant** | Minimal utility/correction/latency signals. | Usually none unless enterprise risk requires. |
+| **Governed Agentic Workflow** | Graph state, node events, tool calls, resource use, breaches. | Checkpoints, payload hashes, approvals, final confirmation. |
+| **AI Gateway** | Route, tokens, cost, latency, policy decision, errors. | Route manifest, policy version, vendor/SLA event, incident record. |
+| **Human Review Queue** | Queue age, reviewer action, correction, downstream result. | Proposal, evidence refs, reviewer decision, payload hash. |
+| **Evaluation / Shadow Mode** | Candidate output, eval score, cost/latency delta. | Eval report, sample version, manifest, release approval. |
+
+Telemetry supports operation. Evidence supports proof. Do not turn raw telemetry into an uncontrolled audit landfill.
+
+### **4. Human Authority Matrix**
+
+| Pattern | Human Authority Level |
+| :---- | :---- |
+| **Copilot** | Human accepts, edits, or rejects suggestions. |
+| **Research Agent** | Human directs research, audits sources, approves synthesis. |
+| **Support Assistant** | Human handles escalations and material account actions. |
+| **Document Intelligence** | Human reviews low-confidence/high-impact fields. |
+| **Workflow Automation Agent** | Human approves plans and high-impact steps. |
+| **Coding Agent** | Human reviews PR and controls merge. |
+| **Analytics Assistant** | Human validates metric interpretation and query output. |
+| **Multimodal Review** | Expert confirms detections and final assessment. |
+| **Enterprise Knowledge System** | Human verifies cited answers and content owners maintain sources. |
+| **Decision-Support Cockpit** | Human is final decision-maker. |
+| **Background Classifier** | Human audits exceptions and taxonomy drift. |
+| **Productivity Assistant** | User owns final use of generated text. |
+| **Governed Agentic Workflow** | Human can halt, approve, rollback, or escalate graph execution. |
+| **AI Gateway** | Platform owner controls route, policy, budget, and shutdown. |
+| **Human Review Queue** | Reviewer has veto/correction authority. |
+| **Evaluation / Shadow Mode** | Release owner approves production promotion. |
+
+### **5. Security Boundary Matrix**
+
+| Pattern | Boundary Requirement |
+| :---- | :---- |
+| **Copilot** | Workspace context scoping, secret masking, local/cloud data policy. |
+| **Research Agent** | Read-only tools, external-query controls, sandboxed browsing/parsing. |
+| **Support Assistant** | Tenant isolation, PII redaction, CRM permission scope, escalation path. |
+| **Document Intelligence** | File sandboxing, malware/PDF safety, PII controls, staging writes. |
+| **Workflow Automation Agent** | Least-privilege tools, idempotency, postcondition checks, no admin identity. |
+| **Coding Agent** | Network-restricted sandbox, secret masking, CI gate, human merge. |
+| **Analytics Assistant** | Read-only credentials, row-level security, query limits, semantic layer. |
+| **Multimodal Review** | Media sandbox, codec protection, PII blur/redaction where required. |
+| **Enterprise Knowledge System** | Chunk-level ACL/RLS, tenant isolation, source lifecycle governance. |
+| **Decision-Support Cockpit** | Regulated workspace, strict access, evidence retention policy. |
+| **Background Classifier** | Input sanitization, queue permission, exception path. |
+| **Productivity Assistant** | Local file and memory controls, no silent enterprise data upload. |
+| **Governed Agentic Workflow** | Isolated node execution, scoped credentials, checkpointed state. |
+| **AI Gateway** | Key vault, route policy, DLP/egress, tenant separation, gateway HA. |
+| **Human Review Queue** | Reviewer RBAC, sensitive-data minimization, audit access controls. |
+| **Evaluation / Shadow Mode** | Candidate isolation, no side effects, mirrored-data policy. |
+
+### **6. Cost Driver and Mitigation Matrix**
+
+| Pattern | Primary Cost Driver | Structural Mitigation |
+| :---- | :---- | :---- |
+| **Copilot** | High-frequency completions. | Debounce, local cache, short context, small route. |
+| **Research Agent** | Search/synthesis loops. | Step budget, plan approval, source cache, bounded search. |
+| **Support Assistant** | Long conversations and escalations. | Summarization, intent routing, KB quality, escalation thresholds. |
+| **Document Intelligence** | OCR/visual processing and review labor. | Page filtering, document classification, field-confidence gates. |
+| **Workflow Automation Agent** | Planning/tool loops and retries. | Static workflow templates, step caps, idempotency, approval gates. |
+| **Coding Agent** | Build/test/retry loops. | Changed-file builds, sandbox reuse, issue scoping. |
+| **Analytics Assistant** | Warehouse compute and bad joins. | Metric layer, query limits, dry-run cost estimates. |
+| **Multimodal Review** | Media processing and expert review. | Sampling policy, preprocessing, exception thresholds. |
+| **Enterprise Knowledge System** | Ingestion/index/reranking. | Deduplication, lifecycle cleanup, hybrid retrieval tuning. |
+| **Decision-Support Cockpit** | Long reasoning and expert review. | Evidence templates, deterministic calculators, scenario caps. |
+| **Background Classifier** | Event volume and exceptions. | Fast classifier, batching, taxonomy quality. |
+| **Productivity Assistant** | Frequent low-value calls. | Local route, caching, memory limits. |
+| **Governed Agentic Workflow** | Multi-agent loops and checkpoints. | Graph constraints, budget caps, early human intervention. |
+| **AI Gateway** | Proxy scale, telemetry, cache, provider calls. | Sampling, budget enforcement, route optimization. |
+| **Human Review Queue** | Reviewer labor. | Better thresholds, prioritization, evidence UI, workflow redesign. |
+| **Evaluation / Shadow Mode** | Duplicate inference and eval cost. | Sampling, offline evals, candidate gating. |
+
+## **Degraded Mode Pattern Library**
+
+Degraded modes are safe lower-capability states. They must preserve the system’s safety contracts even when capability, provider availability, retrieval, tools, or latency degrade.
+
+| Pattern | Trigger | Safe Degraded Behavior | Disabled Capability | Disclosure / Recovery |
+| :---- | :---- | :---- | :---- | :---- |
+| **Copilot / Embedded Assistant** | Model latency, provider outage, context unsafe. | Static snippets, deterministic autocomplete, local templates. | Generative suggestions. | Show reduced-assist status; restore after route health and policy pass. |
+| **Research Agent** | Search loop budget, source verifier failure, provider outage. | Present source list, notes, and unresolved questions without synthesis. | Final synthesized answer. | Show unsupported/partial status; recover after evidence verification. |
+| **Support Assistant** | Low confidence, policy retrieval failure, customer distress, outage. | Route to human queue with conversation summary and known context. | Bot resolution and transactional actions. | Tell user escalation occurred; recover after support route healthy. |
+| **Document Intelligence** | OCR/parser failure, schema failure, low confidence, malware flag. | Manual document review queue. | Automated extraction/write-back. | Mark document needs review; recover after parser/eval pass. |
+| **Workflow Automation Agent** | Permission failure, loop budget, unknown final state, API outage. | Freeze workflow, serialize state, notify operator. | Further side effects. | Show paused state and required human action. |
+| **Coding Agent** | Sandbox failure, test failure, security scan failure. | Suggestion-only analysis with no PR/write authority. | Automated patch/PR creation. | Show failed gate; recover after tests/sandbox pass. |
+| **Analytics Assistant** | Query validator failure, warehouse limit, metric ambiguity. | Static dashboards, metric glossary, or dry-run query only. | Ad-hoc execution. | Explain query blocked; recover after metric/query validation. |
+| **Multimodal Review System** | Media parser failure, detection uncertainty, coordinate verifier failure. | Raw media review with manual checklist. | Automated annotations/final assessment. | Mark automation unavailable; recover after media/eval pass. |
+| **Enterprise Knowledge System** | Retrieval permission uncertainty, index outage, citation verifier failure. | Keyword search/document list only. | Generated answers/summaries. | Show synthesis disabled; recover after retrieval/grounding healthy. |
+| **Decision-Support Cockpit** | Evidence conflict, missing source, high uncertainty, route failure. | Static checklist and raw evidence packet. | Scenario synthesis/recommendation. | Require human decision; recover after evidence sufficiency. |
+| **Background Classifier / Router** | Classifier drift, low confidence, queue route failure. | Manual triage queue or deterministic rules. | Automated routing. | Alert queue owner; recover after taxonomy/eval pass. |
+| **Personal / Team Productivity Assistant** | Memory unsafe, context too sensitive, local route unavailable. | Standard editor/search without AI. | Memory use and generation. | Show AI unavailable/restricted; recover after policy/route pass. |
+| **Governed Agentic Workflow** | Graph deadlock, contract breach, tool failure, resource budget. | Pause graph and checkpoint state. | Node advancement and side effects. | Notify process supervisor; recover by manual resume or rollback. |
+| **AI Gateway / Control Plane** | Provider outage, policy failure, key compromise, routing anomaly. | Fail closed or use only approved fallback routes preserving contracts. | Unsafe provider routes and direct bypass. | Alert platform; recover after route/policy health check. |
+| **Human Review Queue** | Reviewer overload, queue tooling failure, evidence missing. | Hold items in staging; pause downstream writes. | Approval/commit. | Notify operations; recover after queue capacity/evidence restored. |
+| **Evaluation / Shadow Mode** | Shadow cost spike, candidate failure, data policy violation. | Disable candidate path; production path remains isolated. | Candidate evaluation traffic. | Alert release owner; recover after shadow policy/eval fix. |
+
+A degraded mode is not “use a weaker model and hope.” It is a controlled reduction in capability that preserves safety, authority, and evidence boundaries.
+
+## **AI Architecture Anti-Pattern Catalog**
+
+### **Chatbox on Everything**
+
+* **Symptoms**: A single, open-ended conversational chat input area is deployed as the primary user interface, replacing structured web forms, nested menus, action tables, and application buttons.  
+* **Why Tempting**: Fast to build and deploy; simplifies UI design; shifts the burden of navigating process complexity directly to the user's phrasing.  
+* **Why It Fails**: Increases cognitive load on users, who must guess which inputs are valid; leads to high task friction; and yields highly inconsistent completions where deterministic data writes are required.1  
+* **Detection Signals**: Low user engagement metrics; high frequencies of multi-turn user explanation queries; user feedback complaining about lost dashboard features.  
+* **Safer Alternatives**: Use the Copilot pattern, embedding task-specific context suggestions inline within structured user interfaces with explicit, validated operation buttons.13
+
+### **RAG-as-Database**
+
+* **Symptoms**: A vector database and Retrieval-Augmented Generation (RAG) pipeline are utilized to perform precise, single-value transactional lookups (e.g., account balances, order status tracking, inventory quantities).  
+* **Why Tempting**: Avoids the engineering effort of building relational database indexes or structured REST APIs, allowing developers to query un-parsed files directly via semantic similarity.  
+* **Why It Fails**: Vector similarity models do not guarantee exact factual retrievals; models frequently miss target numbers or synthesize adjacent data fields.7  
+* **Detection Signals**: Numeric errors in customer responses; low context precision metrics; database retrieval mismatches.  
+* **Safer Alternatives**: Use deterministic lookup paths (SQL indices, REST endpoints) for structured data queries, and reserve RAG patterns strictly for unstructured document search.
+
+### **Agent as Intern with Admin Rights**
+
+* **Symptoms**: An autonomous, model-driven agent is deployed to write directly to enterprise production systems of record (e.g., modifying ERPs, updating cloud server states) without sandbox boundaries or human approval gates.1  
+* **Why Tempting**: Promises high automation speeds and creates the appearance of a fully automated operational process.  
+* **Why It Fails**: Non-deterministic planner behaviors, tool call hallucinations, or prompt injections can trigger unauthorized database deletions, infinite transaction loops, and data corruption.1  
+* **Detection Signals**: Corrupt production databases; billing anomalies; security alerts indicating unauthorized administrative API executions.  
+* **Safer Alternatives**: Deploy the Governed Agentic Workflow pattern with sandboxed transaction runtimes and strict human verification gates.1
+
+### **Demo Architecture**
+
+* **Symptoms**: A prototype pipeline using complex multi-agent frameworks is deployed to production with the same configurations used during local development, lacking telemetry logging, error routing, and tracing configurations.2  
+* **Why Tempting**: Accelerates initial deployment schedules; minimizes system setup and platform management workloads.  
+* **Why It Fails**: Production data exposes systemic anomalies, rate-limiting failures, token budget overruns, and security exploits that local testing environments hide.2  
+* **Detection Signals**: Uncontrollable API spend; system timeout errors; untraceable transactional failures; lack of structured logging.  
+* **Safer Alternatives**: Implement the AI Gateway pattern to manage credentials, rate-limiting parameters, and open telemetry collections across providers.
+
+### **Citation Theater**
+
+* **Symptoms**: Generated documents feature academic-style footnotes and hyperlink annotations that point to irrelevant sources, hallucinated files, or non-existent document subsections.1  
+* **Why Tempting**: Footnotes look professional and create the appearance of factual grounding and research reliability.  
+* **Why It Fails**: Undermines system trust; users can be misled by plausible-sounding synthetic text backed by hallucinated references.1  
+* **Detection Signals**: User feedback flagging broken links; low citation fidelity evaluation scores; automated grounding mismatches.  
+* **Safer Alternatives**: Deploy a dedicated Citation Verifier pipeline to validate visual coordinate maps and link offsets before rendering documents.
+
+### **Workflow Double-Work**
+
+* **Symptoms**: Users spend more time reviewing, correcting, and re-verifying model-generated drafts than they would have spent writing the document manually.  
+* **Why Tempting**: Promises high-volume automated document drafts at low upfront cost.  
+* **Why It Fails**: High-volume, low-quality generations introduce long correction workloads, causing operator fatigue and reducing productivity.  
+* **Detection Signals**: High user reject rates; low adoption metrics; longer document processing timelines.  
+* **Safer Alternatives**: Deploy bounded Copilot models designed to suggest local completions inline, rather than generating entire complex reports at once.13
+
+### **Model Leaderboard Architecture**
+
+* **Symptoms**: Selecting a core model backend based purely on generic public benchmarks (e.g., MMLU scores) rather than evaluating performance against custom task data.  
+* **Why Tempting**: Avoids the operational cost of building local evaluation test suites and benchmark datasets.  
+* **Why It Fails**: Public benchmarks rarely reflect specific corporate task parameters, schema requirements, or document formatting realities.  
+* **Detection Signals**: Upgraded models underperforming on custom corporate tasks despite higher public benchmark scores.  
+* **Safer Alternatives**: Build localized evaluation datasets and regression gates based on production telemetry to validate model upgrades.
+
+### **Single-Provider Hardwire**
+
+* **Symptoms**: Directly referencing vendor-specific SDK libraries and proprietary API payload formats throughout system controller files, without decoupling layers.  
+* **Why Tempting**: Simplifies initial integration; leverages vendor-specific helper utilities.  
+* **Why It Fails**: Locks the enterprise into a single model provider; introduces operational risk during outages or API deprecations.6  
+* **Detection Signals**: Long refactoring timelines during model migration projects; systemic outages when a primary model provider experiences downtime.  
+* **Safer Alternatives**: Implement the AI Gateway pattern using standard API specifications to decouple application controllers from provider endpoints.9
+
+### **Unbounded Research Goblin**
+
+* **Symptoms**: Deploying research agents without step execution boundaries, model timeout constraints, or spending ceilings, allowing models to query APIs indefinitely in search of answers.1  
+* **Why Tempting**: Promises deep, thorough research by allowing agents to search iteratively.1  
+* **Why It Fails**: Stochastic loops can trigger hundreds of search queries and model calls, causing token costs to spike rapidly.1  
+* **Detection Signals**: Cost alerts; model requests timing out; execution trace logs showing deep, circular reasoning trees.  
+* **Safer Alternatives**: Implement strict execution budgets, step limits, and timeout boundaries in agent planner configurations.1
+
+### **Magic Document Reader**
+
+* **Symptoms**: Multi-page, visually complex document folders (e.g., scanned PDFs with tables) are sent directly to models as raw file streams, relying on model context to interpret visual and spatial data.  
+* **Why Tempting**: Avoids configuring specialized layout extraction tools and OCR parsers.  
+* **Why It Fails**: Standard models frequently misinterpret multi-column tables, omit visual data, or confuse page-level spatial hierarchies.2  
+* **Detection Signals**: Low extraction precision scores; misread data fields; hallucinated table summaries.  
+* **Safer Alternatives**: Implement a structured Document Intelligence Pipeline with layout parsing and spatial coordinate validation.2
+
+### **One Pattern to Rule Them All**
+
+* **Symptoms**: Attempting to use a single architectural pattern (e.g., an open-ended conversational agent) to handle all enterprise AI workloads.  
+* **Why Tempting**: Standardizes development on a single framework, simplifying platform team operations.  
+* **Why It Fails**: Different tasks have divergent constraints; forcing low-latency tasks through agent loops or highly structured extractions through chat interfaces degrades quality.  
+* **Detection Signals**: Rising execution latency; user friction; high development costs as teams patch a monolithic system.  
+* **Safer Alternatives**: Select specialized reference patterns matched to the constraints of each task class.14
+
+### **Gateway Bypass**
+
+* **Symptoms**: Product development teams bypass central AI Gateways and deploy custom model endpoints directly using local cloud credentials.  
+* **Why Tempting**: Allows developers to prototype and deploy changes without coordination bottlenecks with platform engineering teams.  
+* **Why It Fails**: Bypasses corporate security, access controls, token spending audits, and threat detection systems, introducing compliance risks.  
+* **Detection Signals**: Hidden API cost increases on cloud billing; security audits finding unmonitored external model traffic.  
+* **Safer Alternatives**: Implement the AI Gateway pattern as a mandatory routing policy at the network boundary.
+
+### **Fake Human-in-the-Loop**
+
+* **Symptoms**: Human review interfaces are designed as simple confirmation panels with no access to grounding data or verification tools, encouraging rapid clicking.  
+* **Why Tempting**: Minimizes workflow delay and reduces human labor costs while claiming safety compliance.  
+* **Why It Fails**: Humans cannot verify claims without grounding data, leading to automated rubber-stamping and un-vetted errors reaching production.13  
+* **Detection Signals**: 100% manual review approval rates; downstream error occurrences matching automated prototype testing rates.  
+* **Safer Alternatives**: Implement a dedicated Human Review and Escalation Queue with side-by-side evidence, coordinate highlighting, and rejection tools.
+
+### **Deflection Theater**
+
+* **Symptoms**: Customer support systems are configured to deflect user requests at all costs, blocking access to human agents or escalation queues.  
+* **Why Tempting**: Minimizes customer support center staffing requirements and operational overhead.  
+* **Why It Fails**: Traps users in unresolved loops with incorrect answers, leading to customer churn and brand damage.  
+* **Detection Signals**: High customer exit rates; negative post-chat feedback ratings; rising repeat-contact frequencies.  
+* **Safer Alternatives**: Support Assistant pattern with structured intent classification and low-friction human escalation paths.
+
+### **Metric Hallucination**
+
+* **Symptoms**: Models generate business intelligence analytics directly against database tables without using standard, governed semantic metric layer definitions.  
+* **Why Tempting**: Fast to deploy; avoids the engineering effort of building metadata frameworks or semantic layers.  
+* **Why It Fails**: Models hallucinate database join paths, use non-standard calculation logic, or expose restricted records to unauthorized users.  
+* **Detection Signals**: Inconsistent business metrics across reports; SQL compilation failures; security policy alerts.  
+* **Safer Alternatives**: Implement the Analytics Assistant pattern with strict SQL validators and a governed semantic metric layer.
+
+### **Vector Dump Knowledge System**
+
+* **Symptoms**: Thousands of un-curated, multi-format documents are uploaded into a single vector index without metadata, access rules, or lifecycle curation.8  
+* **Why Tempting**: Extremely low configuration cost; provides generic conversational answers across the corpus.  
+* **Why It Fails**: Returns outdated, duplicate, or conflicting context chunks, causing model synthesis confusion and access control leaks.  
+* **Detection Signals**: Stale information in answers; high rate of irrelevant citations; unauthorized access to sensitive files.  
+* **Safer Alternatives**: Enterprise Knowledge System pattern with ingestion filters, dynamic chunking, and IAM integration.8
+
+### **Auto-Merge Coding Agent**
+
+* **Symptoms**: Automated coding tools are configured to commit code patches directly to production branches without developer review or verification testing.1  
+* **Why Tempting**: Accelerates feature delivery; minimizes developer review overhead.  
+* **Why It Fails**: Plausible but broken patches, logic errors, or security vulnerabilities are deployed directly to production systems.1  
+* **Detection Signals**: Rising production regressions; build breakages; automated security alert spikes.  
+* **Safer Alternatives**: Enforce sandbox testing and manual peer-developer code reviews for all model-generated patches.
+
+### **Fallback Contract Downgrade**
+
+* **Symptoms**: When a primary, secure model provider fails, the system automatically redirects traffic to a simpler backup model while bypassing security, output validation, or policy contracts.  
+* **Why Tempting**: Prioritizes system availability during primary provider outages.  
+* **Why It Fails**: Lowers system security, allows unsafe outputs to bypass filters, and risks deploying unvalidated data.  
+* **Detection Signals**: Security anomalies during primary provider outages; format validation failures on backup routes.  
+* **Safer Alternatives**: Fallback configurations must enforce identical security, validation, and policy contracts across all model routes.
+
+## **No-Use Condition Matrix**
+
+No-use conditions prevent pattern overreach. They do not always mean “never use AI”; they often mean “use another pattern,” “add a human gate,” “use deterministic software,” or “complete readiness work first.”
+
+| Pattern | No-Use / Redesign Condition | Why This Pattern Fails | Safer Architecture |
+| :---- | :---- | :---- | :---- |
+| **Copilot / Embedded Assistant** | Task requires autonomous execution, exact calculation, or unattended batch processing. | Inline suggestion surface does not provide execution assurance. | Deterministic workflow, analytics assistant, or workflow automation with gates. |
+| **Research Agent** | User needs exact source-of-record lookup or answer must be instant and deterministic. | Multi-hop synthesis adds latency and hallucination risk. | SQL/API lookup, enterprise search, or deterministic report. |
+| **Support Assistant** | Emergency, legal, medical, abuse, or high-emotion dispute without human escalation. | AI may delay proper human intervention. | Human-first support queue with AI evidence assist only. |
+| **Document Intelligence Pipeline** | Source system already provides clean structured data. | OCR/extraction adds unnecessary error and cost. | API ingestion or deterministic parser. |
+| **Workflow Automation Agent** | Irreversible or high-value mutation lacks approval, idempotency, or verification. | Side effects can be wrong and unrecoverable. | Human approval queue plus deterministic execution. |
+| **Coding Agent** | Codebase cannot be built, tested, sandboxed, or reviewed. | No reliable validation path. | Human developer workflow; build test infrastructure first. |
+| **Analytics Assistant** | Metrics are undefined, database access is broad, or output is regulated filing. | Model may invent joins/calculations. | Semantic metric layer, governed BI, deterministic reporting. |
+| **Multimodal Review System** | Safety-critical diagnosis or measurement lacks regulated validation and expert authority. | False negatives/positives can cause harm. | Expert-led review with AI as evidence-prep only. |
+| **Enterprise Knowledge System** | Corpus lacks ACLs, freshness, ownership, or lifecycle governance. | Retrieval can leak data or surface stale/conflicting answers. | Corpus engineering and permission indexing first. |
+| **Decision-Support Cockpit** | Organization wants AI to make final high-impact decisions. | Cockpit pattern supports humans; it does not replace authority. | Manual decision workflow with evidence support. |
+| **Background Classifier / Router** | False negatives have high consequence and no exception review exists. | Silent misrouting becomes systemic risk. | Manual triage or deterministic rules until eval/review exists. |
+| **Productivity Assistant** | System manipulates records, sends customer messages, or processes regulated data. | Local assistant lacks governance and action controls. | Support assistant, workflow automation, or governed enterprise system. |
+| **Governed Agentic Workflow** | Workflow is simple, linear, deterministic, or latency-critical. | Agent graph adds unnecessary complexity and cost. | Static workflow engine or deterministic microservice. |
+| **AI Gateway / Control Plane** | One-off local toy prototype with no enterprise data or shared use. | Gateway overhead may exceed value. | Direct sandbox SDK with test credentials only. |
+| **Human Review Queue** | Task is low-risk, high-volume, and deterministically validated. | Review creates bottleneck and fatigue. | Automated validation with sampled audit. |
+| **Evaluation / Shadow Mode** | Production data cannot be mirrored safely or no evaluation metric exists. | Shadow path creates privacy risk or meaningless scores. | Offline eval with sanitized/representative data. |
+
+If the no-use condition is true, do not “prompt harder.” Change the architecture.
+
+## **Implementation Maturity Levels**
+
+AI architecture maturity describes how safely and repeatably a pattern can be operated. Maturity is not model quality. It is the presence of contracts, evals, telemetry, security, human authority, operations, support, and lifecycle controls.
+
+| Level | Name | Allowed Use | Forbidden Use | Required Controls | Exit Gate to Next Level |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **0** | **Demo** | Local exploration with synthetic or non-sensitive data. | Production data, customer exposure, system-of-record access, unmanaged secrets. | Sandbox only, test credentials, no live integrations, no claims of reliability. | Define use case, data class, owner, and prototype boundary. |
+| **1** | **Controlled Prototype** | Internal prototype with curated data and limited users. | Production actions, broad rollout, sensitive data without approval. | Basic prompt/schema, sandbox, initial evals, test keys/vaulted secrets, trace capture. | Pass seed eval, security/data review, and product-fit review. |
+| **2** | **Pilot** | Bounded real workflow with limited users and explicit monitoring. | Autonomous high-impact actions, unreviewed external outputs. | Named owner, telemetry, human review path, fallback, incident contact, pilot success criteria. | Demonstrate quality, adoption, cost, safety, and operational readiness. |
+| **3** | **Production** | Approved production workflow within defined risk tier. | Unbounded route changes, silent model swaps, missing rollback. | Contract stack, eval gate, deployment manifest, observability, runbook, rollback, support. | Prove repeatability across teams/routes and governance review. |
+| **4** | **Governed Scale** | Multi-team or high-volume production under platform controls. | Pattern-specific one-off exceptions without review. | Gateway/control plane, standardized evals, policy automation, cost controls, audit evidence, adoption support. | Package as reusable golden path. |
+| **5** | **Platform Golden Path** | Reusable pattern available through developer platform templates. | Bypassing mandatory controls. | Automated scaffolding, contract templates, eval harness, observability, security defaults, documentation, support model. | Continuous lifecycle; no higher maturity required. |
+
+### **Maturity Rules**
+
+| Rule | Meaning |
+| :---- | :---- |
+| **No production without owner.** | Every deployed pattern needs accountable product, technical, and operational ownership. |
+| **No write authority before action verification.** | Tools that mutate state require permission, idempotency, and postcondition checks. |
+| **No broad rollout without telemetry.** | Adoption, quality, cost, latency, and breach events must be visible. |
+| **No model migration without eval evidence.** | Provider/model/prompt/schema changes are deployment events. |
+| **No human review theater.** | Reviewers need evidence, veto power, and time. |
+| **No prototype secrets sprawl.** | Even demos use test credentials and safe environments. |
+| **No golden path without exit path.** | Reusable patterns must include sourcing and migration assumptions. |
+
+Maturity is not achieved when the demo works. Maturity begins when failure is boring, bounded, and recoverable.
+
+## **Cross-Canon Handoff Map**
+
+AI-ENG-AJ converts the AI Engineering Systems Canon into reusable reference architectures. Earlier reports define the doctrine, constraints, controls, and failure modes. AJ packages them into pattern cards that teams can select, instantiate, evaluate, operate, and govern.
+
+| Canon Report | Input to AJ | How AJ Uses It |
+| :---- | :---- | :---- |
+| **AI-ENG-AF — Product Architecture** | Use-case fit, workflow value, no-AI decisions, product surface. | Determines whether a pattern should be selected at all. |
+| **AI-ENG-AG — Adoption Systems** | Training, support, feedback loops, user resistance, incentives. | Adds adoption and support requirements to pattern cards. |
+| **AI-ENG-AH — Sourcing and Vendor Strategy** | Build/buy/open/hybrid, vendor exit, control plane. | Adds sourcing and exit fields to every pattern. |
+| **AI-ENG-AI — Contract Thinking** | Prompt, schema, retrieval, tool, permission, route, eval, observability contracts. | Defines the contract surfaces required by each pattern. |
+| **AI-ENG-AD — Governance Architecture** | Policy, audit, accountability, procurement, compliance. | Defines governance and evidence requirements. |
+| **AI-ENG-AE — Sustainable AI** | Cost, energy, routing, lifecycle impact. | Adds cost drivers and degraded/resource-aware modes. |
+| **AI-ENG-J — Throughput Mechanics** | Latency, batching, streaming, queueing. | Shapes route strategy and user-surface expectations. |
+| **AI-ENG-K — Weight Dynamics** | Model size, quantization, adaptation. | Informs route class and self-host/open-weight viability. |
+| **AI-ENG-L — Serving Architecture** | Gateways, serving topologies, fallback. | Implements patterns through route/control-plane designs. |
+| **AI-ENG-M — Agentic Orchestration** | Planners, executors, graph workflows, multi-agent systems. | Grounds agentic and workflow automation patterns. |
+| **AI-ENG-N — Tool Contracts** | Tool schemas, idempotency, side effects. | Defines tool/action requirements for action-oriented patterns. |
+| **AI-ENG-O — Action Verification** | Source-of-record confirmation and false-success prevention. | Defines postcondition verification for tools and workflows. |
+| **AI-ENG-P — Multimodal Understanding** | Vision/audio/video evidence and uncertainty. | Grounds document and multimodal review patterns. |
+| **AI-ENG-Q — Speech and Realtime Systems** | Streaming, voice latency, turn-taking. | Informs interactive/embedded and support surfaces. |
+| **AI-ENG-R — UI Agents** | Browser/UI control and interface state. | Informs UI-agent authority and action boundaries. |
+| **AI-ENG-S — Production Pathologies** | Common production failures. | Feeds anti-patterns, failure modes, and degraded modes. |
+| **AI-ENG-T — Boundary Defense** | Prompt injection, tenant isolation, egress policy. | Defines security boundaries for every pattern. |
+| **AI-ENG-U — Supply Chain Security** | SBOM, AI-BOM, provenance, dependency risk. | Informs sourcing, deployment, and platform patterns. |
+| **AI-ENG-V — Resource Abuse** | Loop abuse, denial-of-wallet, budget failures. | Defines resource controls and cost drivers. |
+| **AI-ENG-W — UX Resilience** | Fallback, degraded UX, continuity. | Defines degraded-mode library. |
+| **AI-ENG-X — User Trust** | Trust calibration, contestability, transparency. | Defines user expectation and human-review surfaces. |
+| **AI-ENG-Y — Human Review** | Reviewer authority, queues, maker-checker, fatigue. | Grounds human review and escalation patterns. |
+| **AI-ENG-Z — Telemetry** | Runtime traces, metrics, correction signals. | Defines telemetry-by-pattern. |
+| **AI-ENG-AA — Evaluation** | Golden sets, eval gates, regression. | Defines eval-by-pattern. |
+| **AI-ENG-AB — Verification Artifacts** | Evidence packages, replay, audit proof. | Defines evidence boundaries. |
+| **AI-ENG-AC — AI Operations** | Incidents, runbooks, rollback, containment. | Defines operational maturity and breach response. |
+
+### **MCP and Tooling Note**
+
+Tooling standards should be referenced carefully. MCP uses JSON-RPC messages over stdio and Streamable HTTP; SSE may be used within Streamable HTTP where supported. Architecture cards should describe the tool contract and transport requirements generically, then name MCP or other protocols as implementation options rather than hard dependencies.
+
+### **Core Handoff Rule**
+
+AJ is where doctrine becomes reusable architecture.
+
+```text
+A reference architecture is a reusable failure-aware contract bundle.
+
+It tells engineers:
+  when to use the pattern,
+  when not to use it,
+  what contracts are required,
+  how it is evaluated,
+  what telemetry proves,
+  how humans retain authority,
+  how it degrades,
+  how it exits,
+  and how it fails safely.
+```
+
+#### **Works cited**
+
+1. What Are Agentic Design Patterns? 2026 Pattern Catalog | Augment ..., accessed June 15, 2026, [https://www.augmentcode.com/guides/agentic-design-patterns](https://www.augmentcode.com/guides/agentic-design-patterns)  
+2. Enterprise AI Agents: Agentic Design Patterns Explained - Tungsten Automation, accessed June 15, 2026, [https://www.tungstenautomation.com/learn/blog/build-enterprise-grade-ai-agents-agentic-design-patterns](https://www.tungstenautomation.com/learn/blog/build-enterprise-grade-ai-agents-agentic-design-patterns)  
+3. Agent system design patterns | Databricks on AWS, accessed June 15, 2026, [https://docs.databricks.com/aws/en/agents/agent-system-design-patterns](https://docs.databricks.com/aws/en/agents/agent-system-design-patterns)  
+4. Reference architecture: The blueprint for safe and scalable autonomy in SRE and DevOps, accessed June 15, 2026, [https://www.ilert.com/blog/reference-architecture-for-scalable-autonomy-in-sre-and-devops](https://www.ilert.com/blog/reference-architecture-for-scalable-autonomy-in-sre-and-devops)  
+5. Design Patterns for Agentic AI and Multi-Agent Systems - AppsTek Corp, accessed June 15, 2026, [https://appstekcorp.com/blog/design-patterns-for-agentic-ai-and-multi-agent-systems/](https://appstekcorp.com/blog/design-patterns-for-agentic-ai-and-multi-agent-systems/)  
+6. AI System Design Patterns for 2026: Architecture That Scales, accessed June 15, 2026, [https://zenvanriel.com/ai-engineer-blog/ai-system-design-patterns-2026/](https://zenvanriel.com/ai-engineer-blog/ai-system-design-patterns-2026/)  
+7. RAG Evaluation Metrics: Assessing Answer Relevancy, Faithfulness, Contextual Relevancy, And More - Confident AI, accessed June 15, 2026, [https://www.confident-ai.com/blog/rag-evaluation-metrics-answer-relevancy-faithfulness-and-more](https://www.confident-ai.com/blog/rag-evaluation-metrics-answer-relevancy-faithfulness-and-more)  
+8. Evaluating the Performance of rag Systems: Metrics Guide ..., accessed June 15, 2026, [https://unstructured.io/insights/rag-evaluation-a-data-pipeline-performance-framework](https://unstructured.io/insights/rag-evaluation-a-data-pipeline-performance-framework)  
+9. AI Gateway Architecture: A Guide for Technical Teams | MLflow, accessed June 15, 2026, [https://mlflow.org/articles/ai-gateway-architecture-a-guide-for-technical-teams/](https://mlflow.org/articles/ai-gateway-architecture-a-guide-for-technical-teams/)  
+10. AI control plane: the architecture for AI governance and security | Speakeasy, accessed June 15, 2026, [https://www.speakeasy.com/resources/ai-control-plane](https://www.speakeasy.com/resources/ai-control-plane)  
+11. What Is An AI Gateway? | IBM, accessed June 15, 2026, [https://www.ibm.com/think/topics/ai-gateway](https://www.ibm.com/think/topics/ai-gateway)  
+12. System Architecture Overview - Envoy AI Gateway, accessed June 15, 2026, [https://aigateway.envoyproxy.io/docs/concepts/architecture/system-architecture](https://aigateway.envoyproxy.io/docs/concepts/architecture/system-architecture)  
+13. Agentic Design Patterns | Terezinha Tech Operations (ttoss), accessed June 15, 2026, [https://ttoss.dev/docs/ai/agentic-design-patterns](https://ttoss.dev/docs/ai/agentic-design-patterns)  
+14. Choosing the Right Agentic Design Pattern: A Decision-Tree Approach, accessed June 15, 2026, [https://machinelearningmastery.com/choosing-the-right-agentic-design-pattern-a-decision-tree-approach/](https://machinelearningmastery.com/choosing-the-right-agentic-design-pattern-a-decision-tree-approach/)  
+15. Model Context Protocol architecture patterns for multi-agent AI systems - IBM Developer, accessed June 15, 2026, [https://developer.ibm.com/articles/mcp-architecture-patterns-ai-systems/](https://developer.ibm.com/articles/mcp-architecture-patterns-ai-systems/)  
+16. Model Context Protocol (MCP) explained: A practical technical overview for developers and architects - CodiLime, accessed June 15, 2026, [https://codilime.com/blog/model-context-protocol-explained/](https://codilime.com/blog/model-context-protocol-explained/)  
+17. Architecture overview - Model Context Protocol, accessed June 15, 2026, [https://modelcontextprotocol.io/docs/learn/architecture](https://modelcontextprotocol.io/docs/learn/architecture)  
+18. What is the Model Context Protocol (MCP)? - Databricks, accessed June 15, 2026, [https://www.databricks.com/blog/what-is-model-context-protocol](https://www.databricks.com/blog/what-is-model-context-protocol)  
+19. What is an AI Gateway? The Complete Guide (2026) - Truefoundry, accessed June 15, 2026, [https://www.truefoundry.com/blog/ai-gateway](https://www.truefoundry.com/blog/ai-gateway)  
+20. AI Gateway & LLM Gateway: How They Work and What They Miss - Atlan, accessed June 15, 2026, [https://atlan.com/know/what-is-ai-gateway-llm-gateway/](https://atlan.com/know/what-is-ai-gateway-llm-gateway/)  
+21. How to Evaluate RAG Systems: Metrics, Methods, and What to Measure First - Comet, accessed June 15, 2026, [https://www.comet.com/site/blog/rag-evaluation/](https://www.comet.com/site/blog/rag-evaluation/)  
+22. RAG Deep Dive Series: Evaluation & Production - Kalvad Blog, accessed June 15, 2026, [https://blog.kalvad.com/rag-deep-dive-series-evaluation-production/](https://blog.kalvad.com/rag-deep-dive-series-evaluation-production/)  
+23. AI Gateway Patterns: Cost Control and Reliability at Scale [2026] - Virtido, accessed June 15, 2026, [https://virtido.com/blog/ai-gateway-patterns-production-guide](https://virtido.com/blog/ai-gateway-patterns-production-guide)  
+24. Multi Agent Architecture: Patterns, Use Cases & Production Reality - Truefoundry, accessed June 15, 2026, [https://www.truefoundry.com/blog/multi-agent-architecture](https://www.truefoundry.com/blog/multi-agent-architecture)
+
+---
+
+# AI-ENG-AK — The AI Engineering Mindset - Probabilistic Systems, Human Judgment & Iterative Control
+
+## **Conceptual Glossary**
+
+The formalization of AI engineering as a distinct systems discipline requires a rigorous, shared vocabulary. The following glossary establishes the technical definitions and operational boundaries for the core concepts that define the modern AI engineering mindset.
+
+| Term | Operational Definition |
+| :---- | :---- |
+| **AI Engineering Mindset** | The systems-level operating philosophy that treats model outputs as non-deterministic behavior distributions rather than static code execution, requiring structural containment, continuous empirical evaluation, and sociotechnical coordination. |
+| **Probabilistic Cognitive Infrastructure** | A multi-layered architecture that integrates non-deterministic foundation models to perform high-dimensional cognitive tasks—such as semantic synthesis, parsing, perception, and action preparation—within complex systems. |
+| **Deterministic Operational System** | The surrounding traditional software shell consisting of typed schemas, permission boundaries, transactional databases, and hard-coded fallbacks designed to constrain, validate, and isolate probabilistic behaviors. |
+| **Technical Humility** | The systematic practice of designing software architectures under the active assumption that models will fail silently, context windows will degrade, prompts will decay, and human operators will exhibit cognitive biases. |
+| **Demo Skepticism** | The refusal to equate isolated prototype success under cooperative conditions with systemic production reliability, treating every unverified demo as a latent operational risk. |
+| **Decomposition Discipline** | The methodology of breaking complex, open-ended cognitive tasks into discrete, observable, and verifiable steps to minimize the surface area of model autonomy in favor of deterministic control. |
+| **Bounded Belief** | The structural restriction of operational trust to a highly specific, evaluated context-space, rejecting generalized assumptions regarding model capability or safety. |
+| **Uncertainty Management** | The deliberate architectural capture, classification, and mitigation of non-deterministic system variances—such as factual, retrieval, or tool-state uncertainty—before they cascade into failures. |
+| **Iterative Control** | The continuous engineering optimization loop that integrates real-time production traces, automated evaluations, and human corrections back into prompt design, context structures, and system guardrails. |
+| **Measurement-Before-Trust** | The operational requirement to establish quantitative, multi-dimensional evaluation baselines grounded in production-realistic data prior to scaling or deploying any model-dependent capability. |
+| **Human Judgment Integration** | The sociotechnical design of interfaces and workflows that provide human operators with the evidence, context, time, and explicit authority necessary to actively supervise and override AI systems. |
+| **Failure as Signal** | The practice of treating operational errors not as isolated bugs to patch, but as systemic data points that expose flaws in offline evaluations, context boundaries, or architectural constraints. |
+| **Anti-Mindset** | A recurring cognitive shortcut or architectural shortcut—such as benchmark theology or prompt mysticism—that introduces systemic risk and operational instability. |
+
+## **AI Engineering Mindset Doctrine**
+
+AI engineering is the discipline of designing probabilistic cognitive capabilities inside bounded, observable, testable, human-governed operational systems. Its mindset is humility under uncertainty, decomposition before automation, measurement before trust, iteration before scale, and production proof before belief.  
+The foundational thesis of high-dimensional AI engineering is that a reference architecture is a decision artifact. The useful question is not "Can the model do it?" but rather: "Under what conditions does it do it, how do we know, what happens when it does not, who catches it, what does it cost, what does the user believe, what evidence survives, and why should production trust this behavior?"  
+This doctrine shifts the locus of engineering rigor. In classical systems, rigor was embodied in hand-coded algorithms and extensive pre-production unit testing. In probabilistic cognitive systems, rigor relocates to defining clear specifications, upfront guardrails, and architectures that make systems verifiable by design.  
+The goal of the AI engineer is to build a system where the internal model behaves probabilistically, but the external system behaves deterministically. The model may be probabilistic; the system must not be confused.
+
+## **AI Engineering Is Not Normal Software Engineering**
+
+AI engineering is not ordinary software engineering with model calls attached. Traditional software engineering assumes that deterministic components, typed interfaces, unit tests, and controlled deployments can produce predictable behavior. AI systems include those same deterministic components, but they also include probabilistic cognitive engines whose outputs vary with context, phrasing, data distribution, model route, retrieval state, and user behavior.
+
+The engineering problem changes.
+
+A model does not fail like a disk, database, or microservice. It may continue producing fluent outputs while violating factual, semantic, policy, permission, or user-expectation constraints. The system can appear healthy while quietly becoming wrong.
+
+AI engineering therefore borrows from several traditions at once:
+
+| Discipline | What AI Engineering Borrows |
+| :---- | :---- |
+| **Classical Software Engineering** | Typed interfaces, modularity, testing, deployment discipline, rollback, reliability engineering. |
+| **Safety Engineering** | Control loops, hazard analysis, degraded modes, safe-state design, incident learning. |
+| **Security Engineering** | Least privilege, boundary defense, untrusted input handling, supply-chain review, abuse modeling. |
+| **Human Factors** | Trust calibration, review burden, automation bias, interface friction, role clarity. |
+| **Data Engineering** | Lineage, freshness, access control, source authority, quality, lifecycle management. |
+| **Product Architecture** | Workflow fit, value design, user tolerance, adoption, no-use decisions. |
+
+System-theoretic safety thinking, including STAMP/STPA where consequences justify it, is especially useful because AI failures are often interaction failures: the model, retrieval system, tool, user interface, workflow, and governance layer each behaved locally “as designed,” while the assembled system produced unsafe behavior.
+
+### **Traditional Software vs. AI Systems Engineering**
+
+| Dimensional Vector | Traditional Software Engineering | AI Systems Engineering |
+| :---- | :---- | :---- |
+| **Logic Definition** | Explicit, hand-written instructions executing deterministic paths. | Learned behavior distributions shaped by prompts, context, weights, retrieval, and route. |
+| **Validation Model** | Unit, integration, and acceptance tests against static specifications. | Statistical evals, behavioral regression suites, shadow testing, production correction loops. |
+| **Interface Properties** | Rigid APIs and typed contracts. | Typed contracts plus natural-language seams, probabilistic outputs, and dynamic context. |
+| **Failure Visibility** | Exceptions, crashes, failed assertions, broken builds. | Silent semantic drift, hallucination, citation failure, tool misuse, overtrust. |
+| **Dependency Model** | Versioned libraries and services with explicit APIs. | Model providers, prompts, corpora, embeddings, tools, policies, and user behavior all drift. |
+| **Upgrade Strategy** | Code diff plus deterministic regression test. | Route/prompt/schema/corpus/model change plus behavioral eval and deployment manifest. |
+| **Security Boundary** | Inputs validated at API edges. | Inputs, retrieved content, model outputs, tool calls, memory, and user actions are all untrusted seams. |
+| **UX Principle** | Predictable direct manipulation. | Trust calibration, evidence display, uncertainty handling, strategic friction. |
+| **Deployment Meaning** | Development ends and operations begins. | Production begins empirical evidence collection. |
+| **Reliability Goal** | Prevent component failure. | Control system behavior despite probabilistic components and shifting context. |
+
+The professional shift is this:
+
+```text
+Classical software asks:
+  Did the code execute the specified logic?
+
+AI engineering asks:
+  Did the system produce acceptable behavior
+  under the actual context, evidence, user, policy, route, and risk tier?
+```
+
+Rigor does not disappear. It relocates to boundaries, measurements, contracts, evals, telemetry, human authority, and recovery behavior.
+
+## **Probabilistic Cognitive Infrastructure Model**
+
+An enterprise AI application is not a model wrapped in an API call. It is probabilistic cognitive capability embedded inside a deterministic operational system. Reliability emerges from the interaction of model behavior, context, retrieval, tools, permissions, human judgment, telemetry, governance, adoption, sourcing, and operations.
+
+```text
+PROBABILISTIC COGNITIVE INFRASTRUCTURE
+
+[ 10. Sourcing / Infrastructure / Vendor Layer ]
+        |
+[ 9. Adoption / Workflow / Support Layer ]
+        |
+[ 8. Operations / Governance / Accountability Layer ]
+        |
+[ 7. Telemetry / Evaluation / Evidence Layer ]
+        |
+[ 6. Human Judgment / Review / Authority Layer ]
+        |
+[ 5. Tool / Action / State-Mutation Layer ]
+        |
+[ 4. Policy / Permission / Boundary Layer ]
+        |
+[ 3. Context / Evidence / Retrieval Layer ]
+        |
+[ 2. Deterministic Execution Shell ]
+        |
+[ 1. Probabilistic Cognitive Core ]
+```
+
+These are not perfectly separable boxes. They are interacting control loops. A failure in one layer often appears as a symptom in another: stale retrieval looks like hallucination; weak UI disclosure looks like overtrust; poor adoption looks like model failure; provider drift looks like prompt regression.
+
+### **Infrastructure Layers**
+
+| Layer | Responsibility | Common Failure Mode | Control Mechanism |
+| :---- | :---- | :---- | :---- |
+| **1. Probabilistic Cognitive Core** | Generates, classifies, summarizes, reasons, perceives, or drafts under context. | Fluent but false or misaligned output. | Route constraints, evals, output validation, bounded task scope. |
+| **2. Deterministic Execution Shell** | Parses, validates, retries, structures, routes, and handles exceptions. | Treating model output as already safe or structured. | Schemas, validators, state machines, deterministic fallback. |
+| **3. Context / Evidence / Retrieval Layer** | Selects what information enters the model. | Stale, unauthorized, irrelevant, poisoned, or conflicting context. | Source authority, freshness, permission filtering, grounding verification. |
+| **4. Policy / Permission / Boundary Layer** | Determines what data, actions, tools, and users are allowed. | Model capability confused with system permission. | RBAC/ABAC, policy-as-code, tenant isolation, pre-egress controls. |
+| **5. Tool / Action / State-Mutation Layer** | Converts proposals into real system actions. | Unauthorized, duplicate, partial, or unverifiable side effects. | Tool contracts, idempotency, preconditions, postcondition verification. |
+| **6. Human Judgment / Review / Authority Layer** | Gives humans evidence, authority, time, and controls to supervise. | Rubber-stamping, undertrust, overload, unclear accountability. | Review UI, veto, correction tools, escalation, role design. |
+| **7. Telemetry / Evaluation / Evidence Layer** | Measures behavior, quality, cost, drift, and incidents. | Logs exist but cannot prove or improve system behavior. | Eval suites, traces, evidence packages, correction capture, dashboards. |
+| **8. Operations / Governance / Accountability Layer** | Owns runtime, incidents, policy, compliance, and lifecycle review. | Governance exists only as documents; incidents do not improve the system. | Runbooks, audits, policy gates, inventories, postmortems. |
+| **9. Adoption / Workflow / Support Layer** | Ensures humans can use the system safely and productively. | Tool is installed but not adopted, trusted, supported, or understood. | Training, support, incentives, workflow redesign, feedback loops. |
+| **10. Sourcing / Infrastructure / Vendor Layer** | Provides compute, models, APIs, hosting, contracts, and exit paths. | Vendor lock-in, route drift, cost shock, data-rights failure. | Gateway abstraction, vendor review, route manifests, exit drills. |
+
+### **Core Principle**
+
+The model is not the system. The system is the coordination of probabilistic cognition with deterministic accountability.
+
+A model can produce language. The infrastructure must decide whether that language may become a claim, a recommendation, a memory, a tool call, a record, a decision, or an action.
+
+## **Humility as Engineering Practice**
+
+Humility in AI engineering is pre-incident realism. It is the discipline of treating unproven assumptions as untrusted until measurement, production evidence, and failure analysis justify confidence.
+
+Humility is not pessimism. It is how professionals avoid being surprised by obvious things slightly later and more expensively.
+
+### **Assumption Audit**
+
+| Assumption to Distrust | Production Countercondition | Required Control |
+| :---- | :---- | :---- |
+| **The demo represents real use.** | Production inputs are messier, more adversarial, more ambiguous, and less cooperative. | Pilot with representative data, edge cases, and adversarial examples. |
+| **Sample data is clean enough.** | Real data has missing fields, duplicates, stale records, malformed files, conflicting sources, and strange user phrasing. | Data readiness review, corpus lifecycle, parser tests, validation gates. |
+| **Users will understand the interface.** | Users miss warnings, overtrust outputs, underuse tools, bypass workflows, and invent workarounds. | Trust-calibrated UI, training, feedback capture, adoption telemetry. |
+| **Model upgrades are improvements.** | Provider changes can regress task-specific behavior while improving generic benchmarks. | Route-specific regression evals, shadow tests, rollback manifests. |
+| **Retrieval grounds the answer.** | Retrieval can surface irrelevant, stale, unauthorized, or poisoned context. | Permission filtering, freshness checks, source authority, citation verification. |
+| **Prompt edits are harmless.** | Prompt changes can fix one case and regress another. | Prompt versioning, linked evals, release gates. |
+| **Costs scale linearly.** | Retries, long context, agent loops, review burden, support, and shadow evals create hidden cost. | Cost telemetry, resource contracts, loop caps, cost-per-success tracking. |
+| **Vendors remain stable.** | Providers change terms, prices, models, limits, routes, regions, and behavior. | Gateway abstraction, vendor inventory, exit plans, provider-change evals. |
+| **Humans will review carefully.** | Reviewers rubber-stamp, fatigue, overtrust, or lack evidence to judge. | Evidence UI, review timing signals, veto controls, sampled audits. |
+| **Evals catch the important failures.** | Initial eval sets miss rare but important production failures. | Production correction capture, failure replay, eval-set expansion. |
+| **Governance documents control behavior.** | Policies are bypassed unless enforced at runtime. | Policy-as-code, gateway checks, permissions, audit evidence. |
+| **Fluent output is good output.** | High fluency can hide unsupported claims, wrong calculations, or unsafe advice. | Grounding, semantic validation, source-of-record checks. |
+| **Fallbacks are safe by default.** | Backup routes may weaken privacy, capability, policy, or output contracts. | Approved fallback manifests and authority downgrade. |
+
+### **Humility Operating Rule**
+
+Every new AI capability should ship with a written list of assumptions and the evidence required to retire them.
+
+```text
+Assumption → Test → Evidence → Boundary → Owner → Review Trigger
+```
+
+Until that chain exists, confidence is storytelling.
+
+## **Demo-to-Production Skepticism Model**
+
+A polished demo proves that a system can succeed under cooperative conditions. Production asks whether it can remain useful, safe, affordable, and recoverable under uncooperative conditions.
+
+Every impressive demo is a suspect until production evidence proves otherwise.
+
+| What the Demo Proves | What Production Must Prove | Evidence Required | Release Gate |
+| :---- | :---- | :---- | :---- |
+| **Possible capability** | Behavior holds across realistic input diversity. | Representative evals, pilot traces, adversarial cases. | Task-specific eval pass. |
+| **Interface direction** | Users understand the system role and can use it safely. | Usability tests, correction patterns, trust-calibration review. | Product/UX approval. |
+| **Early user excitement** | Users adopt it after novelty fades. | Repeat use, task-completion improvement, support burden, bypass rate. | Adoption review. |
+| **Rough technical feasibility** | System works with production data, permissions, latency, scale, and errors. | Integration test, load test, permission test, degraded-mode test. | Operational readiness gate. |
+| **Compelling narrative** | Business value survives full cost-to-serve and review burden. | Cost per verified task, human review time, support impact, ROI sensitivity. | Value gate. |
+| **Model can answer examples** | Answers are grounded, current, permitted, and verifiable. | Citation fidelity, source authority, freshness, conflict handling. | Grounding gate. |
+| **Tool path can execute once** | Tool path handles retries, duplicates, partial state, and postcondition checks. | Idempotency test, rollback/compensation test, source-of-record verification. | Action-verification gate. |
+| **Safety appears fine in demo** | System resists prompt injection, data leakage, misuse, and boundary attacks. | Red-team tests, policy checks, tenant isolation tests, egress controls. | Security gate. |
+| **Humans can approve output** | Humans have evidence, time, authority, and veto power. | Review UI test, reviewer feedback, approval-quality metrics. | Human-review gate. |
+| **Provider route works today** | Route remains stable through drift, outage, rate limits, and migration. | Shadow test, fallback test, vendor review, route manifest. | Sourcing/ops gate. |
+
+### **Skepticism Rule**
+
+A demo is allowed to earn attention. It is not allowed to earn trust.
+
+Trust requires production-shaped evidence.
+
+## **Decomposition Discipline**
+
+The primary failure mode of naive AI design is delegating open-ended tasks to autonomous model loops. Professional AI engineering enforces a strict decomposition discipline: breaking workflows down until the safe automation boundary becomes obvious.  
+Before any cognitive workflow is automated, the systems engineer must answer eleven distinct questions:
+
+* **What is the user trying to accomplish?** Map the core business outcome, ignoring the technology, to establish the baseline requirement.  
+* **Which steps are deterministic?** Identify tasks—such as mathematical calculations, relational queries, or form submissions—that can be handled by traditional software.  
+* **Which steps require language, ambiguity, synthesis, perception, or judgment support?** Isolate the specific tasks that require a probabilistic foundation model.  
+* **Which steps require source-of-record lookup?** Pinpoint where the system must fetch data from a traditional database, avoiding model memory retrieval.  
+* **Which steps require human authority?** Define high-consequence decision points—such as financial mutations, medical recommendations, or security changes—that must be made by a human operator.  
+* **Which steps can be drafted but not executed?** Isolate steps where the model can generate a candidate output for human review, rather than mutating state directly.  
+* **Which steps can be automated safely?** Identify low-risk, verifiable steps that can run in the background under strict constraints.  
+* **Which steps require approval?** Define the verification boundaries where system execution halts until explicit human sign-off is logged.  
+* **Which outputs are verifiable?** Establish which model-generated outputs can be parsed and verified against hard schemas, rules, or test suites.  
+* **Which failures are reversible?** Distinguish between actions that can be undone (e.g., drafting an email) and actions that are permanent (e.g., sending an payment).  
+* **Which parts should be no-AI?** Identify steps that must be routed completely away from models to ensure absolute determinism and compliance.
+
+Through this decomposition, the engineer isolates the probabilistic core, surrounding it with deterministic verification steps.
+
+## **Uncertainty Management Model**
+
+AI engineering does not eliminate uncertainty. It prevents uncertainty from silently becoming authority.
+
+A mature AI system detects uncertainty, classifies it, chooses a safe response, assigns ownership, and preserves the minimum evidence needed to improve the system.
+
+| Uncertainty Type | Signal | Risk | Safe System Response | Owner | Evidence Boundary |
+| :---- | :---- | :---- | :---- | :---- | :---- |
+| **Factual Uncertainty** | Claim lacks support, conflicts with source, or cannot be verified. | False answer becomes trusted output. | Mark unsupported, remove claim, ask for evidence, or route to human. | Retrieval / Eval Owner | Claim ID, source refs, verifier result. |
+| **Retrieval Uncertainty** | Low relevance, sparse results, missing source-of-record, duplicate/conflicting chunks. | Model synthesizes from weak context. | Disclose limited evidence, rerun retrieval, use deterministic lookup, or refuse grounded answer. | Corpus / Retrieval Owner | Retrieval manifest, source IDs, freshness metadata. |
+| **Temporal Uncertainty** | Source date/version does not match task time scope. | System answers with obsolete or future-inapplicable information. | Ask time scope, retrieve current source, label historical status, or refuse current claim. | Corpus / Product Owner | Source version/date, user time scope. |
+| **Classification Uncertainty** | Low confidence, unstable class assignment, high disagreement, or ambiguous input. | Wrong route, policy, or workflow selected. | Ask clarification, route to exception queue, or use human triage. | Product / Eval Owner | Class candidates, confidence bucket, selected route. |
+| **User-Intent Uncertainty** | Request is incomplete, contradictory, underspecified, or high-consequence. | System executes the wrong task. | Present structured choices, ask clarification, or require confirmation. | Product / UX Owner | Intent state, clarification prompt, user selection. |
+| **Policy Uncertainty** | Conflicting instructions, unclear data use, missing approval, or boundary condition. | Unsafe or noncompliant output/action. | Deny by default, require approval, or escalate to governance/security. | Policy / Governance Owner | Policy version, decision, reason code. |
+| **Permission Uncertainty** | User/resource/tool/tenant scope cannot be proven. | Unauthorized data access or action. | Block before data injection or side effect. | Security Owner | Subject/resource refs, policy decision. |
+| **Model-Route Uncertainty** | Route drift, eval expiry, outage, latency anomaly, or unsupported capability. | Weak route handles strong task. | Use approved fallback, downgrade authority, or fail closed. | Platform Owner | Route manifest, eval status, health signal. |
+| **Tool-State Uncertainty** | API error, unknown final state, partial write, invalid arguments, duplicate retry. | False success or corrupted state. | Query source of record, compensate/reconcile where possible, escalate if unresolved. | Tool / Ops Owner | Action ID, idempotency key, postcondition result. |
+| **Cost / Resource Uncertainty** | Token, tool, latency, retry, or loop budget approaches limit. | Denial-of-wallet, timeout, degraded UX. | Stop loop, return partial, require approval, or queue. | Platform / FinOps Owner | Usage counters, budget state, route ID. |
+| **Human-Review Uncertainty** | Very fast approvals, low disagreement, reviewer overload, high correction fatigue. | Rubber-stamping or review collapse. | Add evidence friction, sample secondary review, rebalance queue, or reduce automation. | Human Review / Adoption Owner | Review time bucket, correction/override rate, queue state. |
+| **Vendor Uncertainty** | Terms, model behavior, price, rate limit, region, or subprocessor changes. | Contract, quality, or compliance regression. | Trigger vendor review, route eval, fallback test, or exit plan. | Procurement / Platform Owner | Vendor notice, contract ref, route eval result. |
+
+### **Uncertainty Rule**
+
+Uncertainty should change system authority.
+
+```text
+higher uncertainty → less autonomy
+higher consequence → more evidence
+weaker evidence → weaker claim
+unknown permission → deny
+unknown state → verify before proceeding
+```
+
+## **Measurement-Before-Trust Framework**
+
+Trust is not granted by fluency, novelty, confidence, or benchmark rank. Trust is earned through repeated measurement inside bounded contexts.
+
+The system should not ask, “Do we trust this model?” It should ask:
+
+```text
+For this task,
+under this data class,
+with this route,
+for this user,
+under this policy,
+at this cost,
+with this evidence,
+how often does the system behave acceptably?
+```
+
+### **Metric Families**
+
+| Metric Family | What It Measures | Example Signals |
+| :---- | :---- | :---- |
+| **Task Outcome** | Whether the workflow achieved the intended business result. | Completion rate, verified success, rework, downstream error rate. |
+| **Grounding and Evidence** | Whether claims are supported by permitted, current, authoritative sources. | Claim support, citation fidelity, source authority, freshness, conflict handling. |
+| **Schema and Semantic Validity** | Whether outputs are structured and meaningful. | Schema validity, enum validity, cross-field invariants, semantic consistency. |
+| **Tool and Action Verification** | Whether proposed actions are authorized and completed correctly. | Tool-call validity, permission decision, postcondition success, false-success rate. |
+| **Human Review Quality** | Whether humans meaningfully supervise the system. | Review time, override rate, correction categories, reviewer agreement, fatigue signals. |
+| **Trust and Adoption** | Whether users rely appropriately and the workflow creates value. | Overtrust, underuse, bypass rate, repeat use, support burden. |
+| **Cost and Resource** | Whether value survives full operating cost. | Cost per verified task, token/tool/retry cost, review labor, support cost. |
+| **Reliability and Operations** | Whether the system remains available, bounded, and recoverable. | Latency p50/p95/p99, error rate, retry loops, incident rate, rollback rate. |
+| **Drift and Regression** | Whether behavior changes over time. | Eval regression, correction clusters, route drift, corpus freshness decay. |
+| **Governance and Evidence** | Whether the organization can prove what happened. | Deployment manifest, policy decision, audit evidence, retention compliance. |
+
+### **Metric Selection Rule**
+
+Metrics must be selected by pattern, task, and risk tier. A support assistant needs resolution and repeat-contact metrics. A document pipeline needs field precision and coordinate grounding. A workflow agent needs postcondition success and idempotency. A research agent needs claim support and source authority.
+
+Generic model scores are not enough. Usage is not enough. Token volume is not enough. User delight is not enough.
+
+### **Trust Gate**
+
+| Condition | Trust Decision |
+| :---- | :---- |
+| Metrics exist only for demo cases. | Do not scale. |
+| Metrics measure usage but not correctness. | Do not claim production value. |
+| Metrics measure output but not downstream outcome. | Pilot only. |
+| Metrics pass offline but fail production correction patterns. | Revise evals and contract boundaries. |
+| Metrics show stable behavior within task/risk/data boundaries. | Trust only inside those boundaries. |
+
+Trust is bounded by evidence. Evidence expires when the system changes.
+
+## **Iterative Control Loop**
+
+AI engineering is an empirical control discipline. Production behavior teaches the system what the original design, evals, prompts, data, policies, users, and assumptions missed.
+
+```text
+ITERATIVE CONTROL LOOP
+
+specify
+  ↓
+prototype
+  ↓
+evaluate
+  ↓
+constrain
+  ↓
+deploy narrowly
+  ↓
+observe
+  ↓
+capture corrections
+  ↓
+update evals
+  ↓
+revise contracts
+  ↓
+harden architecture
+  ↓
+expand cautiously
+  ↓
+monitor drift
+  ↓
+rollback / recalibrate
+  ↓
+repeat
+```
+
+### **Control Loop Stages**
+
+| Stage | Core Question | Primary Artifact | Owner |
+| :---- | :---- | :---- | :---- |
+| **Specify** | What task, user, data, risk, and value are in scope? | Use-case decision record, pattern card, requirements. | Product / Architect |
+| **Prototype** | Can the capability work under bounded conditions? | Prototype, prompt/schema draft, route candidate. | Engineering |
+| **Evaluate** | Does behavior meet task-specific evidence requirements? | Eval suite, golden set, failure taxonomy. | Eval Owner |
+| **Constrain** | What contracts must surround the probabilistic core? | Prompt, schema, retrieval, tool, permission, resource contracts. | Architect / Security |
+| **Deploy Narrowly** | Can a limited population use it safely? | Pilot plan, rollback route, support path. | Product / Ops |
+| **Observe** | What happens in real workflow conditions? | Telemetry, traces, corrections, support signals. | Ops / Observability |
+| **Capture Corrections** | What did humans repair, reject, override, or misunderstand? | Correction dataset, feedback events. | Product / Eval |
+| **Update Evals** | Which production failures must become regression tests? | Expanded eval suite. | Eval Owner |
+| **Revise Contracts** | Which boundary failed or was missing? | Updated contract registry. | Contract Owner |
+| **Harden Architecture** | What structural change prevents recurrence? | Architecture patch, route change, UI change, policy update. | Architect / Platform |
+| **Expand Cautiously** | Which new users/workflows are safe to add? | Scale decision, risk review. | Product / Governance |
+| **Monitor Drift** | Is behavior changing as data, users, models, or vendors change? | Drift dashboard, shadow evals. | Platform / Eval |
+| **Rollback / Recalibrate** | Should we revert, degrade, pause, or continue? | Rollback manifest, incident/postmortem. | Ops / Governance |
+
+### **Developer Feedback Speedups**
+
+Iteration fails when feedback is too slow. Mature AI platforms build speed without removing gates.
+
+| Speedup Mechanism | Purpose |
+| :---- | :---- |
+| **Long-Running Eval Environments** | Keep representative staging systems alive so evals can run without repeated setup. |
+| **Failure Replay Harness** | Reconstruct failed trajectories from scoped evidence and secure references. |
+| **Context Forking** | Resume debugging from a past state instead of replaying an entire agent run. |
+| **Local Mock Services** | Let developers test gateways, tools, databases, and provider responses safely. |
+| **Contract Unit Tests** | Quickly test schemas, tool preconditions, policy decisions, and prompt variables. |
+| **Shadow Evaluation** | Compare candidate routes without changing production behavior. |
+
+### **Control Loop Question**
+
+The recurring engineering question is:
+
+```text
+What did production teach us
+that our design, evals, prompts, data, policies, users,
+and assumptions missed?
+```
+
+## **Human Judgment Integration Model**
+
+Enterprise AI systems must reject both extremes:
+
+```text
+AI replaces human judgment.
+Humans are safely in control because someone clicked approve.
+```
+
+Human judgment must be designed into the workflow. A human who cannot inspect, refuse, correct, or understand the output is not in the loop; they are a liability sponge.
+
+### **Human Judgment Requirements**
+
+| Requirement | What It Provides | Pattern Examples |
+| :---- | :---- | :---- |
+| **Evidence Access** | Reviewer can inspect sources, records, calculations, coordinates, logs, or rationale. | Research Agent, Decision Cockpit, Document Intelligence. |
+| **Context Visibility** | Reviewer sees relevant workflow history and system state. | Support Assistant, Workflow Agent, Human Review Queue. |
+| **Time to Review** | Reviewer is not forced into instant rubber-stamping. | High-risk actions, legal/compliance review, underwriting. |
+| **Authority Clarity** | Reviewer knows whether they are advising, approving, correcting, or deciding. | Decision Cockpit, Workflow Automation, Governed Agentic Workflow. |
+| **Veto Power** | Reviewer can reject or halt output/action. | Human Review Queue, Coding Agent, Tool Execution. |
+| **Correction Tools** | Reviewer can edit fields, claims, coordinates, routes, or payloads. | Document Intelligence, Multimodal Review, Support Assist. |
+| **Escalation Path** | Reviewer can move the case to a higher authority or expert. | Support, compliance, security, regulated workflows. |
+| **Accountability Boundary** | Human and system responsibility are explicit. | Decision Support, HR/finance/legal workflows. |
+| **Uncertainty Display** | Reviewer can see unsupported, conflicting, stale, or low-confidence areas. | RAG, research, analytics, decision support. |
+| **Anti-Pressure Controls** | System detects review overload, rushed approval, or rubber-stamping risk. | High-risk queues and regulated workflows. |
+| **Feedback Capture** | Corrections improve evals, prompts, data, and training. | All review-enabled patterns. |
+
+### **Risk-Tiered Human Authority**
+
+| Risk Tier | Human Role |
+| :---- | :---- |
+| **Low** | User edits, accepts, or rejects suggestions. |
+| **Medium** | Human reviews outputs before external use or material write-back. |
+| **High** | Human approves action with evidence, rationale, and audit record. |
+| **Regulated / Critical** | Human authority is primary; AI may organize evidence, draft, or check but not decide. |
+
+### **Human Review Anti-Patterns**
+
+| Anti-Pattern | Failure |
+| :---- | :---- |
+| **Approval Button With No Evidence** | Human cannot judge, only absorb liability. |
+| **Review Queue Without Time Budget** | Review becomes rubber-stamping under throughput pressure. |
+| **AI Recommendation Framed as Default** | Automation bias increases. |
+| **No Reject Path** | Human cannot exercise authority. |
+| **No Correction Capture** | System repeats the same failures. |
+| **No Escalation Path** | Edge cases become hidden local workarounds. |
+
+Meaningful human control is not a checkbox. It is an interface, workflow, evidence package, authority model, and organizational practice.
+
+## **Bounded Belief Doctrine**
+
+A professional AI engineer never believes in a model generally. Belief is bounded by task, data, route, user, policy, evidence, time, and observed behavior.
+
+Believe an AI system only within the boundaries where it has been evaluated, observed, and operationally constrained.
+
+### **Belief Boundaries**
+
+| Boundary | What May Be Believed | Evidence Required | Breach Behavior |
+| :---- | :---- | :---- | :---- |
+| **Task Class** | The system works for a narrow, defined task. | Task-specific evals and production traces. | Route to discovery, no-AI, or human review. |
+| **Data Class** | The system may process approved data types. | Data classification, permissions, retention policy. | Block context injection or require governance review. |
+| **User Role** | Authorized users may access approved capability. | RBAC/ABAC, tenant scope, role mapping. | Deny or escalate. |
+| **Model Route** | A route is acceptable for a task/risk tier. | Route manifest, eval pass, monitoring. | Use approved fallback or fail closed. |
+| **Prompt Version** | This prompt behaves acceptably for linked evals. | Versioned prompt, hash, regression suite. | Rollback or block release. |
+| **Retrieval Scope** | Retrieved context is permitted and authoritative enough. | Source IDs, freshness, ACL/RLS, grounding checks. | Disclose, reretrieve, or refuse. |
+| **Tool Authority** | The system may propose or execute specific actions. | Tool contract, permission policy, idempotency, postcondition tests. | Block before side effect or compensate/reconcile. |
+| **Eval Evidence** | Offline evidence supports limited deployment. | Golden set, adversarial cases, benchmark by task. | Pilot only or redesign. |
+| **Production Behavior** | Live behavior remains within acceptable bounds. | Telemetry, corrections, incidents, support signals. | Recalibrate, roll back, or pause. |
+| **Failure Response** | The system can recover safely. | Degraded mode, rollback manifest, runbook, incident drill. | Reduce authority or block production. |
+| **Governance Approval** | Risk tier is organizationally accepted. | Approval record proportional to risk. | Require review before expansion. |
+| **Time Window** | Evidence remains current enough. | Review date, model/corpus/vendor-change status. | Revalidate before relying. |
+
+### **Bounded Belief Rule**
+
+```text
+No evidence outside the boundary.
+No trust outside the boundary.
+No authority outside the boundary.
+```
+
+The boundary is part of the system.
+
+## **Failure as Signal Doctrine**
+
+Operational failures are inevitable in probabilistic environments. The wrong response is to patch the nearest prompt and declare the system healed. A failure is information about which assumption was false, which boundary was weak, which metric was missing, or which workflow was misunderstood.
+
+### **Failure Learning Matrix**
+
+| Failure Reveals | Update Target | Artifact Changed | Owner |
+| :---- | :---- | :---- | :---- |
+| **Eval missed a case** | Evaluation suite. | New golden/adversarial case, failure taxonomy update. | Eval Owner |
+| **Prompt allowed unsafe behavior** | Prompt contract. | Prompt version, refusal behavior, linked evals. | Prompt Owner |
+| **Retrieved evidence was wrong or stale** | Retrieval/corpus contract. | Source authority, freshness, chunking, index lifecycle. | Corpus Owner |
+| **Output passed schema but was wrong** | Semantic/factual validator. | Business rules, grounding checks, verifier tests. | Domain / Eval Owner |
+| **Tool call failed or misfired** | Tool/action contract. | Preconditions, idempotency, postcondition checks, compensation path. | Tool Owner |
+| **Permission boundary failed** | Policy contract. | RBAC/ABAC rule, tenant filter, approval state, egress control. | Security / Governance |
+| **User overtrusted output** | User expectation design. | Evidence UI, uncertainty display, confirmation gate. | Product / UX |
+| **Human review collapsed** | Human review model. | Queue design, review instructions, sampling, workload allocation. | Review Owner |
+| **Users bypassed the workflow** | Adoption system. | Training, support, workflow redesign, incentive alignment. | Adoption / Product |
+| **Provider/model drifted** | Sourcing and route strategy. | Route manifest, fallback, vendor review, shadow eval. | Platform / Procurement |
+| **Cost spiked** | Resource contract. | Token budget, loop cap, retry policy, route selection. | Platform / FinOps |
+| **Fallback weakened safety** | Degraded mode. | Fallback manifest, authority downgrade, policy parity test. | Ops / Platform |
+| **Incident response was slow** | Runbook. | Alert threshold, owner, escalation, rollback drill. | Operations |
+| **Pattern was wrong** | Architecture pattern card. | No-use condition, pattern selection rule, reference blueprint. | Architect |
+
+### **Failure Handling Rule**
+
+A failure should produce at least one durable artifact update:
+
+```text
+eval case
+contract revision
+policy update
+runbook change
+UI correction
+training example
+pattern no-use condition
+route manifest change
+```
+
+If nothing durable changed, the system learned nothing.
+
+## **Anti-Mindset Catalog**
+
+Systemic failures in enterprise AI projects are often caused by the adoption of flawed mental models.  
+These "Anti-Mindsets" treat probabilistic systems as if they were simple, deterministic, or inherently safe, leading to poor designs, security vulnerabilities, and project failures.
+
+| Anti-Mindset | Primary Symptoms | Why It Is Tempting | Operational Failure Mode | Healthy Posture |
+| :---- | :---- | :---- | :---- | :---- |
+| **Demo Worship** | Standardizing core architecture based on a small set of successful prototype runs under optimal conditions. | Provides immediate progress signals; generates high interest and secures funding from leadership teams. | Complete system collapse when exposed to messy production payloads, retrieval noise, and edge cases. | Treat the demo as a highly fragile proof of concept; verify all system capabilities with robust evaluation suites. |
+| **Prompt Mysticism** | Treating prompt engineering as an art or magic, manually tweaking words without structured testing. | Requires zero engineering setup; provides immediate feedback loops on single local test inputs. | Extreme system fragility; prompt changes fix one bug while silently regressing dozens of other scenarios. | Treat prompts as versioned, strictly controlled system configuration files verified via regression testing. |
+| **Benchmark Theology** | Assuming high ranks on public LLM leaderboards guarantee success in domain-specific workflows. | Simplifies vendor and model selection; avoids the hard engineering work of building custom evaluations. | Poor real-world performance; models fail to handle specific enterprise schemas, terminology, and workflows. | Build domain-specific evaluation suites; rank candidate models using real historical production telemetry. |
+| **Automation Maximalism** | Attempting to automate highly complex, open-ended workflows without human review boundaries. | Promises massive cost reduction and complete operational scale-out in a single project release. | High rates of silent failures, compliance violations, and severe brand damage when models fail silently. | Decompose workflows; automate low-risk, highly structured steps and use models to draft actions for human review. |
+| **Chatbox Monoculture** | Forcing all user interactions through free-form natural language chat interfaces. | Simplifies design tasks; leverages the popular, familiar design patterns of consumer AI products. | Extremely high user friction, search failures, high latency, and severe automation-bias patterns. | Use structured UI components; deploy chat only when handling high-entropy, highly ambiguous inputs. |
+| **Human-in-the-Loop Theater** | Using human review simply to click "approve" without providing context, evidence, or veto power. | Keeps the system fast and high-throughput while claiming regulatory and risk compliance on paper. | Operators experience rapid automation bias, rubber-stamping incorrect outputs and missing silent errors. | Design interfaces that show supporting evidence and force active verification through interaction friction. |
+| **Vendor Faith** | Treating vendor claims, dynamic updates, and standard model alignments as robust security layers. | Outsources complex security and safety challenges; reduces initial development overhead and setup times. | Sudden system regression or security failure when models are updated or alignments are bypassed. | Build independent input and output safety filters; treat every external model as a hostile dependency. |
+| **Metric Cosmetics** | Tracking usage, user logins, and token volume while ignoring quality, grounding, and error rates. | Dashboards look positive; metrics are easy to gather and show immediate, high-velocity adoption signs. | Silent operational decay; enterprise users abandon the tool because of high error rates and support burdens. | Track task success rates, grounding, citation precision, human veto rates, and error costs. |
+| **Agent Romanticism** | Designing systems with autonomous, multi-turn, unstructured planning loops. | Creates highly impressive demos; aligns with the narrative of building fully autonomous systems. | Infinite execution loops, runaway API costs, high latencies, and severe cascading failure paths. | Constrain agents using structured workflow loops with clear state machines and hard stop boundaries. |
+| **Scale Prematurely Syndrome** | Rolling out systems to large user bases before establishing evaluations, rollbacks, and support structures. | Driven by market competition and executive pressure to rapidly demonstrate progress. | High incident rates, system outages, massive support ticket volumes, and rapid trust loss among users. | Scale incrementally; prove system stability in shadow and canary releases before expanding user access. |
+| **Determinism Delusion** | Treating probabilistic model completions as if they were predictable, static code paths. | Simplifies code; allows developers to write traditional software integrations without exception paths. | Frequent system crashes and validation failures when models return unexpected output formats or schemas. | Isolate models behind strict validation contracts; design robust fallbacks and degraded operational modes. |
+| **RAG Salvationism** | Assuming that adding dynamic retrieval (RAG) completely eliminates hallucination and security risks. | Avoids complex model fine-tuning; provides a simple mechanism to ground model outputs in enterprise data. | Models hallucinate over irrelevant search results or execute instructions injected into retrieved context. | Build evaluation layers to verify context relevance, semantic grounding, and data-instruction isolation. |
+| **Governance Theater** | Writing extensive legal and policy guidelines while lacking real-time runtime control enforcement. | Satisfies compliance audits on paper; avoids the technical work of building gateway filter systems. | Policy guidelines are bypassed by users or ignored by models; security breaches occur despite written policies. | Implement real-time policy evaluation and runtime gatekeeping at the API gateway layer. |
+| **Cost Blindness** | Designing complex agentic chains without tracking token volume, support costs, or review overhead. | Simplifies initial prototyping; assumes API tokens are too cheap to impact business viability. | Runaway operating costs, high cloud bills, and low ROI when human review and support burdens are counted. | Calculate the cost per successful outcome; track token and model execution costs for every user flow. |
+
+## **AI Engineering Maxims**
+
+These maxims define the professional operating code of AI engineering.
+
+| Maxim | Meaning |
+| :---- | :---- |
+| **The model is not the system.** | The system includes context, retrieval, schemas, tools, permissions, telemetry, humans, governance, operations, sourcing, and adoption. |
+| **Fluency is not truth.** | Polished prose is not evidence, correctness, authority, or safety. |
+| **Retrieval is not evidence unless verified.** | Retrieved context must be permissioned, current, authoritative, and claim-supporting. |
+| **A demo is not a deployment.** | Cooperative success proves possibility, not production reliability. |
+| **Human approval is not human judgment.** | Judgment requires evidence, time, authority, correction tools, and veto power. |
+| **Failure budget is not harm permission.** | A workflow that cannot tolerate error needs stronger gates or no AI. |
+| **Every model route is bounded.** | Routes are approved only for specific tasks, data classes, users, and risk tiers. |
+| **Every agent needs a stop condition.** | Unbounded loops become cost, latency, state, and safety failures. |
+| **Every tool action needs authorization and verification.** | The system must check permission before execution and confirm state after execution. |
+| **Every memory needs scope, provenance, and deletion.** | Persistent state must be permissioned, inspectable, and governed. |
+| **Every fallback must preserve safety properties.** | Degraded modes may reduce capability, not policy, privacy, or evidence requirements. |
+| **Every eval is a release contract.** | Prompt, schema, route, retrieval, tool, and policy changes require risk-appropriate evaluation. |
+| **Every production failure should teach the system.** | Failures should update evals, contracts, policies, runbooks, UI, or pattern cards. |
+| **No-use is an architectural decision.** | Deterministic software, manual workflow, or no-AI is often the correct answer. |
+| **The system should be more deterministic than the model.** | Variance belongs inside bounded cognitive work, not at state, permission, evidence, or action boundaries. |
+| **Inside the box, the model may dance; at the edges, it signs paperwork.** | Let models synthesize internally; enforce strict contracts at every system boundary. |
+
+## **Professional Practices of AI Engineers**
+
+AI engineering is a professional discipline. It requires repeatable habits, not heroic prompt tinkering.
+
+| Practice | Daily Behavior | Durable Artifact | Failure Prevented |
+| :---- | :---- | :---- | :---- |
+| **Write Assumptions Explicitly** | State task, data, user, route, risk, cost, and failure assumptions before building. | Assumption log / decision record. | Hidden demo assumptions. |
+| **Decompose Before Automating** | Split workflows into deterministic, probabilistic, human, and no-AI steps. | Workflow decomposition map. | Over-automation. |
+| **Build Evals Before Scaling** | Create task-specific tests before broad rollout. | Eval suite / golden set. | Demo-to-production collapse. |
+| **Test Messy and Hostile Conditions** | Include malformed input, missing data, conflicting sources, injection attempts, and edge cases. | Adversarial eval set. | Fragile prompt success. |
+| **Instrument What Matters, Minimize What Hurts** | Capture route, cost, validation, correction, and breach signals while redacting or referencing sensitive payloads. | Telemetry and evidence schema. | Blind operation or overcollection. |
+| **Use Deterministic Code Where Sufficient** | Prefer rules, SQL, forms, parsers, and APIs when exactness is required. | No-AI / deterministic design record. | RAG-as-database and model overreach. |
+| **Isolate Model Behavior Behind Contracts** | Validate inputs, outputs, tools, permissions, resources, routes, and memory. | Contract registry. | Probabilistic spillover. |
+| **Route by Task and Risk** | Match model route to task complexity, data class, latency, cost, and consequence. | Route manifest. | Weak model on strong task. |
+| **Preserve Human Authority Where Consequence Demands It** | Require human approval with evidence for high-impact decisions/actions. | Human review workflow. | Rubber-stamped harm. |
+| **Keep Rollback and Degraded Modes Ready** | Maintain rollback manifests, approved fallback routes, and manual recovery paths. | Runbook / deployment manifest. | Irrecoverable production failure. |
+| **Track Cost-to-Serve Continuously** | Measure cost per verified outcome, including model, retrieval, tools, infra, review, support, and failures. | Cost dashboard. | ROI fantasy and cost bombs. |
+| **Update Evals From Production Corrections** | Convert edits, overrides, incidents, and support failures into regression cases. | Eval update log. | Repeated production failure. |
+| **Treat Vendor Changes as System Changes** | Re-evaluate affected routes when providers change models, terms, limits, regions, or prices. | Vendor-change review / route eval. | Silent dependency drift. |
+| **Treat Adoption as Architecture** | Design training, support, incentives, and workflows as part of the system. | Adoption plan / support model. | Installed-but-unused AI. |
+| **Document No-Use Conditions** | State when the pattern must not be used. | Pattern card no-use section. | Pattern overreach. |
+| **Prefer Boring Recoverable Systems** | Choose designs that are observable, bounded, reversible, and understandable. | Reference architecture / runbook. | Dazzling fragile autonomy. |
+
+The professional AI engineer does not ask, “How impressive can this be?” first.
+
+They ask, “How does this fail, and what survives?”
+
+## **Capstone Cross-Canon Synthesis**
+
+AI-ENG-AK is the operating philosophy that binds the AI Engineering Systems Canon together. Each prior domain provides a specialized discipline. AK defines the mindset required to use those disciplines without being seduced by demos, benchmarks, or model fluency.
+
+| Canon Domain | Engineering Contribution | AK Mindset Commitment |
+| :---- | :---- | :---- |
+| **Prompt and Context Architecture** | Instruction hierarchy, context windows, memory, state, prompt configuration. | Treat prompts and context as versioned, bounded, testable system configuration. |
+| **Corpus Engineering** | Data provenance, metadata, document lifecycle, source authority. | Treat knowledge as governed infrastructure, not loose text dumped into a model. |
+| **Retrieval and Freshness** | Search, RAG, reranking, citation, source conflict, freshness. | Treat retrieved context as candidate evidence requiring verification. |
+| **Model Selection and Routing** | Model choice, capability profile, cost, route class, fallback. | Trust routes only inside evaluated task/data/risk boundaries. |
+| **Model Adaptation** | Fine-tuning, adapters, specialization, weight behavior. | Treat adaptation as a new system behavior requiring regression evidence. |
+| **Regression Control** | Evals, golden sets, shadow testing, release gates. | Treat every change as a hypothesis that must survive measurement. |
+| **Throughput and Serving** | Latency, batching, queues, streaming, model serving. | Treat performance as part of reliability and user trust. |
+| **Agentic Orchestration** | Planning, graph execution, multi-agent workflows. | Constrain autonomy with state machines, budgets, checkpoints, and human authority. |
+| **Tool Contracts and Action Verification** | Tools, APIs, idempotency, postconditions, source-of-record checks. | Never confuse generated action text with authorized completed action. |
+| **Multimodal and Realtime Systems** | Images, audio, video, speech, streaming interaction. | Treat non-text evidence and realtime behavior as special uncertainty surfaces. |
+| **UI Agents** | Browser/UI state, visual control, interface actions. | Give agents no UI authority without permission, verification, and rollback. |
+| **Production Pathologies** | Failure modes, retry storms, silent regressions, brittle chains. | Expect failure; design containment before incidents teach it violently. |
+| **Boundary Defense and Supply Chain** | Prompt injection, tenant isolation, SBOM/AI-BOM, artifact provenance. | Treat every model, tool, corpus, and vendor dependency as untrusted until bounded. |
+| **Resource Abuse** | Cost bombs, loops, denial-of-wallet, resource exhaustion. | Bound every loop, token budget, tool call, retry, and route. |
+| **UX Resilience and Trust** | Degraded modes, transparency, contestability, expectation management. | Make uncertainty, authority, fallback, and evidence visible to users. |
+| **Human Review** | Review queues, maker-checker, escalation, reviewer burden. | Human approval is meaningful only with evidence, time, veto, and accountability. |
+| **Telemetry, Evaluation, and Evidence** | Observability, eval suites, traces, proof artifacts. | Production is the primary teacher; evidence must be scoped, structured, and usable. |
+| **Operations and Governance** | Runbooks, incidents, policy, audit, accountability. | Governance must execute at runtime, not merely decorate documents. |
+| **Sustainability** | Energy, carbon, cost, routing, lifecycle impact. | Route by value, quality, cost, resource impact, and lifecycle—not model spectacle. |
+| **Product Architecture** | Use-case selection, workflow fit, value design, no-AI path. | Ask whether AI belongs before asking which model to use. |
+| **Adoption Systems** | Training, incentives, support, workflow redesign, skill preservation. | Adoption is architecture; humans are part of the system. |
+| **Sourcing Strategy** | Build/buy/open/vendor, data rights, exit, control plane. | Own or control the surfaces that define safety, value, evidence, and exit. |
+| **Contract Thinking** | Deterministic boundaries around probabilistic cores. | Every seam needs an owner, enforcer, validation method, and breach behavior. |
+| **Reference Architectures** | Failure-aware pattern cards and no-use conditions. | Reuse patterns only when their assumptions, controls, and degraded modes fit. |
+
+### **Canonical Integration**
+
+```text
+AI engineering is probabilistic capability
+inside deterministic accountability.
+
+Capability comes from models.
+Reliability comes from systems.
+Trust comes from evidence.
+Safety comes from boundaries.
+Value comes from workflow fit.
+Durability comes from iteration.
+```
+
+AK is the mindset that keeps all of those truths active at the same time.
+
+## **Final Canon Handoff Statement**
+
+The AI Engineering Systems Canon closes with a simple discipline:
+
+```text
+Do not believe the model.
+Believe the measured system.
+```
+
+AI engineering is not normal software engineering with a chat box bolted onto the side. It is the practice of placing probabilistic cognition inside deterministic accountability, then measuring, constraining, observing, correcting, governing, and operating it until production earns trust.
+
+The model may draft. The system must verify.
+
+The model may synthesize. The system must ground.
+
+The model may plan. The system must authorize.
+
+The model may propose action. The system must check permission, preserve state, verify postconditions, and recover from failure.
+
+The model may impress. The system must survive.
+
+Across these volumes, the canon has defined the layers required to make that possible: context architecture, corpus engineering, retrieval, freshness, model routing, serving, orchestration, tools, action verification, multimodal understanding, realtime interaction, UI agents, pathologies, boundary defense, supply-chain security, resilience, trust, human review, telemetry, evaluation, evidence, operations, governance, sustainability, product architecture, adoption, sourcing, contract thinking, and reference architectures.
+
+The final professional posture is unsentimental:
+
+```text
+Decompose before automating.
+Measure before trusting.
+Constrain before scaling.
+Observe before believing.
+Preserve human judgment where consequence demands it.
+Treat failure as instruction.
+Prefer boring recoverable systems over dazzling fragile ones.
+```
+
+Build systems that can say no.
+
+Build systems that can degrade safely.
+
+Build systems that can prove what happened.
+
+Build systems that can be corrected.
+
+Build systems whose users understand the boundary between assistance and authority.
+
+The future of AI engineering will not be won by whoever worships the largest model. It will be won by whoever builds the most disciplined systems around probabilistic capability.
+
+Inside the box, the model may dance.
+
+At the edges, it signs paperwork.
+
+---
