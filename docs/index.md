@@ -38,48 +38,57 @@ Use it as doctrine for AI agents tasked with designing, critiquing, or improving
 
 ### Part I — Foundations of AI Systems
 
-- [Volume 1 — The Informational/Epistemic Layer](./volume-01/)  
+[Volume 1 — The Informational/Epistemic Layer](./volume-01/)  
   *How models think, how meaning is steered, and how state becomes usable.*
 
-- [Volume 2 — Knowledge, Data, and Corpus Engineering](./volume-02/)  
+
+[Volume 2 — Knowledge, Data, and Corpus Engineering](./volume-02/)  
   *Where trustworthy external knowledge comes from, how it is shaped, and how it enters the system.*
 
-- [Volume 3 — Model Lifecycle and Adaptation](./volume-03/)  
+
+[Volume 3 — Model Lifecycle and Adaptation](./volume-03/)  
   *How models are selected, modified, evaluated, compressed, deployed, and retired.*
 
-- [Volume 4 — Runtime Architecture and Inference Mechanics](./volume-04/)  
+
+[Volume 4 — Runtime Architecture and Inference Mechanics](./volume-04/)  
   *How AI systems actually execute under physical, computational, and operational constraints.*
+
 
 ### Part II — Agentic and Multimodal Systems
 
-- [Volume 5 — Agentic Systems and Tool-Using Architectures](./volume-05/)  
+[Volume 5 — Agentic Systems and Tool-Using Architectures](./volume-05/)  
   *How static generators become actors, and how to keep them from becoming raccoons with API keys.*
 
-- [Volume 6 — Multimodal and Interface-Controlling Systems](./volume-06/)  
+
+[Volume 6 — Multimodal and Interface-Controlling Systems](./volume-06/)  
   *How AI engineering changes when the system reads, sees, hears, speaks, and acts through interfaces.*
+
 
 ### Part III — Failure, Security, and Resilience
 
-- [Volume 7 — Failure, Security, and Hostile Environments](./volume-07/)  
+[Volume 7 — Failure, Security, and Hostile Environments](./volume-07/)  
   *How AI systems break, leak, get attacked, or quietly become cursed.*
 
-- [Volume 8 — Resilience, Degraded Modes, and Human Trust](./volume-08/)  
+
+[Volume 8 — Resilience, Degraded Modes, and Human Trust](./volume-08/)  
   *How systems fail gracefully enough that users do not feel the machinery grinding underneath them.*
+
 
 ### Part IV — Evaluation, Operations, and Governance
 
-- [Volume 9 — Observability, Evaluation, and Verification](./volume-09/)  
+[Volume 9 — Observability, Evaluation, and Verification](./volume-09/)  
   *How to know whether the system is actually doing what it claims to do.*
 
-- [Volume 10 — Operations, Governance, and Lifecycle Management](./volume-10/)  
+
+[Volume 10 — Operations, Governance, and Lifecycle Management](./volume-10/)  
   *How AI systems are maintained as living infrastructure rather than one-time builds.*
 
 ### Part V — Product Doctrine and Engineering Method
 
-- [Volume 11 — Product, Business, and Organizational Architecture](./volume-11/)  
+[Volume 11 — Product, Business, and Organizational Architecture](./volume-11/)  
   *How to ensure the system matters, survives adoption, and creates value instead of expensive theater.*
 
-- [Volume 12 — Engineering Method and System Doctrine](./volume-12/)  
+[Volume 12 — Engineering Method and System Doctrine](./volume-12/)  
   *The cross-cutting principles that govern the entire canon.*
 
 ---
