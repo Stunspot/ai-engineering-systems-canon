@@ -1,4 +1,9 @@
 title: "Stunspot's Guide to AI Systems"
 description: "A comprehensive field manual for practical AI systems design."
-# theme: minima
 show_downloads: false
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default

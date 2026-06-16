@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+  <meta name="description" content="{{ site.description }}">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+</head>
+
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand-mark" href="{{ '/' | relative_url }}">
+        <span class="brand-kicker">STUNSPOT</span>
+        <span class="brand-title">Guide to AI Systems</span>
+      </a>
+
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="{{ '/canon-map.html' | relative_url }}">Canon Map</a>
+        <a href="{{ '/how-to-use-this-canon.html' | relative_url }}">How to Use</a>
+        <a href="https://github.com/Stunspot/stunspots-guide-to-ai-systems">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="content-panel">
+      {{ content }}
+    </main>
+
+    <footer class="site-footer">
+      <span>Stunspot’s Guide to AI Systems</span>
+      <span>The AI Engineering Systems Canon</span>
+    </footer>
+  </div>
+</body>
+</html>
