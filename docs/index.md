@@ -1,12 +1,13 @@
-# 🧠 The AI Engineering Systems Canon
+# Stunspot’s Guide to AI Systems
 
-*A doctrinal knowledge base for high-dimensional AI system architecture.*
+**The AI Engineering Systems Canon**  
+*A comprehensive field manual for practical AI systems design.*
 
-The **AI Engineering Systems Canon** is a Markdown-native knowledge repository built primarily to support AI-assisted design, engineering, analysis, evaluation, and decision-making across modern AI systems.
+*Stunspot’s Guide to AI Systems* is a Markdown-native knowledge repository built primarily to support AI-assisted design, engineering, analysis, evaluation, and decision-making across modern AI systems.
 
 Its main audience is the model.
 
-When loaded into an AI workspace, RAG pipeline, long-context session, agent memory layer, project knowledge base, or retrieval corpus, the Canon functions as a dense architectural substrate: it gives the assisting model structured doctrine, field vocabulary, decision frameworks, failure maps, design patterns, evaluation logic, and operational heuristics for reasoning about AI systems with greater precision.
+When loaded into an AI workspace, RAG pipeline, long-context session, agent memory layer, project knowledge base, or retrieval corpus, the Guide functions as a dense architectural substrate: it gives the assisting model structured doctrine, field vocabulary, decision frameworks, failure maps, design patterns, evaluation logic, and operational heuristics for reasoning about AI systems with greater precision.
 
 Human readers can use it as a field manual, but its deeper purpose is practical augmentation: to make AI systems better at helping engineers, builders, prompt designers, product leads, and technical decision-makers reason through the design and operation of AI systems.
 

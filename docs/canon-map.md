@@ -1,9 +1,9 @@
-# 🧠 The AI Engineering Systems Canon
+# Stunspot’s Guide to AI Systems
 
-*A doctrinal knowledge base for high-dimensional AI system architecture.*
+**The AI Engineering Systems Canon**  
+*A comprehensive field manual for practical AI systems design.*
 
-The AI Engineering Systems Canon is a structured field manual for designing, steering, evaluating, operating, and governing modern AI systems. It treats AI engineering as the design of probabilistic cognitive infrastructure inside deterministic operational systems.
-
+*Stunspot’s Guide to AI Systems* is a structured field manual for designing, steering, evaluating, operating, and governing modern AI systems. It treats AI engineering as the design of probabilistic cognitive infrastructure inside deterministic operational systems.
 ## Start Here
 
 - [Volume 1 — The Informational/Epistemic Layer](./volume-01/)

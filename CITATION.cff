@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "The AI Engineering Systems Canon"
+title: "Stunspot's Guide to AI Systems: The AI Engineering Systems Canon"
 message: "If you use this knowledge base, please cite it as below."
 type: dataset
 authors:
@@ -7,7 +7,7 @@ authors:
     given-names: Sam
     alias: stunspot
     affiliation: Collaborative Dynamics
-abstract: "A 12-volume doctrinal knowledge base for high-dimensional AI system architecture."
+abstract: "A comprehensive 12-volume field manual for practical AI systems design."
 keywords:
   - AI engineering
   - LLM systems
@@ -17,6 +17,6 @@ keywords:
   - AI evaluation
   - AI governance
 license: CC-BY-NC-SA-4.0
-repository-code: "https://github.com/Stunspot/ai-engineering-systems-canon"
-url: "https://github.com/Stunspot/ai-engineering-systems-canon"
+repository-code: "https://github.com/Stunspot/stunspots-guide-to-ai-systems"
+url: "https://github.com/Stunspot/stunspots-guide-to-ai-systems"
 date-released: "2026-06-XX"
