@@ -2,7 +2,7 @@
 
 *Stunspot’s Guide to AI Systems* is available in multiple packaging formats for different AI/RAG platforms.
 
-The canonical source reports live in the `/docs/` directory. The bundled packs live in `/knowledge-packs/`.
+The canonical source reports live in the [`/docs/`](https://github.com/Stunspot/stunspots-guide-to-ai-systems/tree/main/docs) directory. The bundled packs live in [`/knowledge-packs/`](https://github.com/Stunspot/stunspots-guide-to-ai-systems/tree/main/knowledge-packs).
 
 ## Recommended Default
 
@@ -12,42 +12,49 @@ It gives you five files: one per multi-volume canon part. That usually works bet
 
 ## Pack Types
 
-| Pack | Files | Best Use |
-|---|---:|---|
-| **By Volume** | 12 | Good retrieval boundaries with manageable upload count. |
-| **By Part** | 5 | Recommended default. Use when a platform limits the number of files you can upload. |
-| **Omnibus** | 1 | Use for archival, local search, local models, or platforms that handle large single-file knowledge sources well. |
-| **Source Reports** | 37 | Best for cloning the repo, precise indexing, citation, editing, and source navigation. |
+| Pack | Files | Best Use | Link |
+|---|---:|---|---|
+| **By Part** | 5 | Recommended default. Good broad coverage with low file count. | [Open By Part pack](https://github.com/Stunspot/stunspots-guide-to-ai-systems/tree/main/knowledge-packs/by-part) |
+| **By Volume** | 12 | Use when you want smaller files and cleaner retrieval boundaries. | [Open By Volume pack](https://github.com/Stunspot/stunspots-guide-to-ai-systems/tree/main/knowledge-packs/by-volume) |
+| **Omnibus** | 1 | Use for archival, local search, local models, or platforms that handle large single-file knowledge sources well. | [Open Omnibus](https://github.com/Stunspot/stunspots-guide-to-ai-systems/tree/main/knowledge-packs/omnibus) |
+| **Source Reports** | 37 | Best for cloning the repo, precise indexing, citation, editing, and source navigation. | [Open Canon Map](./canon-map.md) |
+
+## Direct Links
+
+- [By Part knowledge pack](https://github.com/Stunspot/stunspots-guide-to-ai-systems/tree/main/knowledge-packs/by-part)
+- [By Volume knowledge pack](https://github.com/Stunspot/stunspots-guide-to-ai-systems/tree/main/knowledge-packs/by-volume)
+- [Omnibus edition](https://github.com/Stunspot/stunspots-guide-to-ai-systems/tree/main/knowledge-packs/omnibus)
+- [Canonical source reports](./canon-map.md)
 
 ## Where to Find Them
 
 The bundled packs are in the repository:
 
-- `/knowledge-packs/by-volume/`
-- `/knowledge-packs/by-part/`
-- `/knowledge-packs/omnibus/`
+- [`/knowledge-packs/by-part/`](https://github.com/Stunspot/stunspots-guide-to-ai-systems/tree/main/knowledge-packs/by-part)
+- [`/knowledge-packs/by-volume/`](https://github.com/Stunspot/stunspots-guide-to-ai-systems/tree/main/knowledge-packs/by-volume)
+- [`/knowledge-packs/omnibus/`](https://github.com/Stunspot/stunspots-guide-to-ai-systems/tree/main/knowledge-packs/omnibus)
 
 The canonical source reports are in:
 
-- `/docs/volume-01/`
-- `/docs/volume-02/`
-- `/docs/volume-03/`
-- `/docs/volume-04/`
-- `/docs/volume-05/`
-- `/docs/volume-06/`
-- `/docs/volume-07/`
-- `/docs/volume-08/`
-- `/docs/volume-09/`
-- `/docs/volume-10/`
-- `/docs/volume-11/`
-- `/docs/volume-12/`
+- [`/docs/volume-01/`](./volume-01/)
+- [`/docs/volume-02/`](./volume-02/)
+- [`/docs/volume-03/`](./volume-03/)
+- [`/docs/volume-04/`](./volume-04/)
+- [`/docs/volume-05/`](./volume-05/)
+- [`/docs/volume-06/`](./volume-06/)
+- [`/docs/volume-07/`](./volume-07/)
+- [`/docs/volume-08/`](./volume-08/)
+- [`/docs/volume-09/`](./volume-09/)
+- [`/docs/volume-10/`](./volume-10/)
+- [`/docs/volume-11/`](./volume-11/)
+- [`/docs/volume-12/`](./volume-12/)
 
 ## How to Choose
 
-Use **By Volume** when you want the best general-purpose Project/RAG upload format.
+Use **By Part** when you want the best default Project/RAG upload format: five files, broad coverage, low upload friction.
 
-Use **By Part** when the platform complains about too many files.
+Use **By Volume** when you want smaller files, cleaner retrieval boundaries, or more selective loading.
 
 Use **Omnibus** when you want the entire canon as one searchable local file or archival artifact.
 
-Use **Source Reports** when you are cloning the repo, building a precise RAG index, or editing the canon.
+Use **Source Reports** when you are cloning the repo, building a precise RAG index, citing specific reports, or editing the canon.
