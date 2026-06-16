@@ -942,3 +942,19 @@ Security claims require signed manifests, SBOM/AI-BOM records, dependency locks,
 59. New MCP Security Flaws: Kubectl-mcp-server, Archon OS, and MarkItDown Vulnerabilities, accessed June 10, 2026, [https://www.ox.security/blog/new-mcp-security-flaws-kubectl-mcp-server-archon-os-and-markitdown-vulnerabilities/](https://www.ox.security/blog/new-mcp-security-flaws-kubectl-mcp-server-archon-os-and-markitdown-vulnerabilities/)
 
 ---
+
+## Attribution
+
+Part of **Stunspot’s Guide to AI Systems** — *The AI Engineering Systems Canon*.
+
+Created by **Sam “stunspot” Walker** / **Collaborative Dynamics**.
+
+Repository: https://github.com/Stunspot/stunspots-guide-to-ai-systems  
+Stunspot: https://stunspot.com  
+Collaborative Dynamics: https://www.collaborative-dynamics.com  
+Discord: https://discord.gg/stunspot  
+
+Licensed under **CC BY-NC-SA 4.0** unless otherwise stated.  
+Commercial use, resale, paid redistribution, inclusion in commercial training products, or incorporation into paid knowledge-base products requires prior written permission.
+
+[← Back to Canon Map](../canon-map.md)

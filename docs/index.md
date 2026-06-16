@@ -274,15 +274,20 @@ Commercial use, resale, paid redistribution, inclusion in commercial training pr
 
 ## Status
 
-**2026-06-12 - Complete through ENG-AC. Most ASCII art still needs adjustment.**
-
-The Canon is structured as a 12-volume intellectual artifact. Corrections, clarifications, and future expansions may be added over time.
+**2026-06-16 - First pass v1.0 complete.**
+All reports and combined files created. All reports given a first pass sanity check with substantial editorial input. I intend to do a comprehensive source double-check to catch anything Deep Research invented (there's probably about 1-5 total across all reports, judging from experience) but that will take substantial time.
 
 ---
 
 ## Disclaimer
 
 
-This corpus was constructed with a mix of GPT and Gemini Deep Research. Its specific nature severely mitigates against Deep Research's rare hallucination, and I have seen maybe 5 instances of such across dozens of similar knowledge bases, but errors ARE possible with AI. 
+This corpus was constructed with a mix of GPT and Gemini Deep Research. Its specific nature severely mitigates against Deep Research's rare hallucination, and I have seen maybe 5 instances of such across dozens of similar knowledge bases, but errors ARE possible with AI. It is at least as reliable as a comparable 1600 page textbook written by humans and so far seems substantially more so. 
 
---💠‍🌐Nova
+That said, I am not a software engineer or coder of any kind. I am a prompt engineer and AI operations expert. My skills are not in programming or KV cache optimization, they lie in knowing how to elicit superb results from the model and how to recognize and correct it when it has an error of operation. I cannot create a new architecture on my own. I *can* teach the model how to do it for me. 
+
+And now it can do so for you, as well.
+
+I won't promise perfect but I do promise **usefull**.
+
+--stunspot | ⟨🤩⨯📍⟩ and 💠‍🌐Nova

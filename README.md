@@ -168,10 +168,22 @@ Read:
 ├── README.md
 ├── LICENSE.md
 ├── CITATION.cff
+├── knowledge-packs/
+│   ├── by-volume/
+│   ├── by-part/
+│   └── omnibus/
 └── docs/
     ├── index.md
     ├── canon-map.md
+    ├── knowledge-packs.md
     ├── how-to-use-this-canon.md
+    ├── _config.yml
+    ├── _layouts/
+    │   └── default.html
+    ├── assets/
+    │   ├── brand/
+    │   └── css/
+    │       └── style.css
     ├── volume-01/
     ├── volume-02/
     ├── volume-03/
@@ -186,7 +198,13 @@ Read:
     └── volume-12/
 ```
 
+The `/docs/` directory contains the canonical source reports and GitHub Pages site.
+
+The `/knowledge-packs/` directory contains bundled upload formats for AI Projects, RAG systems, NotebookLM-style tools, and long-context workspaces.
+
 ---
+
+## Disclaimer
 
 This corpus was constructed with a mix of GPT and Gemini Deep Research. Its specific nature severely mitigates against Deep Research's rare hallucination, and I have seen maybe 5 instances of such across dozens of similar knowledge bases, but errors ARE possible with AI. It is at least as reliable as a comparable 1600 page textbook written by humans and so far seems substantially more so. 
 

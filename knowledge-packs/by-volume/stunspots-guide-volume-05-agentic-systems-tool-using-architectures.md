@@ -4096,3 +4096,20 @@ The user may be told only reconciled truth.
 ```
 
 ---
+
+## Attribution and License
+
+This knowledge pack is part of **Stunspot’s Guide to AI Systems** — *The AI Engineering Systems Canon*.
+
+Created by **Sam “stunspot” Walker** / **Collaborative Dynamics**.
+
+Repository: https://github.com/Stunspot/stunspots-guide-to-ai-systems  
+Stunspot: https://stunspot.com  
+Collaborative Dynamics: https://www.collaborative-dynamics.com  
+Discord: https://discord.gg/stunspot  
+Support: https://www.patreon.com/StunspotPrompting
+
+Licensed under **CC BY-NC-SA 4.0** unless otherwise stated.  
+Commercial use, resale, paid redistribution, inclusion in commercial training products, or incorporation into paid knowledge-base products requires prior written permission.
+
+[← Back to Knowledge Packs](../docs/knowledge-packs.md)
