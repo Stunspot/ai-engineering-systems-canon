@@ -290,4 +290,4 @@ And now it can do so for you, as well.
 
 I won't promise perfect but I do promise **usefull**.
 
---stunspot | ⟨🤩⨯📍⟩ and 💠‍🌐Nova
+--stunspot ⟨🤩⨯📍⟩ and 💠‍🌐Nova
