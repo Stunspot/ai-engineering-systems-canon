@@ -1,9 +1,9 @@
 # How to Use This Canon
 
-Stunspot’s Guide to AI Systems is designed to work in two ways:
+*Stunspot’s Guide to AI Systems* is designed to work in two ways:
 
-1. As a human-readable field manual for practical AI systems design.
-2. As model-readable reference material for AI Projects, RAG systems, long-context workspaces, and agentic design workflows.
+1. as a human-readable field manual for practical AI systems design;
+2. as model-readable reference material for AI Projects, RAG systems, long-context workspaces, and agentic design workflows.
 
 The canonical source reports live in `/docs/`.
 
@@ -18,12 +18,11 @@ Use the Guide in one of four ways:
 | Use Case | Best Format |
 |---|---|
 | Reading and browsing the canon | `/docs/` |
-| Uploading when file size is limited | `/knowledge-packs/by-volume/` |
 | Uploading to an AI Project or RAG workspace | `/knowledge-packs/by-part/` |
-| Local search, archival use, or full-corpus import | `/knowledge-packs/omnibus RAG workspace | `/knowledge-packs/by-volume/` |
-| Uploading when file count is limited | `/knowledge-packs/by/` |
+| Uploading when smaller files or cleaner retrieval boundaries are preferred | `/knowledge-packs/by-volume/` |
+| Local search, archival use, or full-corpus import | `/knowledge-packs/omnibus/` |
 
-Most users should start with the **By Volume** pack.
+Most users should start with the **By Part** pack. It gives broad coverage with low upload friction while avoiding both extremes: one giant file or dozens of separate reports.
 
 ---
 
@@ -34,9 +33,9 @@ For ChatGPT Projects, Claude Projects, NotebookLM-style tools, or other AI works
 Recommended order:
 
 1. Start with `/knowledge-packs/by-part/`.
-2. Upload only the volumes relevant to your task when possible.
-3. Use `/knowledge-packs/by-volume/` if the platform limits file size.
-4. Use `/knowledge-packs/omnibus/` only when the platform handles large files well.
+2. Upload only the parts relevant to your task when possible.
+3. Use `/knowledge-packs/by-volume/` when you want smaller files or more precise retrieval boundaries.
+4. Use `/knowledge-packs/omnibus/` only when the platform handles large single-file knowledge sources well.
 
 The goal is to give the model enough canon context to reason well without forcing the retrieval system to chew one giant undifferentiated brick.
 
@@ -108,21 +107,29 @@ Load more only when the task actually needs it.
 
 Use `/docs/` when cloning the repo, building a serious RAG index, citing specific reports, or editing the canon.
 
-### By Volume
-
-Use `/knowledge-packs/by-volume/` when the By Part files are too large for a limited RAG. It keeps the canon modular without requiring 37 separate files.
-
 ### By Part
 
-Use `/knowledge-packs/by-part/` when the platform limits file count or when you want broader coverage with fewer files. Suggested default.
+Use `/knowledge-packs/by-part/` as the recommended default for most AI Projects and RAG workspaces. It preserves major canon structure while keeping file count low.
+
+### By Volume
+
+Use `/knowledge-packs/by-volume/` when the By Part files are too large, when you want smaller upload units, or when cleaner retrieval boundaries matter more than file-count simplicity.
 
 ### Omnibus
 
 Use `/knowledge-packs/omnibus/` when you need the entire canon as one file for local search, archival use, or a platform that handles large single-file knowledge sources well.
 
-For most hosted RAG and Project systems, the omnibus is not the best default. 
+For most hosted RAG and Project systems, the omnibus is not the best default.
 
-Special Note: NotebookLM has a very powerful RAG/knowledge graph infrastructure and handles the omnibus file with ease. 
+Special note: NotebookLM has a powerful RAG/knowledge-graph infrastructure and can usually handle the omnibus file well.
+
+---
+
+## Suggested Instruction
+
+When loading the Guide into an AI system, give the model a clear usage frame:
+
+> Analyze, design, critique, or improve the requested AI system using *Stunspot’s Guide to AI Systems* as governing reference material, not decorative background reading. Retrieve and apply the Guide’s vocabulary, doctrine, design patterns, failure modes, interface logic, evaluation standards, and operational assumptions as the frame through which the system is understood. Do not merely summarize the Guide. Use it to improve the precision, realism, safety, and build-awareness of the work.
 
 ---
 
