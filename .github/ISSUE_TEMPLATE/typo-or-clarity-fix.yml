@@ -1,0 +1,42 @@
+name: Typo or clarity fix
+description: Report a typo, formatting problem, awkward passage, or small clarity issue.
+title: "Typo/clarity: "
+labels: ["copy", "clarity"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for small text repairs. Keep it specific and file-path grounded.
+  - type: input
+    id: file-path
+    attributes:
+      label: File path
+      description: Example: docs/volume-01/index.md
+      placeholder: path/to/file.md
+    validations:
+      required: true
+  - type: textarea
+    id: current-text
+    attributes:
+      label: Current text or location
+      description: Paste the sentence/heading, or describe the exact location.
+    validations:
+      required: true
+  - type: textarea
+    id: suggested-fix
+    attributes:
+      label: Suggested fix
+      description: Paste the replacement text or describe the correction.
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact
+      options:
+        - Typo only
+        - Clarity improvement
+        - Formatting/Markdown issue
+        - Model/RAG ingestion clarity issue
+    validations:
+      required: true
