@@ -1,0 +1,37 @@
+name: Broken link or file issue
+description: Report a broken link, missing file, wrong path, or repository navigation problem.
+title: "Broken link/file: "
+labels: ["links", "repo-structure"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for link rot, missing files, wrong generated paths, or navigation problems.
+  - type: input
+    id: source-file
+    attributes:
+      label: Source file containing the problem
+      placeholder: README.md or docs/canon-map.md
+    validations:
+      required: true
+  - type: input
+    id: broken-target
+    attributes:
+      label: Broken target or missing path
+      placeholder: knowledge-packs/by-part/example.md
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happened?
+      description: Describe the broken link, missing file, bad path, or unexpected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected target or correction
+      description: Provide the correct path or intended target if known.
+    validations:
+      required: false
