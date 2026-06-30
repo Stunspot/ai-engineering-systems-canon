@@ -31,6 +31,11 @@ Use it as reference material.
 Use it as RAG substrate.  
 Use it as project knowledge.  
 Use it as doctrine for AI agents tasked with designing, critiquing, or improving AI systems.
+
+Part of the Stunspot’s Guide to… Advanced Knowledge Base Library
+Browse the full library: 
+[Gateway Repo](https://github.com/Stunspot/stunspots-guides) · [stunspot.com](stunspot.com/#guides)
+
 ---
 
 ## Start Here
