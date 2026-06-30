@@ -13,7 +13,7 @@ abstract: >-
 type: software
 version: "1.0"
 date-released: "2026-06-16"
-license: CC-BY-NC-SA-4.0
+license: CC-BY-4.0
 url: "https://stunspot.github.io/stunspots-guide-to-ai-systems/"
 repository-code: "https://github.com/Stunspot/stunspots-guide-to-ai-systems"
 authors:
